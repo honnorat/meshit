@@ -19,9 +19,7 @@
 // in Linux, "PACKAGE_VERSION" is replaced 
 // in the configure/make phases, with the 
 // right version number
-#ifdef WIN32
 #define PACKAGE_VERSION "5.3"
-#endif
 
 
 #ifdef WIN32
