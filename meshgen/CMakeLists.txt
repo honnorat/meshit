@@ -2,32 +2,6 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 
 PROJECT( meshgen )
 
-SET(src_CSG
-#	csg/algprim.cpp
-#	csg/brick.cpp
-#	csg/bspline2d.cpp
-#	csg/csgeom.cpp
-#	csg/csgparser.cpp
-#	csg/csgpkg.cpp
-#	csg/curve2d.cpp
-#	csg/edgeflw.cpp
-#	csg/explicitcurve2d.cpp
-#	csg/extrusion.cpp
-#	csg/gencyl.cpp
-#	csg/genmesh.cpp
-#	csg/identify.cpp
-#	csg/manifold.cpp
-#	csg/meshsurf.cpp
-#	csg/polyhedra.cpp
-#	csg/revolution.cpp
-#	csg/singularref.cpp
-#	csg/solid.cpp
-#	csg/specpoin.cpp
-#	csg/spline3d.cpp
-#	csg/surface.cpp
-#	csg/triapprox.cpp
-#	csg/vscsg.cpp
-)
 SET(src_GENERAL
 	general/array.cpp
 	general/bitarray.cpp
@@ -47,9 +21,7 @@ SET(src_GENERAL
 SET(src_GEOM2D
 	geom2d/genmesh2d.cpp
 	geom2d/geom2dmesh.cpp
-	geom2d/geom2dpkg.cpp
 	geom2d/geometry2d.cpp
-	geom2d/vsgeom2d.cpp
 )
 SET(src_GPRIM
 	gprim/adtree.cpp
@@ -62,8 +34,6 @@ SET(src_GPRIM
 	gprim/transform3d.cpp
 )
 SET(src_INTERFACE
-#	interface/nginterface.cpp
-#	interface/nginterface_v2.cpp
 	interface/read_fnf_mesh.cpp
 	interface/readtetmesh.cpp
 	interface/readuser.cpp
@@ -109,7 +79,6 @@ SET(src_MESHING
 	meshing/improve3.cpp
 	meshing/localh.cpp
 	meshing/meshclass.cpp
-#	meshing/meshfunc2d.cpp
 	meshing/meshfunc.cpp
 	meshing/meshing2.cpp
 	meshing/meshing3.cpp
@@ -138,44 +107,12 @@ SET(src_MESHING
 	meshing/topology.cpp
 	meshing/triarls.cpp
 	meshing/validate.cpp
-#	meshing/zrefine.cpp
-)
-SET (src_OCC
-#	occ/occconstruction.cpp
-#	occ/occgenmesh.cpp
-#	occ/occgeom.cpp
-#	occ/occmeshsurf.cpp
-#	occ/occpkg.cpp
-#	occ/vsocc.cpp
-)
-SET(src_STLGEOM
-#	stlgeom/meshstlsurface.cpp
-#	stlgeom/stlgeomchart.cpp
-#	stlgeom/stlgeom.cpp
-#	stlgeom/stlgeommesh.cpp
-#	stlgeom/stlline.cpp
-#	stlgeom/stlpkg.cpp
-#	stlgeom/stltool.cpp
-#	stlgeom/stltopology.cpp
-#	stlgeom/vsstl.cpp
-)
-SET(src_VISUALIZATION
-#	visualization/importsolution.cpp
-#	visualization/meshdoc.cpp
-#	visualization/mvdraw.cpp
-#	visualization/vsfieldlines.cpp
-#	visualization/vsmesh.cpp
-#	visualization/vssolution.cpp
 )
 ADD_LIBRARY(meshgen STATIC
-	${src_CSG}
 	${src_GENERAL}
 	${src_GEOM2D}
 	${src_GPRIM}
 	${src_LINALG}
 	${src_MESHING}
-	${src_OCC}
-	${src_STLGEOM}
-	${src_VISUALIZATION}
 )
 TARGET_LINK_LIBRARIES(meshgen)
