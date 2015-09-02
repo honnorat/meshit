@@ -1,5 +1,8 @@
-#include <meshing.hpp>
-#include <geometry2d.hpp>
+//#include <meshing.hpp>
+//#include <geometry2d.hpp>
+
+#include "../meshing/bisect.hpp"
+#include "geometry2d.hpp"
 
 namespace netgen
 {
@@ -41,8 +44,8 @@ namespace netgen
     p2d = geometry.GetSplines().Get(ap1.edgenr) -> 
       GetPoint (((1-secpoint)*ap1.dist+secpoint*ap2.dist));
   
-    //  (*testout) << "refine 2d line, ap1.dist, ap2.dist = " << ap1.dist << ", " << ap2.dist << endl;
-    //  (*testout) << "p1, p2 = " << p1 << p2 << ", newp = " << p2d << endl;
+    //  std::cerr << "refine 2d line, ap1.dist, ap2.dist = " << ap1.dist << ", " << ap2.dist <<std::endl;
+    //  std::cerr << "p1, p2 = " << p1 << p2 << ", newp = " << p2d <<std::endl;
 
     newp = Point3d (p2d(0), p2d(1), 0);
     newgi.edgenr = ap1.edgenr;

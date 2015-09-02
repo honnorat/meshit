@@ -7,7 +7,11 @@
 /* Date:   01. Jun. 95                                                    */
 /**************************************************************************/
 
-#include <limits.h>
+#include <climits>
+#include <iostream>
+
+#include "array.hpp"
+#include "template.hpp"
 
 namespace netgen
 {
@@ -91,7 +95,7 @@ private:
 
 
 // print bitarray
-inline ostream & operator<< (ostream & s, const BitArray & a)
+inline std::ostream & operator<< (std::ostream & s, const BitArray & a)
 {
   for (int i = 1; i <= a.Size(); i++)
     {
@@ -211,7 +215,7 @@ private:
 
 
 template <int BASE>
-inline ostream & operator<< (ostream & s, const BitArrayChar<BASE> & a)
+inline std::ostream & operator<< (std::ostream & s, const BitArrayChar<BASE> & a)
 {
   for (int i = BASE; i < a.Size()+BASE; i++)
     {

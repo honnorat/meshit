@@ -276,7 +276,7 @@ void Partition_Spliter::Compute(const TopAbs_ShapeEnum Limit)
 
 #ifdef PART_PERF
     MESSAGE("+++ CompletPart3d()");
-    aCron.Show( cout );
+    aCron.Show( std::cout );
     aCron.Reset();
     aCron.Start();
 #endif
@@ -289,7 +289,7 @@ void Partition_Spliter::Compute(const TopAbs_ShapeEnum Limit)
 
 #ifdef PART_PERF
     MESSAGE("+++ FindToolsToReconstruct()");
-    aCron.Show( cout );
+    aCron.Show( std::cout );
     aCron.Reset();
     aCron.Start();
 #endif
@@ -325,7 +325,7 @@ void Partition_Spliter::Compute(const TopAbs_ShapeEnum Limit)
     
 #ifdef PART_PERF
     MESSAGE("+++ CompletPart2d()");
-    aCron.Show( cout );
+    aCron.Show( std::cout );
     aCron.Reset();
     aCron.Start();
 #endif
@@ -434,7 +434,7 @@ void Partition_Spliter::Compute(const TopAbs_ShapeEnum Limit)
     }
 #ifdef PART_PERF
     MESSAGE("+++ Cut Edges");
-    aCron.Show( cout );
+    aCron.Show( std::cout );
     aCron.Reset();
     aCron.Start();
 #endif
@@ -446,7 +446,7 @@ void Partition_Spliter::Compute(const TopAbs_ShapeEnum Limit)
     
 #ifdef PART_PERF
     MESSAGE("+++ MergeEqualEdges()");
-    aCron.Show( cout );
+    aCron.Show( std::cout );
     aCron.Reset();
     aCron.Start();
 #endif
@@ -491,7 +491,7 @@ void Partition_Spliter::Compute(const TopAbs_ShapeEnum Limit)
     myDoneStep = TopAbs_FACE;
 #ifdef PART_PERF
     MESSAGE("+++ MakeFaces()");
-    aCron.Show( cout );
+    aCron.Show( std::cout );
     aCron.Reset();
     aCron.Start();
 #endif
@@ -534,7 +534,7 @@ void Partition_Spliter::Compute(const TopAbs_ShapeEnum Limit)
   }
 #ifdef PART_PERF
     MESSAGE("+++ MakeShells()");
-    aCron.Show( cout );
+    aCron.Show( std::cout );
 #endif
 
   //-----------------------------------------------

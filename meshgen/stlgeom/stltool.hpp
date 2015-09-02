@@ -2,7 +2,11 @@
 #define FILE_STLTOOL
 
 
-//#include "gprim/gprim.hh"
+#include "../general/array.hpp"
+#include "../gprim/adtree.hpp"
+#include "../gprim/geom3d.hpp"
+
+#include "stltopology.hpp"
 
 /**************************************************************************/
 /* File:   stlgeom.hh                                                     */
@@ -11,28 +15,28 @@
 /* Date:   20. Nov. 99                                                    */
 /**************************************************************************/
 
-
+namespace netgen {
 
 // use one normal vector for whole chart
 extern int usechartnormal;
 extern int chartdebug;
 
 extern int geomsearchtreeon;
-extern int AddPointIfNotExists(Array<Point3d>& ap, const Point3d& p, double eps = 1e-8);
+int AddPointIfNotExists(Array<Point3d>& ap, const Point3d& p, double eps = 1e-8);
 //get distance from line lp1-lp2 to point p
-extern double GetDistFromLine(const Point<3>& lp1, const Point<3>& lp2, Point<3>& p);
-extern double GetDistFromInfiniteLine(const Point<3>& lp1, const Point<3>& lp2, const Point<3>& p);
+double GetDistFromLine(const Point<3>& lp1, const Point<3>& lp2, Point<3>& p);
+double GetDistFromInfiniteLine(const Point<3>& lp1, const Point<3>& lp2, const Point<3>& p);
 
 
-extern void FIOReadInt(istream& ios, int& i);
-extern void FIOWriteInt(ostream& ios, const int& i);
-extern void FIOReadDouble(istream& ios, double& i);
-extern void FIOWriteDouble(ostream& ios, const double& i);
-extern void FIOReadFloat(istream& ios, float& i);
-extern void FIOWriteFloat(ostream& ios, const float& i);
-extern void FIOReadString(istream& ios, char* str, int len);
-extern void FIOReadStringE(istream& ios, char* str, int len);
-extern void FIOWriteString(ostream& ios, char* str, int len);
+void FIOReadInt(std::istream& ios, int& i);
+void FIOWriteInt(std::ostream& ios, const int& i);
+void FIOReadDouble(std::istream& ios, double& i);
+void FIOWriteDouble(std::ostream& ios, const double& i);
+void FIOReadFloat(std::istream& ios, float& i);
+void FIOWriteFloat(std::ostream& ios, const float& i);
+void FIOReadString(std::istream& ios, char* str, int len);
+void FIOReadStringE(std::istream& ios, char* str, int len);
+void FIOWriteString(std::ostream& ios, char* str, int len);
 
 
 typedef Array <int> * ArrayINTPTR;
@@ -215,7 +219,7 @@ public:
   ///
   STLDoctorParams();
   ///
-  void Print (ostream & ost) const;
+  void Print (std::ostream & ost) const;
 };
 
 extern STLDoctorParams stldoctor;
@@ -264,7 +268,7 @@ public:
   ///
   STLParameters();
   ///
-  void Print (ostream & ost) const;
+  void Print (std::ostream & ost) const;
 };
 
 extern STLParameters stlparam;
@@ -282,6 +286,6 @@ void STLSurfaceOptimization (STLGeometry & geom,
 			     class MeshingParameters & mparam);
 
 
-
+}
 
 #endif

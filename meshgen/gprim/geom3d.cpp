@@ -1,17 +1,15 @@
 #include <algorithm>
-#include <mystdlib.h>
-
-#include <myadt.hpp>
-#include <gprim.hpp>
+#include <meshgen.hpp>
+#include "geom3d.hpp"
 
 namespace netgen
 {
-ostream & operator<<(ostream  & s, const Point3d & p)
+std::ostream & operator<<(std::ostream  & s, const Point3d & p)
   {
   return s << "(" << p.x[0] << ", " << p.x[1] << ", " << p.x[2] << ")";
   }
 
-ostream & operator<<(ostream  & s, const Vec3d & v)
+std::ostream & operator<<(std::ostream  & s, const Vec3d & v)
   {
   return s << "(" << v.x[0] << ", " << v.x[1] << ", " << v.x[2] << ")";
   }
@@ -290,7 +288,7 @@ void Box3d :: CreateNegMinMaxBox()
 }
 */
 
-void Box3d :: WriteData(ofstream& fout) const
+void Box3d :: WriteData(std::ofstream& fout) const
 {
   for(int i = 0; i < 3; i++)
     {
@@ -299,7 +297,7 @@ void Box3d :: WriteData(ofstream& fout) const
   fout << "\n";
 }
 
-void Box3d :: ReadData(ifstream& fin)
+void Box3d :: ReadData(std::ifstream& fin)
 {
   for(int i = 0; i < 3; i++)
     {
@@ -394,9 +392,9 @@ double Determinant (const Vec3d & col1,
 
 void Transpose (Vec3d & v1, Vec3d & v2, Vec3d & v3)
 {
-  Swap (v1.Y(), v2.X());
-  Swap (v1.Z(), v3.X());
-  Swap (v2.Z(), v3.Y());
+  std::swap (v1.Y(), v2.X());
+  std::swap (v1.Z(), v3.X());
+  std::swap (v2.Z(), v3.Y());
 }
 
 
@@ -440,10 +438,10 @@ int SolveLinearSystem (const Vec3d & col1, const Vec3d & col2,
 	{
 	  if(pivot != i)
 	    {
-	      swap(matrix[i][0],matrix[pivot][0]);
-	      swap(matrix[i][1],matrix[pivot][1]);
-	      swap(matrix[i][2],matrix[pivot][2]);
-	      swap(locrhs[i],locrhs[pivot]);
+	      std::swap(matrix[i][0],matrix[pivot][0]);
+	      std::swap(matrix[i][1],matrix[pivot][1]);
+	      std::swap(matrix[i][2],matrix[pivot][2]);
+	      std::swap(locrhs[i],locrhs[pivot]);
 	    }
 	  for(int j=i+1; j<3; j++)
 	    {
@@ -668,10 +666,10 @@ QuadraticFunction3d (const Point3d & p, const Vec3d & v)
   cyz = 2 * t1.Y() * t1.Z() + 2 * t2.Y() * t2.Z();
 
   /*
-  (*testout) << "c0 = " << c0
+  std::cerr << "c0 = " << c0
 	     << " clin = " << cx << " " << cy << " " << cz 
 	     << " cq = " << cxx << " " << cyy << " " << czz
-	     << cxy << " " << cyz << " " << cyz << endl;
+	     << cxy << " " << cyz << " " << cyz <<std::endl;
   */
 }
 

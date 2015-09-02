@@ -1,14 +1,9 @@
-#include <mystdlib.h>
-#include <myadt.hpp>
-
-#include <linalg.hpp>
-#include <gprim.hpp>
-
-#include <meshing.hpp>
-
-
+#include <meshgen.hpp>
 #include "stlgeom.hpp"
 
+#include "../general/ngexception.hpp"
+#include "../meshing/meshing3.hpp"
+#include "../meshing/global.hpp"
 
 namespace netgen
 {
@@ -31,11 +26,11 @@ static void STLFindEdges (STLGeometry & geom,
   PrintMessage(3,"Mesh Lines");
 
   /*
-  cout << geom.GetNLines() << " lines" << endl;
+  std::cout << geom.GetNLines() << " lines" <<std::endl;
   double totnp = 0;
   for (int i = 1; i <= geom.GetNLines(); i++)
     totnp += geom.GetLine(i)->NP();
-  cout << "avg np per line " << totnp/geom.GetNLines() << endl;
+  std::cout << "avg np per line " << totnp/geom.GetNLines() <<std::endl;
   */
 
   for (int i = 1; i <= geom.GetNLines(); i++)
@@ -63,7 +58,7 @@ static void STLFindEdges (STLGeometry & geom,
   for (int i = 1; i <= meshlines.Size(); i++)
     {
       STLLine* line = meshlines.Get(i);
-      (*testout) << "store line " << i << endl;
+      std::cerr << "store line " << i <<std::endl;
       for (int j = 1; j <= line->GetNS(); j++)
 	{
 	  int p1, p2;
@@ -72,7 +67,7 @@ static void STLFindEdges (STLGeometry & geom,
 	  int trig1, trig2, trig1b, trig2b;
 
 	  if (p1 == p2) 
-	    cout << "Add Segment, p1 == p2 == " << p1 << endl;
+	    std::cout << "Add Segment, p1 == p2 == " << p1 <<std::endl;
 
 	  // Test auf geschlossener Rand mit 2 Segmenten 
 	      
@@ -98,26 +93,26 @@ static void STLFindEdges (STLGeometry & geom,
 	  trig1b = line->GetLeftTrig(j+1);
 	  trig2b = line->GetRightTrig(j+1);
 	  
-	  (*testout) << "j = " << j << ", p1 = " << p1 << ", p2 = " << p2 << endl;
-	  (*testout) << "segm-trigs: "
+	  std::cerr << "j = " << j << ", p1 = " << p1 << ", p2 = " << p2 <<std::endl;
+	  std::cerr << "segm-trigs: "
 		   << "trig1 = " << trig1
 		   << ", trig1b = " << trig1b
 		   << ", trig2 = " << trig2
-		   << ", trig2b = " << trig2b << endl;
+		   << ", trig2b = " << trig2b <<std::endl;
 
 	  if (trig1 <= 0 || trig2 <= 0 || trig1b <= 0 || trig2b <= 0)
 	    {
-	      cout << "negative trigs, "
+	      std::cout << "negative trigs, "
 		   << ", trig1 = " << trig1
 		   << ", trig1b = " << trig1b
 		   << ", trig2 = " << trig2
-		   << ", trig2b = " << trig2b << endl;
+		   << ", trig2b = " << trig2b <<std::endl;
 	    }
 	  /*
-	  (*testout) << "   trigs p1: " << trig1 << " - " << trig2 << endl;
-	  (*testout) << "   trigs p2: " << trig1b << " - " << trig2b << endl;
-	  (*testout) << "   charts p1: " << geom.GetChartNr(trig1) << " - " << geom.GetChartNr(trig2) << endl;
-	  (*testout) << "   charts p2: " << geom.GetChartNr(trig1b) << " - " << geom.GetChartNr(trig2b) << endl;
+	  std::cerr << "   trigs p1: " << trig1 << " - " << trig2 <<std::endl;
+	  std::cerr << "   trigs p2: " << trig1b << " - " << trig2b <<std::endl;
+	  std::cerr << "   charts p1: " << geom.GetChartNr(trig1) << " - " << geom.GetChartNr(trig2) <<std::endl;
+	  std::cerr << "   charts p2: " << geom.GetChartNr(trig1b) << " - " << geom.GetChartNr(trig2b) <<std::endl;
 	  */
 	  Point3d hp, hp2;
 	  Segment seg;
@@ -131,11 +126,11 @@ static void STLFindEdges (STLGeometry & geom,
 	  seg.epgeominfo[1].edgenr = i;
 	  seg.epgeominfo[1].dist = line->GetDist(j+1);
 	  /*
-	  (*testout) << "seg = " 
+	  std::cerr << "seg = " 
 		     << "edgenr " << seg.epgeominfo[0].edgenr
 		     << " dist " << seg.epgeominfo[0].dist
 		     << " edgenr " << seg.epgeominfo[1].edgenr
-		     << " dist " << seg.epgeominfo[1].dist << endl;
+		     << " dist " << seg.epgeominfo[1].dist <<std::endl;
 	  */
 	  
 	  seg.geominfo[0].trignum = trig1;
@@ -146,30 +141,30 @@ static void STLFindEdges (STLGeometry & geom,
 	  hp = hp2 = mesh.Point (seg[0]);
 	  seg.geominfo[0].trignum = geom.Project (hp);
 
-	  (*testout) << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[0].trignum << endl;
+	  std::cerr << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[0].trignum <<std::endl;
 	  if (Dist (hp, hp2) > 1e-5 || seg.geominfo[0].trignum == 0) 
 	    {
-	      (*testout) << "PROBLEM" << endl;
+	      std::cerr << "PROBLEM" <<std::endl;
 	    }
 
 	  geom.SelectChartOfTriangle (trig1b);
 	  hp = hp2 = mesh.Point (seg[1]);
 	  seg.geominfo[1].trignum = geom.Project (hp);
 
-	  (*testout) << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[1].trignum << endl;
+	  std::cerr << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[1].trignum <<std::endl;
 	  if (Dist (hp, hp2) > 1e-5 || seg.geominfo[1].trignum == 0) 
 	    {
-	      (*testout) << "PROBLEM" << endl;
+	      std::cerr << "PROBLEM" <<std::endl;
 	    }
 	  */
 
 
 	  if (Dist (mesh.Point(seg[0]), mesh.Point(seg[1])) < 1e-10)
 	    {
-	      (*testout) << "ERROR: Line segment of length 0" << endl;
-	      (*testout) << "pi1, 2 = " << seg[0] << ", " << seg[1] << endl;
-	      (*testout) << "p1, 2 = " << mesh.Point(seg[0])
-			 << ", " << mesh.Point(seg[1]) << endl;
+	      std::cerr << "ERROR: Line segment of length 0" <<std::endl;
+	      std::cerr << "pi1, 2 = " << seg[0] << ", " << seg[1] <<std::endl;
+	      std::cerr << "p1, 2 = " << mesh.Point(seg[0])
+			 << ", " << mesh.Point(seg[1]) <<std::endl;
 	      throw NgException ("Line segment of length 0");
 	    }
 	  
@@ -187,11 +182,11 @@ static void STLFindEdges (STLGeometry & geom,
 	  seg2.epgeominfo[1].edgenr = i;
 	  seg2.epgeominfo[1].dist = line->GetDist(j);
 	  /*
-	  (*testout) << "seg = " 
+	  std::cerr << "seg = " 
 		     << "edgenr " << seg2.epgeominfo[0].edgenr
 		     << " dist " << seg2.epgeominfo[0].dist
 		     << " edgenr " << seg2.epgeominfo[1].edgenr
-		     << " dist " << seg2.epgeominfo[1].dist << endl;
+		     << " dist " << seg2.epgeominfo[1].dist <<std::endl;
 	  */
 	  
 	  seg2.geominfo[0].trignum = trig2b;
@@ -202,20 +197,20 @@ static void STLFindEdges (STLGeometry & geom,
 	  hp = hp2 = mesh.Point (seg[0]);
 	  seg2.geominfo[0].trignum = geom.Project (hp);
 
-	  (*testout) << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[0].trignum << endl;
+	  std::cerr << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[0].trignum <<std::endl;
 	  if (Dist (hp, hp2) > 1e-5 || seg2.geominfo[0].trignum == 0) 
 	    {
-	      (*testout) << "Get GeomInfo PROBLEM" << endl;
+	      std::cerr << "Get GeomInfo PROBLEM" <<std::endl;
 	    }
 
 
 	  geom.SelectChartOfTriangle (trig2b);
 	  hp = hp2 = mesh.Point (seg[1]);
 	  seg2.geominfo[1].trignum = geom.Project (hp);
-	  (*testout) << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[1].trignum << endl;
+	  std::cerr << "hp = " << hp2 << ", hp proj = " << hp << ", trignum = " << seg.geominfo[1].trignum <<std::endl;
 	  if (Dist (hp, hp2) > 1e-5 || seg2.geominfo[1].trignum == 0) 
 	    {
-	      (*testout) << "Get GeomInfo PROBLEM" << endl;
+	      std::cerr << "Get GeomInfo PROBLEM" <<std::endl;
 	    }
 	  */	  
 
@@ -249,7 +244,7 @@ int STLSurfaceMeshing (STLGeometry & geom, class Mesh & mesh)
     {
       const Segment & seg = mesh.LineSegment (i);
       if (seg.geominfo[0].trignum <= 0 || seg.geominfo[1].trignum <= 0)
-	(*testout) << "Problem with segment " << i << ": " << seg << endl;
+	std::cerr << "Problem with segment " << i << ": " << seg <<std::endl;
     }
 
 
@@ -529,12 +524,6 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 			 class Mesh & mesh,
 			 int retrynr)
 {
-  static int timer1 = NgProfiler::CreateTimer ("STL surface meshing1");
-  static int timer1a = NgProfiler::CreateTimer ("STL surface meshing1a");
-  static int timer1b = NgProfiler::CreateTimer ("STL surface meshing1b");
-  static int timer1c = NgProfiler::CreateTimer ("STL surface meshing1c");
-  static int timer1d = NgProfiler::CreateTimer ("STL surface meshing1d");
-
   double h = mparam.maxh;
 
   mesh.FindOpenSegments();
@@ -591,20 +580,15 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
     {
       const Segment & seg = mesh.GetOpenSegment (i);
       if (seg.si < 1 || seg.si > mesh.GetNFD())
-	cerr << "segment index " << seg.si << " out of range [1, " << mesh.GetNFD() << "]" << endl;
+	std::cerr << "segment index " << seg.si << " out of range [1, " << mesh.GetNFD() << "]" <<std::endl;
       opensegments.Add (seg.si, i);
     }
   
 
   for (int fnr = 1; fnr <= mesh.GetNFD(); fnr++)
     {
-      if (fnr == 100) NgProfiler::ClearTimers();
       if (!opensegsperface[fnr]) continue;
       if (multithread.terminate) return;
-
-      NgProfiler::StartTimer (timer1);
-      NgProfiler::StartTimer (timer1a);
-
 
       PrintMessage(5,"Meshing surface ", fnr, "/", mesh.GetNFD());
       MeshingSTLSurface meshing (geom, mparam);
@@ -620,24 +604,6 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 	  icompress.Append(imeshsp[i]);
 	}
 
-      NgProfiler::StopTimer (timer1a);
-      NgProfiler::StartTimer (timer1b);
-
-
-
-      /*
-      for (int i = 1; i <= mesh.GetNOpenSegments(); i++)
-	{
-	  const Segment & seg = mesh.GetOpenSegment (i);
-	  if (seg.si == fnr)
-	    for (int j = 0; j < 2; j++)
-	      if (compress[seg[j]] == 0)
-		{
-		  compress[seg[j]] = ++cntused;
-		  icompress.Append(seg[j]);
-		}
-	}
-      */
       FlatArray<int> segs = opensegments[fnr];
       for (int hi = 0; hi < segs.Size(); hi++)
 	{
@@ -650,10 +616,6 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 		icompress.Append(seg[j]);
 	      }
 	}
-
-      NgProfiler::StopTimer (timer1b);
-      NgProfiler::StartTimer (timer1c);
-
 
       for (int hi = 0; hi < icompress.Size(); hi++)
 	{
@@ -693,20 +655,6 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 	    meshing.AddPoint (mesh[pi], pi);
 	}
 
-      NgProfiler::StopTimer (timer1c);
-      NgProfiler::StartTimer (timer1d);
-
-      /*
-        for (int i = 1; i <= mesh.GetNOpenSegments(); i++)
-	  {
-	    const Segment & seg = mesh.GetOpenSegment (i);
-	    if (seg.si == fnr)
-	      meshing.AddBoundaryElement (compress[seg[0]], compress[seg[1]], 
-					  seg.geominfo[0], seg.geominfo[1]);
-	  }
-      */
-
-
       // FlatArray<int> segs = opensegments[fnr];
       for (int hi = 0; hi < segs.Size(); hi++)
 	{
@@ -718,10 +666,6 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 
 
 
-      NgProfiler::StopTimer (timer1d);
-
-      NgProfiler::StopTimer (timer1);
-      
       PrintMessage(3,"start meshing, trialcnt = ", retrynr);
       
       meshing.GenerateMesh (mesh, mparam, h, fnr);  
@@ -761,7 +705,7 @@ void STLSurfaceOptimization (STLGeometry & geom,
 	if (multithread.terminate)
 	  break;
 
-	//(*testout) << "optimize, before, step = " << meshparam.optimize2d[j-1] << mesh.Point (3679) << endl;
+	//std::cerr << "optimize, before, step = " << meshparam.optimize2d[j-1] << mesh.Point (3679) <<std::endl;
 
 	mesh.CalcSurfacesOfNode();
 	switch (meshparam.optimize2d[j-1])
@@ -787,7 +731,7 @@ void STLSurfaceOptimization (STLGeometry & geom,
 	      break;
 	    }
 	  }
-	//(*testout) << "optimize, after, step = " << meshparam.optimize2d[j-1] << mesh.Point (3679) << endl;
+	//std::cerr << "optimize, after, step = " << meshparam.optimize2d[j-1] << mesh.Point (3679) <<std::endl;
       }
 
   geom.surfaceoptimized = 1;
@@ -831,7 +775,7 @@ void MeshingSTLSurface :: TransformToPlain (const Point3d & locpoint, const Mult
   trigs[gi.GetNPGI()] = 0;
 
   //  int trig = gi.trignum;
-  //   (*testout) << "locpoint = " << locpoint;
+  //   std::cerr << "locpoint = " << locpoint;
 
   Point<2> hp2d;
   geom.ToPlane (locpoint, trigs, hp2d, h, zone, 1);
@@ -839,9 +783,9 @@ void MeshingSTLSurface :: TransformToPlain (const Point3d & locpoint, const Mult
 
   //  geom.ToPlane (locpoint, NULL, plainpoint, h, zone, 1);
   /*
-  (*testout) << " plainpoint = " << plainpoint
+  std::cerr << " plainpoint = " << plainpoint
 	     << " h = " << h 
-	     << endl;
+	     <<std::endl;
   */
 }
 
@@ -900,7 +844,7 @@ ChooseChartPointGeomInfo (const MultiPointGeomInfo & mpgi,
   /*
   for (i = 0; i < mpgi.cnt; i++)
     {
-      //      (*testout) << "d" << endl;
+      //      std::cerr << "d" <<std::endl;
       if (geom.TrigIsInOC (mpgi.mgi[i].trignum, geom.meshchart))
 	{
 	  pgi = mpgi.mgi[i];
@@ -989,7 +933,7 @@ MeshOptimizeSTLSurface :: MeshOptimizeSTLSurface (STLGeometry & ageom)
 void MeshOptimizeSTLSurface :: SelectSurfaceOfPoint (const Point<3> & p,
 						     const PointGeomInfo & gi)
 {
-  //  (*testout) << "sel char: " << gi.trignum << endl;
+  //  std::cerr << "sel char: " << gi.trignum <<std::endl;
   
   geom.SelectChartOfTriangle (gi.trignum);
   //  geom.SelectChartOfPoint (p);
@@ -1065,8 +1009,8 @@ PointBetween  (const Point<3> & p1, const Point<3> & p2, double secpoint,
   newp = p1+secpoint*(p2-p1);
 
   /*
-  (*testout) << "surf-between: p1 = " << p1 << ", p2 = " << p2
-	     << ", gi = " << gi1 << " - " << gi2 << endl;
+  std::cerr << "surf-between: p1 = " << p1 << ", p2 = " << p2
+	     << ", gi = " << gi1 << " - " << gi2 <<std::endl;
   */
 
   if (gi1.trignum > 0)
@@ -1110,12 +1054,12 @@ PointBetween  (const Point<3> & p1, const Point<3> & p2, double secpoint,
     }
   else
     {
-      //      (*testout) << "WARNING: PointBetween got geominfo = 0" << endl;
+      //      std::cerr << "WARNING: PointBetween got geominfo = 0" <<std::endl;
       newp =  p1+secpoint*(p2-p1);
       newgi.trignum = 0;
     }
      
-  //  (*testout) << "newp = " << newp << ", ngi = " << newgi << endl;
+  //  std::cerr << "newp = " << newp << ", ngi = " << newgi <<std::endl;
 }
 
 void RefinementSTLGeometry ::
@@ -1126,8 +1070,8 @@ PointBetween (const Point<3> & p1, const Point<3> & p2, double secpoint,
 	      Point<3> & newp, EdgePointGeomInfo & newgi) const
 {
   /*
-  (*testout) << "edge-between: p1 = " << p1 << ", p2 = " << p2
-	     << ", gi1,2 = " << gi1 << ", " << gi2 << endl;
+  std::cerr << "edge-between: p1 = " << p1 << ", p2 = " << p2
+	     << ", gi1,2 = " << gi1 << ", " << gi2 <<std::endl;
   */
   /*
   newp = Center (p1, p2);
@@ -1139,19 +1083,19 @@ PointBetween (const Point<3> & p1, const Point<3> & p2, double secpoint,
   newgi.edgenr = gi1.edgenr;
 
   /*
-  (*testout) << "p1 = " << p1 << ", p2 = " << p2 << endl;
-  (*testout) << "refedge: " << gi1.edgenr
-	     << " d1 = " << gi1.dist << ", d2 = " << gi2.dist << endl;
+  std::cerr << "p1 = " << p1 << ", p2 = " << p2 <<std::endl;
+  std::cerr << "refedge: " << gi1.edgenr
+	     << " d1 = " << gi1.dist << ", d2 = " << gi2.dist <<std::endl;
   */
   newp = geom.GetLine (gi1.edgenr)->GetPointInDist (geom.GetPoints(), newgi.dist, hi);
 
-  //  (*testout) << "newp = " << newp << endl;
+  //  std::cerr << "newp = " << newp <<std::endl;
 }
 
 
 void RefinementSTLGeometry :: ProjectToSurface (Point<3> & p, int surfi) const
 {
-  cout << "RefinementSTLGeometry :: ProjectToSurface not implemented!" << endl;
+  std::cout << "RefinementSTLGeometry :: ProjectToSurface not implemented!" <<std::endl;
 };
 
 
@@ -1161,7 +1105,7 @@ void RefinementSTLGeometry :: ProjectToSurface (Point<3> & p, int surfi,
   ((STLGeometry&)geom).SelectChartOfTriangle (gi.trignum);
   gi.trignum = geom.Project (p);
   //  if (!gi.trignum) 
-  //    cout << "projectSTL failed" << endl;
+  //    std::cout << "projectSTL failed" <<std::endl;
 };
 
  

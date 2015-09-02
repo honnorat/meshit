@@ -134,7 +134,7 @@ void WriteFEAPFormat (const Mesh & mesh,
   //outfile << "1.0" << "\n";
   //}
   outfile << "\n";
-  //outfile << endl;
+  //outfile <<std::endl;
   }
   */
 
@@ -143,9 +143,9 @@ void WriteFEAPFormat (const Mesh & mesh,
   // BEGIN CONTACT OUTPUT
   /*      
 	  int masterindex, slaveindex;
-	  cout << "Master Surface index = ";
+	  std::cout << "Master Surface index = ";
 	  cin >> masterindex;
-	  cout << "Slave Surface index  = ";
+	  std::cout << "Slave Surface index  = ";
 	  cin >> slaveindex;
 
 
@@ -215,6 +215,6 @@ void WriteFEAPFormat (const Mesh & mesh,
       
   // END CONTACT OUTPUT
 
-  cout << "done" << endl;
+  std::cout << "done" <<std::endl;
 }
 }

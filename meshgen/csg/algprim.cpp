@@ -1,9 +1,11 @@
-#include <mystdlib.h>
+//#include <mystdlib.h>
+//
+//
+//#include <linalg.hpp>
+//#include <csg.hpp>
 
-
-#include <linalg.hpp>
-#include <csg.hpp>
-
+#include "algprim.hpp"
+//#include "meshsurf.hpp"
 
 namespace netgen
 {
@@ -36,12 +38,12 @@ namespace netgen
   }
 
 
-  void QuadraticSurface :: Read (istream & ist)
+  void QuadraticSurface :: Read (std::istream & ist)
   {
     ist >> cxx >> cyy >> czz >> cxy >> cxz >> cyz >> cx >> cy >> cz >> c1;
   }
 
-  void QuadraticSurface :: Print (ostream & ost) const
+  void QuadraticSurface :: Print (std::ostream & ost) const
   {
     ost << cxx << "  " << cyy << "  " << czz << "  "
         << cxy << "  " << cxz << "  " << cyz << "  "
@@ -50,7 +52,7 @@ namespace netgen
   }
 
 
-  void QuadraticSurface :: PrintCoeff (ostream & ost) const
+  void QuadraticSurface :: PrintCoeff (std::ostream & ost) const
   {
     ost << " cxx = " << cxx
         << " cyy = " << cyy
@@ -61,7 +63,7 @@ namespace netgen
         << " cx = " << cx
         << " cy = " << cy
         << " cz = " << cz
-        << " c1 = " << c1 << endl;
+        << " c1 = " << c1 << std::endl;
   }
 
 
@@ -182,16 +184,15 @@ namespace netgen
   }
 
 
-  void Plane :: ToPlane (const Point<3> & p3d, 
+  void Plane :: ToPlane (const Point3d & p3d, 
                          Point<2> & pplane, 
                          double h, int & zone) const
   {
     Vec<3> p1p;
 
     p1p = p3d - p1;
-    p1p /= h;
-    pplane(0) = p1p * ex;
-    pplane(1) = p1p * ey;
+    pplane(0) = p1p * ex / h;
+    pplane(1) = p1p * ey / h;
     zone = 0;
   }
 
@@ -201,7 +202,7 @@ namespace netgen
   }
 
 
-  void Plane :: Project (Point<3> & p3d) const
+  void Plane :: Project (Point3d & p3d) const
   {
     double val = Plane::CalcFunctionValue (p3d);
     p3d -= val * n;
@@ -650,7 +651,7 @@ namespace netgen
     double r = box.Diam() / 2;
     double maxval = grad * r + ggrad * r * r;
 
-    //  (*testout) << "box = " << box << ", val = " << val << ", maxval = " << maxval << endl;
+    //  std::cerr << "box = " << box << ", val = " << val << ", maxval = " << maxval <<std::endl;
 
     if (val > maxval) return IS_OUTSIDE;
     if (val < -maxval) return IS_INSIDE;
@@ -962,8 +963,8 @@ namespace netgen
     pplane(1) = (p1pp * e2y) / h;
 
     /*
-      (*testout) << "p1 = " << p1 << ",  p2 = " << p2 << endl;
-      (*testout) << "p = " << p << ",  pp = " << pp << ",  pplane = " << pplane << endl;
+      std::cerr << "p1 = " << p1 << ",  p2 = " << p2 <<std::endl;
+      std::cerr << "p = " << p << ",  pp = " << pp << ",  pplane = " << pplane <<std::endl;
     */
 
     /*
@@ -1195,7 +1196,7 @@ namespace netgen
     double r = box.Diam() / 2;
     double maxval = grad * r + ggrad * r * r;
 
-    // (*testout) << "box = " << box << ", val = " << val << ", maxval = " << maxval << endl;
+    // std::cerr << "box = " << box << ", val = " << val << ", maxval = " << maxval <<std::endl;
 
     if (val > maxval) return IS_OUTSIDE;
     if (val < -maxval) return IS_INSIDE;
@@ -1281,7 +1282,7 @@ namespace netgen
     rb = arb;
 
     CalcData();
-    // Print (cout);
+    // Print (std::cout);
   }
 
 
@@ -1373,9 +1374,9 @@ namespace netgen
     c1 /= maxr;
 
 
-    // (*testout) << "t0vec = " << t0vec << " t0 = " << t0 << endl;
-    // (*testout) << "t1vec = " << t1vec << " t1 = " << t1 << endl;
-    // PrintCoeff (*testout);
+    // std::cerr << "t0vec = " << t0vec << " t0 = " << t0 <<std::endl;
+    // std::cerr << "t1vec = " << t1vec << " t1 = " << t1 <<std::endl;
+    // PrintCoeff std::cerr;
   }
 
 
@@ -1398,7 +1399,7 @@ namespace netgen
 
   double Cone :: HesseNorm () const
   {
-    // cout << "2/minr = " << 2/minr << ",  cxx .. = " << cxx << ", " << cyy << ", " << czz << endl;
+    // std::cout << "2/minr = " << 2/minr << ",  cxx .. = " << cxx << ", " << cyy << ", " << czz <<std::endl;
     return 2 / minr;
   }
 
@@ -1416,13 +1417,13 @@ namespace netgen
          +2 * g(1)*g(2)*cyz - 2 * cxx * (g(1)*g(1)+g(2)*g(2))
          +2 * g(0)*g(2)*cxz - 2 * cyy * (g(0)*g(0)+g(2)*g(2))) / (3*lam*lam*lam);
 
-    // cout << "type = " << typeid(*this).name() << ", baseh = " << bloch << ", meancurv = " << meancurv << endl;
+    // std::cout << "type = " << typeid(*this).name() << ", baseh = " << bloch << ", meancurv = " << meancurv <<std::endl;
     // return bloch;
   
     meancurv = fabs (meancurv);
     if (meancurv < 1e-20) meancurv = 1e-20;
 
-    // cout << "c = " << c << ", safety = " << mparam.curvaturesafety << endl;
+    // std::cout << "c = " << c << ", safety = " << mparam.curvaturesafety <<std::endl;
     double hcurv = 1.0/(4*meancurv*mparam.curvaturesafety);
 
     return min2 (hmax, hcurv);
@@ -1710,16 +1711,16 @@ namespace netgen
 	}
   } 
   
-  void Torus :: Read (istream & ist)
+  void Torus :: Read (std::istream & ist)
   {
     ist >> c(0) >> c(1) >> c(2) >> n(0) >> n(1) >> n(2) >> R >> r;
   }
 
-  void Torus :: Print (ostream & ost) const
+  void Torus :: Print (std::ostream & ost) const
   {
     ost << c(0) << "  " << c(1) << "  " << c(2) << "  "
         << n(0) << "  " << n(1) << "  " << n(2) << "  "
-        << R    << "  " << r    << endl;
+        << R    << "  " << r    << std::endl;
   }
 
 

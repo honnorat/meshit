@@ -5,11 +5,10 @@
 */
 
 
-#include <mystdlib.h>
-#include <linalg.hpp>
-#include <gprim.hpp>
+#include <meshgen.hpp>
 #include "splinegeometry.hpp"
- 
+#include "../general/ngexception.hpp" 
+
 namespace netgen
 {
 

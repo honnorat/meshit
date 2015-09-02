@@ -6,7 +6,12 @@
 /* Author: Joachim Schoeberl                                               */
 /* Date:   01. Oct. 94                                                     */
 /* *************************************************************************/
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <cstring>
 
+namespace netgen {
 
 class FlatVector
 {
@@ -72,7 +77,7 @@ public:
     double sum = 0;
     for (int i = 0; i < s; i++)
       sum += data[i] * data[i];
-    return sqrt (sum);
+    return sqrt(sum);
   }
 
   friend double operator* (const FlatVector & v1, const FlatVector & v2);
@@ -147,14 +152,14 @@ inline double operator* (const FlatVector & v1, const FlatVector & v2)
 
 
 
-inline ostream & operator<< (ostream & ost, const FlatVector & v)
+inline std::ostream & operator<< (std::ostream & ost, const FlatVector & v)
 {
   for (int i = 0; i < v.Size(); i++)
-    ost << " " << setw(7) << v[i];
+    ost << " " << std::setw(7) << v[i];
   return ost;
 }
 
-
+}
 
 #endif
 

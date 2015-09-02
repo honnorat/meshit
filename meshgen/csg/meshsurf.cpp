@@ -119,10 +119,10 @@ RefinementSurfaces :: RefinementSurfaces (const CSGeometry & ageometry)
   : Refinement(), geometry(ageometry)
 {
   if(geometry.GetNSurf() == 0)
-    *testout << endl 
-             << "WARNING: Intializing 2D refinement with 0-surface geometry" << endl
-             << "==========================================================" << endl
-             << endl << endl;
+    std::cerr <<std::endl 
+             << "WARNING: Intializing 2D refinement with 0-surface geometry" <<std::endl
+             << "==========================================================" <<std::endl
+             <<std::endl <<std::endl;
 }
 
 RefinementSurfaces :: ~RefinementSurfaces ()
@@ -156,21 +156,21 @@ PointBetween (const Point<3> & p1, const Point<3> & p2, double secpoint,
 	      Point<3> & newp, EdgePointGeomInfo & newgi) const
 {
   Point<3> hnewp = p1+secpoint*(p2-p1);
-  //(*testout) << "hnewp " << hnewp << " s1 " << surfi1 << " s2 " << surfi2 << endl;
+  //std::cerr << "hnewp " << hnewp << " s1 " << surfi1 << " s2 " << surfi2 <<std::endl;
   if (surfi1 != -1 && surfi2 != -1 && surfi1 != surfi2)
     {
       netgen::ProjectToEdge (geometry.GetSurface(surfi1), 
                              geometry.GetSurface(surfi2), 
                              hnewp);
-      // (*testout) << "Pointbetween, newp = " << hnewp << endl
-      // << ", err = " << sqrt (sqr (hnewp(0))+ sqr(hnewp(1)) + sqr (hnewp(2))) - 1 << endl;
+      // std::cerr << "Pointbetween, newp = " << hnewp <<std::endl
+      // << ", err = " << sqrt (sqr (hnewp(0))+ sqr(hnewp(1)) + sqr (hnewp(2))) - 1 <<std::endl;
       newgi.edgenr = 1;
-      //(*testout) << "hnewp (a1) " << hnewp << endl;
+      //std::cerr << "hnewp (a1) " << hnewp <<std::endl;
     }
   else if (surfi1 != -1)
     {
       geometry.GetSurface (surfi1) -> Project (hnewp);
-      //(*testout) << "hnewp (a2) " << hnewp << endl;
+      //std::cerr << "hnewp (a2) " << hnewp <<std::endl;
     }
 
   newp = hnewp;

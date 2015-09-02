@@ -1,5 +1,8 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <climits>
+#include <fstream>
+#include <sstream>
+#include <meshgen.hpp>
+#include "meshing3.hpp"
 
 #ifdef WIN32
 #define COMMASIGN ':'
@@ -13,7 +16,7 @@ namespace netgen
 
 extern const char * tetrules[];
 
-void LoadVMatrixLine (istream & ist, DenseMatrix & m, int line)
+void LoadVMatrixLine (std::istream & ist, DenseMatrix & m, int line)
 {
   char ch;
   int pnum;
@@ -79,7 +82,7 @@ int vnetrule :: NeighbourTrianglePoint (const threeint & t1, const threeint & t2
 
 }
 
-void vnetrule :: LoadRule (istream & ist)
+void vnetrule :: LoadRule (std::istream & ist)
 {
   char buf[256];
   char ch, ok;
@@ -110,7 +113,7 @@ void vnetrule :: LoadRule (istream & ist)
   delete [] name;
   name = new char[strlen (buf) + 1];
   strcpy (name, buf);
-  //  (*mycout) << "Rule " << name << " found." << endl;
+  //  (*mystd::cout) << "Rule " << name << " found." <<std::endl;
 
   do
     {
@@ -398,7 +401,7 @@ void vnetrule :: LoadRule (istream & ist)
 		    hm3.Elem(i + 3 * (nfp-1), j) = sum;
 		  }
 
-	      //	    (*testout) << "freepoint: " << p << endl;
+	      //	    std::cerr << "freepoint: " << p <<std::endl;
 
 	      while (ch != ';')
 		ist >> ch; 
@@ -458,7 +461,7 @@ void vnetrule :: LoadRule (istream & ist)
 		    hm3.Elem(i + 3 * (nfp-1), j) = sum;
 		  }
 
-	      //	    (*testout) << "freepoint: " << p << endl;
+	      //	    std::cerr << "freepoint: " << p <<std::endl;
 
 	      while (ch != ';')
 		ist >> ch; 
@@ -592,9 +595,9 @@ void vnetrule :: LoadRule (istream & ist)
   while (!ist.eof() && strcmp (buf, "endrule") != 0);
 
 
-  //  (*testout) << endl;
-  //  (*testout) << Name() << endl;
-  //  (*testout) << "no1 = " << GetNO() << endl;
+  //  std::cerr <<std::endl;
+  //  std::cerr << Name() <<std::endl;
+  //  std::cerr << "no1 = " << GetNO() <<std::endl;
 
   oldutonewu.SetSize (3 * (points.Size() - noldp), 3 * noldp);
   oldutonewu = 0;
@@ -645,9 +648,9 @@ void vnetrule :: LoadRule (istream & ist)
       }
   
   /*
-  (*testout) << "Rule " << Name() << endl;
-  (*testout) << "oldutofreezone = " << (*oldutofreezone) << endl;
-  (*testout) << "oldutofreezonelimit = " << (*oldutofreezonelimit) << endl;
+  std::cerr << "Rule " << Name() <<std::endl;
+  std::cerr << "oldutofreezone = " << (*oldutofreezone) <<std::endl;
+  std::cerr << "oldutofreezonelimit = " << (*oldutofreezonelimit) <<std::endl;
   */
 
   freezonepi.SetSize (freezone.Size());
@@ -697,10 +700,10 @@ void vnetrule :: LoadRule (istream & ist)
     }
 
 
-  //  testout << "Freezone: " << endl;
+  //  testout << "Freezone: " <<std::endl;
 
   //  for (i = 1; i <= freezone.Size(); i++)
-  //    (*testout) << "freepoint: " << freezone.Get(i) << endl;
+  //    std::cerr << "freepoint: " << freezone.Get(i) <<std::endl;
   Vector vp(points.Size()), vfp(freezone.Size());
 
 
@@ -715,7 +718,7 @@ void vnetrule :: LoadRule (istream & ist)
 	    freezone.Elem(j).X(i) = vfp(j-1);
 	}
       //      for (i = 1; i <= freezone.Size(); i++)
-      //	(*testout) << "freepoint: " << freezone.Get(i) << endl;
+      //	std::cerr << "freepoint: " << freezone.Get(i) <<std::endl;
     }
 
 
@@ -741,13 +744,13 @@ void vnetrule :: LoadRule (istream & ist)
 		v2 = freezone.Get(i2) - freezone.Get(i1);
 		n = Cross (v1, v2);
 		n /= n.Length();
-		//		(*testout) << "i1,2,3 = " << i1 << ", " << i2 << ", " << i3 << endl;
-		//		(*testout) << "v1 = " << v1 << " v2 = " << v2 << " n = " << n << endl;
+		//		std::cerr << "i1,2,3 = " << i1 << ", " << i2 << ", " << i3 <<std::endl;
+		//		std::cerr << "v1 = " << v1 << " v2 = " << v2 << " n = " << n <<std::endl;
 		ok = 1;
 		for (ii = 1; ii <= freeset.Size(); ii++)
 		  {
 		    i = freeset.Get(ii);
-		    //		    (*testout) << "i = " << i << endl;
+		    //		    std::cerr << "i = " << i <<std::endl;
 		    if (i != i1 && i != i2 && i != i3)
 		      if ( (freezone.Get(i) - freezone.Get(i1)) * n < 0 ) ok = 0;
 		  }
@@ -852,7 +855,7 @@ void vnetrule :: LoadRule (istream & ist)
 	  fnearness.Elem(i) += pnearness.Get(GetPointNr (i, j));
       }
 
-    // (*testout) << "rule " << name << ", pnear = " << pnearness << endl;
+    // std::cerr << "rule " << name << ", pnear = " << pnearness <<std::endl;
   }
 
   
@@ -893,8 +896,8 @@ void vnetrule :: LoadRule (istream & ist)
 			  ed.I(1) = f1.I(f11);
 			  ed.I(2) = f1.I(f12);
 			}
-	      //	      (*testout) << "ed = " << ed.I(1) << "-" << ed.I(2) << endl;
-	      //	      (*testout) << "ind = " << ind << " ed = " << ed << endl;
+	      //	      std::cerr << "ed = " << ed.I(1) << "-" << ed.I(2) <<std::endl;
+	      //	      std::cerr << "ind = " << ind << " ed = " << ed <<std::endl;
 	      for (int eli = 1; eli <= GetNOldF(); eli++)
 		{
 		  if (GetNP(eli) == 4)
@@ -905,9 +908,9 @@ void vnetrule :: LoadRule (istream & ist)
 			      GetPointNrMod (eli, elr+2) == ed.I(2))
 			    {
 			      /*
-			      (*testout) << "ed is diagonal of rectangle" << endl;
-			      (*testout) << "ed = " << ed.I(1) << "-" << ed.I(2) << endl;
-			      (*testout) << "ind = " << ind << endl;
+			      std::cerr << "ed is diagonal of rectangle" <<std::endl;
+			      std::cerr << "ed = " << ed.I(1) << "-" << ed.I(2) <<std::endl;
+			      std::cerr << "ind = " << ind <<std::endl;
 			      */
 			      ind = 0;
 			    }
@@ -919,11 +922,11 @@ void vnetrule :: LoadRule (istream & ist)
 	      if (ind)
 		{
 		  /*
-		  (*testout) << "new edge from face " << k 
+		  std::cerr << "new edge from face " << k 
 			     << " = (" << freesetfaces.Get(k).i1 
 			     << ", " << freesetfaces.Get(k).i2 
 			     << ", " << freesetfaces.Get(k).i3
-			     << "), point " << ind << endl;
+			     << "), point " << ind <<std::endl;
 			     */
 		  freesetedges.Append(twoint(k,ind));
 		}
@@ -940,13 +943,13 @@ void vnetrule :: LoadRule (istream & ist)
 void Meshing3 :: LoadRules (const char * filename, const char ** prules)
 {
   char buf[256];
-  istream * ist;
+  std::istream * ist;
   char *tr1 = NULL;
 
   if (filename)
     {
       PrintMessage (3, "rule-filename = ", filename);
-      ist = new ifstream (filename);
+      ist = new std::ifstream (filename);
     }
   else 
     {
@@ -982,12 +985,12 @@ void Meshing3 :: LoadRules (const char * filename, const char ** prules)
 	  tr1[i] = ':';
 #endif
 
-      ist = new istringstream (tr1);
+      ist = new std::istringstream (tr1);
     }
   
   if (!ist->good())
     {
-      cerr << "Rule description file " << filename << " not found" << endl;
+      std::cerr << "Rule description file " << filename << " not found" <<std::endl;
       delete ist;
       exit (1);
     }

@@ -58,12 +58,12 @@ void QuadraticCurve2d :: Project (Point<2> & p) const
       x -= f * gradx / grad2;
       y -= f * grady / grad2;
 
-      //      (*mycout) << "x = " << x << " y = " << y << " f = " << f << endl;
+      //      (*mystd::cout) << "x = " << x << " y = " << y << " f = " << f <<std::endl;
       its++;
     }
   while (fabs (f) > 1e-8 && its < 20);
   if (its >= 20)
-    cerr << "QuadraticCurve2d::Project:  many iterations, f = " << f << endl;
+    std::cerr << "QuadraticCurve2d::Project:  many iterations, f = " << f <<std::endl;
   p(0) = x;
   p(1) = y;
 }

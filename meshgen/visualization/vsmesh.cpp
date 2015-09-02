@@ -589,7 +589,7 @@ namespace netgen
 	glPopAttrib ();
 	//      	glDisable (GL_COLOR_MATERIAL);
       }
-    glEndList ();
+    gstd::endlist ();
 
 
 
@@ -673,10 +673,10 @@ namespace netgen
 
             if (hascp)
 	      {
-		(*testout) << "draw el " << i << " : ";
+		std::cerr << "draw el " << i << " : ";
 		for (int j = 1; j <= el.GetNP(); j++)
-                  (*testout) << el.PNum(j) << " ";
-		(*testout) << endl;
+                  std::cerr << el.PNum(j) << " ";
+		std::cerr <<std::endl;
 
 		if (el.GetNP() == 4)
 		  {
@@ -744,7 +744,7 @@ namespace netgen
             if (!drawel)
 	      continue;
 
-            // cout << int (el.GetType()) << " " << flush;
+            // std::cout << int (el.GetType()) << " " << flush;
             switch (el.GetType())
 	      {
 	      case TRIG:
@@ -827,7 +827,7 @@ namespace netgen
 	glLoadName (0);
 
       }
-    glEndList ();
+    gstd::endlist ();
 
 
     if (1)
@@ -869,7 +869,7 @@ namespace netgen
 	      }
 	  }
 
-	glEndList ();
+	gstd::endlist ();
       }
 
     if (lock)
@@ -910,7 +910,7 @@ namespace netgen
 	for ( int dest = 1; dest < ntasks; dest++ )
 	  glCallList (par_filledlists[dest]);
 
-	glEndList();
+	gstd::endlist();
 
 	filledtimestamp = NextTimeStamp();
 	return;
@@ -1262,7 +1262,7 @@ namespace netgen
     
 
     glLoadName (0);
-    glEndList ();
+    gstd::endlist ();
 
 
 #ifdef PARALLELGL
@@ -1301,7 +1301,7 @@ namespace netgen
 	for ( int dest = 1; dest < ntasks; dest++ )
 	  glCallList (par_linelists[dest]);
 
-	glEndList();
+	gstd::endlist();
 
 
 	linetimestamp = NextTimeStamp();
@@ -1329,7 +1329,7 @@ namespace netgen
     linelist = glGenLists (1);
     glNewList (linelist, GL_COMPILE);
 
-    // cout << "linelist = " << linelist << endl;
+    // std::cout << "linelist = " << linelist <<std::endl;
 
     glLineWidth (1.0f);
 
@@ -1541,7 +1541,7 @@ namespace netgen
 	  }
       }
 
-    glEndList ();
+    gstd::endlist ();
 
 
 #ifdef PARALLELGL
@@ -1626,9 +1626,9 @@ namespace netgen
 		mesh->GetCurvedElements().CalcSegmentTransformation ((double) j/hoplotn, i-1, x);
 		glVertex3d (x(0), x(1), x(2));
 		/*
-		  cout << "x = " << x(0) << ", " << x(1) << ", " << x(2)
+		  std::cout << "x = " << x(0) << ", " << x(1) << ", " << x(2)
 		  << ", norm = 1+" << sqrt(x(0)*x(0)+x(1)*x(1))-1
-		  << ", phi = " << atan2(x(1), x(0))/M_PI << endl;
+		  << ", phi = " << atan2(x(1), x(0))/M_PI <<std::endl;
 		*/
 	      }
 
@@ -1658,7 +1658,7 @@ namespace netgen
     glDisable (GL_COLOR_MATERIAL);
     glEnable (GL_LIGHTING);
 
-    glEndList();
+    gstd::endlist();
   }
 
 
@@ -2070,7 +2070,7 @@ namespace netgen
 	  }
       }
 
-    glEndList ();
+    gstd::endlist ();
   }
 
 
@@ -2237,7 +2237,7 @@ namespace netgen
 		  x1 = facepoint[0] - facepoint[2];
 		  x0.Normalize();
 		  x1.Normalize();
-		  if (trig == 1) swap (x0,x1);
+		  if (trig == 1) std::swap (x0,x1);
 
 		  Point<3> xr[3];
 		  Point<3> xg;
@@ -2315,7 +2315,7 @@ namespace netgen
 		  x0.Normalize();
 		  x1.Normalize();
 
-		  swap (x0,x1);
+		  std::swap (x0,x1);
 
 		  Point<3> xr[4];
 		  Point<3> xg;
@@ -2398,7 +2398,7 @@ namespace netgen
 	      }
 	  }
       }
-    glEndList ();
+    gstd::endlist ();
   }
 
 
@@ -2601,7 +2601,7 @@ namespace netgen
 	      }
 	  }
       }
-    glEndList ();
+    gstd::endlist ();
   }
 
 
@@ -2953,7 +2953,7 @@ namespace netgen
 	      }
 	  }
       }
-    glEndList ();
+    gstd::endlist ();
   }
 
   void VisualSceneMesh :: BuildBadelList()
@@ -3072,7 +3072,7 @@ namespace netgen
 	    glEnd();
 	  }
       }
-    glEndList ();
+    gstd::endlist ();
   }
 
 
@@ -3100,14 +3100,14 @@ namespace netgen
     int hy = viewport[3]-py;
 
     GLfloat pz;
-    // cout << "x, y = " << px << ", " << hy << endl;
+    // std::cout << "x, y = " << px << ", " << hy <<std::endl;
     glReadPixels (px, hy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &pz);
-    cout << "pz = " << pz << endl;    
+    std::cout << "pz = " << pz <<std::endl;    
     gluUnProject(px, hy, pz, transformationmat, projection, viewport,
                  &result[0], &result[1], &result[2]);
 
     if (pz < 1.0)
-      cout << "point : " << result[0] << ", " << result[1] << ", " << result[2] << endl;
+      std::cout << "point : " << result[0] << ", " << result[1] << ", " << result[2] <<std::endl;
     
 
     if (user_me_handler && pz < 1.0)
@@ -3212,7 +3212,7 @@ namespace netgen
 
       hits = glRenderMode (GL_RENDER);
 
-      //  cout << "hits = " << hits << endl;
+      //  std::cout << "hits = " << hits <<std::endl;
 
       int minname = 0;
       GLuint mindepth = 0;
@@ -3245,12 +3245,12 @@ namespace netgen
       const Element2d & sel = mesh->SurfaceElement(minname);
 
 
-      cout << "select element " << minname
-      << " on face " << sel.GetIndex() << endl;
-      cout << "Nodes: ";
+      std::cout << "select element " << minname
+      << " on face " << sel.GetIndex() <<std::endl;
+      std::cout << "Nodes: ";
       for (i = 1; i <= sel.GetNP(); i++)
-      cout << sel.PNum(i) << " ";
-      cout << endl;
+      std::cout << sel.PNum(i) << " ";
+      std::cout <<std::endl;
 
       selelement = minname;
       selface = mesh->SurfaceElement(minname).GetIndex();
@@ -3258,9 +3258,9 @@ namespace netgen
       locpi = (locpi % sel.GetNP()) + 1;
       selpoint2 = selpoint;
       selpoint = sel.PNum(locpi);
-      cout << "selected point " << selpoint
+      std::cout << "selected point " << selpoint
       << ", pos = " << mesh->Point (selpoint)
-      << endl;
+      <<std::endl;
 
       for (i = 1; i <= mesh->GetNSeg(); i++)
       {
@@ -3269,7 +3269,7 @@ namespace netgen
       seg[1] == selpoint && seg[0] == selpoint2)
       {
       seledge = seg.edgenr;
-      cout << "seledge = " << seledge << endl;
+      std::cout << "seledge = " << seledge <<std::endl;
       }
       }
 
@@ -3386,7 +3386,7 @@ namespace netgen
 
 
     hits = glRenderMode (GL_RENDER);
-    //cout << "hits = " << hits << endl;
+    //std::cout << "hits = " << hits <<std::endl;
 
     int minname = 0;
     GLuint mindepth = 0;
@@ -3405,8 +3405,8 @@ namespace netgen
 	int curname = selbuf[4*i+3];
 	GLuint curdepth = selbuf[4*i+1];
 	/*
-	  cout << selbuf[4*i] << " " << selbuf[4*i+1] << " "
-	  << selbuf[4*i+2] << " " << selbuf[4*i+3] << endl;
+	  std::cout << selbuf[4*i] << " " << selbuf[4*i+1] << " "
+	  << selbuf[4*i+2] << " " << selbuf[4*i+3] <<std::endl;
 	*/
 	if (curname && (curdepth > clipdepth) &&
             (curdepth < mindepth || !minname))
@@ -3422,12 +3422,12 @@ namespace netgen
 	const Element2d & sel = mesh->SurfaceElement(minname);
 
 
-	cout << "select element " << minname
-	     << " on face " << sel.GetIndex() << endl;
-	cout << "Nodes: ";
+	std::cout << "select element " << minname
+	     << " on face " << sel.GetIndex() <<std::endl;
+	std::cout << "Nodes: ";
 	for (i = 1; i <= sel.GetNP(); i++)
-	  cout << sel.PNum(i) << " ";
-	cout << endl;
+	  std::cout << sel.PNum(i) << " ";
+	std::cout <<std::endl;
 
 	selelement = minname;
 	selface = mesh->SurfaceElement(minname).GetIndex();
@@ -3435,9 +3435,9 @@ namespace netgen
 	locpi = (locpi % sel.GetNP()) + 1;
 	selpoint2 = selpoint;
 	selpoint = sel.PNum(locpi);
-	cout << "selected point " << selpoint
+	std::cout << "selected point " << selpoint
 	     << ", pos = " << mesh->Point (selpoint)
-	     << endl;
+	     <<std::endl;
 
 	for (i = 1; i <= mesh->GetNSeg(); i++)
 	  {
@@ -3446,7 +3446,7 @@ namespace netgen
 		 (seg[1] == selpoint && seg[0] == selpoint2) )
 	      {
 		seledge = seg.edgenr;
-		cout << "seledge = " << seledge << endl;
+		std::cout << "seledge = " << seledge <<std::endl;
 	      }
 	  }
       }

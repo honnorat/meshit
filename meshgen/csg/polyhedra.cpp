@@ -74,7 +74,7 @@ INSOLID_TYPE Polyhedra :: BoxInSolid (const BoxSphere<3> & box) const
     {
       if (!faces[i].bbox.Intersect (box))
 	continue;
-      //(*testout) << "face " << i << endl;
+      //std::cerr << "face " << i <<std::endl;
 
       const Point<3> & p1 = points[faces[i].pnums[0]];
       const Point<3> & p2 = points[faces[i].pnums[1]];
@@ -83,15 +83,15 @@ INSOLID_TYPE Polyhedra :: BoxInSolid (const BoxSphere<3> & box) const
       if (fabs (faces[i].nn * (p1 - box.Center())) > box.Diam()/2)
 	continue;
 
-      //(*testout) << "still in loop" << endl;
+      //std::cerr << "still in loop" <<std::endl;
 
       double dist2 = MinDistTP2 (p1, p2, p3, box.Center());
-      //(*testout) << "p1 " << p1 << " p2 " << p2 << " p3 " << p3 << endl
-      //		 << " box.Center " << box.Center() << " box.Diam() " << box.Diam() << endl
-      //	 << " dist2 " << dist2 << " sqr(box.Diam()/2) " << sqr(box.Diam()/2) << endl;
+      //std::cerr << "p1 " << p1 << " p2 " << p2 << " p3 " << p3 <<std::endl
+      //		 << " box.Center " << box.Center() << " box.Diam() " << box.Diam() <<std::endl
+      //	 << " dist2 " << dist2 << " sqr(box.Diam()/2) " << sqr(box.Diam()/2) <<std::endl;
       if (dist2 < sqr (box.Diam()/2))
 	{
-	  //(*testout) << "DOES_INTERSECT" << endl;
+	  //std::cerr << "DOES_INTERSECT" <<std::endl;
 	  return DOES_INTERSECT;
 	}
     };
@@ -103,14 +103,14 @@ INSOLID_TYPE Polyhedra :: BoxInSolid (const BoxSphere<3> & box) const
 INSOLID_TYPE Polyhedra :: PointInSolid (const Point<3> & p,
 					double eps) const
 {
-  //(*testout) << "PointInSolid p " << p << " eps " << eps << endl;
-  //(*testout) << "bbox " << poly_bbox << endl;
+  //std::cerr << "PointInSolid p " << p << " eps " << eps <<std::endl;
+  //std::cerr << "bbox " << poly_bbox <<std::endl;
 
   if((p(0) > poly_bbox.PMax()(0) + eps) || (p(0) < poly_bbox.PMin()(0) - eps) ||
      (p(1) > poly_bbox.PMax()(1) + eps) || (p(1) < poly_bbox.PMin()(1) - eps) ||
      (p(2) > poly_bbox.PMax()(2) + eps) || (p(2) < poly_bbox.PMin()(2) - eps))
     {
-      //(*testout) << "returning IS_OUTSIDE" << endl;
+      //std::cerr << "returning IS_OUTSIDE" <<std::endl;
       return IS_OUTSIDE;
     }
 
@@ -137,7 +137,7 @@ INSOLID_TYPE Polyhedra :: PointInSolid (const Point<3> & p,
 	  double lam2 = (faces[i].w2 * v0);
 	  if (lam1 >= -eps_base1 && lam2 >= -eps_base1 && lam1+lam2 <= 1+eps_base1)
 	    {
-	      //(*testout) << "returning DOES_INTERSECT" << endl;
+	      //std::cerr << "returning DOES_INTERSECT" <<std::endl;
 	      return DOES_INTERSECT;
 	    }
 	}
@@ -157,7 +157,7 @@ INSOLID_TYPE Polyhedra :: PointInSolid (const Point<3> & p,
 
     }
 
-  //(*testout) << " cnt = " << cnt%2 << endl;
+  //std::cerr << " cnt = " << cnt%2 <<std::endl;
   return (cnt % 2) ? IS_INSIDE : IS_OUTSIDE;
 }
 
@@ -206,7 +206,7 @@ INSOLID_TYPE Polyhedra :: VecInSolid (const Point<3> & p,
 
 
       if (fabs (lam3) > eps) continue;
-      //(*testout) << "lam3 <= eps" << endl;
+      //std::cerr << "lam3 <= eps" <<std::endl;
 
       double lam1 = (faces[i].w1 * v0);
       double lam2 = (faces[i].w2 * v0);
@@ -223,8 +223,8 @@ INSOLID_TYPE Polyhedra :: VecInSolid (const Point<3> & p,
 	}
     }
   
-  //(*testout) << "point_on_faces.Size() " << point_on_faces.Size() 
-  //	     << " res " << res << endl;
+  //std::cerr << "point_on_faces.Size() " << point_on_faces.Size() 
+  //	     << " res " << res <<std::endl;
 
   if (point_on_faces.Size() == 0)
     return PointInSolid (p, 0);
@@ -253,7 +253,7 @@ INSOLID_TYPE Polyhedra :: VecInSolid (const Point<3> & p,
   Point<3> p2 = p + (1e-2*mindist) * vn;
   res = PointInSolid (p2, eps);
 
-  //  (*testout) << "mindist " << mindist << " res " << res << endl;
+  //  std::cerr << "mindist " << mindist << " res " << res <<std::endl;
 
   return res;
   
@@ -311,7 +311,7 @@ INSOLID_TYPE Polyhedra :: VecInSolid2 (const Point<3> & p,
   if (point_on_n_faces == 1)
     return res;
 
-  cerr << "primitive::vecinsolid2 makes nonsense for polyhedra" << endl;
+  std::cerr << "primitive::vecinsolid2 makes nonsense for polyhedra" <<std::endl;
 
   return Primitive :: VecInSolid2 (p, v1, v2, eps);
 }
@@ -324,9 +324,9 @@ INSOLID_TYPE Polyhedra :: VecInSolid2 (const Point<3> & p,
 				       const Vec<3> & v2,
 				       double eps) const
 {
-  //(*testout) << "VecInSolid2 eps " << eps << endl;
+  //std::cerr << "VecInSolid2 eps " << eps <<std::endl;
   INSOLID_TYPE res = VecInSolid(p,v1,eps);
-  //(*testout) << "VecInSolid = " <<res <<endl;
+  //std::cerr << "VecInSolid = " <<res <std::endl;
 
   if(res != DOES_INTERSECT)
     return res;
@@ -379,8 +379,8 @@ INSOLID_TYPE Polyhedra :: VecInSolid2 (const Point<3> & p,
   if (point_on_n_faces >= 1)
     return res;
 
-  (*testout) << "primitive::vecinsolid2 makes nonsense for polyhedra" << endl;
-  cerr << "primitive::vecinsolid2 makes nonsense for polyhedra" << endl;
+  std::cerr << "primitive::vecinsolid2 makes nonsense for polyhedra" <<std::endl;
+  std::cerr << "primitive::vecinsolid2 makes nonsense for polyhedra" <<std::endl;
 
   return Primitive :: VecInSolid2 (p, v1, v2, eps);
 }
@@ -459,14 +459,14 @@ void Polyhedra :: GetPrimitiveData (const char *& classname,
   int i, j;
   for (i = 1; i <= planes.Size(); i++)
     {
-      planes.Elem(i)->Print (*testout);
+      planes.Elem(i)->Print std::cerr;
     }
   for (i = 1; i <= faces.Size(); i++)
     {
-      (*testout) << "face " << i << " has plane " << faces.Get(i).planenr << endl;
+      std::cerr << "face " << i << " has plane " << faces.Get(i).planenr <<std::endl;
       for (j = 1; j <= 3; j++)
-	(*testout) << points.Get(faces.Get(i).pnums[j-1]);
-      (*testout) << endl;
+	std::cerr << points.Get(faces.Get(i).pnums[j-1]);
+      std::cerr <<std::endl;
     }
   */
 }
@@ -504,7 +504,7 @@ int Polyhedra :: AddPoint (const Point<3> & p)
 
 int Polyhedra :: AddFace (int pi1, int pi2, int pi3, int inputnum)
 {
-  (*testout) << "polyhedra, add face " << pi1 << ", " << pi2 << ", " << pi3 << endl;
+  std::cerr << "polyhedra, add face " << pi1 << ", " << pi2 << ", " << pi3 <<std::endl;
 
   if(pi1 == pi2 || pi2 == pi3 || pi3 == pi1)
     {
@@ -534,7 +534,7 @@ int Polyhedra :: AddFace (int pi1, int pi2, int pi3, int inputnum)
 // 	if (!inverse)
 // 	  identicto = i;
 //       }
-//   //  cout << "is identic = " << identicto << endl;
+//   //  std::cout << "is identic = " << identicto <<std::endl;
 //   identicto = -1;    // changed April 10, JS
 
 //   if (identicto != -1)
@@ -547,7 +547,7 @@ int Polyhedra :: AddFace (int pi1, int pi2, int pi3, int inputnum)
       faces.Last().planenr = planes.Size()-1;
     }
 
-//  (*testout) << "is plane nr " << faces.Last().planenr << endl;
+//  std::cerr << "is plane nr " << faces.Last().planenr <<std::endl;
 
   return faces.Size();
 }
@@ -557,9 +557,9 @@ int Polyhedra :: AddFace (int pi1, int pi2, int pi3, int inputnum)
 int Polyhedra :: FaceBoxIntersection (int fnr, const BoxSphere<3> & box) const
 {
   /*
-  (*testout) << "check face box intersection, fnr = " << fnr << endl;
-  (*testout) << "box = " << box << endl;
-  (*testout) << "face-box = " << faces[fnr].bbox << endl;
+  std::cerr << "check face box intersection, fnr = " << fnr <<std::endl;
+  std::cerr << "box = " << box <<std::endl;
+  std::cerr << "face-box = " << faces[fnr].bbox <<std::endl;
   */
 
   if (!faces[fnr].bbox.Intersect (box))
@@ -571,18 +571,18 @@ int Polyhedra :: FaceBoxIntersection (int fnr, const BoxSphere<3> & box) const
 
   double dist2 = MinDistTP2 (p1, p2, p3, box.Center());
   /*
-  (*testout) << "p1 = " << p1 << endl;
-  (*testout) << "p2 = " << p2 << endl;
-  (*testout) << "p3 = " << p3 << endl;
+  std::cerr << "p1 = " << p1 <<std::endl;
+  std::cerr << "p2 = " << p2 <<std::endl;
+  std::cerr << "p3 = " << p3 <<std::endl;
 
-  (*testout) << "box.Center() = " << box.Center() << endl;
-  (*testout) << "center = " << box.Center() << endl;
-  (*testout) << "dist2 = " << dist2 << endl;
-  (*testout) << "diam = " << box.Diam() << endl;
+  std::cerr << "box.Center() = " << box.Center() <<std::endl;
+  std::cerr << "center = " << box.Center() <<std::endl;
+  std::cerr << "dist2 = " << dist2 <<std::endl;
+  std::cerr << "diam = " << box.Diam() <<std::endl;
   */
   if (dist2 < sqr (box.Diam()/2))
     {
-      //      (*testout) << "intersect" << endl;
+      //      std::cerr << "intersect" <<std::endl;
       return 1;
     }
   return 0;
@@ -633,13 +633,13 @@ Vec<3> Polyhedra :: SpecialPointTangentialVector (const Point<3> & p, int s1, in
 
 	if (surfaceids[si1] != s1 || surfaceids[si2] != s2) continue;
 
-	//(*testout) << "check pair fi1/fi2 " << fi1 << "/" << fi2 << endl;
+	//std::cerr << "check pair fi1/fi2 " << fi1 << "/" << fi2 <<std::endl;
 	
 	Vec<3> n1 = GetSurface(si1) . GetNormalVector (p);
 	Vec<3> n2 = GetSurface(si2) . GetNormalVector (p);
 	Vec<3> t = Cross (n1, n2);
 
-	//(*testout) << "t = " << t << endl;
+	//std::cerr << "t = " << t <<std::endl;
 
 
 	/*
@@ -680,7 +680,7 @@ Vec<3> Polyhedra :: SpecialPointTangentialVector (const Point<3> & p, int s1, in
 		 else
 		   v2 += v1;
 		 
-		 //(*testout) << "v2.Length2() " << v2.Length2() << endl;
+		 //std::cerr << "v2.Length2() " << v2.Length2() <<std::endl;
 
 		 if(v2.Length2() > 1e-18)
 		   continue;
@@ -700,7 +700,7 @@ Vec<3> Polyhedra :: SpecialPointTangentialVector (const Point<3> & p, int s1, in
 		   }
 
 		 //testout->precision(20);
-		 //(*testout) << "sa " << sa << " sb " << sb << " smax " << smax << " sp " << sp  << " v1 " << v1 << endl;
+		 //std::cerr << "sa " << sa << " sb " << sb << " smax " << smax << " sp " << sp  << " v1 " << v1 <<std::endl;
 		 //testout->precision(8);
 
 

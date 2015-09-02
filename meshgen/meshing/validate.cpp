@@ -1,7 +1,10 @@
-
-#include <mystdlib.h>
-#include "meshing.hpp"
-
+#include <sstream>
+#include <meshgen.hpp>
+#include "validate.hpp"
+#include "bisect.hpp"
+#include "improve2.hpp"
+#include "improve3.hpp"
+#include "global.hpp"
 
 namespace netgen
 {
@@ -54,7 +57,7 @@ namespace netgen
   {
     PrintMessage(3,"!!!! Validating !!!!");
     //if(max_worsening > 0)
-    //  (*testout) << "badness " << counter++ << endl;
+    //  std::cerr << "badness " << counter++ <<std::endl;
 
     bad_elements.SetSize(0);
 
@@ -157,12 +160,12 @@ namespace netgen
 		       double max_worsening, const bool uselocalworsening,
 		       const Array< Array<int,PointIndex::BASE>* > & idmaps)
   {
-    ostringstream ostrstr;
+    std::ostringstream ostrstr;
 
     const int maxtrials = 100;
 
     //bool doit;
-    //cout << "DOIT: " << flush;
+    //std::cout << "DOIT: " << flush;
     //cin >> doit;
 
     int ne = mesh.GetNE();
@@ -279,7 +282,7 @@ namespace netgen
     MeshOptimize2d * optimizer2d = refinement.Get2dOptimizer();
     if(!optimizer2d)
       {
-	cerr << "No 2D Optimizer!" << endl;
+	std::cerr << "No 2D Optimizer!" <<std::endl;
 	return;
       }    
 
@@ -287,9 +290,9 @@ namespace netgen
 	   cnttrials < maxtrials &&
 	   multithread.terminate != 1)
       {
-	(*testout) << "   facokedge " << facokedge << " facokface " << facokface << " cnttrials " << cnttrials << endl
+	std::cerr << "   facokedge " << facokedge << " facokface " << facokface << " cnttrials " << cnttrials <<std::endl
 		   << " perc. " << 95. * max2( min2(facokedge,facokface),
-					       double(cnttrials)/double(maxtrials)) << endl;
+					       double(cnttrials)/double(maxtrials)) <<std::endl;
 
 	SetThreadPercent(95. * max2( min2(facokedge,facokface),
 				     double(cnttrials)/double(maxtrials)));
@@ -568,10 +571,10 @@ namespace netgen
 	for(int i=0; i<bad_elements.Size(); i++)
 	  {
 	    ostrstr.str("");
-	    ostrstr << "bad element:" << endl
-		    << mesh[bad_elements[i]][0] << ": " << mesh.Point(mesh[bad_elements[i]][0]) << endl
-		    << mesh[bad_elements[i]][1] << ": " << mesh.Point(mesh[bad_elements[i]][1]) << endl
-		    << mesh[bad_elements[i]][2] << ": " << mesh.Point(mesh[bad_elements[i]][2]) << endl
+	    ostrstr << "bad element:" <<std::endl
+		    << mesh[bad_elements[i]][0] << ": " << mesh.Point(mesh[bad_elements[i]][0]) <<std::endl
+		    << mesh[bad_elements[i]][1] << ": " << mesh.Point(mesh[bad_elements[i]][1]) <<std::endl
+		    << mesh[bad_elements[i]][2] << ": " << mesh.Point(mesh[bad_elements[i]][2]) <<std::endl
 		    << mesh[bad_elements[i]][3] << ": " << mesh.Point(mesh[bad_elements[i]][3]);
 	    PrintMessage(5,ostrstr.str());
 	  }

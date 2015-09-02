@@ -1,9 +1,11 @@
-#include <mystdlib.h>
+//#include <mystdlib.h>
 
 
-#include <myadt.hpp>
+//#include <myadt.hpp>
 // class DenseMatrix;
-#include <gprim.hpp>
+//#include <gprim.hpp>
+#include <cstring>
+#include "adtree.hpp"
 
 namespace netgen
 {
@@ -217,7 +219,7 @@ namespace netgen
   }
 
 
-  void ADTree :: PrintRec (ostream & ost, const ADTreeNode * node) const
+  void ADTree :: PrintRec (std::ostream & ost, const ADTreeNode * node) const
   {
   
     if (node->data)
@@ -226,7 +228,7 @@ namespace netgen
 	ost << node->nchilds << " childs, ";
 	for (int i = 0; i < dim; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
     if (node->left)
       {
@@ -448,7 +450,7 @@ namespace netgen
       }
   }
 
-  void ADTree3 :: PrintRec (ostream & ost, const ADTreeNode3 * node) const
+  void ADTree3 :: PrintRec (std::ostream & ost, const ADTreeNode3 * node) const
   {
   
     if (node->data)
@@ -457,7 +459,7 @@ namespace netgen
 	ost << node->nchilds << " childs, ";
 	for (int i = 0; i < 3; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
     if (node->left)
       PrintRec (ost, node->left);
@@ -579,7 +581,7 @@ namespace netgen
 	double dx = (bmax[dir] - bmin[dir]) / ADTN_DIV;
 	bag = int ((p[dir]-bmin[dir]) / dx);
 
-	//      (*testout) << "insert, bag = " << bag << endl;
+	//      std::cerr << "insert, bag = " << bag <<std::endl;
 
 	if (bag < 0) bag = 0;
 	if (bag >= ADTN_DIV) bag = ADTN_DIV-1;
@@ -588,14 +590,14 @@ namespace netgen
 	double nbmax = bmin[dir] + (bag+1) * dx;
 
 	/*      
-		(*testout) << "bmin, max = " << bmin[dir] << "-" << bmax[dir]
+		std::cerr << "bmin, max = " << bmin[dir] << "-" << bmax[dir]
 		<< " p = " << p[dir];
 	*/
 	next = node->childs[bag];
 	bmin[dir] = nbmin;
 	bmax[dir] = nbmax;
 
-	//      (*testout) << "new bmin, max = " << bmin[dir] << "-" << bmax[dir] << endl;
+	//      std::cerr << "new bmin, max = " << bmin[dir] << "-" << bmax[dir] <<std::endl;
 
       
 	/*      
@@ -696,7 +698,7 @@ namespace netgen
 	int mini = int ( (bmin[dir] - node->minx) / node->dist );
 	int maxi = int ( (bmax[dir] - node->minx) / node->dist );
       
-	//      (*testout) << "get int, mini, maxi = " << mini << ", " << maxi << endl;
+	//      std::cerr << "get int, mini, maxi = " << mini << ", " << maxi <<std::endl;
 	if (mini < 0) mini = 0;
 	if (maxi >= ADTN_DIV) maxi = ADTN_DIV-1;
 
@@ -726,7 +728,7 @@ namespace netgen
       }
   }
 
-  void ADTree3Div :: PrintRec (ostream & ost, const ADTreeNode3Div * node) const
+  void ADTree3Div :: PrintRec (std::ostream & ost, const ADTreeNode3Div * node) const
   {
   
     if (node->data)
@@ -736,7 +738,7 @@ namespace netgen
 	ost << " from " << node->minx << " - " << node->minx + node->dist*ADTN_DIV << "  ";
 	for (int i = 0; i < 3; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
     int i;
     for (i = 0; i < ADTN_DIV; i++)
@@ -970,7 +972,7 @@ namespace netgen
       }
   }
 
-  void ADTree3M :: PrintRec (ostream & ost, const ADTreeNode3M * node) const
+  void ADTree3M :: PrintRec (std::ostream & ost, const ADTreeNode3M * node) const
   {
   
     if (node->data)
@@ -979,7 +981,7 @@ namespace netgen
 	ost << node->nchilds << " childs, ";
 	for (int i = 0; i < 3; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
     if (node->left)
       PrintRec (ost, node->left);
@@ -1227,7 +1229,7 @@ namespace netgen
       }
   }
 
-  void ADTree3F :: PrintRec (ostream & ost, const ADTreeNode3F * node) const
+  void ADTree3F :: PrintRec (std::ostream & ost, const ADTreeNode3F * node) const
   {
     int i;
     if (node->data)
@@ -1236,7 +1238,7 @@ namespace netgen
 	ost << node->nchilds << " childs, ";
 	for (i = 0; i < 3; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
 
     for (i = 0; i < 8; i++)
@@ -1504,7 +1506,7 @@ namespace netgen
       }
   }
 
-  void ADTree3FM :: PrintRec (ostream & ost, const ADTreeNode3FM * node) const
+  void ADTree3FM :: PrintRec (std::ostream & ost, const ADTreeNode3FM * node) const
   {
     int i;
     if (node->data)
@@ -1513,7 +1515,7 @@ namespace netgen
 	ost << node->nchilds << " childs, ";
 	for (i = 0; i < 3; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
 
     for (i = 0; i < 8; i++)
@@ -1679,12 +1681,12 @@ namespace netgen
       }
   }
 
-  void ADTree6 :: PrintMemInfo (ostream & ost) const
+  void ADTree6 :: PrintMemInfo (std::ostream & ost) const
   {
     ost << Elements() << " elements a " << sizeof(ADTreeNode6) 
 	<< " Bytes = "
-	<< Elements() * sizeof(ADTreeNode6) << endl;
-    ost << "maxind = " << ela.Size() << " = " << sizeof(ADTreeNode6*) * ela.Size() << " Bytes" << endl;
+	<< Elements() * sizeof(ADTreeNode6) << std::endl;
+    ost << "maxind = " << ela.Size() << " = " << sizeof(ADTreeNode6*) * ela.Size() << " Bytes" << std::endl;
   }
 
 
@@ -1749,7 +1751,7 @@ namespace netgen
       }
   }
 
-  void ADTree6 :: PrintRec (ostream & ost, const ADTreeNode6 * node) const
+  void ADTree6 :: PrintRec (std::ostream & ost, const ADTreeNode6 * node) const
   {
   
     if (node->data)
@@ -1758,7 +1760,7 @@ namespace netgen
 	ost << node->nchilds << " childs, ";
 	for (int i = 0; i < 6; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
     if (node->left)
       PrintRec (ost, node->left);
@@ -1776,7 +1778,7 @@ namespace netgen
       ldepth = DepthRec(node->left);
     if (node->right)
       rdepth = DepthRec(node->right);
-    return 1 + max2 (ldepth, rdepth);
+    return 1 + std::max(ldepth, rdepth);
   }
 
   int ADTree6 :: ElementsRec (const ADTreeNode6 * node) const
@@ -2039,7 +2041,7 @@ namespace netgen
       }
   }
 
-  void ADTree6F :: PrintRec (ostream & ost, const ADTreeNode6F * node) const
+  void ADTree6F :: PrintRec (std::ostream & ost, const ADTreeNode6F * node) const
   {
     int i;
     if (node->data)
@@ -2048,7 +2050,7 @@ namespace netgen
 	ost << node->nchilds << " childs, ";
 	for (i = 0; i < 6; i++)
 	  ost << node->data[i] << " ";
-	ost << endl;
+	ost << std::endl;
       }
 
     for (i = 0; i < 64; i++)

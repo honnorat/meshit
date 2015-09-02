@@ -1,7 +1,7 @@
-#include <mystdlib.h>
-
-#include "meshing.hpp"
-#include <opti.hpp>
+#include <meshgen.hpp>
+#include "improve2.hpp"
+#include "global.hpp"
+#include "../general/ngexception.hpp"
 
 namespace netgen
 {
@@ -41,10 +41,10 @@ namespace netgen
 //     for (SurfaceElementIndex sei = 0; sei < ne; sei++)
 //       {
 // 	const Element2d & el = mesh[sei];
-// 	(*testout) << "element " << sei << ": " <<flush;
+// 	std::cerr << "element " << sei << ": " <<flush;
 // 	for(int j=0; j<el.GetNP(); j++)
-// 	  (*testout) << el[j] << " " << flush;
-// 	(*testout) << "IsDeleted() " << el.IsDeleted()<< endl;
+// 	  std::cerr << el[j] << " " << flush;
+// 	std::cerr << "IsDeleted() " << el.IsDeleted()<<std::endl;
 //       }
 
     bool ok;
@@ -81,7 +81,7 @@ namespace netgen
     r1->bonus = 0;
     rules.Append (r1);
 
-    // swap quads
+    // std::swap quads
     r1 = new ImprovementRule;
     r1->oldels.Append (Element2d (1, 2, 3, 4));
     r1->oldels.Append (Element2d (3, 2, 5, 6));
@@ -158,7 +158,7 @@ namespace netgen
     r1->bonus = -1;
     rules.Append (r1);
 
-    // swap quad + trig (a and b)
+    // std::swap quad + trig (a and b)
     r1 = new ImprovementRule;
     r1->oldels.Append (Element2d (1, 2, 3, 4));
     r1->oldels.Append (Element2d (2, 5, 3));

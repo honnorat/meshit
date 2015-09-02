@@ -13,7 +13,7 @@ namespace netgen
     planee1 = ae1;
     planee2 = ae2;
     planee3 = Cross (planee1, planee2);
-    (*testout) << "Vecs = " << planee1 << " " << planee2 << " " << planee3 << endl;
+    std::cerr << "Vecs = " << planee1 << " " << planee2 << " " << planee3 <<std::endl;
   };
   
 
@@ -172,7 +172,7 @@ namespace netgen
 
   void GeneralizedCylinder :: Print (ostream & str) const
   {
-    str << "Generalized Cylinder" << endl;
+    str << "Generalized Cylinder" <<std::endl;
     crosssection.Print (str);
   }
   

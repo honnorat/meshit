@@ -3,30 +3,30 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 PROJECT( meshgen )
 
 SET(src_CSG
-	csg/algprim.cpp
-	csg/brick.cpp
-	csg/bspline2d.cpp
-	csg/csgeom.cpp
-	csg/csgparser.cpp
-	csg/csgpkg.cpp
-	csg/curve2d.cpp
-	csg/edgeflw.cpp
-	csg/explicitcurve2d.cpp
-	csg/extrusion.cpp
-	csg/gencyl.cpp
-	csg/genmesh.cpp
-	csg/identify.cpp
-	csg/manifold.cpp
-	csg/meshsurf.cpp
-	csg/polyhedra.cpp
-	csg/revolution.cpp
-	csg/singularref.cpp
-	csg/solid.cpp
-	csg/specpoin.cpp
-	csg/spline3d.cpp
-	csg/surface.cpp
-	csg/triapprox.cpp
-	csg/vscsg.cpp
+#	csg/algprim.cpp
+#	csg/brick.cpp
+#	csg/bspline2d.cpp
+#	csg/csgeom.cpp
+#	csg/csgparser.cpp
+#	csg/csgpkg.cpp
+#	csg/curve2d.cpp
+#	csg/edgeflw.cpp
+#	csg/explicitcurve2d.cpp
+#	csg/extrusion.cpp
+#	csg/gencyl.cpp
+#	csg/genmesh.cpp
+#	csg/identify.cpp
+#	csg/manifold.cpp
+#	csg/meshsurf.cpp
+#	csg/polyhedra.cpp
+#	csg/revolution.cpp
+#	csg/singularref.cpp
+#	csg/solid.cpp
+#	csg/specpoin.cpp
+#	csg/spline3d.cpp
+#	csg/surface.cpp
+#	csg/triapprox.cpp
+#	csg/vscsg.cpp
 )
 SET(src_GENERAL
 	general/array.cpp
@@ -35,12 +35,9 @@ SET(src_GENERAL
 	general/flags.cpp
 	general/gzstream.cpp
 	general/hashtabl.cpp
-	general/mpi_interface.cpp
 	general/mystring.cpp
 	general/ngexception.cpp
 	general/optmem.cpp
-	general/parthreads.cpp
-	general/profiler.cpp
 	general/seti.cpp
 	general/sort.cpp
 	general/spbita2d.cpp
@@ -65,8 +62,8 @@ SET(src_GPRIM
 	gprim/transform3d.cpp
 )
 SET(src_INTERFACE
-	interface/nginterface.cpp
-	interface/nginterface_v2.cpp
+#	interface/nginterface.cpp
+#	interface/nginterface_v2.cpp
 	interface/read_fnf_mesh.cpp
 	interface/readtetmesh.cpp
 	interface/readuser.cpp
@@ -100,7 +97,6 @@ SET(src_MESHING
 	meshing/basegeom.cpp
 	meshing/bcfunctions.cpp
 	meshing/bisect.cpp
-	meshing/boundarylayer.cpp
 	meshing/clusters.cpp
 	meshing/curvedelems.cpp
 	meshing/delaunay2d.cpp
@@ -142,34 +138,34 @@ SET(src_MESHING
 	meshing/topology.cpp
 	meshing/triarls.cpp
 	meshing/validate.cpp
-	meshing/zrefine.cpp
+#	meshing/zrefine.cpp
 )
 SET (src_OCC
-	occ/occconstruction.cpp
-	occ/occgenmesh.cpp
-	occ/occgeom.cpp
-	occ/occmeshsurf.cpp
-	occ/occpkg.cpp
-	occ/vsocc.cpp
+#	occ/occconstruction.cpp
+#	occ/occgenmesh.cpp
+#	occ/occgeom.cpp
+#	occ/occmeshsurf.cpp
+#	occ/occpkg.cpp
+#	occ/vsocc.cpp
 )
 SET(src_STLGEOM
-	stlgeom/meshstlsurface.cpp
-	stlgeom/stlgeomchart.cpp
-	stlgeom/stlgeom.cpp
-	stlgeom/stlgeommesh.cpp
-	stlgeom/stlline.cpp
-	stlgeom/stlpkg.cpp
-	stlgeom/stltool.cpp
-	stlgeom/stltopology.cpp
-	stlgeom/vsstl.cpp
+#	stlgeom/meshstlsurface.cpp
+#	stlgeom/stlgeomchart.cpp
+#	stlgeom/stlgeom.cpp
+#	stlgeom/stlgeommesh.cpp
+#	stlgeom/stlline.cpp
+#	stlgeom/stlpkg.cpp
+#	stlgeom/stltool.cpp
+#	stlgeom/stltopology.cpp
+#	stlgeom/vsstl.cpp
 )
 SET(src_VISUALIZATION
-	visualization/importsolution.cpp
-	visualization/meshdoc.cpp
-	visualization/mvdraw.cpp
-	visualization/vsfieldlines.cpp
-	visualization/vsmesh.cpp
-	visualization/vssolution.cpp
+#	visualization/importsolution.cpp
+#	visualization/meshdoc.cpp
+#	visualization/mvdraw.cpp
+#	visualization/vsfieldlines.cpp
+#	visualization/vsmesh.cpp
+#	visualization/vssolution.cpp
 )
 ADD_LIBRARY(meshgen STATIC
 	${src_CSG}

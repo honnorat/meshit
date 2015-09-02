@@ -1,9 +1,11 @@
 /*
   Advancing front class for surfaces
 */
-
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <iostream>
+#include <meshgen.hpp>
+#include "adfront2.hpp"
+#include "../gprim/geom3d.hpp"
+#include "../gprim/geomops.hpp"
 
 
 namespace netgen
@@ -22,7 +24,7 @@ namespace netgen
 	mgi = new MultiPointGeomInfo (*amgi);
 	for (int i = 1; i <= mgi->GetNPGI(); i++)
 	  if (mgi->GetPGI(i).trignum <= 0)
-	    cout << "Add FrontPoint2, illegal geominfo = " << mgi->GetPGI(i).trignum << endl;
+	    std::cout << "Add FrontPoint2, illegal geominfo = " << mgi->GetPGI(i).trignum << std::endl;
       }
     else
       mgi = NULL;
@@ -48,16 +50,16 @@ namespace netgen
   }
 
 
-  void AdFront2 :: PrintOpenSegments (ostream & ost) const
+  void AdFront2 :: PrintOpenSegments (std::ostream & ost) const
   {
     if (nfl > 0)
       {
-	ost << nfl << " open front segments left:" << endl;
+	ost << nfl << " open front segments left:" << std::endl;
 	for (int i = lines.Begin(); i < lines.End(); i++)
 	  if (lines[i].Valid())
 	    ost << i << ": " 
                 << GetGlobalIndex (lines[i].L().I1()) << "-"
-		<< GetGlobalIndex (lines[i].L().I2()) << endl;
+		<< GetGlobalIndex (lines[i].L().I2()) << std::endl;
       }
   }
 
@@ -134,7 +136,7 @@ namespace netgen
   
     if (!gi1.trignum || !gi2.trignum)
       {
-	cout << "ERROR: in AdFront::AddLine, illegal geominfo" << endl;
+	std::cout << "ERROR: in AdFront::AddLine, illegal geominfo" << std::endl;
       }
   
     lines[li].SetGeomInfo (gi1, gi2);
@@ -150,8 +152,7 @@ namespace netgen
 	if (allflines->Used (INDEX_2 (GetGlobalIndex (pi1), 
 				      GetGlobalIndex (pi2))))
 	  {
-	    cerr << "ERROR Adfront2::AddLine: line exists" << endl;
-	    (*testout) << "ERROR Adfront2::AddLine: line exists" << endl;
+	    std::cerr << "ERROR Adfront2::AddLine: line exists" << std::endl;
 	  }
 
 	allflines->Set (INDEX_2 (GetGlobalIndex (pi1), 
@@ -275,10 +276,6 @@ namespace netgen
 			     Array<INDEX> & lindex,
 			     double xh)
   {
-    static int timer = NgProfiler::CreateTimer ("adfront2::GetLocals");
-    NgProfiler::RegionTimer reg (timer);
-
-
     int pstind;
     Point<3>  midp, p0;
 
@@ -414,19 +411,16 @@ namespace netgen
 	    pgeominfo[i].AddPointGeomInfo (points[pi].mgi->GetPGI(j));
       }
    
-    if (loclines.Size() == 1)
-      {
-	cout << "loclines.Size = 1" << endl;
-	(*testout) << "loclines.size = 1" << endl
-		   << " h = " << xh << endl
-		   << " nearline.size = " << nearlines.Size() << endl
-		   << " p0 = " << p0 << endl;
-      }
+//    if (loclines.Size() == 1)
+//      {
+//	std::cerr << "loclines.Size = 1" << std::endl
+//		   << " h = " << xh << std::endl
+//		   << " nearline.size = " << nearlines.Size() << std::endl
+//		   << " p0 = " << p0 << std::endl;
+//      }
 
     return lines[baselineindex].LineClass();
   }
-
-
 
   void AdFront2 :: SetStartFront ()
   {
@@ -437,20 +431,20 @@ namespace netgen
   }
 
 
-  void AdFront2 :: Print (ostream & ost) const
-  {
-    ost << points.Size() << " Points: " << endl;
-    for (int i = points.Begin(); i < points.End(); i++)
-      if (points[i].Valid())
-	ost << i << "  " << points[i].P() << endl;
-
-    ost << nfl << " Lines: " << endl;
-    for (int i = lines.Begin(); i < lines.End(); i++)
-      if (lines[i].Valid())
-	ost << lines[i].L().I1() << " - " << lines[i].L().I2() << endl;
-
-    ost << flush;
-  }
+//  void AdFront2 :: Print (std::ostream & ost) const
+//  {
+//    ost << points.Size() << " Points: " << std::endl;
+//    for (int i = points.Begin(); i < points.End(); i++)
+//      if (points[i].Valid())
+//	ost << i << "  " << points[i].P() << std::endl;
+//
+//    ost << nfl << " Lines: " << std::endl;
+//    for (int i = lines.Begin(); i < lines.End(); i++)
+//      if (lines[i].Valid())
+//	ost << lines[i].L().I1() << " - " << lines[i].L().I2() << std::endl;
+//
+//    ost << flush;
+//  }
 
 
   bool AdFront2 :: Inside (const Point<2> & p) const

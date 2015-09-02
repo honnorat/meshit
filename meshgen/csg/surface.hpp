@@ -7,6 +7,10 @@
 /* Date:   1. Dez. 95                                                     */
 /**************************************************************************/
 
+#include <iostream>
+#include <string>
+
+#include "../gprim/transform3d.hpp"
 
 namespace netgen 
 {
@@ -31,7 +35,7 @@ namespace netgen
     /// boundary condition nr
     int bcprop;
     /// boundary condition label
-    string bcname;
+    std::string bcname;
   
   public:
     Surface ();
@@ -74,7 +78,7 @@ namespace netgen
 					const Point<3> & ap2);
 
     /// Transforms 3d point p3d to local coordinates pplane
-    virtual void ToPlane (const Point<3> & p3d, Point<2> & pplane, 
+    virtual void ToPlane (const Point3d & p3d, Point<2> & pplane, 
 			  double h, int & zone) const;
   
     /// Transforms point pplane in local coordinates to 3d point
@@ -153,7 +157,7 @@ namespace netgen
     ///
     void SetInverse (bool ainverse) { inverse = ainverse; }
     /// 
-    virtual void Print (ostream & str) const = 0;
+    virtual void Print (std::ostream & str) const = 0;
   
     ///
     virtual void Reduce (const BoxSphere<3> & /* box */) { };
@@ -187,13 +191,13 @@ namespace netgen
 					   double /* facets */ ) const { };
 
 
-    string GetBCName() const { return bcname; }
+    std::string GetBCName() const { return bcname; }
 
-    void SetBCName( string abc ) { bcname = abc; }
+    void SetBCName( std::string abc ) { bcname = abc; }
   };
 
 
-  inline ostream & operator<< (ostream & ost, const Surface & surf)
+  inline std::ostream & operator<< (std::ostream & ost, const Surface & surf)
   {
     surf.Print(ost);
     return ost;
@@ -224,7 +228,7 @@ namespace netgen
     virtual void Project (Point<3> & /* p */) const
     { ; }
 
-    virtual void Print (ostream & ost) const
+    virtual void Print (std::ostream & ost) const
     { ost << "dummy surface"; }
   };
 

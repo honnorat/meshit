@@ -1,20 +1,18 @@
 //20.11.1999 second part of stlgeom.cc, mainly mesh functions
 
-#include <mystdlib.h>
-
-#include <myadt.hpp>
-#include <linalg.hpp>
-#include <gprim.hpp>
-
-#include <meshing.hpp>
-
+#include <meshgen.hpp>
 #include "stlgeom.hpp"
+
+#include "../gprim/geomtest3d.hpp"
+#include "../meshing/global.hpp"
+#include "../meshing/meshfunc.hpp"
+#include "../meshing/meshtool.hpp"
 
 namespace netgen
 {
 int EdgeUsed(int p1, int p2, Array<INDEX_2>& edges, INDEX_2_HASHTABLE<int>& hashtab)
 {
-  if (p1 > p2) {swap (p1,p2);}
+  if (p1 > p2) {std::swap (p1,p2);}
 
   if (hashtab.Used(INDEX_2(p1,p2))) 
     {return hashtab.Get(INDEX_2(p1,p2));}
@@ -75,7 +73,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
       int ptn1 = GetTriangle(t1).PNum(i);
       int ptn2 = GetTriangle(t1).PNumMod(i+1);
 
-      if (ptn1 > ptn2) {swap(ptn1,ptn2);}
+      if (ptn1 > ptn2) {std::swap(ptn1,ptn2);}
 
       Point3d pt1 = GetPoint(ptn1);
       Point3d pt2 = GetPoint(ptn2);
@@ -130,7 +128,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
 		  int pnt1 = GetTriangle(tn).PNum(k);
 		  int pnt2 = GetTriangle(tn).PNumMod(k+1);
 		      
-		  if (pnt1 > pnt2) {swap(pnt1,pnt2);}
+		  if (pnt1 > pnt2) {std::swap(pnt1,pnt2);}
 
 		  Point3d pt1 = GetPoint(pnt1);
 		  Point3d pt2 = GetPoint(pnt2);
@@ -595,8 +593,8 @@ int STLGeometry :: Project(Point<3> & p3d) const
 	    {
 	      if (Dist2(p,pf)>=1E-16) 
 		{
-		  //		  (*testout) << "ERROR: found two points to project which are different" << endl;
-		  //(*testout) << "p=" << p << ", pf=" << pf << endl;
+		  //		  std::cerr << "ERROR: found two points to project which are different" <<std::endl;
+		  //std::cerr << "p=" << p << ", pf=" << pf <<std::endl;
 		  different = 1;
 		}
 	    }
@@ -608,14 +606,14 @@ int STLGeometry :: Project(Point<3> & p3d) const
 
     }
 
-  //  if (cnt == 2) {(*testout) << "WARNING: found 2 triangles to project" << endl;}
-  //if (cnt == 3) {(*testout) << "WARNING: found 3 triangles to project" << endl;}
-  //if (cnt > 3) {(*testout) << "WARNING: found more than 3 triangles to project" << endl;}
+  //  if (cnt == 2) {std::cerr << "WARNING: found 2 triangles to project" <<std::endl;}
+  //if (cnt == 3) {std::cerr << "WARNING: found 3 triangles to project" <<std::endl;}
+  //if (cnt > 3) {std::cerr << "WARNING: found more than 3 triangles to project" <<std::endl;}
 
   if (fi != 0) {lasttrig = fi;}
   if (fi != 0 && !different) {p3d = pf; return fi;}
 
-  //  (*testout) << "WARNING: Project failed" << endl;
+  //  std::cerr << "WARNING: Project failed" <<std::endl;
   return 0;
   
 }
@@ -651,8 +649,8 @@ int STLGeometry :: ProjectOnWholeSurface(Point<3> & p3d) const
 	    {
 	      if (Dist2(p,pf)>=1E-16) 
 		{
-		  //		  (*testout) << "ERROR: found two points to project which are different" << endl;
-		  //		  (*testout) << "p=" << p << ", pf=" << pf << endl;
+		  //		  std::cerr << "ERROR: found two points to project which are different" <<std::endl;
+		  //		  std::cerr << "p=" << p << ", pf=" << pf <<std::endl;
 		  different = 1;
 		}
 	    }
@@ -660,14 +658,14 @@ int STLGeometry :: ProjectOnWholeSurface(Point<3> & p3d) const
 	}
     }
   /*
-  if (cnt == 2) {(*testout) << "WARNING: found 2 triangles to project" << endl;}
-  if (cnt == 3) {(*testout) << "WARNING: found 3 triangles to project" << endl;}
-  if (cnt > 3) {(*testout) << "WARNING: found more than 3 triangles to project" << endl;}
+  if (cnt == 2) {std::cerr << "WARNING: found 2 triangles to project" <<std::endl;}
+  if (cnt == 3) {std::cerr << "WARNING: found 3 triangles to project" <<std::endl;}
+  if (cnt > 3) {std::cerr << "WARNING: found more than 3 triangles to project" <<std::endl;}
   */
   if (fi != 0) {lasttrig = fi;}
   if (fi != 0 && !different) {p3d = pf; return fi;}
 
-  //  (*testout) << "WARNING: Project failed" << endl;
+  //  std::cerr << "WARNING: Project failed" <<std::endl;
   return 0;
   
 }
@@ -696,7 +694,7 @@ int STLGeometry :: ProjectNearest(Point<3> & p3d) const
 	}      
     }
   p3d = pf;
-  //if (!ft) {(*testout) << "ERROR: ProjectNearest failed" << endl;}
+  //if (!ft) {std::cerr << "ERROR: ProjectNearest failed" <<std::endl;}
   
   return ft;
 }
@@ -904,7 +902,7 @@ void STLGeometry :: RestrictLocalH(class Mesh & mesh, double gh)
 
 	      if(localh < objectsize)
 		mesh.RestrictLocalHLine(p1p, p2p, localh);
-	      (*testout) << "restrict h along " << p1p << " - " << p2p << " to " << localh << endl;
+	      std::cerr << "restrict h along " << p1p << " - " << p2p << " to " << localh <<std::endl;
 	      
 	      if (localh < 0.1)
 		{
@@ -1119,13 +1117,6 @@ void STLGeometry :: RestrictLocalH(class Mesh & mesh, double gh)
 void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrigs, 
 					       class Mesh & mesh, double gh, double fact, double minh)
 {
-  static int timer1 = NgProfiler::CreateTimer ("restrictH OneChart 1");
-  static int timer2 = NgProfiler::CreateTimer ("restrictH OneChart 2");
-  static int timer3 = NgProfiler::CreateTimer ("restrictH OneChart 3");
-  static int timer3a = NgProfiler::CreateTimer ("restrictH OneChart 3a");
-  static int timer3b = NgProfiler::CreateTimer ("restrictH OneChart 3b");
-
-  NgProfiler::StartTimer (timer1);
   double limessafety = stlparam.resthchartdistfac*fact;  // original: 2
   double localh;
 
@@ -1204,9 +1195,6 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 	}
     }
 	  
-  NgProfiler::StopTimer (timer1);	 
-
-  NgProfiler::StartTimer (timer2);	 
   for (int j = 1; j <= chart.GetNT(); j++)
     acttrigs.Elem(chart.GetTrig(j)) = chartnum;
 
@@ -1245,14 +1233,10 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 	}
     }
 	  
-  NgProfiler::StopTimer (timer2);	 
-  NgProfiler::StartTimer (timer3);	 	  
-
   double chartmindist = 1E50;
 
   if (plimes2.Size())
     {
-      NgProfiler::StartTimer (timer3a);
       Box3d bbox;
       bbox.SetPoint (plimes2.Get(1));
       for (int j = 2; j <= plimes2.Size(); j++)
@@ -1262,9 +1246,6 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 	stree.Insert (plimes2.Get(j), j);
       Array<int> foundpts;
 	  
-      NgProfiler::StopTimer (timer3a);
-      NgProfiler::StartTimer (timer3b);
-
       for (int j = 1; j <= plimes1.Size(); j++) 
 	{
 	  double mindist = 1E50;
@@ -1323,9 +1304,7 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 	      if (mindist < chartmindist) {chartmindist = mindist;}
 	    }
 	}
-      NgProfiler::StopTimer (timer3b);
     }
-  NgProfiler::StopTimer (timer3);	 
 }
 
 
@@ -1402,12 +1381,6 @@ int STLMeshingDummy (STLGeometry* stlgeometry, Mesh*& mesh, MeshingParameters & 
 	{
 	  PrintError("Surface meshing not successful. Meshing aborted!");
 	}
-      
-#ifdef STAT_STREAM
-      (*statout) << mesh->GetNSeg() << " & " << endl
-		 << mesh->GetNSE() << " & " << endl
-		 << GetTime() << " & ";
-#endif
     }
   if (multithread.terminate)
     return 0;
@@ -1455,9 +1428,6 @@ int STLMeshingDummy (STLGeometry* stlgeometry, Mesh*& mesh, MeshingParameters & 
 						      stlparam.resthsurfmeshcurvfac);
 	      mparam.optimize2d = "cmsmSm";
 	      STLSurfaceOptimization (*stlgeometry, *mesh, mparam);
-#ifdef STAT_STREAM
-	      (*statout) << GetTime() << " & ";
-#endif
 
 	      extern void Render();
 	      Render();
@@ -1529,9 +1499,6 @@ int STLMeshingDummy (STLGeometry* stlgeometry, Mesh*& mesh, MeshingParameters & 
 	      return 0;
 	    }
 
-#ifdef STAT_STREAM
-	  (*statout) << GetTime() << " & " << endl;
-#endif
 	  MeshQuality3d (*mesh);
 	}
 
@@ -1571,9 +1538,9 @@ int STLMeshingDummy (STLGeometry* stlgeometry, Mesh*& mesh, MeshingParameters & 
 	  OptimizeVolume (mparam, *mesh);
 	  
 #ifdef STAT_STREAM
-	  (*statout) << GetTime() << " & " << endl;
-	  (*statout) << mesh->GetNE() << " & " << endl
-		     << mesh->GetNP() << " " << '\\' << '\\' << " \\" << "hline" << endl;
+	  (*statout) << GetTime() << " & " <<std::endl;
+	  (*statout) << mesh->GetNE() << " & " <<std::endl
+		     << mesh->GetNP() << " " << '\\' << '\\' << " \\" << "hline" <<std::endl;
 #endif
 
 	  extern void Render();

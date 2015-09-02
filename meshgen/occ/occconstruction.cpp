@@ -38,7 +38,7 @@ namespace netgen
   void OCCConstructGeometry (OCCGeometry & geom)
   {
 #ifdef NOTHING
-    cout << "OCC construction" << endl;
+    std::cout << "OCC construction" <<std::endl;
 
     BRep_Builder builder;
     BRepPrimAPI_MakeBox mbox(gp_Pnt(-10e5, -15e5, 0), gp_Pnt(20e5, 15e5, 10e5));
@@ -89,7 +89,7 @@ namespace netgen
 	  my_fuse = exp_solid.Current();
 	else
 	  {
-	    cout << "fuse, cnt = " << cnt << endl;
+	    std::cout << "fuse, cnt = " << cnt <<std::endl;
 	    if (cnt != 7 && cnt != 9)
 	      my_fuse = BRepAlgoAPI_Fuse (my_fuse, exp_solid.Current());
 	  }
@@ -108,7 +108,7 @@ namespace netgen
     int cnt = 0;
     for (TopExp_Explorer exp_solid(geom.shape, TopAbs_SOLID); exp_solid.More(); exp_solid.Next())
       {
-	cout << "swe, cnt = " << cnt << endl;
+	std::cout << "swe, cnt = " << cnt <<std::endl;
 	if (cnt != 7 && cnt != 9)
 	  sewing.Add (exp_solid.Current());
 	cnt++;
@@ -120,13 +120,13 @@ namespace netgen
 
 
     /*
-    cout << "build air domain" << endl;
+    std::cout << "build air domain" <<std::endl;
     TopoDS_Shape air = BRepAlgoAPI_Cut (TopoDS_Solid (mbox), my_fuse);
 
     cnt = 0;
     for (TopExp_Explorer exp_solid(geom.shape, TopAbs_SOLID); exp_solid.More(); exp_solid.Next())
       {
-	cout << "section, cnt = " << cnt << endl;
+	std::cout << "section, cnt = " << cnt <<std::endl;
 	if (cnt == 7)
 	  {
 	    builder.Add (geom.shape, 

@@ -1,6 +1,11 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <string>
+#include <meshgen.hpp>
 #include "hprefinement.hpp" 
+#include "topology.hpp"
+#include "meshclass.hpp"
+#include "curvedelems.hpp"
+#include "../general/bitarray.hpp"
+#include "../general/ngexception.hpp"
 
 namespace netgen
 {
@@ -131,7 +136,7 @@ namespace netgen
       case HP_HEX: np=8; break;      
 
       default:
-        cerr << "HPRefElement: illegal type " << type << endl;
+        std::cerr << "HPRefElement: illegal type " << type << std::endl;
         throw NgException ("HPRefElement::SetType: illegal type");
       } 
 
@@ -565,7 +570,7 @@ namespace netgen
 
     if (!hps)
       {
-	cout << "Attention hps : hp-refinement not implemented for case " << type << endl;
+	std::cout << "Attention hps : hp-refinement not implemented for case " << type << std::endl;
 	PrintSysError ("hp-refinement not implemented for case ", type);
       }
 
@@ -594,7 +599,7 @@ namespace netgen
 	  case PYRAMID: hpel.type = HP_PYRAMID; break; 
 
           default:
-            cerr << "HPRefElement: illegal elementtype (1) " << mesh[i].GetType() << endl;
+            std::cerr << "HPRefElement: illegal elementtype (1) " << mesh[i].GetType() << std::endl;
             throw NgException ("HPRefElement: illegal elementtype (1)");
 	  } 
 	elements.Append(hpel); 
@@ -610,7 +615,7 @@ namespace netgen
 	  case QUAD: hpel.type = HP_QUAD; break; 
 
           default:
-            cerr << "HPRefElement: illegal elementtype (1b) " << mesh[i].GetType() << endl;
+            std::cerr << "HPRefElement: illegal elementtype (1b) " << mesh[i].GetType() << std::endl;
             throw NgException ("HPRefElement: illegal elementtype (1b)");
 	  } 
 	elements.Append(hpel);
@@ -643,10 +648,8 @@ namespace netgen
 
     // prepare new points  
     
-    fac1 = max(0.001,min(0.33,fac1));
-    cout << " in HP-REFINEMENT with fac1 " << fac1 << endl; 
-    *testout << " in HP-REFINEMENT with fac1 " << fac1 <<  endl; 
-   
+    fac1 = std::max(0.001,std::min(0.33,fac1));
+    std::cout << " in HP-REFINEMENT with fac1 " << fac1 << std::endl; 
 
     int oldelsize = elements.Size();
        
@@ -657,7 +660,7 @@ namespace netgen
 		
 	if (!hprs) 
 	  {
-	    cout << "Refinementstruct not defined for element " << el.type << endl;
+	    std::cout << "Refinementstruct not defined for element " << el.type << std::endl;
 	    continue;
 	  }
 
@@ -687,7 +690,7 @@ namespace netgen
 			 el.pnums[hprs->splitfaces[j][1]-1],
 			 el.pnums[hprs->splitfaces[j][2]-1]);
 
-	      if (i3.I2() > i3.I3()) Swap (i3.I2(), i3.I3());
+	      if (i3.I2() > i3.I3()) std::swap (i3.I2(), i3.I3());
 	      
 	      if (!newfacepts.Used (i3))
 		{
@@ -720,7 +723,7 @@ namespace netgen
 	  case HP_HEX: oldnp = 8; break;
             
           default:
-            cerr << "HPRefElement: illegal type (3) " << hprs->geom << endl;
+            std::cerr << "HPRefElement: illegal type (3) " << hprs->geom << std::endl;
             throw NgException ("HPRefElement::SetType: illegal type (3)");
 	  }
 
@@ -774,7 +777,7 @@ namespace netgen
 			 el.pnums[hprs->splitfaces[j][1]-1],
 			 el.pnums[hprs->splitfaces[j][2]-1]);
 	      if (i3.I2() > i3.I3())
-		Swap (i3.I2(), i3.I3());
+		std::swap (i3.I2(), i3.I3());
 	      int npi = newfacepts.Get(i3);
 	      newpnums[hprs->splitfaces[j][3]-1] = npi;
 	    
@@ -817,10 +820,10 @@ namespace netgen
 	j = 0;
 
 	/*
-	*testout << " newpnums = ";
+	std::cerr << " newpnums = ";
 	for (int hi = 0; hi < 64; hi++)
-	  *testout << newpnums[hi] << " ";
-	*testout << endl;
+	  std::cerr << newpnums[hi] << " ";
+	std::cerr <<std::endl;
 	*/
 
 	while (hprs->neweltypes[j])
@@ -843,17 +846,17 @@ namespace netgen
 	      case HP_TET: newel.np=4; break; 
 	      case HP_PYRAMID: newel.np=5; break; 
               default:
-                throw NgException (string("hprefinement.cpp: illegal type"));
+                throw NgException (std::string("hprefinement.cpp: illegal type"));
 	      }
 
 	    for (int k = 0; k < newel.np; k++)
 	      newel.pnums[k] = newpnums[hprs->newels[j][k]-1];
 	    
 	    /*
-	    *testout  << " newel pnums " ; 
+	    std::cerr  << " newel pnums " ; 
 	    for (int k = 0; k < newel.np; k++)  
-	      *testout  << newel.pnums[k] << "\t"; 
-	    *testout << endl; 
+	      std::cerr  << newel.pnums[k] << "\t"; 
+	    std::cerr <<std::endl; 
 	    */
 
 	    for (int k = 0; k < newel.np; k++)  
@@ -861,9 +864,9 @@ namespace netgen
 		for (int l = 0; l < 3; l++)
 		  { 
 		    newel.param[k][l] = newparam[hprs->newels[j][k]-1][l];
-		    //    *testout << newel.param[k][l] << " \t ";
+		    //    std::cerr << newel.param[k][l] << " \t ";
 		  } 
-		// *testout << endl; 
+		// std::cerr <<std::endl; 
 	      } 
 	    
 	    if (j == 0) 
@@ -931,7 +934,7 @@ namespace netgen
 	      case HP_PYRAMID: newel.np=5; break; 
 
               default:
-                cerr << "HPRefElement: illegal type (4) " << hprsnew->geom << endl;
+                std::cerr << "HPRefElement: illegal type (4) " << hprsnew->geom << std::endl;
                 throw NgException ("HPRefElement: illegal type (4)");
                 
 	      }
@@ -976,8 +979,7 @@ namespace netgen
 	    {
 
                
-	      cout << " Degenerate Hex found " << endl; 
-              *testout << " Degenerate Hex found " << endl; 
+	      std::cout << " Degenerate Hex found " << std::endl; 
 	      HPRefElement el = elements[i];
 	      HPRefElement newel = el;
 
@@ -1082,8 +1084,8 @@ namespace netgen
 			newel.pnums[1] = el.PNum(e[1]+1); 			
 			newel.pnums[2] = npi; 
 			
-			*testout << "DEGHEX TRIG :: newpnums " << newel.pnums[0] << "\t"  << newel.pnums[1] << "\t"  << newel.pnums[2] << endl;  
-	cout << "DEGHEX TRIG :: newpnums " << newel.pnums[0] << "\t"  << newel.pnums[1] << "\t"  << newel.pnums[2] << endl;  
+			std::cerr << "DEGHEX TRIG :: newpnums " << newel.pnums[0] << "\t"  << newel.pnums[1] << "\t"  << newel.pnums[2] <<std::endl;  
+	std::cout << "DEGHEX TRIG :: newpnums " << newel.pnums[0] << "\t"  << newel.pnums[1] << "\t"  << newel.pnums[2] <<std::endl;  
 			for(int j=0;j<3;j++) 
 			  {
 			    // newel.param[0][j] = el.param[e[0]][j]; 
@@ -1103,151 +1105,6 @@ namespace netgen
   void CalcStatistics (Array<HPRefElement> & elements)
   {
     return;
-#ifdef ABC    
-    int i, p;
-    int nsegm = 0, ntrig = 0, nquad = 0;
-    int nhex = 0, nprism = 0, npyramid = 0, ntet = 0;
-    int maxlevel = 0;
-
-    for (i = 1; i <= elements.Size(); i++)
-      {
-	const HPRefElement & el = elements.Get(i);
-	maxlevel = max2 (el.level, maxlevel);
-	switch (Get_HPRef_Struct (el.type)->geom)
-	  {
-	  case HP_SEGM:
-
-	    {
-	      nsegm++;
-	      break;
-	    }
-	  case HP_TRIG:
-	    {
-	      ntrig ++;
-	      break;
-	    }
-	  case HP_QUAD:
-	    {
-	      nquad++;
-	      break;
-	    }
-	  case HP_TET:
-	    {
-	      ntet++;
-	      break;
-	    }
-
-	  case HP_PRISM:
-	    {
-	      nprism++;
-	      break;
-	    }
-
-	  case HP_PYRAMID:
-	    {
-	      npyramid++;
-	      break;
-	    }
-
-	  case HP_HEX:
-	    {	
-	      nhex++;
-	      break;
-	    }
-
-	  default:
-	    {
-	      cerr << "statistics error, unknown element type" << endl;
-	    }
-	  }
-      }
-
-    cout << "level = " << maxlevel << endl;
-    cout << "nsegm = " << nsegm << endl;
-    cout << "ntrig = " << ntrig << ", nquad = " << nquad << endl;
-    cout << "ntet = " << ntet << ", npyr = " << npyramid
-	 << ", nprism = " << nprism << ", nhex = " << nhex << endl;
-
-    return;
-
-    double memcost = 0, cpucost = 0;
-    for (p = 1; p <= 20; p++)
-      {
-	memcost = (ntet + nprism + nhex) * pow (static_cast<double>(p), 6.0);
-	cpucost = (ntet + nprism + nhex) * pow (static_cast<double>(p), 9.0);
-	cout << "costs for p = " << p << ": mem = " << memcost << ", cpu = " << cpucost << endl;
-      }
-
-    double memcosttet = 0;
-    double memcostprism = 0;
-    double memcosthex = 0;
-    double memcostsctet = 0; 
-    double memcostscprism = 0;
-    double memcostschex = 0;
-    double cpucosttet = 0;
-    double cpucostprism = 0;
-    double cpucosthex = 0;
-
-    for (i = 1; i <= elements.Size(); i++)
-      {
-	const HPRefElement & el = elements.Get(i);
-	switch (el.type)
-	  {
-	  case HP_TET:
-	  case HP_TET_0E_1V:
-	  case HP_TET_1E_0V:
-	  case HP_TET_1E_1VA:
-	    {
-	      int p1 = maxlevel - el.level + 1;
-	      (*testout) << "p1 = " << p1 << ", P1^6 = " << pow (static_cast<double>(p1), 6.0)
-			 << " (p1-3)^6 = " << pow ( static_cast<double>(max2(p1-3, 0)), 6.0) 
-			 << " p1^3 = " << pow ( static_cast<double>(p1), 3.0) 
-			 << " (p1-3)^3 = " << pow ( static_cast<double>(p1-3), 3.0) 
-			 << " [p1^3-(p1-3)^3]^2 = " << sqr (pow (static_cast<double>(p1),3.0) - pow ( static_cast<double>(p1-3), 3.0))
-			 << endl;
-
-	      p1 /= 2 +1;
-	      memcosttet += pow (static_cast<double>(p1), 6.0);
-	      memcostsctet += pow (static_cast<double>(p1), 6.0) - pow ( static_cast<double>(max2(p1-3, 1)), 6.0);
-	      cpucosttet += pow (static_cast<double>(p1), 9.0);
-	      break;
-	    }
-	  case HP_PRISM:
-	  case HP_PRISM_SINGEDGE:
-	    {
-	      int p1 = maxlevel - el.level + 1;
-	      p1 /= 2 +1;
-	      memcostprism += pow (static_cast<double>(p1), 6.0);
-	      memcostscprism += pow (static_cast<double>(p1), 6.0) - pow ( static_cast<double>(max2(p1-3, 1)), 6.0);
-	      cpucostprism += pow (static_cast<double>(p1), 9.0);
-	      break;
-	    }
-	  case HP_HEX:
-	    {	
-	      int p1 = maxlevel - el.level + 1;
-	      int p2 = maxlevel;
-	      p1 /= 2 +1;
-	      p2 /= 2 +1;
-	      memcosthex += pow (static_cast<double>(p1), 4.0) * pow (static_cast<double>(p2), 2.0);
-	      memcostschex += pow (static_cast<double>(p1), 6.0) - pow ( static_cast<double>(max2(p1-2, 0)), 6.0);
-	      cpucosthex += pow (static_cast<double>(p1), 6.0) * pow (static_cast<double>(p2), 3.0);
-	      break;
-	    }
-	  default:
-	    ;
-	  }
-      }
-    cout << "TET: hp-memcost = " << memcosttet 
-	 << ", scmemcost = " << memcostsctet
-	 << ", cpucost = " << cpucosttet
-	 << endl;
-    cout << "PRI: hp-memcost = " << memcostprism
-	 << ", scmemcost = " << memcostscprism
-	 << ", cpucost = " << cpucostprism << endl;
-    cout << "HEX: hp-memcost = " << memcosthex
-	 << ", scmemcost = " << memcostschex
-	 << ", cpucost = " << cpucosthex << endl;
-#endif
   }
 
 
@@ -1283,16 +1140,16 @@ namespace netgen
                 if (minbot != mintop)
                   {
                     if (map[hpel.pnums[minbot]] < map[hpel.pnums[mintop+3]])
-                      swap (map[hpel.pnums[3+minbot]], map[hpel.pnums[3+mintop]]);
+                      std::swap(map[hpel.pnums[3+minbot]], map[hpel.pnums[3+mintop]]);
                     else
-                      swap (map[hpel.pnums[minbot]], map[hpel.pnums[mintop]]);
+                      std::swap(map[hpel.pnums[minbot]], map[hpel.pnums[mintop]]);
                   }
               }
           }
-        // cout << nwrong << " wrong prisms, " << nright << " right prisms" << endl;
+        // std::cout << nwrong << " wrong prisms, " << nright << " right prisms" <<std::endl;
       }
 
-    cout << nwrong << " wrong prisms, " << nright << " right prisms" << endl;
+    std::cout << nwrong << " wrong prisms, " << nright << " right prisms" << std::endl;
 
 
     Array<MeshPoint, 1> hpts(mesh.GetNP());
@@ -1347,7 +1204,7 @@ namespace netgen
     sing = true; // iterate at least once
     while(sing) 
       {
-	cout << " Start new hp-refinement: step " <<  act_ref  << endl; 
+	std::cout << " Start new hp-refinement: step " <<  act_ref  << std::endl; 
 		
 	DoRefinement (mesh, hpelements, ref, fac1); 
 	DoRefineDummies (mesh, hpelements, ref);
@@ -1438,16 +1295,16 @@ namespace netgen
 				 int(Get_HPRef_Struct (hpel.type) -> geom));
 		}
 	  }
-	cout << " Start with Update Topology " << endl; 
+	std::cout << " Start with Update Topology " << std::endl; 
 	mesh.UpdateTopology();
-	cout << " Mesh Update Topology done " << endl; 
+	std::cout << " Mesh Update Topology done " << std::endl; 
 
 	act_ref++; 
 	
 	sing = ClassifyHPElements(mesh,hpelements, act_ref, levels); 
       }
 
-    cout << " HP-Refinement done with " << --act_ref << " refinement steps." << endl; 
+    std::cout << " HP-Refinement done with " << --act_ref << " refinement steps." << std::endl; 
 
     if(act_ref>=1)
       { 
@@ -1464,22 +1321,22 @@ namespace netgen
 	    switch (mesh[i].GetType())
 	      {
 	      case TET: 
-		/* cout << " TET " ; 
-		for(int k=0;k<4;k++) cout << el[k] << "\t" ; 
-		cout << endl; */ 
+		/* std::cout << " TET " ; 
+		for(int k=0;k<4;k++) std::cout << el[k] << "\t" ; 
+		std::cout <<std::endl; */ 
 		break; 
 	      case PRISM:
-		/* cout << " PRISM " ; 
-		for(int k=0;k<6;k++) cout << el[k] << "\t" ; 
-		cout << endl;  */ 
+		/* std::cout << " PRISM " ; 
+		for(int k=0;k<6;k++) std::cout << el[k] << "\t" ; 
+		std::cout <<std::endl;  */ 
 		for(int l=6;l<9;l++) edge_dir[l] = 2; 
 		ord_dir[2] = 2; 
 		ned = 9; 
 		break; 
 	      case HEX: 
-		/* cout << " HEX " ; 
-		for(int k=0;k<8;k++) cout << el[k] << "\t" ; 
-		cout << endl; */
+		/* std::cout << " HEX " ; 
+		for(int k=0;k<8;k++) std::cout << el[k] << "\t" ; 
+		std::cout <<std::endl; */
 		for(int l=8;l<12; l++) edge_dir[l] = 2; 
 		edge_dir[2] = edge_dir[3] = edge_dir[6] = edge_dir[7] = 1;
 		ord_dir[1] = 1; 
@@ -1487,9 +1344,9 @@ namespace netgen
 		ned = 12; 
 		break;  
 	      case PYRAMID: 
-		/*	cout << " PYRAMID " ; 
-		for(int k=0;k<5;k++) cout << el[k] << "\t" ; 
-		cout << endl; */ 
+		/*	std::cout << " PYRAMID " ; 
+		for(int k=0;k<5;k++) std::cout << el[k] << "\t" ; 
+		std::cout <<std::endl; */ 
 		for(int l=4;l<8;l++) edge_dir[l] = 2; 
 		edge_dir[2] = edge_dir[3] = 1; 
 		ord_dir[1] = 1; 
@@ -1499,7 +1356,7 @@ namespace netgen
 
 
               default:
-                cerr << "HPRefElement: illegal elementtype (2) " << mesh[i].GetType() << endl;
+                std::cerr << "HPRefElement: illegal elementtype (2) " << mesh[i].GetType() << std::endl;
                 throw NgException ("HPRefElement: illegal elementtype (2)");
                 
 	      }
@@ -1510,15 +1367,15 @@ namespace netgen
 		Vec<3> v(hpel.param[edges[j][0]-1][0]-hpel.param[edges[j][1]-1][0],
 			    hpel.param[edges[j][0]-1][1]-hpel.param[edges[j][1]-1][1],
 			    hpel.param[edges[j][0]-1][2]-hpel.param[edges[j][1]-1][2]);
-		dist[edge_dir[j]] = max(v.Length(),dist[edge_dir[j]]);
+		dist[edge_dir[j]] = std::max(v.Length(),dist[edge_dir[j]]);
 	      }
 	    
 	    int refi[3];  
 	    for(int j=0;j<3;j++) 
-	      refi[j] = int(max(double(floor(log(dist[ord_dir[j]]/sqrt(2.))/log(fac1))),0.)); 	
+	      refi[j] = int(std::max(double(floor(log(dist[ord_dir[j]]/sqrt(2.))/log(fac1))),0.)); 	
 	    
-	    // cout << " ref " << refi[0] << "\t" << refi[1] << "\t" << refi[2] << endl; 
-	    // cout << " order " << act_ref +1 - refi[0] << "\t" << act_ref +1 - refi[1] << "\t" << act_ref +1 - refi[2] << endl; 
+	    // std::cout << " ref " << refi[0] << "\t" << refi[1] << "\t" << refi[2] <<std::endl; 
+	    // std::cout << " order " << act_ref +1 - refi[0] << "\t" << act_ref +1 - refi[1] << "\t" << act_ref +1 - refi[2] <<std::endl; 
 	   	      
 	    if(setorders)
 	      mesh[i].SetOrder(act_ref+1-refi[0],act_ref+1-refi[1],act_ref+1-refi[2]); 
@@ -1535,9 +1392,9 @@ namespace netgen
 	   
 	    if(mesh[i].GetType() == QUAD)
 	      {
-		/*	cout << " QUAD " ; 
-		for(int k=0;k<4;k++) cout << el[k] << "\t" ; 
-		cout << endl; 	*/ 
+		/*	std::cout << " QUAD " ; 
+		for(int k=0;k<4;k++) std::cout << el[k] << "\t" ; 
+		std::cout <<std::endl; 	*/ 
  
 		edge_dir[2] = edge_dir[3] = 1; 
 		ord_dir[1] = 1; 
@@ -1545,9 +1402,9 @@ namespace netgen
 	      }
 	    /*  else 
 	      { 
-		cout << " TRIG " ; 
-		for(int k=0;k<3;k++) cout << el[k] << "\t" ; 
-		cout << endl; 
+		std::cout << " TRIG " ; 
+		for(int k=0;k<3;k++) std::cout << el[k] << "\t" ; 
+		std::cout <<std::endl; 
 		} */ 
 	    
 	    for (int j=0;j<ned;j++) 
@@ -1555,18 +1412,18 @@ namespace netgen
 		Vec<3> v(hpel.param[edges[j][0]-1][0]-hpel.param[edges[j][1]-1][0],
 			    hpel.param[edges[j][0]-1][1]-hpel.param[edges[j][1]-1][1],
 			    hpel.param[edges[j][0]-1][2]-hpel.param[edges[j][1]-1][2]);
-		dist[edge_dir[j]] = max(v.Length(),dist[edge_dir[j]]);
+		dist[edge_dir[j]] = std::max(v.Length(),dist[edge_dir[j]]);
 	      }
 	    
 	    int refi[3]; 
 	    for(int j=0;j<3;j++) 
-	      refi[j] = int(max(double(floor(log(dist[ord_dir[j]]/sqrt(2.))/log(fac1))),0.)); 	
+	      refi[j] = int(std::max(double(floor(log(dist[ord_dir[j]]/sqrt(2.))/log(fac1))),0.)); 	
 	    
 	    if(setorders)
 	      mesh[i].SetOrder(act_ref+1-refi[0],act_ref+1-refi[1],act_ref+1-refi[2]); 
 
-	      // cout << " ref " << refi[0] << "\t" << refi[1] << endl; 
-	      // cout << " order " << act_ref +1 - refi[0] << "\t" << act_ref +1 - refi[1] << endl; 
+	      // std::cout << " ref " << refi[0] << "\t" << refi[1] <<std::endl; 
+	      // std::cout << " order " << act_ref +1 - refi[0] << "\t" << act_ref +1 - refi[1] <<std::endl; 
 	  }
       }
   }
@@ -1613,7 +1470,7 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 		sing = 1; 
 	      } 
 	  }
-	cout << endl; 
+	std::cout << std::endl; 
 
 	for (int i = 1; i <= mesh.GetNSeg(); i++)
 	  if (mesh.LineSegment(i).singedge_left * levels >= act_ref)
@@ -1665,8 +1522,8 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 	  }
 
 	edgepoint.Or (cornerpoint);
-	(*testout) << "cornerpoint = " << endl << cornerpoint << endl;
-	(*testout) << "edgepoint = " << endl << edgepoint << endl;
+	std::cerr << "cornerpoint = " << std::endl << cornerpoint << std::endl;
+	std::cerr << "edgepoint = " << std::endl << edgepoint << std::endl;
 
 	facepoint = 0;
 	for (SurfaceElementIndex sei = 0; sei < mesh.GetNSE(); sei++)
@@ -1716,8 +1573,8 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 	      }
 	   
 	  }
-	(*testout) << "singular faces = " << faces << endl;
-	(*testout) << "singular faces_edges = " << face_edges << endl;
+	std::cerr << "singular faces = " << faces << std::endl;
+	std::cerr << "singular faces_edges = " << face_edges << std::endl;
       }
     else
       {
@@ -1741,9 +1598,9 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 		edges.Set(i2,1); 
 		edgepoint.Set(i2.I1());
 		edgepoint.Set(i2.I2());
-		*testout << " singleft " << endl;  
-		*testout << " mesh.LineSegment(i).domout " << mesh.LineSegment(i).domout << endl;      
-		*testout << " mesh.LineSegment(i).domin " << mesh.LineSegment(i).domin << endl;      
+		std::cerr << " singleft " << std::endl;  
+		std::cerr << " mesh.LineSegment(i).domout " << mesh.LineSegment(i).domout << std::endl;      
+		std::cerr << " mesh.LineSegment(i).domin " << mesh.LineSegment(i).domin << std::endl;      
 		edgepoint_dom.Set (INDEX_2(mesh.LineSegment(i).domin, i2.I1()), 1);
 		edgepoint_dom.Set (INDEX_2(mesh.LineSegment(i).domin, i2.I2()), 1);
 		sing = 1; 
@@ -1758,16 +1615,16 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 		edgepoint.Set(i2.I1());
 		edgepoint.Set(i2.I2());
 		
-		*testout << " singright " << endl;  
-		*testout << " mesh.LineSegment(i).domout " << mesh.LineSegment(i).domout << endl;      
-		*testout << " mesh.LineSegment(i).domin " << mesh.LineSegment(i).domin << endl;      
+		std::cerr << " singright " << std::endl;  
+		std::cerr << " mesh.LineSegment(i).domout " << mesh.LineSegment(i).domout << std::endl;      
+		std::cerr << " mesh.LineSegment(i).domin " << mesh.LineSegment(i).domin << std::endl;      
 		
 		edgepoint_dom.Set (INDEX_2(mesh.LineSegment(i).domout, i2.I1()), 1);
 		edgepoint_dom.Set (INDEX_2(mesh.LineSegment(i).domout, i2.I2()), 1);
 		sing = 1;
 	      }
 	    
-	    // (*testout) << "seg = " << ind << ", " << seg[0] << "-" << seg[1] << endl;
+	    // std::cerr << "seg = " << ind << ", " << seg[0] << "-" << seg[1] <<std::endl;
 	    
 
 	    if (seg.singedge_left * levels >= act_ref
@@ -1808,15 +1665,15 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 
 	edgepoint.Or (cornerpoint);
 
-	(*testout) << "2d sing edges: " << endl << edges << endl;
-	(*testout) << "2d cornerpoints: " << endl << cornerpoint << endl
-		   << "2d edgepoints: " << endl << edgepoint << endl;
+	std::cerr << "2d sing edges: " << std::endl << edges << std::endl;
+	std::cerr << "2d cornerpoints: " << std::endl << cornerpoint << std::endl
+		   << "2d edgepoints: " << std::endl << edgepoint << std::endl;
 	
 	facepoint = 0;
       }
 
     if (!sing)
-      cout << "PrepareElements no more to do for actual refinement " << act_ref << endl; 
+      std::cout << "PrepareElements no more to do for actual refinement " << act_ref << std::endl; 
 
     return(sing); 
 }
@@ -1850,11 +1707,11 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
     Array<int> misses(10000);
     misses = 0;
 
-    (*testout) << "edgepoint_dom = " << endl << edgepoint_dom << endl;
+    std::cerr << "edgepoint_dom = " << std::endl << edgepoint_dom << std::endl;
 
     for( int i = 0; i<elements.Size(); i++) 
       {
-	// *testout << "classify element " << i << endl;
+	// std::cerr << "classify element " << i <<std::endl;
 
 	HPRefElement & hpel = elements[i]; 
 	HPRef_Struct * hprs = Get_HPRef_Struct (hpel.type);
@@ -1921,12 +1778,12 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 	      hpel.type = ClassifyPyramid(hpel, edges, edgepoint_dom, cornerpoint, edgepoint, faces,
 						  face_edges, surf_edges, facepoint); 	    	    
 	      
-	      cout << " ** Pyramid classified  " << hpel.type << endl; 
+	      std::cout << " ** Pyramid classified  " << hpel.type << std::endl; 
 	      break; 
 	    }
 	  default:
 	    {
-	      cout << "illegal element type for hp-prepare elements " << hpel.type << endl;
+	      std::cout << "illegal element type for hp-prepare elements " << hpel.type << std::endl;
 	      throw NgException ("hprefinement.cpp: don't know how to set parameters");
 	    }
 	  }
@@ -1935,15 +1792,14 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 	  cnt_undef++; 
 
 	//else 
-	//cout << "elem " << i << " classified type " << hpel.type << endl; 
+	//std::cout << "elem " << i << " classified type " << hpel.type <<std::endl; 
 
 	
 	
 	if (!Get_HPRef_Struct (hpel.type)) 
 	  {
-	    (*testout) << "hp-element-type " << hpel.type << " not implemented   " << endl;
-	    (*testout) << " elType " << hprs->geom << endl; 
- (cout) << " elType " << hprs->geom << endl;        
+	    std::cout << "hp-element-type " << hpel.type << " not implemented   " << std::endl;
+        std::cout << " elType " << hprs->geom << std::endl;        
 	    cnt_nonimplement++;
 	    misses[hpel.type]++;
 	  }
@@ -1963,12 +1819,12 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
       }
     
     
-    cout << "undefined elements update classification: " << cnt_undef << endl;
-    cout << "non-implemented in update classification: " << cnt_nonimplement << endl;
+    std::cout << "undefined elements update classification: " << cnt_undef << std::endl;
+    std::cout << "non-implemented in update classification: " << cnt_nonimplement << std::endl;
 
     for (int i = 0; i < misses.Size(); i++)
       if (misses[i])
-	cout << " in update classification missing case " << i << " occured " << misses[i] << " times" << endl;
+	std::cout << " in update classification missing case " << i << " occured " << misses[i] << " times" << std::endl;
 
     return(sing); 
   }

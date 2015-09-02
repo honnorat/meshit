@@ -142,7 +142,7 @@ namespace netgen
 
   const Refinement & CSGeometry :: GetRefinement () const
   {
-    // cout << "get CSGeometry - Refinement" << endl;
+    // std::cout << "get CSGeometry - Refinement" <<std::endl;
     // should become class variables
     RefinementSurfaces * ref = new RefinementSurfaces(*this);
     ref -> Set2dOptimizer(new MeshOptimize2dSurfaces(*this));
@@ -175,7 +175,7 @@ namespace netgen
 	      << classname << "  " << coeffs.Size();
 	for (int i = 0; i < coeffs.Size(); i++)
 	  ost << " " << coeffs[i];
-	ost << endl;
+	ost <<std::endl;
       }
   }
 
@@ -194,7 +194,7 @@ namespace netgen
 	<< boundingbox.PMin()(2) << " "
 	<< boundingbox.PMax()(0) << " "
 	<< boundingbox.PMax()(1) << " "
-	<< boundingbox.PMax()(2) << endl;
+	<< boundingbox.PMax()(2) <<std::endl;
 
 
     WritePrimitivesIt wpi(ost);
@@ -206,7 +206,7 @@ namespace netgen
 	  {
 	    ost << "solid " << solids.GetName(i) << " ";
 	    solids[i] -> GetSolidData (ost);
-	    ost << endl;
+	    ost <<std::endl;
 	  }
       }
 
@@ -220,17 +220,17 @@ namespace netgen
 	else
 	  ost << "solid " << tlo->GetSolid()->Name() << " ";
 	tlo->GetData(ost);
-	ost << endl;
+	ost <<std::endl;
       }
 
     for (int i = 0; i < identifications.Size(); i++)
       {
 	ost << "identify ";
 	identifications[i] -> GetData (ost);
-	ost << endl;
+	ost <<std::endl;
       }
 
-    ost << "end" << endl;
+    ost << "end" <<std::endl;
   }
 
  
@@ -276,9 +276,9 @@ namespace netgen
 	    ist >> name;
 	    Solid * nsol = Solid::CreateSolid (ist, solids);
 
-	    cout << " I have found solid " << name << " = ";
-	    nsol -> GetSolidData (cout);
-	    cout << endl;
+	    std::cout << " I have found solid " << name << " = ";
+	    nsol -> GetSolidData (std::cout);
+	    std::cout <<std::endl;
 
 	    SetSolid (name, nsol);
 	  }
@@ -511,7 +511,7 @@ namespace netgen
  
   void CSGeometry :: AddSurface (char * name, Surface * surf)
   { 
-    (*testout) << "Adding surface " << name << endl;
+    std::cerr << "Adding surface " << name <<std::endl;
     surfaces.Set (name, surf); 
     surf->SetName (name);
     changeval++; 
@@ -563,7 +563,7 @@ namespace netgen
 	if (oldsol->op != Solid::ROOT ||
 	    sol->op != Solid::ROOT)
 	  {
-	    cerr << "Setsolid: old or new no root" << endl;
+	    std::cerr << "Setsolid: old or new no root" <<std::endl;
 	  }
 	oldsol -> s1 = sol -> s1;
       }
@@ -632,7 +632,7 @@ namespace netgen
 
   void RemoveDummyIterator :: Do(Solid * sol)
   {
-    cerr << "remove dummy iterator is obsolete" << endl;
+    std::cerr << "remove dummy iterator is obsolete" <<std::endl;
 
     if ( (sol->op == Solid::SUB || sol->op == Solid::SECTION || 
 	  sol->op == Solid::UNION)
@@ -732,8 +732,8 @@ namespace netgen
 	    Array < Array<int> * > polysurfs;
 	    polyh->GetPolySurfs(polysurfs);
 	    if(bcname.Size() != polysurfs.Size())
-	      cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.Size()
-		   << " surfaces and should get " << bcname.Size() << " bc-names!" << endl;
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.Size()
+		   << " surfaces and should get " << bcname.Size() << " bc-names!" <<std::endl;
 	    
 	    for ( i = 0; i < min2(polysurfs.Size(),bcname.Size()); i++)
 	      {
@@ -749,8 +749,8 @@ namespace netgen
 	  {
 	    solid->GetSurfaceIndices (surfind);
 	    if(bcname.Size() != surfind.Size())
-	      cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.Size()
-		   << " surfaces and should get " << bcname.Size() << " bc-names!" << endl;
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.Size()
+		   << " surfaces and should get " << bcname.Size() << " bc-names!" <<std::endl;
 	    
 	    for (i = 0; i < min2(surfind.Size(),bcname.Size()); i++)
 	      {
@@ -786,8 +786,8 @@ namespace netgen
 	    Array < Array<int> * > polysurfs;
 	    polyh->GetPolySurfs(polysurfs);
 	    if(bcnum.Size() != polysurfs.Size())
-	      cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.Size()
-		   << " surfaces and should get " << bcnum.Size() << " bc-numbers!" << endl;
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.Size()
+		   << " surfaces and should get " << bcnum.Size() << " bc-numbers!" <<std::endl;
 	    
 	    for ( i = 0; i < min2(polysurfs.Size(),bcnum.Size()); i++)
 	      {
@@ -803,8 +803,8 @@ namespace netgen
 	  {
 	    solid->GetSurfaceIndices (surfind);
 	    if(bcnum.Size() != surfind.Size())
-	      cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.Size()
-		   << " surfaces and should get " << bcnum.Size() << " bc-numbers!" << endl;
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.Size()
+		   << " surfaces and should get " << bcnum.Size() << " bc-numbers!" <<std::endl;
 	    
 	    for (i = 0; i < min2(surfind.Size(),bcnum.Size()); i++)
 	      {
@@ -836,9 +836,9 @@ namespace netgen
 	    }
 	}
 
-    (*testout) << "identicmap:" << endl;
+    std::cerr << "identicmap:" <<std::endl;
     for (int i = 0; i < isidenticto.Size(); i++)
-      (*testout) << i << " -> " << isidenticto[i] << endl;
+      std::cerr << i << " -> " << isidenticto[i] <<std::endl;
   }
   
 
@@ -911,7 +911,7 @@ namespace netgen
 	    if (identicsurfaces.Used (INDEX_2::Sort (locsurf[i], locsurf[j])) !=
 		(isidenticto[locsurf[i]] == isidenticto[locsurf[j]]))
 	      {
-		cerr << "different result" << endl;
+		std::cerr << "different result" <<std::endl;
 		exit(1);
 	      }
 
@@ -936,7 +936,7 @@ namespace netgen
 				const Point<3> & p, Vec<3> & v,
 				Array<int> & locsurf) const
   {
-    cout << "very dangerous" << endl;
+    std::cout << "very dangerous" <<std::endl;
     Point<3> p2 = p + 1e-2 * v;
     BoxSphere<3> box (p2, p2);
     box.Increase (1e-3);
@@ -1082,13 +1082,13 @@ namespace netgen
       }
     catch (exception)
       {
-	cerr << "*************************************************************" << endl
-	     << "****   out of memory problem in CSG visualization        ****" << endl
-	     << "****   Restart netgen, and disable                       ****" << endl
-	     << "****   'Draw Geometry' in Geometry -> CSG Options        ****" << endl
-	     << "****   before loading the geometry                       ****" << endl
-	     << "****   meshing will still work !                         ****" << endl
-	     << "*************************************************************" << endl;
+	std::cerr << "*************************************************************" <<std::endl
+	     << "****   out of memory problem in CSG visualization        ****" <<std::endl
+	     << "****   Restart netgen, and disable                       ****" <<std::endl
+	     << "****   'Draw Geometry' in Geometry -> CSG Options        ****" <<std::endl
+	     << "****   before loading the geometry                       ****" <<std::endl
+	     << "****   meshing will still work !                         ****" <<std::endl
+	     << "*************************************************************" <<std::endl;
 	exit(1);
       }
     Change();
@@ -1109,8 +1109,8 @@ namespace netgen
     // if (level > 10) return;
 
     //tams.AddTriangle (tria);
-    //(*testout) << "tria " << tams.GetPoint(tria[0]) << " - " << tams.GetPoint(tria[1]) << " - " << tams.GetPoint(tria[2]) 
-    //       << " ( " << tria[0] << " " << tria[1] << " " << tria[2] << ")" <<endl;
+    //std::cerr << "tria " << tams.GetPoint(tria[0]) << " - " << tams.GetPoint(tria[1]) << " - " << tams.GetPoint(tria[2]) 
+    //       << " ( " << tria[0] << " " << tria[1] << " " << tria[2] << ")" <std::endl;
     //return;
 
     int pinds[6];
@@ -1163,7 +1163,7 @@ namespace netgen
     if (cntindep == 1)
       {
 	tams.AddTriangle (tria);
-	//(*testout) << "pos1 " << tams.GetPoint(tria[0]) << " - " << tams.GetPoint(tria[1]) << " - " << tams.GetPoint(tria[2]) << endl;
+	//std::cerr << "pos1 " << tams.GetPoint(tria[0]) << " - " << tams.GetPoint(tria[1]) << " - " << tams.GetPoint(tria[2]) <<std::endl;
 	return;
       }
 
@@ -1210,7 +1210,7 @@ namespace netgen
 		if(!onsurface[j])
 		  {
 		    nos++;
-		    cout << "NOT ON SURFACE!! "<< nos << endl;
+		    std::cout << "NOT ON SURFACE!! "<< nos <<std::endl;
 		  }
 		*/
 	      }
@@ -1245,10 +1245,10 @@ namespace netgen
 
 // 		    if(fabs(pn(0)) > 4 || fabs(pn(1)) > 4 || fabs(pn(2)) > 4)
 // 		      {
-// 			cout << "p1 " << p1 << " p2 " << p2 
+// 			std::cout << "p1 " << p1 << " p2 " << p2 
 // 			     << " f1 " << f1 << " f2 " << f2
 // 			     << " l1 " << l1 << " l2 " << l2 
-// 			     << " pn " << pn << endl;
+// 			     << " pn " << pn <<std::endl;
 
 // 		      }
 
@@ -1294,8 +1294,8 @@ namespace netgen
 				 pnums[trias[vcase][3*j]-1],
 				 pnums[trias[vcase][3*j+1]-1],
 				 pnums[trias[vcase][3*j+2]-1]);
-		//(*testout) << "pos2 " << tams.GetPoint(ntria[0]) << " - " << tams.GetPoint(ntria[1]) << " - " << tams.GetPoint(ntria[2]) << endl
-		//	   << "( " << ntria[0] << " - " << ntria[1] << " - " << ntria[2] << ")" << endl;
+		//std::cerr << "pos2 " << tams.GetPoint(ntria[0]) << " - " << tams.GetPoint(ntria[1]) << " - " << tams.GetPoint(ntria[2]) <<std::endl
+		//	   << "( " << ntria[0] << " - " << ntria[1] << " - " << ntria[2] << ")" <<std::endl;
 		tams.AddTriangle (ntria);
 	      }
 
@@ -1344,7 +1344,7 @@ namespace netgen
 	    int pic1 = newpi[(visj+1)%3];
 	    int pic2 = newpi[(visj+2)%3];
 		
-	    cout << pivis << "," << pic1 << "," << pic2 << endl;
+	    std::cout << pivis << "," << pic1 << "," << pic2 <<std::endl;
 		
 	    tams.AddTriangle (TATriangle (si, pivis, pic1,pic2));
 	    break;
@@ -1379,7 +1379,7 @@ namespace netgen
     // bisection
     if (box.Diam() < detail)
       {
-	//cout << "returning" << endl;
+	//std::cout << "returning" <<std::endl;
 	return;
       }
 

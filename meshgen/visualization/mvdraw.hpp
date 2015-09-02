@@ -1,6 +1,10 @@
 #ifndef FILE_MVDRAW
 #define FILE_MVDRAW
 
+#include <GL/gl.h>
+#include "../general/parthreads.hpp"
+#include "../gprim/geom3d.hpp"
+#include "soldata.hpp"
 
 namespace netgen
 {

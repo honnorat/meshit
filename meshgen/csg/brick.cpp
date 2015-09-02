@@ -87,7 +87,7 @@ Point<3> Parallelogram3d :: GetSurfacePoint () const
 
 void Parallelogram3d :: Print (ostream & str) const
 {
-  str << "Parallelogram3d " << p1 << " - " << p2 << " - " << p3 << endl;
+  str << "Parallelogram3d " << p1 << " - " << p2 << " - " << p3 <<std::endl;
 }
 
   

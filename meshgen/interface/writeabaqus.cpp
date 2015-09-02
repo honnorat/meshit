@@ -22,16 +22,16 @@ void WriteAbaqusFormat (const Mesh & mesh,
 
 {
       
-  cout << "\nWrite Abaqus Volume Mesh" << endl;
+  std::cout << "\nWrite Abaqus Volume Mesh" <<std::endl;
 
   ofstream outfile (filename.c_str());
 
-  outfile << "*Heading" << endl;
-  outfile << " " << filename << endl;
+  outfile << "*Heading" <<std::endl;
+  outfile << " " << filename <<std::endl;
 
   outfile.precision(8);
 
-  outfile << "*Node" << endl;
+  outfile << "*Node" <<std::endl;
 
   int np = mesh.GetNP();
   int ne = mesh.GetNE();
@@ -56,15 +56,15 @@ void WriteAbaqusFormat (const Mesh & mesh,
       int non = el1.GetNP();
       if (non == 4)
 	{
-	  outfile << "*Element, type=C3D4, ELSET=PART" << indcnt << endl;
+	  outfile << "*Element, type=C3D4, ELSET=PART" << indcnt <<std::endl;
 	} 
       else if (non == 10)
 	{
-	  outfile << "*Element, type=C3D10, ELSET=PART" << indcnt << endl;
+	  outfile << "*Element, type=C3D10, ELSET=PART" << indcnt <<std::endl;
 	} 
       else
 	{
-	  cout << "unsupported Element type!!!" << endl;	  
+	  std::cout << "unsupported Element type!!!" <<std::endl;	  
 	}
 
       for (i = 1; i <= ne; i++)
@@ -76,7 +76,7 @@ void WriteAbaqusFormat (const Mesh & mesh,
 	      actcnt++;
 	      if (el.GetNP() != non) 
 		{
-		  cout << "different element-types in a subdomain are not possible!!!" << endl;
+		  std::cout << "different element-types in a subdomain are not possible!!!" <<std::endl;
 		  continue;
 		}
 		  
@@ -104,7 +104,7 @@ void WriteAbaqusFormat (const Mesh & mesh,
 		}
 	      else
 		{
-		  cout << "unsupported Element type!!!" << endl;
+		  std::cout << "unsupported Element type!!!" <<std::endl;
 		  for (j = 1; j <= el.GetNP(); j++)
 		    {
 		      outfile << el.PNum(j);
@@ -115,7 +115,7 @@ void WriteAbaqusFormat (const Mesh & mesh,
 	    }
 	}	  
       indcnt++;
-      if (elemcnt == ne) {finished = 1; cout << "all elements found by Index!" << endl;}
+      if (elemcnt == ne) {finished = 1; std::cout << "all elements found by Index!" <<std::endl;}
       if (actcnt == 0) {finished = 1;}
     }
 
@@ -156,8 +156,8 @@ void WriteAbaqusFormat (const Mesh & mesh,
 	if (master.Test(i))
 	  masternode = i;
 
-      cout << "masternode = " << masternode << " = "
-	   << mesh.Point(masternode) << endl;
+      std::cout << "masternode = " << masternode << " = "
+	   << mesh.Point(masternode) <<std::endl;
       Array<int> slaves(3);
       for (i = 1; i <= 3; i++)
 	{
@@ -167,8 +167,8 @@ void WriteAbaqusFormat (const Mesh & mesh,
 	      if (pairs.Get(j).I1() == masternode)
 		slaves.Elem(i) = pairs.Get(j).I2();
 	    }
-	  cout << "slave(" << i << ") = " << slaves.Get(i)
-	       << " = " << mesh.Point(slaves.Get(i)) << endl;
+	  std::cout << "slave(" << i << ") = " << slaves.Get(i)
+	       << " = " << mesh.Point(slaves.Get(i)) <<std::endl;
 	}
 	  
 	  
@@ -176,7 +176,7 @@ void WriteAbaqusFormat (const Mesh & mesh,
 	      << "*NSET,NSET=CTENODS\n"
 	      << slaves.Get(1) << ", " 
 	      << slaves.Get(2) << ", " 
-	      << slaves.Get(3) << endl;
+	      << slaves.Get(3) <<std::endl;
 
 	  
       outfile << "**\n"
@@ -197,12 +197,12 @@ void WriteAbaqusFormat (const Mesh & mesh,
 	  if (fabs (v.Y()) > 0.9 * vlen) dir = 3;
 	  if (fabs (v.Z()) > 0.9 * vlen) dir = 1;
 	  if (!dir)
-	    cout << "ERROR: Problem with rigid body constraints" << endl;
+	    std::cout << "ERROR: Problem with rigid body constraints" <<std::endl;
 	  outfile << slaves.Get(j) << ", " << dir << ",,    0.\n";
 	}
 
       outfile << "**\n"
-	      << "*EQUATION, INPUT=" << mpcfilename << endl;
+	      << "*EQUATION, INPUT=" << mpcfilename <<std::endl;
 	  
 
       BitArray eliminated(np);
@@ -231,7 +231,7 @@ void WriteAbaqusFormat (const Mesh & mesh,
     }
 
 
-  cout << "done" << endl;
+  std::cout << "done" <<std::endl;
 }
 
 }

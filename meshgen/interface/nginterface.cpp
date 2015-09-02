@@ -72,7 +72,7 @@ void RunParallel ( void * (*fun)(void *), void * in)
   MPI_Query_thread(&provided);
   if (provided < 3)
     if (netgen::ntasks > 1) parthread = false;
-  // cout << "runparallel = " << parthread << endl;
+  // std::cout << "runparallel = " << parthread <<std::endl;
 #endif
 
   if (parthread)
@@ -150,7 +150,7 @@ void Ng_LoadGeometry (const char * filename)
 
 
   // if (id == 0)
-  cerr << "cannot load geometry '" << filename << "'" << ", id = " << id << endl;
+  std::cerr << "cannot load geometry '" << filename << "'" << ", id = " << id <<std::endl;
 }                          
 
 
@@ -222,7 +222,7 @@ void Ng_LoadMesh (const char * filename)
 	  
 	  if (!(weightsfile.good()))
 	    {
-	      // cout << "regular distribute" << endl;
+	      // std::cout << "regular distribute" <<std::endl;
 	      mesh -> Distribute();
 	    }
 	  else
@@ -326,7 +326,7 @@ void Ng_GetPoint (int pi, double * p)
   if (pi < 1 || pi > mesh->GetNP())
     {
       if (printmessage_importance>0)
-        cout << "Ng_GetPoint: illegal point " << pi << endl;
+        std::cout << "Ng_GetPoint: illegal point " << pi <<std::endl;
       return;
     }
 
@@ -369,7 +369,7 @@ NG_ELEMENT_TYPE Ng_GetElement (int ei, int * epi, int * np)
 	      {
 	      case 1:
                 if (printmessage_importance>0)
-                  cout << "degenerated prism found, deg = 1" << endl;
+                  std::cout << "degenerated prism found, deg = 1" <<std::endl;
 		for (i = 0; i < 5; i++)
 		  epi[i] = el.PNum (map[i]);
 		
@@ -380,7 +380,7 @@ NG_ELEMENT_TYPE Ng_GetElement (int ei, int * epi, int * np)
 	    case 2:
 	      {
                 if (printmessage_importance>0)
-                  cout << "degenerated prism found, deg = 2" << endl;
+                  std::cout << "degenerated prism found, deg = 2" <<std::endl;
 		if (!deg1) epi[3] = el.PNum(4);
 		if (!deg2) epi[3] = el.PNum(5);
 		if (!deg3) epi[3] = el.PNum(6);
@@ -458,7 +458,7 @@ char * Ng_GetElementMaterial (int ei)
   if (mesh->GetDimension() == 3)
     {
       int ind = mesh->VolumeElement(ei).GetIndex();
-      // cout << "ind = " << ind << endl;
+      // std::cout << "ind = " << ind <<std::endl;
       const char * mat = mesh->GetMaterial (ind);
       if (mat)
 	return const_cast<char*> (mat);
@@ -617,7 +617,7 @@ void Ng_GetNormalVector (int sei, int locpi, double * nv)
 
       int surfi = mesh->GetFaceDescriptor(mesh->SurfaceElement(sei).GetIndex()).SurfNr();
       
-      (*testout) << "surfi = " << surfi << endl;
+      std::cerr << "surfi = " << surfi <<std::endl;
 #ifdef OCCGEOMETRYxxx
       OCCGeometry * occgeometry = dynamic_cast<OCCGeometry*> (ng_geometry);
       if (occgeometry)
@@ -716,7 +716,7 @@ int Ng_FindSurfaceElementOfPoint (double * p, double * lami, int build_searchtre
   else
     {
       //throw NgException("FindSurfaceElementOfPoint for 2D meshes not yet implemented");
-      cerr << "FindSurfaceElementOfPoint for 2D meshes not yet implemented" << endl;
+      std::cerr << "FindSurfaceElementOfPoint for 2D meshes not yet implemented" <<std::endl;
     }
 
   delete dummy;
@@ -936,7 +936,7 @@ int NgPar_GetDistantNodeNums ( int nodetype, int locnum, int * distnums )
       // mesh->GetParallelTopology().GetDistantElNums( locnum, distnums );
       break;
     default:
-      cerr << "NgPar_GetDistantNodeNums() Unknown nodetype " << nodetype << endl;
+      std::cerr << "NgPar_GetDistantNodeNums() Unknown nodetype " << nodetype <<std::endl;
       size = -1;
     }
 
@@ -1078,7 +1078,7 @@ void Ng_SecondOrder ()
     else
     {
     if (printmessage_importance>0)
-    cout << "no geom" << endl;
+    std::cout << "no geom" <<std::endl;
     Refinement ref;
     ref.MakeSecondOrder (*mesh);
     }
@@ -1191,7 +1191,7 @@ int Ng_ME_GetNVertices (NG_ELEMENT_TYPE et)
       return 8;
 
     default:
-      cerr << "Ng_ME_GetNVertices, illegal element type " << et << endl;
+      std::cerr << "Ng_ME_GetNVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -1226,7 +1226,7 @@ int Ng_ME_GetNEdges (NG_ELEMENT_TYPE et)
       return 12;
 
     default:
-      cerr << "Ng_ME_GetNEdges, illegal element type " << et << endl;
+      std::cerr << "Ng_ME_GetNEdges, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -1263,7 +1263,7 @@ int Ng_ME_GetNFaces (NG_ELEMENT_TYPE et)
       return 6;
 
     default:
-      cerr << "Ng_ME_GetNVertices, illegal element type " << et << endl;
+      std::cerr << "Ng_ME_GetNVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -1338,7 +1338,7 @@ const NG_POINT * Ng_ME_GetVertices (NG_ELEMENT_TYPE et)
 
     case NG_HEX:
     default:
-      cerr << "Ng_ME_GetVertices, illegal element type " << et << endl;
+      std::cerr << "Ng_ME_GetVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -1420,7 +1420,7 @@ const NG_EDGE * Ng_ME_GetEdges (NG_ELEMENT_TYPE et)
 
     case NG_HEX:
     default:
-      cerr << "Ng_ME_GetEdges, illegal element type " << et << endl;
+      std::cerr << "Ng_ME_GetEdges, illegal element type " << et <<std::endl;
     }
   return 0;  
 }
@@ -1483,7 +1483,7 @@ const NG_FACE * Ng_ME_GetFaces (NG_ELEMENT_TYPE et)
     case NG_HEX:
 
     default:
-      cerr << "Ng_ME_GetFaces, illegal element type " << et << endl;
+      std::cerr << "Ng_ME_GetFaces, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -1589,7 +1589,7 @@ int Ng_GetFace_Vertices (int fnr, int * vert)
   topology.GetFaceVertices (fnr, ia);
   for (int i = 0; i < ia.Size(); i++)
     vert[i] = ia[i];
-  //  cout << "face verts = " << ia << endl;
+  //  std::cout << "face verts = " << ia <<std::endl;
   return ia.Size();
 }
 
@@ -1627,8 +1627,8 @@ int Ng_GetNVertexElements (int vnr)
         return cnt;
       }
     default:
-      cerr << "error: mesh->GetDimension() gives " 
-           << mesh->GetDimension() << endl;
+      std::cerr << "error: mesh->GetDimension() gives " 
+           << mesh->GetDimension() <<std::endl;
       return 0;
     }
 }
@@ -1827,14 +1827,14 @@ int Ng_GetNPeriodicEdges (int idnr)
   //  for (int id = 1; id <= mesh->GetIdentifications().GetMaxNr(); id++)
   {
     mesh->GetIdentifications().GetMap(idnr, map);
-    //(*testout) << "ident-map " << id << ":" << endl << map << endl;
+    //std::cerr << "ident-map " << id << ":" <<std::endl << map <<std::endl;
 
     for (SegmentIndex si = 0; si < nse; si++)
       {
 	PointIndex other1 = PointIndex (map[(*mesh)[si][0]]);
 	PointIndex other2 = PointIndex (map[(*mesh)[si][1]]);
-	//  (*testout) << "seg = " << (*mesh)[si] << "; other = " 
-	//     << other1 << "-" << other2 << endl;
+	//  std::cerr << "seg = " << (*mesh)[si] << "; other = " 
+	//     << other1 << "-" << other2 <<std::endl;
 	if (other1 && other2 && mesh->IsSegment (other1, other2))
 	  {
 	    cnt++;
@@ -1855,7 +1855,7 @@ void Ng_GetPeriodicEdges (int idnr, int * pairs)
   {
     mesh->GetIdentifications().GetMap(idnr, map);
       
-    //(*testout) << "map = " << map << endl;
+    //std::cerr << "map = " << map <<std::endl;
 
     for (SegmentIndex si = 0; si < nse; si++)
       {
@@ -2008,7 +2008,7 @@ int Ng_SocketClientOpen( const int port, const char * host )
     }
   catch( SocketException e)
     {
-      cerr << e.Description() << endl;
+      std::cerr << e.Description() <<std::endl;
       return 0;
     }
   return 1;
@@ -2251,7 +2251,7 @@ int Ng_GetClosureNodes (int nt, int nodenr, int nodeset, int * nodes)
       }
     default:
       {
-        cerr << "GetClosureNodes not implemented for Nodetype " << nt << endl;
+        std::cerr << "GetClosureNodes not implemented for Nodetype " << nt <<std::endl;
       }
     }
   return 0;
@@ -2324,7 +2324,7 @@ int Ng_GetElementClosureNodes (int dim, int elementnr, int nodeset, int * nodes)
       }
     default:
       {
-        cerr << "GetClosureNodes not implemented for Element of dimension " << dim << endl;
+        std::cerr << "GetClosureNodes not implemented for Element of dimension " << dim <<std::endl;
       }
     }
   return 0;

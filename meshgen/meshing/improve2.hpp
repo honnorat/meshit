@@ -1,8 +1,9 @@
 #ifndef FILE_IMPROVE2
 #define FILE_IMPROVE2
 
+#include "meshclass.hpp"
 
-
+namespace netgen {
 ///
 class MeshOptimize2d
 {
@@ -97,6 +98,8 @@ extern double CalcTriangleBadness (const Point<3> & p1,
 				   const Vec<3> & n,
 				   double metricweight,
 				   double h);
+
+}
 
 #endif
 

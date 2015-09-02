@@ -1,6 +1,12 @@
 #ifndef FILE_RULER3
 #define FILE_RULER3
 
+#include "../general/array.hpp"
+#include "../linalg/densemat.hpp"
+#include "../gprim/geom3d.hpp"
+#include "meshtype.hpp"
+
+namespace netgen {
 
 /**
   3D element generation rule.
@@ -191,7 +197,7 @@ public:
   ///
   const char * Name () const { return name; }
   ///
-  void LoadRule (istream & ist);
+  void LoadRule (std::istream & ist);
 
   ///
   const Array<Point3d> & GetTransFreeZone () { return transfreezone; }
@@ -204,7 +210,7 @@ public:
   //  friend void Plot3DRule (const ROT3D & r, char key);
 };
 
-
+}
 
 #endif
 

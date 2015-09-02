@@ -8,8 +8,8 @@
    Abstract data type TABLE
 */
 
-#include <mystdlib.h>
-#include <myadt.hpp>
+#include <meshgen.hpp>
+#include "table.hpp"
 
 namespace netgen
 {
@@ -129,7 +129,7 @@ namespace netgen
       {
 	void * p = new char [newsize * elsize];
       
-	memcpy (p, line.col, min2 (newsize, line.size) * elsize);
+	memcpy (p, line.col, std::min (newsize, line.size) * elsize);
 	delete [] (char*)line.col;
 
 	line.col = p;

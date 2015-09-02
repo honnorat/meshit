@@ -1,5 +1,5 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "ruler2.hpp"
 
 namespace netgen
 {
@@ -170,8 +170,8 @@ int netrule :: ConvexFreeZone () const
 					 transfreezone.Get(i % n + 1),
 					 transfreezone.Get( (i+1) % n + 1 ),
 					 1e-7);
-      //(*testout) << "ccw " << counterclockwise << endl << " p1 " << transfreezone.Get(i) << " p2 " << transfreezone.Get(i % n + 1)
-      //		 << " p3 " << transfreezone.Get( (i+1) % n + 1 ) << endl;
+      //std::cerr << "ccw " << counterclockwise <<std::endl << " p1 " << transfreezone.Get(i) << " p2 " << transfreezone.Get(i % n + 1)
+      //		 << " p3 " << transfreezone.Get( (i+1) % n + 1 ) <<std::endl;
       if (!counterclockwise )
 	return 0;
     }

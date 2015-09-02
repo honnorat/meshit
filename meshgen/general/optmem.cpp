@@ -9,8 +9,8 @@
 */
 
 
-#include <mystdlib.h>
-#include <myadt.hpp>
+#include <meshgen.hpp>
+#include "optmem.hpp"
 
 namespace netgen
 {
@@ -36,8 +36,8 @@ namespace netgen
     //  return new char[size];
     if (!freelist)
       {
-	// cout << "freelist = " << freelist << endl;
-	// cout << "BlockAlloc: " << size*blocks << endl;
+	// std::cout << "freelist = " << freelist <<std::endl;
+	// std::cout << "BlockAlloc: " << size*blocks <<std::endl;
 	char * hcp = new char [size * blocks];
 	bablocks.Append (hcp);
 	bablocks.Last() = hcp;

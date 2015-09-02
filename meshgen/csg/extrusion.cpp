@@ -408,8 +408,8 @@ namespace netgen
 
     Project(center);
 
-    //(*testout) << "box.Center() " << box.Center() << " projected " << center << " diam " << box.Diam() 
-    //       << " dist " << Dist(box.Center(),center) << endl;
+    //std::cerr << "box.Center() " << box.Center() << " projected " << center << " diam " << box.Diam() 
+    //       << " dist " << Dist(box.Center(),center) <<std::endl;
 
     return (Dist(box.Center(),center) < 0.5*box.Diam());
   }
@@ -467,11 +467,11 @@ namespace netgen
     else
       comp = 1;
 
-    //(*testout) << "p2d " << p2d;
+    //std::cerr << "p2d " << p2d;
 
     for(int i=0; i<ips.Size(); i++)
       {
-	//(*testout) << " ip " << ips[i];
+	//std::cerr << " ip " << ips[i];
 
 	double t = (ips[i](comp)-p2d(comp))/v2d(comp);
 
@@ -482,7 +482,7 @@ namespace netgen
 	else
 	  intersecting = true;
       }
-    //(*testout) << endl;
+    //std::cerr <<std::endl;
   }
 
   void ExtrusionFace :: Print (ostream & str) const{}
@@ -707,7 +707,7 @@ namespace netgen
       {
 	faces[i]->LineIntersections(p,random_vec,eps,before,after,intersects);
 
-	//(*testout) << "intersects " << intersects << " before " << before << " after " << after << endl;
+	//std::cerr << "intersects " << intersects << " before " << before << " after " << after <<std::endl;
 	if(intersects)
 	  {
 	    if(facenums)
@@ -810,7 +810,7 @@ namespace netgen
 
     else
       {
-	cerr << "WHY ARE THERE " << facenums.Size() << " FACES?" << endl;
+	std::cerr << "WHY ARE THERE " << facenums.Size() << " FACES?" <<std::endl;
       }
 
     if(d > eps)
@@ -832,7 +832,7 @@ namespace netgen
     INSOLID_TYPE retval;
     retval = VecInSolid(p,v1,eps);
 
-    // *testout << "extr, vecinsolid=" << int(retval) << endl;
+    // std::cerr << "extr, vecinsolid=" << int(retval) <<std::endl;
 
     if(retval != DOES_INTERSECT)
       return retval;

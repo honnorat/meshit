@@ -7,6 +7,11 @@
 /* Date:   01. Jun. 95                                                    */
 /**************************************************************************/
 
+#include <iostream>
+
+#include "table.hpp"
+#include "template.hpp"
+
 namespace netgen
 {
 
@@ -60,7 +65,7 @@ public:
   inline void GetData (int bnr, int colnr, INDEX & ahash, T & acont) const;
 
   ///
-  inline void PrintMemInfo (ostream & ost) const;
+  inline void PrintMemInfo (std::ostream & ost) const;
 };
 
 
@@ -85,7 +90,7 @@ public:
     : hash (size) { };
 
   ///
-  void PrintStat (ostream & ost) const;
+  void PrintStat (std::ostream & ost) const;
   void BaseSetSize(int s) {hash.SetSize(s);}
   //protected:
   ///
@@ -180,11 +185,11 @@ public:
   }
   
   ///
-  void PrintMemInfo (ostream & ost) const
+  void PrintMemInfo (std::ostream & ost) const
   {
-    ost << "Hash: " << endl;
+    ost << "Hash: " << std::endl;
     hash.PrintMemInfo (ost);
-    ost << "Cont: " << endl;
+    ost << "Cont: " << std::endl;
     cont.PrintMemInfo (ost);
   }
 
@@ -212,7 +217,7 @@ public:
 
     void operator++ (int)
     {
-      // cout << "begin Operator ++: bagnr = " << bagnr << " -  pos = " << pos << endl;
+      // std::cout << "begin Operator ++: bagnr = " << bagnr << " -  pos = " << pos <<std::endl;
       pos++;
       while (bagnr < ht.GetNBags() && 
 	     pos == ht.GetBagSize(bagnr+1))
@@ -220,7 +225,7 @@ public:
 	  pos = 0;
 	  bagnr++;
 	}
-      // cout << "end Operator ++: bagnr = " << bagnr << " - pos = " << pos << endl;
+      // std::cout << "end Operator ++: bagnr = " << bagnr << " - pos = " << pos <<std::endl;
     }
 
     bool operator != (int i) const
@@ -259,12 +264,12 @@ public:
 
 
 template <typename T> 
-inline ostream & operator<< (ostream & ost, const INDEX_2_HASHTABLE<T> & ht)
+inline std::ostream & operator<< (std::ostream & ost, const INDEX_2_HASHTABLE<T> & ht)
 {
   for (typename INDEX_2_HASHTABLE<T>::Iterator it = ht.Begin();
        it != ht.End(); it++)
     {
-      ost << ht.GetHash(it) << ": " << ht.GetData(it) << endl;
+      ost << ht.GetHash(it) << ": " << ht.GetData(it) << std::endl;
     }
 
   return ost;
@@ -348,7 +353,7 @@ public:
   inline void AllocateElements ();
 
   ///
-  inline void PrintMemInfo (ostream & ost) const;
+  inline void PrintMemInfo (std::ostream & ost) const;
   ///
   inline void DeleteData ();
 
@@ -375,7 +380,7 @@ public:
 
     void operator++ (int)
     {
-      // cout << "begin Operator ++: bagnr = " << bagnr << " -  pos = " << pos << endl;
+      // std::cout << "begin Operator ++: bagnr = " << bagnr << " -  pos = " << pos <<std::endl;
       pos++;
       while (bagnr < ht.GetNBags() && 
 	     pos == ht.GetBagSize(bagnr+1))
@@ -383,7 +388,7 @@ public:
 	  pos = 0;
 	  bagnr++;
 	}
-      // cout << "end Operator ++: bagnr = " << bagnr << " - pos = " << pos << endl;
+      // std::cout << "end Operator ++: bagnr = " << bagnr << " - pos = " << pos <<std::endl;
     }
 
     bool operator != (int i) const
@@ -428,12 +433,12 @@ public:
 
 
 template <typename T> 
-inline ostream & operator<< (ostream & ost, const INDEX_3_HASHTABLE<T> & ht)
+inline std::ostream & operator<< (std::ostream & ost, const INDEX_3_HASHTABLE<T> & ht)
 {
   for (typename INDEX_3_HASHTABLE<T>::Iterator it = ht.Begin();
        it != ht.End(); it++)
     {
-      ost << ht.GetHash(it) << ": " << ht.GetData(it) << endl;
+      ost << ht.GetHash(it) << ": " << ht.GetData(it) << std::endl;
     }
 
   return ost;
@@ -723,7 +728,7 @@ public:
   ///
   inline void SetSize (int size);
   ///
-  inline void PrintMemInfo (ostream & ost) const;
+  inline void PrintMemInfo (std::ostream & ost) const;
   ///
   inline void DeleteData ()
   { SetSize (cont.Size()); }
@@ -739,7 +744,7 @@ public:
 
 
 template <typename T> 
-inline ostream & operator<< (ostream & ost, const INDEX_2_CLOSED_HASHTABLE<T> & ht)
+inline std::ostream & operator<< (std::ostream & ost, const INDEX_2_CLOSED_HASHTABLE<T> & ht)
 {
   for (int i = 0; i < ht.Size(); i++)
     if (ht.UsedPos(i))
@@ -747,7 +752,7 @@ inline ostream & operator<< (ostream & ost, const INDEX_2_CLOSED_HASHTABLE<T> & 
 	INDEX_2 hash;
 	T data;
 	ht.GetData (i, hash, data);
-	ost << "hash = " << hash << ", data = " << data << endl;
+	ost << "hash = " << hash << ", data = " << data << std::endl;
       }
   return ost;
 }
@@ -915,11 +920,11 @@ public:
     cont.SetSize(size);
   }
 
-  void PrintMemInfo (ostream & ost) const
+  void PrintMemInfo (std::ostream & ost) const
   {
-    cout << "Hashtable: " << Size() 
+    std::cout << "Hashtable: " << Size() 
          << " entries of size " << sizeof(INDEX_3) << " + " << sizeof(T) 
-         << " = " << Size() * (sizeof(INDEX_3) + sizeof(T)) << " bytes" << endl;
+         << " = " << Size() * (sizeof(INDEX_3) + sizeof(T)) << " bytes" << std::endl;
     
   }
 
@@ -939,7 +944,7 @@ public:
 
 
 template <typename T> 
-inline ostream & operator<< (ostream & ost, const INDEX_3_CLOSED_HASHTABLE<T> & ht)
+inline std::ostream & operator<< (std::ostream & ost, const INDEX_3_CLOSED_HASHTABLE<T> & ht)
 {
   for (int i = 0; i < ht.Size(); i++)
     if (ht.UsedPos(i))
@@ -947,7 +952,7 @@ inline ostream & operator<< (ostream & ost, const INDEX_3_CLOSED_HASHTABLE<T> & 
 	INDEX_3 hash;
 	T data;
 	ht.GetData (i, hash, data);
-	ost << "hash = " << hash << ", data = " << data << endl;
+	ost << "hash = " << hash << ", data = " << data << std::endl;
       }
   return ost;
 }
@@ -1077,11 +1082,11 @@ inline void INDEX_3_HASHTABLE<T> :: AllocateElements ()
 
 
 template<class T>
-inline void INDEX_3_HASHTABLE<T> :: PrintMemInfo (ostream & ost) const
+inline void INDEX_3_HASHTABLE<T> :: PrintMemInfo (std::ostream & ost) const
   {
-    ost << "Hash: " << endl;
+    ost << "Hash: " << std::endl;
     hash.PrintMemInfo (ost);
-    ost << "Cont: " << endl;
+    ost << "Cont: " << std::endl;
     cont.PrintMemInfo (ost);
   }
 
@@ -1144,11 +1149,11 @@ inline void INDEX_HASHTABLE<T> :: GetData (int bnr, int colnr, INDEX & ahash, T 
     }
     
 template<class T>
-inline void INDEX_HASHTABLE<T> :: PrintMemInfo (ostream & ost) const
+inline void INDEX_HASHTABLE<T> :: PrintMemInfo (std::ostream & ost) const
   {
-    ost << "Hash: " << endl;
+    ost << "Hash: " << std::endl;
     hash.PrintMemInfo (ost);
-    ost << "Cont: " << endl;
+    ost << "Cont: " << std::endl;
     cont.PrintMemInfo (ost);
   }
 
@@ -1247,13 +1252,13 @@ SetSize (int size)
   
 template<class T>
 inline void INDEX_2_CLOSED_HASHTABLE<T> :: 
-PrintMemInfo (ostream & ost) const
+PrintMemInfo (std::ostream & ost) const
 {
-  cout << "Hashtable: " << Size() 
+  std::cout << "Hashtable: " << Size() 
        << " entries of size " << sizeof(INDEX_2) << " + " << sizeof(T) 
        << " = " << Size() * (sizeof(INDEX_2) + sizeof(T)) << " bytes." 
        << " Used els: " << UsedElements() 
-       << endl;
+       << std::endl;
 }
 
 
@@ -1356,9 +1361,9 @@ template<class T>
 inline void INDEX_3_CLOSED_HASHTABLE<T> :: 
 PrintMemInfo (ostream & ost) const
 {
-  cout << "Hashtable: " << Size() 
+  std::cout << "Hashtable: " << Size() 
        << " entries of size " << sizeof(INDEX_3) << " + " << sizeof(T) 
-       << " = " << Size() * (sizeof(INDEX_3) + sizeof(T)) << " bytes" << endl;
+       << " = " << Size() * (sizeof(INDEX_3) + sizeof(T)) << " bytes" <<std::endl;
 }
 */
 

@@ -7,12 +7,20 @@
 /* Date:   01. Okt. 95                                                    */
 /**************************************************************************/
 
+#include <climits>
+#include <iostream>
+
+#include "../gprim/geomobjects.hpp"
+#include "../gprim/adtree.hpp"
+#include "meshtype.hpp"
 
 /**
 
     Advancing front class for surfaces
 
 */
+namespace netgen
+{
 
   ///
   class FrontPoint2
@@ -163,7 +171,6 @@
 
 class AdFront2
 {
-
   ///
   Array<FrontPoint2> points;  /// front points
   Array<FrontLine> lines;     /// front lines
@@ -194,7 +201,7 @@ public:
   ///
   // void GetPoints (Array<Point<3> > & apoints) const;
   ///
-  void Print (ostream & ost) const;
+//  void Print (std::ostream & ost) const;
 
   ///
   bool Empty () const
@@ -271,10 +278,10 @@ public:
   ///
   void SetStartFront ();
   ///
-  void PrintOpenSegments (ostream & ost) const;
+  void PrintOpenSegments (std::ostream & ost) const;
 };
 
-
+}
 
 #endif
 

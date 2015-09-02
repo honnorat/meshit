@@ -1,66 +1,61 @@
 #ifndef NOTCL
 
-#include <mystdlib.h>
+#include <tcl.h>
 
-#include <meshing.hpp>
+#include <meshgen.hpp>
+#include "meshdoc.hpp"
 
-// #include "incvis.hpp"
-
-
-#include <visual.hpp>
-
+#include "../include/incvis.hpp"
 
 namespace netgen
 {
-  // #include "meshdoc.hpp"
-
 
 MeshDoctorParameters meshdoctor;
 VisualSceneMeshDoctor vsmeshdoc;
 
-extern AutoPtr<Mesh> mesh;
+//extern AutoPtr<Mesh> mesh;
 
-  int Ng_MeshDoctor (ClientData clientData,
-		     Tcl_Interp * interp,
-		     int argc, tcl_const char *argv[])
-{
-  cout << "Mesh Doctor:" << endl;
-  int i;
-  for (i = 0; i < argc; i++)
-    cout << argv[i] << " ";
-  cout << endl;
-
-  meshdoctor.active = 
-      atoi (Tcl_GetVar (interp, "::meshdoctor.active", 0)); 
-
-
-  if (argc >= 2)
-    {
-      if (strcmp (argv[1], "markedgedist") == 0)
-	{
-	  vsmeshdoc.SetMarkEdgeDist (atoi (argv[2]));
-	}
-
-      if (strcmp (argv[1], "deletemarkedsegments") == 0)
-	{
-	  for (i = 1; i <= mesh->GetNSeg(); i++)
-	    if (vsmeshdoc.IsSegmentMarked (i))
-	      mesh->DeleteSegment (i);
-
-	  //	  for (i = 1; i <= mesh->GetNSE(); i++)
-	  //	    mesh->SurfaceElement(i).SetIndex (1);
-	  mesh->Compress();
-	}
-    }
-
-
-  vsmeshdoc.UpdateTables ();
-  vsmeshdoc.BuildScene();
-  return TCL_OK;
-}
-
-
-
+//  int Ng_MeshDoctor (ClientData clientData,
+//		     Tcl_Interp * interp,
+//		     int argc, tcl_const char *argv[])
+//{
+//  std::cout << "Mesh Doctor:" <<std::endl;
+//  int i;
+//  for (i = 0; i < argc; i++)
+//    std::cout << argv[i] << " ";
+//  std::cout <<std::endl;
+//
+//  meshdoctor.active = 
+//      atoi (Tcl_GetVar (interp, "::meshdoctor.active", 0)); 
+//
+//
+//  if (argc >= 2)
+//    {
+//      if (strcmp (argv[1], "markedgedist") == 0)
+//	{
+//	  vsmeshdoc.SetMarkEdgeDist (atoi (argv[2]));
+//	}
+//
+//      if (strcmp (argv[1], "deletemarkedsegments") == 0)
+//	{
+//	  for (i = 1; i <= mesh->GetNSeg(); i++)
+//	    if (vsmeshdoc.IsSegmentMarked (i))
+//	      mesh->DeleteSegment (i);
+//
+//	  //	  for (i = 1; i <= mesh->GetNSE(); i++)
+//	  //	    mesh->SurfaceElement(i).SetIndex (1);
+//	  mesh->Compress();
+//	}
+//    }
+//
+//
+//  vsmeshdoc.UpdateTables ();
+//  vsmeshdoc.BuildScene();
+//  return TCL_OK;
+//}
+//
+//
+//
 
 
 VisualSceneMeshDoctor :: VisualSceneMeshDoctor ()
@@ -304,7 +299,7 @@ void VisualSceneMeshDoctor :: BuildScene (int zoomall)
     }
   glLoadName (0);
   
-  glEndList ();
+  gstd::endlist ();
 
   
   
@@ -398,7 +393,7 @@ void VisualSceneMeshDoctor :: BuildScene (int zoomall)
 	}
     }
   glLoadName (0);  
-  glEndList ();
+  gstd::endlist ();
 
 
 
@@ -440,7 +435,7 @@ void VisualSceneMeshDoctor :: BuildScene (int zoomall)
     }
 
   glLineWidth (1.0f);
-  glEndList ();
+  gstd::endlist ();
 }
 
 
@@ -448,7 +443,7 @@ void VisualSceneMeshDoctor :: BuildScene (int zoomall)
 
 void VisualSceneMeshDoctor :: MouseDblClick (int px, int py)
 {
-  cout << "dblclick: " << px << " - " << py << endl;
+  std::cout << "dblclick: " << px << " - " << py <<std::endl;
   
   int i, hits;
 
@@ -504,7 +499,7 @@ void VisualSceneMeshDoctor :: MouseDblClick (int px, int py)
 	
   hits = glRenderMode (GL_RENDER);
 
-  cout << "hits = " << hits << endl;
+  std::cout << "hits = " << hits <<std::endl;
 
   int minname = 0;
   GLuint mindepth = 0;
@@ -521,7 +516,7 @@ void VisualSceneMeshDoctor :: MouseDblClick (int px, int py)
 	}
     }
 
-  cout << "clicked element: " << minname << endl;
+  std::cout << "clicked element: " << minname <<std::endl;
 
   ClickElement (minname);
 
@@ -548,7 +543,7 @@ void VisualSceneMeshDoctor :: ClickElement (int elnr)
     {
       selpoint = mesh->SurfaceElement(selelement).PNum(locpi);
       selpoint2 = mesh->SurfaceElement(selelement).PNum(oldlocpi);
-      cout << "selpts = " << selpoint << ", " << selpoint2 << endl;
+      std::cout << "selpts = " << selpoint << ", " << selpoint2 <<std::endl;
     }
 
   UpdateTables();

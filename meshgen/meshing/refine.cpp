@@ -1,5 +1,5 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "bisect.hpp"
 
 
 namespace netgen
@@ -267,7 +267,7 @@ namespace netgen
 	     for (j = 1; j <= 4; j++)
 	     pnums.Elem(j) = el.PNum(j);
 	     if (elrev)
-	     swap (pnums.Elem(3), pnums.Elem(4));
+	     std::swap (pnums.Elem(3), pnums.Elem(4));
 
 	     for (j = 0; j < 6; j++)
 	     {
@@ -322,7 +322,7 @@ namespace netgen
 	      if (elrev)
 	      {
 		nel.flags.reverse = !nel.flags.reverse;
-		swap (nel.PNum(3), nel.PNum(4));
+		std::swap (nel.PNum(3), nel.PNum(4));
 	      }
 
 	      if (j == 0)
@@ -499,7 +499,7 @@ namespace netgen
            for (j = 1; j <= 6; j++)
 	     pnums.Elem(j) = el.PNum(j);
 	    // if (elrev)
-	    // swap (pnums.Elem(3), pnums.Elem(4));
+	    // std::swap (pnums.Elem(3), pnums.Elem(4));
 
 	     for (j = 0; j < 9; j++)
 	     {
@@ -568,7 +568,7 @@ namespace netgen
 	      //if (elrev)
 	     // {
 		//nel.flags.reverse = 1 - nel.flags.reverse;
-		//swap (nel.PNum(3), nel.PNum(4));
+		//std::swap (nel.PNum(3), nel.PNum(4));
 
 
 	      if (j == 0)
@@ -625,7 +625,7 @@ namespace netgen
 
     if (wrongels)
       {
-	cout << "WARNING: " << wrongels << " with wrong orientation found" << endl;
+	std::cout << "WARNING: " << wrongels << " with wrong orientation found" <<std::endl;
 
 	int np = mesh.GetNP();
 	Array<Point<3> > should(np);
@@ -664,7 +664,7 @@ namespace netgen
 		lam *= 0.5;
 		cnttrials--;
 
-		cout << "lam = " << lam << endl;
+		std::cout << "lam = " << lam <<std::endl;
 
 		for (int i = 1; i <= np; i++)
 		  if (boundp.Test(i))
@@ -704,15 +704,15 @@ namespace netgen
 		    free.Or (fhelp);
 		  }
 
-		(*testout) << "smooth points: " << endl;
+		std::cerr << "smooth points: " <<std::endl;
 		for (int i = 1; i <= free.Size(); i++)
 		  if (free.Test(i))
-		    (*testout) << "p " << i << endl;
+		    std::cerr << "p " << i <<std::endl;
 
-		(*testout) << "surf points: " << endl;
+		std::cerr << "surf points: " <<std::endl;
 		for (int i = 1; i <= mesh.GetNSE(); i++)
 		  for (int j = 1; j <= 3; j++)
-		    (*testout) << mesh.SurfaceElement(i).PNum(j) << endl;
+		    std::cerr << mesh.SurfaceElement(i).PNum(j) <<std::endl;
 		  
 
 
@@ -730,15 +730,15 @@ namespace netgen
 		      {
 			wrongels++;
 			mesh.VolumeElement(i).flags.badel = 1;
-			(*testout) << "wrong el: ";
+			std::cerr << "wrong el: ";
 			for (int j = 1; j <= 4; j++)
-			  (*testout) << mesh.VolumeElement(i).PNum(j) << " ";
-			(*testout) << endl;
+			  std::cerr << mesh.VolumeElement(i).PNum(j) << " ";
+			std::cerr <<std::endl;
 		      }
 		    else
 		      mesh.VolumeElement(i).flags.badel = 0;
 		  }
-		cout << "wrongels = " << wrongels << endl;
+		std::cout << "wrongels = " << wrongels <<std::endl;
 	      }
 	    while (wrongels && cnttrials > 0);
 	  
@@ -749,7 +749,7 @@ namespace netgen
 
     if (cnttrials <= 0)
       {
-	cerr << "ERROR: Sorry, reverted elements" << endl;
+	std::cerr << "ERROR: Sorry, reverted elements" <<std::endl;
       }
  
     mesh.ComputeNVertices();

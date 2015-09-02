@@ -1,7 +1,9 @@
-#include <mystdlib.h>
+#include <meshgen.hpp>
+#include "improve2.hpp"
+#include "global.hpp"
 
-#include "meshing.hpp"
-#include <opti.hpp>
+#include "../general/ngexception.hpp"
+#include "../linalg/opti.hpp"
 
 namespace netgen
 {
@@ -190,7 +192,7 @@ namespace netgen
     Array<int> locrots;
     Array<double> lochs;
     Array<Point<3> > loc_pnts2, loc_pnts3;
-  // static int locerr2;
+  // static int lostd::cerr2;
     double locmetricweight;
     double loch;
     int surfi, surfi2;
@@ -309,7 +311,7 @@ namespace netgen
             }
         }
       
-      // cout << "deriv = " << deriv << " =?= ";
+      // std::cout << "deriv = " << deriv << " =?= ";
       return badness;
       /*
       static int timer = NgProfiler::CreateTimer ("opti2surface - deriv");
@@ -324,7 +326,7 @@ namespace netgen
           xl(i) = x(i) - eps * dir(i);
         }
       deriv = (Func (xr) - Func(xl) ) / (2*eps); 
-      cout << deriv << endl;
+      std::cout << deriv <<std::endl;
       return Func(x);
       */
     }
@@ -392,7 +394,7 @@ namespace netgen
 	  }
 	else
 	  {
-	    // (*testout) << "very very bad badness" << endl;
+	    // std::cerr << "very very bad badness" <<std::endl;
 	    badness += 1e8;
 	  }
       }
@@ -448,7 +450,7 @@ namespace netgen
 	  }
 	else
 	  {
-	    // (*testout) << "very very bad badness" << endl;
+	    // std::cerr << "very very bad badness" <<std::endl;
 	    badness += 1e8;
 	  }
       }
@@ -729,13 +731,6 @@ namespace netgen
 	return;
       }
 
-    static int timer = NgProfiler::CreateTimer ("MeshSmoothing 2D");
-    static int timer1 = NgProfiler::CreateTimer ("MeshSmoothing 2D start");
-    static int timer2 = NgProfiler::CreateTimer ("MeshSmoothing 2D - BFGS");
-
-    NgProfiler::RegionTimer reg (timer);
-    NgProfiler::StartTimer (timer1);
-
     CheckMeshApproximation (mesh);
 
     Opti2dLocalData ld;
@@ -919,8 +914,6 @@ namespace netgen
     int cnt = 0;
 
 
-    NgProfiler::StopTimer (timer1);
-
     /*
     for (PointIndex pi = PointIndex::BASE; pi < mesh.GetNP()+PointIndex::BASE; pi++)
       if (mesh[pi].Type() == SURFACEPOINT)
@@ -1015,8 +1008,6 @@ namespace netgen
 	  x = 0;
 	  par.typx = 0.3*ld.lochs[0];
 
-          NgProfiler::StartTimer (timer2);
-
 	  if (mixed)
 	    {
 	      BFGS (x, surfminfj, par, 1e-6);
@@ -1025,8 +1016,6 @@ namespace netgen
 	    {
 	      BFGS (x, surfminf, par, 1e-6);
 	    }
-
-          NgProfiler::StopTimer (timer2);
 
 	  Point3d origp = mesh[pi];
 	  int loci = 1;

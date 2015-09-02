@@ -72,7 +72,7 @@ namespace netgen
     infile >> reco;  // file format recognition
   
     infile >> n;   // number of surface elements
-    cout << n << " Surface elements" << endl;
+    std::cout << n << " Surface elements" <<std::endl;
   
     for (i = 1; i <= n; i++)
       {
@@ -82,7 +82,7 @@ namespace netgen
       }
     
     infile >> n;   // number of volume elements
-    cout << n << " Volume elements" << endl;
+    std::cout << n << " Volume elements" <<std::endl;
   
     for (i = 1; i <= n; i++)
       {
@@ -92,7 +92,7 @@ namespace netgen
       }
     
     infile >> n;   // number of points 
-    cout << n << " Points" << endl;
+    std::cout << n << " Points" <<std::endl;
   
     for (i = 1; i <= n; i++)
       {
@@ -109,7 +109,7 @@ namespace netgen
     int i, n;
   
     n = mesh.GetNSE();   // number of surface elements
-    cout << n << " Surface elements" << endl;
+    std::cout << n << " Surface elements" <<std::endl;
   
     for (i = 1; i <= n; i++)
       {
@@ -123,7 +123,7 @@ namespace netgen
       }
     
     n = mesh.GetNE();   // number of volume elements
-    cout << n << " Volume elements" << endl;
+    std::cout << n << " Volume elements" <<std::endl;
   
     for (i = 1; i <= n; i++)
       {
@@ -138,7 +138,7 @@ namespace netgen
       }
     
     n = mesh.GetNP();   // number of points 
-    cout << n << " Points" << endl;
+    std::cout << n << " Points" <<std::endl;
   
     for (i = 1; i <= n; i++)
       {
@@ -233,7 +233,7 @@ namespace netgen
               default:
                 i2.I1()=i2.I2()=0;
               }
-            if (i2.I1() > i2.I2()) swap (i2.I1(), i2.I2());
+            if (i2.I1() > i2.I2()) std::swap (i2.I1(), i2.I2());
             if (edgeindex.Used (i2)) 
               edgei = edgeindex.Get(i2);
             else
@@ -258,48 +258,48 @@ namespace netgen
     int i;
   
     outfile 
-      << "#VERSION: 1.0" << endl
-      << "#PROGRAM: NETGEN" << endl
-      << "#EQN_TYPE: POISSON" << endl
-      << "#DIMENSION: 3D" << endl
-      << "#DEG_OF_FREE: 1" << endl
-      << "#DESCRIPTION: I don't know" << endl
-      << "##RENUM: not done" << endl
-      << "#USER: Kleinzen" << endl
-      << "DATE: 10.06.1996" << endl;
+      << "#VERSION: 1.0" <<std::endl
+      << "#PROGRAM: NETGEN" <<std::endl
+      << "#EQN_TYPE: POISSON" <<std::endl
+      << "#DIMENSION: 3D" <<std::endl
+      << "#DEG_OF_FREE: 1" <<std::endl
+      << "#DESCRIPTION: I don't know" <<std::endl
+      << "##RENUM: not done" <<std::endl
+      << "#USER: Kleinzen" <<std::endl
+      << "DATE: 10.06.1996" <<std::endl;
   
-    outfile << "#HEADER:   8" << endl
+    outfile << "#HEADER:   8" <<std::endl
             << points.Size() << "  " << edges.Size() << "  " 
-            << faces.Size() << "  " << volelements.Size() << "  0  0  0  0" << endl;
+            << faces.Size() << "  " << volelements.Size() << "  0  0  0  0" <<std::endl;
   
-    outfile << "#VERTEX:   " << points.Size() << endl;
+    outfile << "#VERTEX:   " << points.Size() <<std::endl;
     for (i = 1; i <= points.Size(); i++)
       outfile << "  " << i << "  " << points.Get(i).x << "  " << points.Get(i).y 
-              << "  " << points.Get(i).z << endl;
+              << "  " << points.Get(i).z <<std::endl;
     	
-    outfile << "#EDGE:  " << edges.Size() << endl;
+    outfile << "#EDGE:  " << edges.Size() <<std::endl;
     for (i = 1; i <= edges.Size(); i++)
       outfile << "  " << i << "  1  " 
               << edges.Get(i).p1 << "  " 
               << edges.Get(i).p2 
-              << "  0" << endl;
+              << "  0" <<std::endl;
     
-    outfile << "#FACE:  " << faces.Size() << endl;  
+    outfile << "#FACE:  " << faces.Size() <<std::endl;  
     for (i = 1; i <= faces.Size(); i++)
       outfile << "  " << i << "  1  3  " 
               << faces.Get(i).edges[0] << "  " 
               << faces.Get(i).edges[1] << "  " 
-              << faces.Get(i).edges[2] << endl;
+              << faces.Get(i).edges[2] <<std::endl;
     	
-    outfile << "#SOLID:  " << volelements.Size() << endl;
+    outfile << "#SOLID:  " << volelements.Size() <<std::endl;
     for (i = 1; i <= volelements.Size(); i++)
       outfile << "  " << i << "  1  4  " 
               << volelements.Get(i).faces[0] << "  "
               << volelements.Get(i).faces[1] << "  "
               << volelements.Get(i).faces[2] << "  "
-              << volelements.Get(i).faces[3] << endl;
+              << volelements.Get(i).faces[3] <<std::endl;
     	
-    outfile << "#END_OF_DATA" << endl;
+    outfile << "#END_OF_DATA" <<std::endl;
   }
     
 
@@ -312,6 +312,6 @@ namespace netgen
     Convert ();
   
     WriteFile (outfile);
-    cout << "Wrote Chemnitz standard file" << endl;
+    std::cout << "Wrote Chemnitz standard file" <<std::endl;
   }
 }

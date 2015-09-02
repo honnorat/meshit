@@ -4,7 +4,10 @@
 /* Date:   16. Jan. 02                                                    */
 /**************************************************************************/
 
-#include <myadt.hpp>
+//#include <myadt.hpp>
+#include <meshgen.hpp>
+#include <string>
+#include "ngexception.hpp"
 
 namespace netgen
 {
@@ -12,7 +15,7 @@ namespace netgen
 
 
 
-  NgException :: NgException (const string & s) 
+  NgException :: NgException (const std::string & s) 
     : what(s)
   {
     ; 
@@ -25,7 +28,7 @@ namespace netgen
   }
 
   /// append string to description
-  void NgException :: Append (const string & s)
+  void NgException :: Append (const std::string & s)
   { 
     what += s; 
   }

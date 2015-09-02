@@ -125,7 +125,7 @@ namespace netgen
       }
 
     //for(int i=0; i<hsp.Size(); i++)
-    //  (*testout) << "hsp["<<i<<"] ... " << specpoints[hsp[i]].p << endl;
+    //  std::cerr << "hsp["<<i<<"] ... " << specpoints[hsp[i]].p <<std::endl;
      
 
     cntedge = 0;
@@ -153,7 +153,7 @@ namespace netgen
 		//if (tlo->GetSolid() && tlo->GetSolid()->IsIn (specpoints[i].p))
 		{
 #ifdef DEVELOP
-		  (*testout) << "point " << specpoints[i].p << " v " <<specpoints[i].v <<" is in " << tlo->GetSolid()->Name() << endl;
+		  std::cerr << "point " << specpoints[i].p << " v " <<specpoints[i].v <<" is in " << tlo->GetSolid()->Name() <<std::endl;
 #endif
 		  specpoint2tlo.Add (i, j);
 		}
@@ -168,8 +168,8 @@ namespace netgen
 	SetThreadPercent(100 - 100 * double (hsp.Size()) / specpoints.Size());
 
 #ifdef DEVELOP
-	(*testout) << "hsp.Size() " << hsp.Size() << " specpoints.Size() " << specpoints.Size() << endl;
-	(*testout) << endl << "edge nr " << cntedge+1 << endl;
+	std::cerr << "hsp.Size() " << hsp.Size() << " specpoints.Size() " << specpoints.Size() <<std::endl;
+	std::cerr <<std::endl << "edge nr " << cntedge+1 <<std::endl;
 #endif
 
 	edgepoints.SetSize (0);
@@ -185,9 +185,9 @@ namespace netgen
 	  for (int j = checkedcopy; j < startpoints.Size() && !pi1; j++)
 	    {
 #ifdef DEVELOP
-	      (*testout) << "checking point " << specpoints[startpoints[j]].p
+	      std::cerr << "checking point " << specpoints[startpoints[j]].p
 			 << ", v = " << specpoints[startpoints[j]].v 
-			 << " for copying (i,j = " << i << ", " << j << ")" << endl;	  
+			 << " for copying (i,j = " << i << ", " << j << ")" <<std::endl;	  
 #endif
  	      if (geometry.identifications[i]->IdentifyableCandidate (specpoints[startpoints[j]]) &&
 		  geometry.identifications[i]->IdentifyableCandidate (specpoints[endpoints[j]]))
@@ -199,13 +199,13 @@ namespace netgen
 		
 		  for (int k = 0; k < hsp.Size() && !pi1; k++)
 		    {
-		      //(*testout) << "   ? identifyable with " << specpoints[hsp[k]].p 
+		      //std::cerr << "   ? identifyable with " << specpoints[hsp[k]].p 
 		      //<< ", v = " << specpoints[hsp[k]].v
-		      //		 << endl;
+		      //		 <<std::endl;
 		      if (identification_used.Used (INDEX_2(i, startpoints[j])) ||
 			  identification_used.Used (INDEX_2(i, hsp[k])))
 			{
-			  //(*testout) << "failed at pos0" << endl;
+			  //std::cerr << "failed at pos0" <<std::endl;
 			  continue;
 			}
 		      
@@ -215,9 +215,9 @@ namespace netgen
 			  ->Identifyable(specpoints[hsp[k]], specpoints[startpoints[j]], specpoint2tlo, specpoint2surface))
 			{
 #ifdef DEVELOP
-			  (*testout) << "identifyable: " << specpoints[hsp[k]].p << ", v = " << specpoints[hsp[k]].v
+			  std::cerr << "identifyable: " << specpoints[hsp[k]].p << ", v = " << specpoints[hsp[k]].v
 				     << " and " << specpoints[startpoints[j]].p << ", v = " << specpoints[startpoints[j]].v 
-				     << " (identification " << i+1 << ")" << endl;
+				     << " (identification " << i+1 << ")" <<std::endl;
 #endif
 
 			  if (Dist (specpoints[startpoints[j]].p, specpoints[hsp[k]].p) < mindist)
@@ -283,8 +283,8 @@ namespace netgen
 	startpoints.Append (hsp.Get(pi1));
 
 #ifdef DEVELOP
-	(*testout) << "start followedge: p1 = " << specpoints[hsp.Get(pi1)].p 
-		   << ", v = " << specpoints[hsp.Get(pi1)].v << endl;
+	std::cerr << "start followedge: p1 = " << specpoints[hsp.Get(pi1)].p 
+		   << ", v = " << specpoints[hsp.Get(pi1)].v <<std::endl;
 #endif
 
 	FollowEdge (pi1, ep, pos, hsp, h, mesh,
@@ -298,7 +298,7 @@ namespace netgen
 	  {
 	    // ignore starting point
 	    hsp.DeleteElement (pi1);
-	    cout << "yes, this happens" << endl;
+	    std::cout << "yes, this happens" <<std::endl;
 	    continue;
 	  }
 
@@ -316,7 +316,7 @@ namespace netgen
 	for (int i = 1; i <= geometry.identifications.Size(); i++)
 	  if (geometry.identifications.Get(i)->ShortEdge(specpoints[hsp.Get(pi1)], specpoints[hsp.Get(ep)]))
 	    shortedge = 1;
-	// (*testout) << "shortedge = " << shortedge << endl;
+	// std::cerr << "shortedge = " << shortedge <<std::endl;
 
 
 	if (!shortedge)
@@ -335,8 +335,8 @@ namespace netgen
 	// delete initial, terminal and conditional points
 
 #ifdef DEVELOP
-	(*testout) << "terminal point: p = " << specpoints[hsp.Get(ep)].p 
-		   << ", v = " << specpoints[hsp.Get(ep)].v << endl;      
+	std::cerr << "terminal point: p = " << specpoints[hsp.Get(ep)].p 
+		   << ", v = " << specpoints[hsp.Get(ep)].v <<std::endl;      
 #endif
 
 	searchtree -> DeleteElement (hsp.Get(ep));
@@ -418,16 +418,16 @@ namespace netgen
 
 	
 #ifdef DEVELOP
-	(*testout) << "edge " << cntedge << endl
+	std::cerr << "edge " << cntedge <<std::endl
 		   << "startp: " << specpoints[startpoints.Last()].p 
-		   << ", v = " << specpoints[startpoints.Last()].v << endl
-		   << "copy = " << copyedge << endl
+		   << ", v = " << specpoints[startpoints.Last()].v <<std::endl
+		   << "copy = " << copyedge <<std::endl
 		   << refedges.Size() << " refedges: ";
 	for (int i = 1; i <= refedges.Size(); i++)
-	  (*testout) << " " << refedges.Get(i).si;
-	(*testout) << endl;
+	  std::cerr << " " << refedges.Get(i).si;
+	std::cerr <<std::endl;
 	if (refedgesinv.Size())
-	  (*testout) << "inv[1] = " << refedgesinv.Get(1) << endl;
+	  std::cerr << "inv[1] = " << refedgesinv.Get(1) <<std::endl;
 #endif
 
 	if (refedges.Size() == 0)
@@ -436,7 +436,7 @@ namespace netgen
       
 	if (!copyedge)
 	  {
-	    // (*testout) << "store edge" << endl;
+	    // std::cerr << "store edge" <<std::endl;
 	    // int oldnseg = mesh.GetNSeg();
 
 	    if (!shortedge)
@@ -496,7 +496,7 @@ namespace netgen
 	    int hnr = mesh.AddEdgeDescriptor(ed);
 	    if (hnr != refedges[i].edgenr)
 	      {
-		cerr << "edgedescriptor index wrong: new : " << hnr << " old = " << refedges[i].edgenr << endl;
+		std::cerr << "edgedescriptor index wrong: new : " << hnr << " old = " << refedges[i].edgenr <<std::endl;
 	      }
 	  }
 	*/
@@ -505,7 +505,7 @@ namespace netgen
 
 // 	for(int i=0; i<hsp.Size(); i++)
 // 	  {
-// 	    (*testout) << "pos2 hsp["<<i<<"] ... " << specpoints[hsp[i]].p << endl;
+// 	    std::cerr << "pos2 hsp["<<i<<"] ... " << specpoints[hsp[i]].p <<std::endl;
 // 	  }
       }
   }
@@ -590,14 +590,14 @@ namespace netgen
 		    if (Dist (p, hp) < 1e-4 * vlen)
 		      {
 			PrintWarning ("Point on edge !!!");
-			cout << "seg: " << i2 << ", p = " << pi << endl;
+			std::cout << "seg: " << i2 << ", p = " << pi <<std::endl;
 			osedgesht.Set (i2, 2);		      
 			point_on_edge_problem = 1;
 
-			(*testout) << "Point on edge" << endl
-				   << "seg = " << i2 << ", p = " << pi << endl
-				   << "pos = " << p << ", projected = " << hp << endl
-				   << "seg is = " << mesh.Point(i2.I1()) << " - " << mesh.Point(i2.I2()) << endl;
+			std::cerr << "Point on edge" <<std::endl
+				   << "seg = " << i2 << ", p = " << pi <<std::endl
+				   << "pos = " << p << ", projected = " << hp <<std::endl
+				   << "seg is = " << mesh.Point(i2.I1()) << " - " << mesh.Point(i2.I2()) <<std::endl;
 		      }
 		  }
 	      }
@@ -695,8 +695,8 @@ namespace netgen
     curvelength.Append (0);
     len = 0;
 
-    // (*testout) << "geometry.GetSurface(s1) -> LocH (p, 3, 1, h) " << geometry.GetSurface(s1) -> LocH (p, 3, 1, h)
-    // << " geometry.GetSurface(s2) -> LocH (p, 3, 1, h) " << geometry.GetSurface(s2) -> LocH (p, 3, 1, h) << endl;
+    // std::cerr << "geometry.GetSurface(s1) -> LocH (p, 3, 1, h) " << geometry.GetSurface(s1) -> LocH (p, 3, 1, h)
+    // << " geometry.GetSurface(s2) -> LocH (p, 3, 1, h) " << geometry.GetSurface(s2) -> LocH (p, 3, 1, h) <<std::endl;
 
     loch = min2 (geometry.GetSurface(s1) -> LocH (p, 3, 1, h), 
 		 geometry.GetSurface(s2) -> LocH (p, 3, 1, h));
@@ -706,7 +706,7 @@ namespace netgen
     if (uselocalh)
       {
 	double lh = mesh.GetH(p);
-	// (*testout) << "lh " << lh << endl;
+	// std::cerr << "lh " << lh <<std::endl;
 	if (lh < loch)
 	  loch = lh;
       }
@@ -791,7 +791,7 @@ namespace netgen
 			    ep = jj+1;
 			    
 			if (!ep) 
-			  cerr << "endpoint not found" << endl;
+			  std::cerr << "endpoint not found" <<std::endl;
 			  //			ep = i;
 			hvtmin = hvt;
 			//			  break;
@@ -901,10 +901,10 @@ namespace netgen
     
     if (debug)
       {
-	(*testout) << "debug edge !!!" << endl;
-	(*testout) << "edgepoints = " << edgepoints << endl;
-	(*testout) << "s1, s2 = " << s1 << " - " << s2 << endl;
-	(*testout) << "s1_rep, s2_rep = " << s1_rep << " - " << s2_rep << endl;
+	std::cerr << "debug edge !!!" <<std::endl;
+	std::cerr << "edgepoints = " << edgepoints <<std::endl;
+	std::cerr << "s1, s2 = " << s1 << " - " << s2 <<std::endl;
+	std::cerr << "s1_rep, s2_rep = " << s1_rep << " - " << s2_rep <<std::endl;
       }
 
     refedges.SetSize(0);
@@ -913,7 +913,7 @@ namespace netgen
     ProjectToEdge (geometry.GetSurface(s1), geometry.GetSurface(s2), hp);
     
     if (debug)
-      *testout << "hp = " << hp << endl;
+      std::cerr << "hp = " << hp <<std::endl;
 
     Vec<3> t, a1, a2;
     geometry.GetSurface(s1) -> CalcGradient (hp, a1);
@@ -936,10 +936,10 @@ namespace netgen
 
 	sol -> TangentialSolid (hp, locsol, locsurfind, size*ideps);
 
-	//*testout << "hp = " << hp << endl;
-	//(*testout) << "locsol: " << endl;
-	//if (locsol) locsol->Print(*testout);
-	//(*testout) << endl;
+	//std::cerr << "hp = " << hp <<std::endl;
+	//std::cerr << "locsol: " <<std::endl;
+	//if (locsol) locsol->Printstd::cerr;
+	//std::cerr <<std::endl;
 
 
 	if (!locsol) continue;
@@ -980,7 +980,7 @@ namespace netgen
 
       
 	if (debug)
-	  (*testout) << "edge of tlo " << i << ", has " << locsurfind.Size() << " faces." << endl;
+	  std::cerr << "edge of tlo " << i << ", has " << locsurfind.Size() << " faces." <<std::endl;
       
 
 	for (int j = locsurfind.Size()-1; j >= 0; j--)
@@ -989,7 +989,7 @@ namespace netgen
 	    locsurfind.Delete(j);
       
 	if (debug)
-	  (*testout) << locsurfind.Size() << " faces on hp" << endl;
+	  std::cerr << locsurfind.Size() << " faces on hp" <<std::endl;
 
 
 
@@ -1002,23 +1002,23 @@ namespace netgen
 	    // n is outer normal to solid
 	    Vec<3> n = geometry.GetSurface(lsi) -> GetNormalVector (hp);
             if (debug)
-              *testout << "n1 = " << n << endl;
+              std::cerr << "n1 = " << n <<std::endl;
 	    if (geometry.GetSurface (lsi)->Inverse())
 	      n *= -1;
 	  
 	    if (fabs (t * n) > 1e-4) continue;
 	    if (debug)
 	      {
-		(*testout) << "face " << locsurfind[j] << ", rep = " << rlsi 
-			   << " has (t*n) = " << (t*n) << endl;
-		(*testout) << "n = " << n << endl;
+		std::cerr << "face " << locsurfind[j] << ", rep = " << rlsi 
+			   << " has (t*n) = " << (t*n) <<std::endl;
+		std::cerr << "n = " << n <<std::endl;
 	      }
 	  
 	    // rn is normal to class representant
 	    Vec<3> rn = geometry.GetSurface(rlsi) -> GetNormalVector (hp);
 	    if (debug)
 	      {
-		(*testout) << "rn = " << rn << endl;
+		std::cerr << "rn = " << rn <<std::endl;
 	      }
 	    
 	    //if( n*rn < 0)
@@ -1034,7 +1034,7 @@ namespace netgen
 
 	    
 	    if (debug)
-	      (*testout) << "m = " << m << endl;
+	      std::cerr << "m = " << m <<std::endl;
 
 
 	    //bool founddirection = false;
@@ -1053,19 +1053,19 @@ namespace netgen
 		
 		if (debug)
 		  {
-		    *testout << "eps = " << eps << endl;
-		    *testout << "in,1 = " << locsol -> VectorIn2 (hp, m, n, eps) << endl;
-		    *testout << "in,1 = " << locsol -> VectorIn2 (hp, m, -1. * n, eps) << endl;
-		    *testout << "in,1 = " << locsol -> VectorIn2 (hp, -1.*m, n, eps) << endl;
-		    *testout << "in,1 = " << locsol -> VectorIn2 (hp, -1.*m, -1. * n, eps) << endl;
+		    std::cerr << "eps = " << eps <<std::endl;
+		    std::cerr << "in,1 = " << locsol -> VectorIn2 (hp, m, n, eps) <<std::endl;
+		    std::cerr << "in,1 = " << locsol -> VectorIn2 (hp, m, -1. * n, eps) <<std::endl;
+		    std::cerr << "in,1 = " << locsol -> VectorIn2 (hp, -1.*m, n, eps) <<std::endl;
+		    std::cerr << "in,1 = " << locsol -> VectorIn2 (hp, -1.*m, -1. * n, eps) <<std::endl;
 		  }
  	      }
  	    while(pre_ok[0] && pre_ok[1] && eps > 1e-16*size);
 
             if (debug)
               {
-                *testout << "eps = " << eps << ", size = " << size << endl;
-                *testout << "pre_ok[0,1] = " << pre_ok[0] << "," << pre_ok[1] << endl;
+                std::cerr << "eps = " << eps << ", size = " << size <<std::endl;
+                std::cerr << "pre_ok[0,1] = " << pre_ok[0] << "," << pre_ok[1] <<std::endl;
               }
 
 	    eps = 1e-8*size;
@@ -1077,12 +1077,12 @@ namespace netgen
 	      
 		if (debug)
 		  {
-		    (*testout) << "onface(" << hp << ", " << m << ")= " << flush;
-		    (*testout) << locsol->OnFace (hp, m, eps) << flush;
-		    (*testout) << " n " << n << flush;
-		    (*testout) << " vec2in = "
+		    std::cerr << "onface(" << hp << ", " << m << ")= " << flush;
+		    std::cerr << locsol->OnFace (hp, m, eps) << flush;
+		    std::cerr << " n " << n << flush;
+		    std::cerr << " vec2in = "
 			       << locsol -> VectorIn2 (hp, m, n, eps) << " and " 
-			       << locsol -> VectorIn2 (hp, m, -1 * n, eps) << endl;
+			       << locsol -> VectorIn2 (hp, m, -1 * n, eps) <<std::endl;
 		  }
 
 		//	      if (locsol -> OnFace (hp, m))
@@ -1094,7 +1094,7 @@ namespace netgen
 			    locsol -> VectorIn2 (hp, m, -1 * n, eps) == IS_INSIDE));
 
 		if (debug)
-		  (*testout) << "ok (before) " << ok <<  endl;
+		  std::cerr << "ok (before) " << ok << std::endl;
 
 		// compute second order approximation
 		// curve = hp + t m + t*t/2 m2
@@ -1104,7 +1104,7 @@ namespace netgen
 		geometry.GetSurface(lsi) -> CalcHesse (hp, hesse);
 		double fac = -(m * (hesse * m)) / (grad * grad);
 		m2 = fac * grad;
-		// (*testout) << "hp = " << hp << ", m = " << m << ", m2 = " << m2 << endl;
+		// std::cerr << "hp = " << hp << ", m = " << m << ", m2 = " << m2 <<std::endl;
 
 		Solid * locsol2;
 		locsol -> TangentialSolid3 (hp, m, m2, locsol2, locsurfind2, ideps*size);
@@ -1115,7 +1115,7 @@ namespace netgen
 		if (ok)
 		  {
 		    if (debug)
-		      (*testout) << "is true" << endl;
+		      std::cerr << "is true" <<std::endl;
 		    int hi = 0;
 		    for (int l = 1; !hi && l <= refedges.Size(); l++)
 		      {
@@ -1165,7 +1165,7 @@ namespace netgen
 		    
 
 		    if (debug)
-		      (*testout) << "add ref seg:" 
+		      std::cerr << "add ref seg:" 
 				 << "si = " << refedges.Get(hi).si
 				 << ", domin = " << refedges.Get(hi).domin
 				 << ", domout = " << refedges.Get(hi).domout
@@ -1175,12 +1175,12 @@ namespace netgen
 				 << ", refedgenr = " << hi
 				 << ", priority = " << edges_priority[hi-1]
 				 << ", hi = " << hi 
-				 << endl;
+				 <<std::endl;
 		  }
 		else
 		  {
 		    if (debug)
-		      (*testout) << "is false" << endl;
+		      std::cerr << "is false" <<std::endl;
 		  }
 		m *= -1;
 	      } 
@@ -1191,8 +1191,8 @@ namespace netgen
    
     if (debug)
       {
-	*testout << "Refsegments, before delete: " << endl << refedges << endl;
-	*testout << "inv: " << endl << refedgesinv << endl;
+	std::cerr << "Refsegments, before delete: " <<std::endl << refedges <<std::endl;
+	std::cerr << "inv: " <<std::endl << refedgesinv <<std::endl;
       }
     
     BitArray todelete(refedges.Size());
@@ -1215,10 +1215,10 @@ namespace netgen
 	       )
 	      {
 		if(debug)
-		  (*testout) << "equal segments: " << refedges[i] << " pri " << edges_priority[i] 
+		  std::cerr << "equal segments: " << refedges[i] << " pri " << edges_priority[i] 
 			     << " tlosurf " << refedges[i].tlosurf
 			     << "\n and " << refedges[j] << " pri " << edges_priority[j]
-			     << " tlosurf " << refedges[i].tlosurf << endl;
+			     << " tlosurf " << refedges[i].tlosurf <<std::endl;
 		
 		if(edges_priority[i] < 10 && edges_priority[i] < edges_priority[j])
 		  {
@@ -1246,7 +1246,7 @@ namespace netgen
     
     if (debug)
       {
-	*testout << "Refsegments: " << endl << refedges << endl;
+	std::cerr << "Refsegments: " <<std::endl << refedges <<std::endl;
       }
   }
 
@@ -1274,9 +1274,9 @@ namespace netgen
     const Surface * surf1 = geometry.GetSurface (refedges.Get(1).surfnr1);
     const Surface * surf2 = geometry.GetSurface (refedges.Get(1).surfnr2);
 
-    (*testout) << "s1 " << refedges.Get(1).surfnr1 << " s2 " << refedges.Get(1).surfnr2
+    std::cerr << "s1 " << refedges.Get(1).surfnr1 << " s2 " << refedges.Get(1).surfnr2
 	       << " rs1 " << geometry.GetSurfaceClassRepresentant(refedges.Get(1).surfnr1)
-	       << " rs2 " << geometry.GetSurfaceClassRepresentant(refedges.Get(1).surfnr2) << endl;
+	       << " rs2 " << geometry.GetSurfaceClassRepresentant(refedges.Get(1).surfnr2) <<std::endl;
 
     len = curvelength.Last();
     ne = int (len + 0.5);
@@ -1314,7 +1314,7 @@ namespace netgen
       {
 	lastpi = mesh.AddPoint (p, layer, FIXEDPOINT);
 	meshpoint_tree -> Insert (p, lastpi); 
-	// (*testout) << "test1, store point " << lastpi << ", p = " << p << endl;
+	// std::cerr << "test1, store point " << lastpi << ", p = " << p <<std::endl;
       }
   
     j = 1;
@@ -1352,7 +1352,7 @@ namespace netgen
 	    thispi = mesh.AddPoint (np, layer, (i==ne) ? FIXEDPOINT : EDGEPOINT);
 	   
 	    meshpoint_tree -> Insert (np, thispi);
-	    // (*testout) << "test2, store point " << thispi << ", p = " << np << endl;
+	    // std::cerr << "test2, store point " << thispi << ", p = " << np <<std::endl;
 	  }
 
 	for (k = 1; k <= refedges.Size(); k++)
@@ -1377,8 +1377,8 @@ namespace netgen
 	    seg.seginfo = 0;
 	    if (k == 1) seg.seginfo = (refedgesinv.Get(k)) ? 2 : 1;
 	    mesh.AddSegment (seg);
-	    //(*testout) << "add seg " << mesh[seg.p1] << "-" << mesh[seg.p2] << endl;
-	    //(*testout) << "refedge " << k << " surf1 " << seg.surfnr1 << " surf2 " << seg.surfnr2 << " inv " << refedgesinv.Get(k) << endl;
+	    //std::cerr << "add seg " << mesh[seg.p1] << "-" << mesh[seg.p2] <<std::endl;
+	    //std::cerr << "refedge " << k << " surf1 " << seg.surfnr1 << " surf2 " << seg.surfnr2 << " inv " << refedgesinv.Get(k) <<std::endl;
 	  
 	    double maxh = min2 (geometry.GetSurface(seg.surfnr1)->GetMaxH(),
 				geometry.GetSurface(seg.surfnr2)->GetMaxH());
@@ -1415,7 +1415,7 @@ namespace netgen
       }
 
 #ifdef DEVELOP
-    (*testout) << " eplast = " << lastpi << " = " << p << endl;
+    std::cerr << " eplast = " << lastpi << " = " << p <<std::endl;
 #endif
   }
   
@@ -1472,7 +1472,7 @@ namespace netgen
       {
 	pi1 = mesh.AddPoint (p, layer, FIXEDPOINT);
 	meshpoint_tree -> Insert (p, pi1);
-	// (*testout) << "test3, store point " << pi1 << ", p = " << p << endl;
+	// std::cerr << "test3, store point " << pi1 << ", p = " << p <<std::endl;
       }
 
     p = edgepoints.Last();
@@ -1489,7 +1489,7 @@ namespace netgen
       {
 	pi2 = mesh.AddPoint (p, layer, FIXEDPOINT);
 	meshpoint_tree -> Insert (p, pi2);
-	// (*testout) << "test4, store point " << pi2 << ", p = " << p << endl;
+	// std::cerr << "test4, store point " << pi2 << ", p = " << p <<std::endl;
       }
 
     /*
@@ -1520,7 +1520,7 @@ namespace netgen
     }
     */
 
-    // (*testout) << "short edge " << pi1 << " - " << pi2 << endl;
+    // std::cerr << "short edge " << pi1 << " - " << pi2 <<std::endl;
   
     for (int k = 1; k <= refedges.Size(); k++)
       {
@@ -1545,7 +1545,7 @@ namespace netgen
 	seg.seginfo = 0;
 	if (k == 1) seg.seginfo = (refedgesinv.Get(k)) ? 2 : 1;
 	mesh.AddSegment (seg);
-	//	  (*testout) << "add seg " << seg[0] << "-" << seg[1] << endl;
+	//	  std::cerr << "add seg " << seg[0] << "-" << seg[1] <<std::endl;
       }
   }
   
@@ -1606,19 +1606,19 @@ namespace netgen
 	  mesh.GetIdentifications().Add(topi, frompi, copyedgeidentification);
 	else
 	  {
-	    cerr << "edgeflw.cpp: should identify, but cannot";
+	    std::cerr << "edgeflw.cpp: should identify, but cannot";
 	    exit(1);
 	  }
 #ifdef DEVELOP
-	(*testout) << "adding identification " << mesh[frompi] << "; " << mesh[topi]
-		   << " (id " << copyedgeidentification <<")" << endl;
+	std::cerr << "adding identification " << mesh[frompi] << "; " << mesh[topi]
+		   << " (id " << copyedgeidentification <<")" <<std::endl;
 #endif
 
 
 	/*
-	  (*testout) << "Add Identification from CopyEdge, p1 = " 
+	  std::cerr << "Add Identification from CopyEdge, p1 = " 
 	  << mesh[PointIndex(frompi)] << ", p2 = " 
-	  << mesh[PointIndex(topi)] << endl;
+	  << mesh[PointIndex(topi)] <<std::endl;
 
 	  mesh.GetIdentifications().Add(frompi, topi, copyedgeidentification);
 	*/
@@ -1642,7 +1642,7 @@ namespace netgen
 	int npi2 = geometry.identifications.Get(copyedgeidentification)
 	  -> GetIdentifiedPoint (mesh, pi2);
 
-	//(*testout) << "copy edge, pts = " << npi1 << " - " << npi2 << endl;
+	//std::cerr << "copy edge, pts = " << npi1 << " - " << npi2 <<std::endl;
 
 	Segment seg;
 
@@ -1654,7 +1654,7 @@ namespace netgen
 	    if (oldseg.seginfo == 1)
 	      inv = !inv;
 
-	    //	  (*testout) << "inv, now = " << inv << endl;
+	    //	  std::cerr << "inv, now = " << inv <<std::endl;
 
 	    if (inv)
 	      {
@@ -1676,12 +1676,12 @@ namespace netgen
 	    seg.seginfo = 0;
 	    if (k == 1) seg.seginfo = refedgesinv.Get(k) ? 2 : 1;
 	    mesh.AddSegment (seg);
-	    //	  (*testout) << "copy seg " << seg[0] << "-" << seg[1] << endl;
+	    //	  std::cerr << "copy seg " << seg[0] << "-" << seg[1] <<std::endl;
 #ifdef DEVELOP
 
-	    (*testout) << "copy seg, face = " << seg.si << ": " 
+	    std::cerr << "copy seg, face = " << seg.si << ": " 
 		       << " inv = " << inv << ", refinv = " << refedgesinv.Get(k)
-		       << mesh.Point(seg[0]) << ", " << mesh.Point(seg[1]) << endl;
+		       << mesh.Point(seg[0]) << ", " << mesh.Point(seg[1]) <<std::endl;
 #endif
 
 	  }
@@ -1718,7 +1718,7 @@ namespace netgen
 	const Segment & seg = mesh.LineSegment(i);
 
 #ifdef DEVELOP      
-	(*testout) << seg.surfnr1 << ", " << seg.surfnr2 << ", si = " << seg.si << endl;
+	std::cerr << seg.surfnr1 << ", " << seg.surfnr2 << ", si = " << seg.si <<std::endl;
 #endif
 	int classrep = geometry.GetSurfaceClassRepresentant (seg.si);
 	pointatsurface.Set (classrep);
@@ -1820,11 +1820,11 @@ namespace netgen
 		PrintMessage (5, "Add line segment to smooth surface");
 
 #ifdef DEVELOP
-		(*testout) << "Add segment at smooth surface " << i;
-		if (i != classrep) (*testout) << ", classrep = " << classrep;
-		(*testout) << ": "
+		std::cerr << "Add segment at smooth surface " << i;
+		if (i != classrep) std::cerr << ", classrep = " << classrep;
+		std::cerr << ": "
 			   << mesh.Point (mesh.GetNP()-1) << " - "
-			   << mesh.Point (mesh.GetNP()) << endl;
+			   << mesh.Point (mesh.GetNP()) <<std::endl;
 #endif
 	      }
 	  }

@@ -1,8 +1,8 @@
-#include <meshing.hpp>
-#include <geometry2d.hpp>
-#include <visual.hpp>
-
+#include <meshgen.hpp>
+#include <tcl.h>
+#include "geometry2d.hpp"
 #include "vsgeom2d.hpp"
+
 
 // extern "C" int Ng_CSG_Init (Tcl_Interp * interp);
 

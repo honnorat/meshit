@@ -9,8 +9,11 @@
 */
 
 #include <algorithm>
-#include <mystdlib.h>
-#include <myadt.hpp>
+#include <meshgen.hpp>
+
+#include "hashtabl.hpp"
+#include "template.hpp"
+#include "ngexception.hpp"
 
 namespace netgen
 {
@@ -18,11 +21,11 @@ namespace netgen
 
   void INDEX_4 :: Sort ()
   {
-    if (i[0] > i[1]) Swap (i[0], i[1]);
-    if (i[2] > i[3]) Swap (i[2], i[3]);
-    if (i[0] > i[2]) Swap (i[0], i[2]);
-    if (i[1] > i[3]) Swap (i[1], i[3]);
-    if (i[1] > i[2]) Swap (i[1], i[2]);
+    if (i[0] > i[1]) std::swap (i[0], i[1]);
+    if (i[2] > i[3]) std::swap (i[2], i[3]);
+    if (i[0] > i[2]) std::swap (i[0], i[2]);
+    if (i[1] > i[3]) std::swap (i[1], i[3]);
+    if (i[1] > i[2]) std::swap (i[1], i[2]);
   }
 
 
@@ -30,30 +33,30 @@ namespace netgen
   void INDEX_4Q :: Sort ()
   {
     if (min2 (i[1], i[2]) < min2 (i[0], i[3]))
-      { Swap (i[0], i[1]); Swap (i[2], i[3]);}
+      { std::swap (i[0], i[1]); std::swap (i[2], i[3]);}
     if (i[3] < i[0])
-      { Swap (i[0], i[3]); Swap (i[1], i[2]);}
+      { std::swap (i[0], i[3]); std::swap (i[1], i[2]);}
     if (i[3] < i[1])
-      { Swap (i[1], i[3]); }
+      { std::swap (i[1], i[3]); }
   }
 
 
-  ostream & operator<<(ostream  & s, const INDEX_2 & i2)
+  std::ostream & operator<<(std::ostream  & s, const INDEX_2 & i2)
   {
     return s << i2.I1() << ", " << i2.I2();
   }
 
-  ostream & operator<<(ostream  & s, const INDEX_3 & i3)
+  std::ostream & operator<<(std::ostream  & s, const INDEX_3 & i3)
   {
     return s << i3.I1() << ", " << i3.I2() << ", " << i3.I3();
   }
 
-  ostream & operator<<(ostream  & s, const INDEX_4 & i4)
+  std::ostream & operator<<(std::ostream  & s, const INDEX_4 & i4)
   {
     return s << i4.I1() << ", " << i4.I2() << ", " << i4.I3() << ", " << i4.I4();
   }
 
-  ostream & operator<<(ostream  & s, const INDEX_4Q & i4)
+  std::ostream & operator<<(std::ostream  & s, const INDEX_4Q & i4)
   {
     return s << i4.I1() << ", " << i4.I2() << ", " << i4.I3() << ", " << i4.I4();
   }
@@ -80,7 +83,7 @@ namespace netgen
   }
   */  
 
-  void BASE_INDEX_2_HASHTABLE :: PrintStat (ostream & ost) const
+  void BASE_INDEX_2_HASHTABLE :: PrintStat (std::ostream & ost) const
   {
     int n = hash.Size();
     int i;
@@ -92,11 +95,11 @@ namespace netgen
 	sumnn += sqr (hash.EntrySize(i));
       }
 
-    ost << "Hashtable: " << endl
-	<< "size             : " << n << endl
-	<< "elements per row : " << (double(sumn) / double(n)) << endl
+    ost << "Hashtable: " << std::endl
+	<< "size             : " << n << std::endl
+	<< "elements per row : " << (double(sumn) / double(n)) << std::endl
 	<< "av. acces time   : " 
-	<< (sumn ? (double (sumnn) / double(sumn)) : 0) << endl;
+	<< (sumn ? (double (sumnn) / double(sumn)) : 0) << std::endl;
   }
 
 

@@ -8,6 +8,8 @@
 /* Date:   1. Aug. 99                                                    */
 /**************************************************************************/
 
+#include <iostream>
+#include "surface.hpp"
 
 namespace netgen
 {
@@ -30,8 +32,8 @@ namespace netgen
   public:
     DLL_HEADER Identification (int anr, const CSGeometry & ageom);
     DLL_HEADER virtual ~Identification ();
-    DLL_HEADER virtual void Print (ostream & ost) const = 0;
-    DLL_HEADER virtual void GetData (ostream & ost) const = 0;
+    DLL_HEADER virtual void Print (std::ostream & ost) const = 0;
+    DLL_HEADER virtual void GetData (std::ostream & ost) const = 0;
 
     /// obsolete
     //  virtual void IdentifySpecialPoints (Array<class SpecialPoint> & points);
@@ -70,7 +72,7 @@ namespace netgen
     /// get list of identified faces
     virtual void GetIdentifiedFaces (Array<INDEX_2> & idfaces) const;
 
-    friend ostream & operator<< (ostream & ost, Identification & ident);
+    friend std::ostream & operator<< (std::ostream & ost, Identification & ident);
   };
 
 
@@ -84,8 +86,8 @@ namespace netgen
 			    const Surface * as1,
 			    const Surface * as2);
     virtual ~PeriodicIdentification ();
-    virtual void Print (ostream & ost) const;
-    virtual void GetData (ostream & ost) const;
+    virtual void Print (std::ostream & ost) const;
+    virtual void GetData (std::ostream & ost) const;
 
 
     //  virtual void IdentifySpecialPoints (Array<class SpecialPoint> & points);
@@ -139,8 +141,8 @@ namespace netgen
 				const Flags & flags);
     virtual ~CloseSurfaceIdentification ();
 
-    virtual void Print (ostream & ost) const;
-    virtual void GetData (ostream & ost) const;
+    virtual void Print (std::ostream & ost) const;
+    virtual void GetData (std::ostream & ost) const;
 
 
     //  virtual void IdentifySpecialPoints (Array<class SpecialPoint> & points);
@@ -190,8 +192,8 @@ namespace netgen
 			      const Surface * as1,
 			      const Surface * as2);
     virtual ~CloseEdgesIdentification ();
-    virtual void Print (ostream & ost) const;
-    virtual void GetData (ostream & ost) const;
+    virtual void Print (std::ostream & ost) const;
+    virtual void GetData (std::ostream & ost) const;
 
     //  virtual void IdentifySpecialPoints (Array<class SpecialPoint> & points);
     virtual int Identifyable (const SpecialPoint & sp1, const SpecialPoint & sp2,

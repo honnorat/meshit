@@ -1,6 +1,10 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <climits>
 
+#include <meshgen.hpp>
+#include "adfront3.hpp"
+#include "../general/bitarray.hpp"
+#include "../gprim/geomops.hpp"
+#include "../gprim/geomtest3d.hpp"
 
 /* ********************** FrontPoint ********************** */
 
@@ -259,7 +263,7 @@ void AdFront3 :: CreateTrees ()
 	}
       pmax = pmax + 0.01 * (pmax - pmin);
       pmin = pmin + 0.01 * (pmin - pmax);
-      //      (*testout) << "insert " << i << ": " << pmin << " - " << pmax << "\n";
+      //      std::cerr << "insert " << i << ": " << pmin << " - " << pmax << "\n";
       facetree -> Insert (pmin, pmax, i);
     }
 }
@@ -281,13 +285,6 @@ void AdFront3 :: GetFaceBoundingBox (int i, Box3d & box) const
 
 void AdFront3 :: RebuildInternalTables ()
 {
-  static int timer_a = NgProfiler::CreateTimer ("Adfront3::RebuildInternal A");
-  static int timer_b = NgProfiler::CreateTimer ("Adfront3::RebuildInternal B");
-  static int timer_c = NgProfiler::CreateTimer ("Adfront3::RebuildInternal C");
-  static int timer_d = NgProfiler::CreateTimer ("Adfront3::RebuildInternal D");
-
-
-  NgProfiler::StartTimer (timer_a);	  
   int hi = 0;
   for (int i = 1; i <= faces.Size(); i++)
     if (faces.Get(i).Valid())
@@ -304,9 +301,6 @@ void AdFront3 :: RebuildInternalTables ()
   for (PointIndex pi = points.Begin(); pi < points.End(); pi++)
     points[pi].cluster = pi;
   
-  NgProfiler::StopTimer (timer_a);	  
-  NgProfiler::StartTimer (timer_b);	  
-
   int change;
   do
     {
@@ -334,13 +328,6 @@ void AdFront3 :: RebuildInternalTables ()
 	}
     }
   while (change);
-
-
-  NgProfiler::StopTimer (timer_b);	  
-  NgProfiler::StartTimer (timer_c);	  
-
-
-
 
   BitArrayChar<PointIndex::BASE> usecl(np);
   usecl.Clear();
@@ -382,11 +369,6 @@ void AdFront3 :: RebuildInternalTables ()
       clvol[faces.Get(i).cluster] += vi;
     }
 
-  NgProfiler::StopTimer (timer_c);	  
-  NgProfiler::StartTimer (timer_d);	  
-
-
-
   int negvol = 0;
   for (int i = PointIndex::BASE; 
        i < clvol.Size()+PointIndex::BASE; i++)
@@ -406,7 +388,6 @@ void AdFront3 :: RebuildInternalTables ()
   if (hashon) 
     hashtable.Create();
 
-  NgProfiler::StopTimer (timer_d);	  
 }
 
 
@@ -493,10 +474,6 @@ int AdFront3 :: GetLocals (int fstind,
 			   float relh,
 			   INDEX& facesplit)
 {
-  static int timer = NgProfiler::CreateTimer ("AdFront3::GetLocals");
-  NgProfiler::RegionTimer reg (timer);
-
-
   if (hashon && faces.Size() < 500) { hashon=0; }
   if (hashon && !hashcreated) 
     {
@@ -627,7 +604,7 @@ int AdFront3 :: GetLocals (int fstind,
 		    {
 		      // INDEX_2 coned(i, other);
 		      // coned.Sort();
-		      // (*testout) << "connected: " << locpoints.Get(i) << "-" << locpoints.Get(other) << endl;
+		      // std::cerr << "connected: " << locpoints.Get(i) << "-" << locpoints.Get(other) <<std::endl;
 		      getconnectedpairs.Set (INDEX_2::Sort (i, other), 1);
 		    }
 		}

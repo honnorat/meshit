@@ -6,11 +6,15 @@
   Very special implementations ..
   
  */
+#include "meshclass.hpp"
 
+namespace netgen {
 
 ///
-extern void CutOffAndCombine (Mesh & mesh, const Mesh & othermesh);
+void CutOffAndCombine (Mesh & mesh, const Mesh & othermesh);
 
-extern void HelmholtzMesh (Mesh & mesh);
+void HelmholtzMesh (Mesh & mesh);
+
+}
 
 #endif

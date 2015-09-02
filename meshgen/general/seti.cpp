@@ -1,6 +1,5 @@
-#include <mystdlib.h>
-#include <myadt.hpp>
-
+#include <meshgen.hpp>
+#include "seti.hpp"
 
 namespace netgen
 {
@@ -38,7 +37,7 @@ namespace netgen
     {
     if (ind > flags.Size())
     {
-    cerr << "out of range" << endl;
+    std::cerr << "out of range" <<std::endl;
     exit (1);
     }
 

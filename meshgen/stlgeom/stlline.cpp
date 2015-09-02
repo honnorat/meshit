@@ -1,11 +1,4 @@
-#include <mystdlib.h>
-
-#include <myadt.hpp>
-#include <linalg.hpp>
-#include <gprim.hpp>
-
-#include <meshing.hpp>
-
+#include <meshgen.hpp>
 #include "stlgeom.hpp"
 
 namespace netgen
@@ -14,240 +7,6 @@ namespace netgen
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++  EDGE DATA     ++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-/*
-void STLEdgeData :: Write(ofstream& of) const
-{
-  of // << angle << " "
-     << p1 << " "
-     << p2 << " "
-     << lt << " "
-     << rt << " "
-    //     << status
-     << endl;
-}
-
-void STLEdgeData :: Read(ifstream& ifs)
-{
-  // ifs >> angle;
-  ifs >> p1;
-  ifs >> p2;
-  ifs >> lt;
-  ifs >> rt;
-  //  ifs >> status;
-}
-
-
-int STLEdgeData :: GetStatus () const
-{
-  if (topedgenr <= 0 || topedgenr > top->GetNTE()) return 0;
-  return top->GetTopEdge (topedgenr).GetStatus(); 
-}
-
-void STLEdgeData ::SetStatus (int stat)
-{
-  if (topedgenr >= 1 && topedgenr <= top->GetNTE())
-    top->GetTopEdge (topedgenr).SetStatus(stat); 
-}
-
-
-float STLEdgeData :: CosAngle() const
-{
-  return top->GetTopEdge (topedgenr).CosAngle(); 
-}
-
-
-
-void STLEdgeDataList :: ResetAll()
-{
-  int i;
-  for (i = 1; i <= edgedata.Size(); i++)
-    {
-      edgedata.Elem(i).SetUndefined();
-    }
-}
-
-void STLEdgeDataList :: ResetCandidates()
-{
-  int i;
-  for (i = 1; i <= edgedata.Size(); i++)
-    {
-      if (edgedata.Get(i).Candidate())
-	{edgedata.Elem(i).SetUndefined();}
-    }
-}
-
-int STLEdgeDataList :: GetNConfEdges() const
-{
-  int i;
-  int cnt = 0;
-  for (i = 1; i <= edgedata.Size(); i++)
-    {
-      if (edgedata.Get(i).Confirmed()) {cnt++;}
-    }
-  return cnt;
-}
-
-void STLEdgeDataList :: ConfirmCandidates()
-{
-  int i;
-  for (i = 1; i <= edgedata.Size(); i++)
-    {
-      if (edgedata.Get(i).Candidate())
-	{edgedata.Elem(i).SetConfirmed();}
-    }
-}
-
-int STLEdgeDataList :: GetEdgeNum(int np1, int np2) const
-{
-  INDEX_2 ed(np1,np2);
-  ed.Sort();
-  if (hashtab.Used(ed))
-    {
-      return hashtab.Get(ed);
-    }
-
-//   int i;
-//   for (i = 1; i <= Size(); i++)
-//     {
-//       if ((Get(i).p1 == np1 && Get(i).p2 == np2) ||
-// 	  (Get(i).p2 == np1 && Get(i).p1 == np2))
-// 	{
-// 	  return i;
-// 	}
-//     }
-
-  return 0;
-}
-
-const STLEdgeDataList& STLEdgeDataList :: operator=(const STLEdgeDataList& edl)
-{
-  int i;
-  SetSize(edl.Size());
-  for (i = 1; i <= Size(); i++)
-    {
-      Add(edl.Get(i), i);
-    }
-  return *this;
-} 
-
-void STLEdgeDataList :: Add(const STLEdgeData& ed, int i)
-{
-  INDEX_2 edge(ed.p1,ed.p2);
-  edge.Sort();
-  hashtab.Set(edge, i);
-  Elem(i) = ed;
-  AddEdgePP(ed.p1,i);
-  AddEdgePP(ed.p2,i);
-}
-
-void STLEdgeDataList :: Write(ofstream& of) const
-{
-  of.precision(16);
-  int i;
-  of << Size() << endl;
-  
-  for (i = 1; i <= Size(); i++)
-    {
-      Get(i).Write(of);
-    }
-}
-
-void STLEdgeDataList :: Read(ifstream& ifs)
-{
-  int i,n;
-  ifs >> n;
-
-  SetSize(n);
-  STLEdgeData ed;
-  for (i = 1; i <= n; i++)
-    {
-      ed.Read(ifs);
-      Add(ed,i);
-    }
-}
-
-int STLEdgeDataList :: GetNEPPStat(int p, int status) const
-{
-  int i;
-  int cnt = 0;
-  for (i = 1; i <= GetNEPP(p); i++)
-    {
-      if (Get(GetEdgePP(p,i)).GetStatus() == status)
-	{
-	  cnt++;
-	}
-    }
-  return cnt;
-}
-
-int STLEdgeDataList :: GetNConfCandEPP(int p) const
-{
-  int i;
-  int cnt = 0;
-  for (i = 1; i <= GetNEPP(p); i++)
-    {
-      if (Get(GetEdgePP(p,i)).ConfCand())
-	{
-	  cnt++;
-	}
-    }
-  return cnt;
-}
-
-
-void STLEdgeDataList :: BuildLineWithEdge(int ep1, int ep2, Array<twoint>& line)
-{
-  int status = Get(GetEdgeNum(ep1,ep2)).GetStatus();
-
-  int found, pstart, p, en, pnew, ennew;
-  int closed = 0;
-  int j, i;
-  for (j = 1; j <= 2; j++)
-    {
-      if (j == 1) {p = ep1;}
-      if (j == 2) {p = ep2;}
-
-      pstart = p;
-      en = GetEdgeNum(ep1,ep2);
-
-      found = 1;
-      while (found && !closed)
-	{
-	  found = 0;
-	  
-	  if (GetNEPPStat(p,status) == 2)
-	    {
-	      for (i = 1; i <= GetNEPP(p); i++)
-		{		
-		  const STLEdgeData& e = Get(GetEdgePP(p,i));
-		  if (GetEdgePP(p,i) != en && e.GetStatus() == status) 
-		    {
-		      if (e.p1 == p) 
-			{pnew = e.p2;}
-		      else 
-			{pnew = e.p1;}
-
-		      ennew = GetEdgePP(p,i);
-		    }
-		}
-	      if (pnew == pstart) {closed = 1;}
-	      else
-		{
-		  line.Append(twoint(p,pnew));
-		  p = pnew;
-		  en = ennew;
-		  found = 1;
-		}
-	    }
-	}
-    }
-  
-}
-*/
-
-
 
 
 STLEdgeDataList :: STLEdgeDataList (STLTopology & ageom)
@@ -318,13 +77,13 @@ void STLEdgeDataList :: Add(const STLEdgeData& ed, int i)
 }
 */
 
-void STLEdgeDataList :: Write(ofstream& of) const
+void STLEdgeDataList :: Write(std::ofstream& of) const
 {
   
   /*
   of.precision(16);
   int i;
-  of << Size() << endl;
+  of << Size() <<std::endl;
   
   for (i = 1; i <= Size(); i++)
     {
@@ -334,8 +93,8 @@ void STLEdgeDataList :: Write(ofstream& of) const
   */
   of.precision(16);
   int i, ne = geom.GetNTE();
-  //of << GetNConfEdges() << endl;
-  of << geom.GetNTE() << endl;
+  //of << GetNConfEdges() <<std::endl;
+  of << geom.GetNTE() <<std::endl;
 
   for (i = 1; i <= ne; i++)
     {
@@ -350,12 +109,12 @@ void STLEdgeDataList :: Write(ofstream& of) const
 	 << p1.Z() << " "
 	 << p2.X() << " "
 	 << p2.Y() << " "
-	 << p2.Z() << endl;
+	 << p2.Z() <<std::endl;
     }
   
 }
 
-void STLEdgeDataList :: Read(ifstream& ifs)
+void STLEdgeDataList :: Read(std::ifstream& ifs)
 {
   int i, nce;
   Point3d p1, p2;
@@ -648,13 +407,6 @@ STLLine* STLLine :: Mesh(const Array<Point<3> >& ap,
 			 Array<Point3d>& mp, double ghi,
 			 class Mesh& mesh) const
 {
-  static int timer1a = NgProfiler::CreateTimer ("mesh stl-line 1a");
-  static int timer1b = NgProfiler::CreateTimer ("mesh stl-line 1b");
-  static int timer2 = NgProfiler::CreateTimer ("mesh stl-line 2");
-  static int timer3 = NgProfiler::CreateTimer ("mesh stl-line 3");
-
-  NgProfiler::StartTimer (timer1a);
-
   STLLine* line = new STLLine(geometry);
 
   //stlgh = ghi; //uebergangsloesung!!!!
@@ -680,10 +432,6 @@ STLLine* STLLine :: Mesh(const Array<Point<3> >& ap,
 
   Array<double> inthi(GetNS()*nph);
   Array<double> curvelen(GetNS()*nph);
-
-  NgProfiler::StopTimer (timer1a);
-  NgProfiler::StartTimer (timer1b);
-
 
   for (int i = 1; i <= GetNS(); i++)
     {
@@ -729,9 +477,6 @@ STLLine* STLLine :: Mesh(const Array<Point<3> >& ap,
   line->AddRightTrig(GetRightTrig(segn));
   line->AddDist(dist);
 
-  NgProfiler::StopTimer (timer1b);
-  NgProfiler::StartTimer (timer2);
-
   inthl = 0; //restart each meshseg
   for (int i = 1; i <= inthlint; i++)
     {
@@ -769,10 +514,6 @@ STLLine* STLLine :: Mesh(const Array<Point<3> >& ap,
       j++;
     }
 
-  NgProfiler::StopTimer (timer2);
-  NgProfiler::StartTimer (timer3);
-
-
   p = ap.Get(EndP());
   pn = AddPointIfNotExists(mp, p, 1e-10*diam);
   segn = GetNS();
@@ -786,12 +527,6 @@ STLLine* STLLine :: Mesh(const Array<Point<3> >& ap,
       int p1, p2;
       line->GetSeg(ii,p1,p2);
     }
-  /*  
-  (*testout) << "line, " << ap.Get(StartP()) << "-" << ap.Get(EndP())
-	     << " len = " << Dist (ap.Get(StartP()), ap.Get(EndP())) << endl;
-  */
-
-  NgProfiler::StopTimer (timer3);
 
   return line;
 }

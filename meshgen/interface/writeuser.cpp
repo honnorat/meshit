@@ -76,7 +76,7 @@ bool WriteUserFormat (const string & format,
     WriteTochnogFormat (mesh, filename);
 
   else if (format == "TecPlot Format")
-    cerr << "ERROR: TecPlot format currently out of order" << endl;
+    std::cerr << "ERROR: TecPlot format currently out of order" <<std::endl;
       // WriteTecPlotFormat (mesh, geom, filename);
 
   else if (format == "Abaqus Format")
@@ -160,7 +160,7 @@ void WriteNeutralFormat (const Mesh & mesh,
 			 const CSGeometry & geom,
 			 const string & filename)
 {
-  cout << "write neutral, new" << endl;
+  std::cout << "write neutral, new" <<std::endl;
   int np = mesh.GetNP();
   int ne = mesh.GetNE();
   int nse = mesh.GetNSE();
@@ -267,13 +267,13 @@ void WriteSurfaceFormat (const Mesh & mesh,
   // surface mesh
   int i, j;
 
-  cout << "Write Surface Mesh" << endl;
+  std::cout << "Write Surface Mesh" <<std::endl;
 
   ofstream outfile (filename.c_str());
 
-  outfile << "surfacemesh" << endl;
+  outfile << "surfacemesh" <<std::endl;
 
-  outfile << mesh.GetNP() << endl;
+  outfile << mesh.GetNP() <<std::endl;
   for (i = 1; i <= mesh.GetNP(); i++)
     {
       for (j = 0; j < 3; j++)
@@ -281,9 +281,9 @@ void WriteSurfaceFormat (const Mesh & mesh,
 	  outfile.width(10);
 	  outfile << mesh.Point(i)(j) << " ";
 	}
-      outfile << endl;
+      outfile <<std::endl;
     }
-  outfile << mesh.GetNSE() << endl;
+  outfile << mesh.GetNSE() <<std::endl;
   for (i = 1; i <= mesh.GetNSE(); i++)
     {
       for (j = 1; j <= 3; j++)
@@ -291,7 +291,7 @@ void WriteSurfaceFormat (const Mesh & mesh,
 	  outfile.width(8);
 	  outfile << mesh.SurfaceElement(i).PNum(j);
 	}
-      outfile << endl;
+      outfile <<std::endl;
     }
 }
 
@@ -306,7 +306,7 @@ void WriteSurfaceFormat (const Mesh & mesh,
 void WriteSTLFormat (const Mesh & mesh,
 		     const string & filename)
 {
-  cout << "\nWrite STL Surface Mesh" << endl;
+  std::cout << "\nWrite STL Surface Mesh" <<std::endl;
 
   ostream *outfile;
 
@@ -319,7 +319,7 @@ void WriteSTLFormat (const Mesh & mesh,
 
   outfile->precision(10);
 
-  *outfile << "solid" << endl;
+  *outfile << "solid" <<std::endl;
 
   for (i = 1; i <= mesh.GetNSE(); i++)
     {
@@ -341,10 +341,10 @@ void WriteSTLFormat (const Mesh & mesh,
       *outfile << "vertex " << p2.X() << " " << p2.Y() << " " << p2.Z() << "\n";
       *outfile << "vertex " << p3.X() << " " << p3.Y() << " " << p3.Z() << "\n";
 
-      *outfile << "endloop\n";
+      *outfile << std::endloop\n";
       *outfile << "endfacet\n";
     }
-  *outfile << "endsolid" << endl;
+  *outfile << "endsolid" <<std::endl;
 }
 
 
@@ -363,7 +363,7 @@ void WriteSTLFormat (const Mesh & mesh,
 void WriteSTLExtFormat (const Mesh & mesh,
 		     const string & filename)
 {
-  cout << "\nWrite STL Surface Mesh (with separated boundary faces)" << endl;
+  std::cout << "\nWrite STL Surface Mesh (with separated boundary faces)" <<std::endl;
 
   ostream *outfile;
 
@@ -434,7 +434,7 @@ void WriteSTLExtFormat (const Mesh & mesh,
         	  *outfile << "vertex " << p2.X() << " " << p2.Y() << " " << p2.Z() << "\n";
         	  *outfile << "vertex " << p3.X() << " " << p3.Y() << " " << p3.Z() << "\n";
 
-        	  *outfile << "endloop\n";
+        	  *outfile << std::endloop\n";
         	  *outfile << "endfacet\n";
           }
       }
@@ -517,7 +517,7 @@ void WriteVRMLFormat (const Mesh & mesh,
       for (i = 1; i <= nse; i++)
 	{
 	  outfile << mesh.GetFaceDescriptor(mesh.SurfaceElement(i).GetIndex ()).BCProperty();
-          outfile << endl;
+          outfile <<std::endl;
 	}
 
       outfile << " ] \n"
@@ -595,7 +595,7 @@ void WriteVRMLFormat (const Mesh & mesh,
       for (i = 1; i <= nse; i++)
 	{
 	  outfile << mesh.GetFaceDescriptor(mesh.SurfaceElement(i).GetIndex ()).BCProperty();
-          outfile << endl;
+          outfile <<std::endl;
 	}
 
       outfile << " ] \n"
@@ -639,8 +639,8 @@ void WriteFEPPFormat (const Mesh & mesh,
       outfile.setf (ios::fixed, ios::floatfield);
       outfile.setf (ios::showpoint);
 
-      outfile << "volumemesh4" << endl;
-      outfile << nse << endl;
+      outfile << "volumemesh4" <<std::endl;
+      outfile << nse <<std::endl;
       for (i = 1; i <= nse; i++)
 	{
 	  const Element2d & el = mesh.SurfaceElement(i);
@@ -704,7 +704,7 @@ void WriteFEPPFormat (const Mesh & mesh,
 	  //	  int ncon = mesh.connectedtonode.Size();
 	  //	  outfile << ncon << "\n";
 	  //	  for (i = 1; i <= ncon; i++)
-	  //	    outfile << i << " " << mesh.connectedtonode.Get(i) << endl;
+	  //	    outfile << i << " " << mesh.connectedtonode.Get(i) <<std::endl;
 	}
       */
 
@@ -712,12 +712,12 @@ void WriteFEPPFormat (const Mesh & mesh,
       // write CSG surfaces
       if (&geom && geom.GetNSurf() >= ns)
 	{
-	  outfile << ns << endl;
+	  outfile << ns <<std::endl;
 	  for (i = 1; i <= ns; i++)
 	    geom.GetSurface(mesh.GetFaceDescriptor(i).SurfNr())->Print(outfile);
 	}
       else
-	outfile << "0" << endl;
+	outfile << "0" <<std::endl;
     }
 
 
@@ -750,7 +750,7 @@ void WriteEdgeElementFormat (const Mesh & mesh,
 			     const CSGeometry & geom,
 			     const string & filename)
 {
-  cout << "write edge element format" << endl;
+  std::cout << "write edge element format" <<std::endl;
 
   const MeshTopology * top = &mesh.GetTopology();
   int npoints = mesh.GetNP();
@@ -803,7 +803,7 @@ void WriteEdgeElementFormat (const Mesh & mesh,
 	}
 
       top->GetElementEdges(i,edges);
-      outfile << endl << "      ";
+      outfile <<std::endl << "      ";
       outfile.width(8);
       outfile << edges.Size();
       for (j=1; j <= edges.Size(); j++)
@@ -845,7 +845,7 @@ void WriteEdgeElementFormat (const Mesh & mesh,
 	}
 
       top->GetSurfaceElementEdges(i,edges);
-      outfile << endl << "      ";
+      outfile <<std::endl << "      ";
       outfile.width(8);
       outfile << edges.Size();
       for (j=1; j <= edges.Size(); j++)
@@ -868,7 +868,7 @@ void WriteEdgeElementFormat (const Mesh & mesh,
       outfile << v1;
       outfile << " ";
       outfile.width(8);
-      outfile << v2 << endl;
+      outfile << v2 <<std::endl;
     }
 }
 
@@ -907,7 +907,7 @@ void WriteFile (int typ,
       // write edge element file
       // Peter Harscher, ETHZ
 
-      cout << "Write Edge-Element Format" << endl;
+      std::cout << "Write Edge-Element Format" <<std::endl;
 
       ofstream outfile (filename);
 
@@ -969,7 +969,7 @@ void WriteFile (int typ,
 
 
 
-      outfile << mesh.GetNE() << endl;
+      outfile << mesh.GetNE() <<std::endl;
       // write element ---> point
       for (i = 1; i <= mesh.GetNE(); i++)
 	{
@@ -982,7 +982,7 @@ void WriteFile (int typ,
 	      outfile.width(8);
 	      outfile << el.PNum(j);
 	    }
-	  outfile << endl;
+	  outfile <<std::endl;
 	}
 
       // write element ---> edge
@@ -999,11 +999,11 @@ void WriteFile (int typ,
 	      outfile.width(8);
 	      outfile << edgeht.Get (edge);
 	    }
-	  outfile << endl;
+	  outfile <<std::endl;
 	}
 
       // write points
-      outfile << mesh.GetNP() << endl;
+      outfile << mesh.GetNP() <<std::endl;
       outfile.precision (6);
       for (i = 1; i <= mesh.GetNP(); i++)
 	{
@@ -1015,11 +1015,11 @@ void WriteFile (int typ,
 	      outfile << p.X(j);
 	    }
 	  outfile << "       "
-		  << (bpoint.Test(i) ? "1" : 0) << endl;
+		  << (bpoint.Test(i) ? "1" : 0) <<std::endl;
 	}
 
       // write edges
-      outfile << edgelist.Size() << endl;
+      outfile << edgelist.Size() <<std::endl;
       for (i = 1; i <= edgelist.Size(); i++)
 	{
 	  outfile.width(8);
@@ -1027,7 +1027,7 @@ void WriteFile (int typ,
 	  outfile.width(8);
 	  outfile << edgelist.Get(i).I2();
 	  outfile << "       "
-		  << (bedge.Test(i) ? "1" : "0") << endl;
+		  << (bedge.Test(i) ? "1" : "0") <<std::endl;
 	}
     }
 

@@ -1,6 +1,9 @@
-#include <meshing.hpp>
-
+#include <meshgen.hpp>
 #include "stlgeom.hpp"
+
+#include "../general/ngexception.hpp"
+#include "../meshing/global.hpp"
+#include "../gprim/geomtest3d.hpp"
 
 namespace netgen
 {
@@ -65,7 +68,7 @@ STLGeometry :: ~STLGeometry()
   delete ref;
 }
 
-void STLGeometry :: Save (string filename) const
+void STLGeometry :: Save (std::string filename) const
 {
   const char  * cfilename = filename.c_str();
   if (strlen(cfilename) < 4) 
@@ -230,8 +233,8 @@ void STLGeometry :: SmoothNormals()
 	  hm.Mult (hv, hv2);
 	  /*
 	  if (testmode)
-	    (*testout) << "add vec " << hv2 << endl 
-		       << " add m " << hm << endl;
+	    std::cerr << "add vec " << hv2 <<std::endl 
+		       << " add m " << hm <<std::endl;
 	  */
 	  rhs.Add (1, hv2);
 	  m += hm;
@@ -250,7 +253,7 @@ void STLGeometry :: SmoothNormals()
 
 	  if (!nbt)
 	    {
-	      cerr << "ERROR: stlgeom::Smoothnormals, nbt = 0" << endl;
+	      std::cerr << "ERROR: stlgeom::Smoothnormals, nbt = 0" <<std::endl;
 	    }
 
 	  // smoothed normal
@@ -277,8 +280,8 @@ void STLGeometry :: SmoothNormals()
 	      hm.Mult (hv, hv2);
 	      /*
 	      if (testmode)
-		(*testout) << "add nb vec " << hv2 << endl 
-			   << " add nb m " << hm << endl;
+		std::cerr << "add nb vec " << hv2 <<std::endl 
+			   << " add nb m " << hm <<std::endl;
 	      */
 
 	      rhs.Add (1, hv2);
@@ -332,7 +335,7 @@ void STLGeometry :: SmoothNormals()
 	  
 	  if (!nbt)
 	    {
-	      cerr << "ERROR: stlgeom::Smoothnormals, nbt = 0" << endl;
+	      std::cerr << "ERROR: stlgeom::Smoothnormals, nbt = 0" <<std::endl;
 	    }
 
 	  Vec3d nnb = GetTriangleNormal(nbt);   // neighbour normal
@@ -366,10 +369,10 @@ void STLGeometry :: SmoothNormals()
 	{
 	  int tnr1 = critpairs.Get(i).I1();
 	  int tnr2 = critpairs.Get(i).I2();
-	  (*testout) << "t1 = " << tnr1 << ", t2 = " << tnr2
+	  std::cerr << "t1 = " << tnr1 << ", t2 = " << tnr2
 		     << " angle = " << Angle (GetTriangleNormal (tnr1),
 					      GetTriangleNormal (tnr2))
-		     << endl;
+		     <<std::endl;
 
 	  // who has more friends ?
 	  int side;
@@ -428,7 +431,7 @@ void STLGeometry :: SmoothNormals()
 	      
 	    }
 
-	  (*testout) << "area1 = " << area1 << " area2 = " << area2 << endl;
+	  std::cerr << "area1 = " << area1 << " area2 = " << area2 <<std::endl;
 	  if (area1 < 0.1 * area2)
 	    {
 	      Vec3d n = GetTriangleNormal (tnr1);
@@ -709,7 +712,7 @@ void STLGeometry :: ImportEdges()
   StoreEdgeData();
 
   PrintMessage(5, "import edges from file 'edges.ng'");
-  ifstream fin("edges.ng");
+  std::ifstream fin("edges.ng");
 
   int ne;
   fin >> ne;
@@ -796,7 +799,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
 {
   //AVL edges!!!!!!
 
-  ifstream inf (filename);
+  std::ifstream inf (filename);
   char ch;
   //int cnt = 0;
   int records, units, i, j;
@@ -814,12 +817,12 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
   while (inf.good())
     {
       inf.get(ch);
-      //      (*testout) << cnt << ": " << ch << endl;
+      //      std::cerr << cnt << ": " << ch <<std::endl;
       
       for (i = 0; i < flen; i++)
 	filter[i] = filter[i+1];
       filter[flen-1] = ch;
-      //      (*testout) << filter << endl;
+      //      std::cerr << filter <<std::endl;
 
       if (strcmp (filter+flen-7, "RECORDS") == 0)
 	{
@@ -840,7 +843,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
 	    {
 	      inf >> nodenr;
 	      importlines.Elem(i) = nodenr;
-	      //	      (*testout) << nodenr << endl;
+	      //	      std::cerr << nodenr <<std::endl;
 	    }
 	}
 
@@ -867,12 +870,12 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
     }
 
   /*
-  (*testout) << "lines: " << endl;
+  std::cerr << "lines: " <<std::endl;
   for (i = 1; i <= importlines.Size(); i++)
-    (*testout) << importlines.Get(i) << endl;
-  (*testout) << "points: " << endl;
+    std::cerr << importlines.Get(i) <<std::endl;
+  std::cerr << "points: " <<std::endl;
   for (i = 1; i <= importpoints.Size(); i++)
-    (*testout) << importpoints.Get(i) << endl;
+    std::cerr << importpoints.Get(i) <<std::endl;
   */
 
 
@@ -902,7 +905,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
   for (i = 1; i <= GetNP(); i++)
     {
       Point3d p = GetPoint(i);
-      //      (*testout) << "stlpt: " << p << endl;
+      //      std::cerr << "stlpt: " << p <<std::endl;
       ptree.Insert (p, i);
     }
   
@@ -968,12 +971,12 @@ void STLGeometry :: ExportEdges()
 {
   PrintFnStart("Save edges to file 'edges.ng'");
 
-  ofstream fout("edges.ng");
+  std::ofstream fout("edges.ng");
   fout.precision(16);
 
   int n = edgedata->GetNConfEdges();
   
-  fout << n << endl;
+  fout << n <<std::endl;
 
   int i;
   for (i = 1; i <= edgedata->Size(); i++)
@@ -981,8 +984,8 @@ void STLGeometry :: ExportEdges()
       if (edgedata->Get(i).GetStatus() == ED_CONFIRMED)
 	{
 	  const STLTopEdge & e = edgedata->Get(i);
-	  fout << GetPoint(e.PNum(1))(0) << " " << GetPoint(e.PNum(1))(1) << " " << GetPoint(e.PNum(1))(2) << endl;
-	  fout << GetPoint(e.PNum(2))(0) << " " << GetPoint(e.PNum(2))(1) << " " << GetPoint(e.PNum(2))(2) << endl;
+	  fout << GetPoint(e.PNum(1))(0) << " " << GetPoint(e.PNum(1))(1) << " " << GetPoint(e.PNum(1))(2) <<std::endl;
+	  fout << GetPoint(e.PNum(2))(0) << " " << GetPoint(e.PNum(2))(1) << " " << GetPoint(e.PNum(2))(2) <<std::endl;
 	}
     }
 
@@ -993,7 +996,7 @@ void STLGeometry :: LoadEdgeData(const char* file)
   StoreEdgeData();
 
   PrintFnStart("Load edges from file '", file, "'");
-  ifstream fin(file);
+  std::ifstream fin(file);
 
   edgedata->Read(fin);
 
@@ -1003,7 +1006,7 @@ void STLGeometry :: LoadEdgeData(const char* file)
 void STLGeometry :: SaveEdgeData(const char* file)
 {
   PrintFnStart("save edges to file '", file, "'");
-  ofstream fout(file);
+  std::ofstream fout(file);
 
   edgedata->Write(fout);
 }
@@ -1021,14 +1024,14 @@ void STLGeometry :: SaveExternalEdges()
   fout.precision(16);
 
   int n = NOExternalEdges();
-  fout << n << endl;
+  fout << n <<std::endl;
 
   int i;
   for (i = 1; i <= n; i++)
     {
       twoint e = GetExternalEdge(i);
-      fout << GetPoint(e.i1)(0) << " " << GetPoint(e.i1)(1) << " " << GetPoint(e.i1)(2) << endl;
-      fout << GetPoint(e.i2)(0) << " " << GetPoint(e.i2)(1) << " " << GetPoint(e.i2)(2) << endl;
+      fout << GetPoint(e.i1)(0) << " " << GetPoint(e.i1)(1) << " " << GetPoint(e.i1)(2) <<std::endl;
+      fout << GetPoint(e.i2)(0) << " " << GetPoint(e.i2)(1) << " " << GetPoint(e.i2)(2) <<std::endl;
     }
 
 }
@@ -1539,7 +1542,7 @@ void STLGeometry :: ShowSelectedTrigCoords()
 void STLGeometry :: LoadMarkedTrigs()
 {
   PrintFnStart("load marked trigs from file 'markedtrigs.ng'");
-  ifstream fin("markedtrigs.ng");
+  std::ifstream fin("markedtrigs.ng");
 
   int n;
   fin >> n;
@@ -1569,10 +1572,10 @@ void STLGeometry :: LoadMarkedTrigs()
 void STLGeometry :: SaveMarkedTrigs()
 {
   PrintFnStart("save marked trigs to file 'markedtrigs.ng'");
-  ofstream fout("markedtrigs.ng");
+  std::ofstream fout("markedtrigs.ng");
 
   int n = GetNT();
-  fout << n << endl;
+  fout << n <<std::endl;
 
   int i;
   for (i = 1; i <= n; i++)
@@ -1581,7 +1584,7 @@ void STLGeometry :: SaveMarkedTrigs()
     }
 
   n = GetNMarkedSegs();
-  fout << n << endl;
+  fout << n <<std::endl;
 
   Point<3> ap1,ap2;
   for (i = 1; i <= n; i++)
@@ -2138,11 +2141,11 @@ int STLGeometry :: CheckGeometryOverlapping()
     }
 
 
-#pragma omp parallel
+//#pragma omp parallel
   {
     Array<int> inters;
     
-#pragma omp for
+//#pragma omp for
     for (int i = 1; i <= GetNT(); i++)
       {
 	const STLTriangle & tri = GetTriangle(i);
@@ -2176,7 +2179,7 @@ int STLGeometry :: CheckGeometryOverlapping()
 
 	    if (IntersectTriangleTriangle (&trip1[0], &trip2[0]))
 	      {
-#pragma omp critical
+//#pragma omp critical
 		{
 		  oltrigs++;
 		  PrintMessage(5,"Intersecting Triangles: trig ",i," with ",inters.Get(j),"!");
@@ -2218,7 +2221,7 @@ void STLGeometry :: InitSTLGeometry()
 
   for(i = 1; i <= GetReadNT(); i++)
     {
-      //if (i%500==499) {(*mycout) << (double)i/(double)GetReadNT()*100. << "%" << endl;}
+      //if (i%500==499) {(*mystd::cout) << (double)i/(double)GetReadNT()*100. << "%" <<std::endl;}
 
       STLReadTriangle t = GetReadTriangle(i);
       STLTriangle st;
@@ -2234,7 +2237,7 @@ void STLGeometry :: InitSTLGeometry()
 	  pointtree.GetIntersecting (pmin, pmax, pintersect);
 	  
 	  if (pintersect.Size() > 1)
-	    (*mycout) << "found too much  " << char(7) << endl;
+	    (*mystd::cout) << "found too much  " << char(7) <<std::endl;
 	  int foundpos = 0;
 	  if (pintersect.Size())
 	    foundpos = pintersect.Get(1);
@@ -2243,7 +2246,7 @@ void STLGeometry :: InitSTLGeometry()
 	    {
 	      normal_cnt[foundpos]++;
 	      SetNormal(foundpos,GetNormal(foundpos)+n);
-	      //	      (*testout) << "found p " << p << endl;
+	      //	      std::cerr << "found p " << p <<std::endl;
 	    }
 	  else
 	    {
@@ -2253,7 +2256,7 @@ void STLGeometry :: InitSTLGeometry()
 
 	      pointtree.Insert (p, foundpos);
 	    }
-	  //(*mycout) << "foundpos=" << foundpos << endl;
+	  //(*mystd::cout) << "foundpos=" << foundpos <<std::endl;
 	  st.pts[k] = foundpos;
 	}
 
@@ -2261,14 +2264,14 @@ void STLGeometry :: InitSTLGeometry()
 	   (st.pts[0] == st.pts[2]) || 
 	   (st.pts[1] == st.pts[2]) )
 	{
-	  (*mycout) << "ERROR: STL Triangle degenerated" << endl;
+	  (*mystd::cout) << "ERROR: STL Triangle degenerated" <<std::endl;
 	}
       else
 	{
 	  // do not add ? js
 	  AddTriangle(st);
 	}
-      //(*mycout) << "TRIG" << i << " = " << st << endl;
+      //(*mystd::cout) << "TRIG" << i << " = " << st <<std::endl;
       
     } 
   //normal the normals
@@ -2300,7 +2303,7 @@ void STLGeometry :: InitSTLGeometry()
 
   ClearLineEndPoints();
 
-  (*mycout) << "done" << endl;
+  (*mystd::cout) << "done" <<std::endl;
 }
 */
 
@@ -2520,7 +2523,7 @@ void STLGeometry :: FindEdgesFromAngles()
       while (changed && stlparam.contyangle < stlparam.yangle)
 	{
 	  its++;
-	  //(*mycout) << "." << flush;
+	  //(*mystd::cout) << "." << flush;
 	  changed = 0;
 	  for (int i = 1; i <= edgedata->Size(); i++)
 	    {
@@ -2559,7 +2562,7 @@ void STLGeometry :: FindEdgesFromAngles()
 
   
 
-  //(*mycout) << "its for continued angle = " << its << endl;
+  //(*mystd::cout) << "its for continued angle = " << its <<std::endl;
   PrintMessage(5,"built ", GetNE(), " edges with yellow angle = ", stlparam.yangle, " degree");
   
 }
@@ -2577,7 +2580,7 @@ void STLGeometry :: FindEdgesFromAngles()
   double ang;
   int i;
 
-  //(*mycout) << "area=" << Area() << endl;
+  //(*mystd::cout) << "area=" << Area() <<std::endl;
 
   for (i = 1; i <= GetNT(); i++)
     {
@@ -2612,7 +2615,7 @@ void STLGeometry :: FindEdgesFromAngles()
 	}      
     }
   
-  (*mycout) << "added " << GetNE() << " edges" << endl;
+  (*mystd::cout) << "added " << GetNE() << " edges" <<std::endl;
 
   //BuildEdgesPerPoint();
 
@@ -2623,13 +2626,13 @@ void STLGeometry :: FindEdgesFromAngles()
 */
 void STLGeometry :: BuildEdgesPerPoint()
 {
-  //cout << "*** build edges per point" << endl;
+  //std::cout << "*** build edges per point" <<std::endl;
   edgesperpoint.SetSize(GetNP());
 
   //add edges to points
   for (int i = 1; i <= GetNE(); i++)
     {
-      //(*mycout) << "EDGE " << GetEdge(i).PNum(1) << " - " << GetEdge(i).PNum(2) << endl;
+      //(*mystd::cout) << "EDGE " << GetEdge(i).PNum(1) << " - " << GetEdge(i).PNum(2) <<std::endl;
       for (int j = 1; j <= 2; j++)
 	{
 	  AddEdgePP(GetEdge(i).PNum(j),i);
@@ -2756,7 +2759,7 @@ void STLGeometry :: LinkEdges()
 			 GetPoint(GetEdge(GetEdgePP(i,2)).PNum(lp2)));
 	      if ((v1*v2)/sqrt(v1.Length2()*v2.Length2()) < cos_eca) 
 		{
-		  //(*testout) << "add edgepoint " << i << endl;
+		  //std::cerr << "add edgepoint " << i <<std::endl;
 		  SetLineEndPoint(i);
 		  ecnt++;
 		}
@@ -2902,7 +2905,7 @@ void STLGeometry :: LinkEdges()
 	{
 	  int ap1, ap2;
 	  line->GetSeg(ii,ap1,ap2);
-	  //	  (*mycout) << "SEG " << p1 << " - " << p2 << endl;
+	  //	  (*mystd::cout) << "SEG " << p1 << " - " << p2 <<std::endl;
 	}
     }
 
@@ -3318,7 +3321,7 @@ void STLGeometry :: AddConeAndSpiralEdges()
 			      {
 				SetSpiralPoint(pn);
 				spworked = 1;
-				//if (GetNEPP(pn) == 0) {(*mycout) << "ERROR: spiralpoint with no edge found!" << endl;}
+				//if (GetNEPP(pn) == 0) {(*mystd::cout) << "ERROR: spiralpoint with no edge found!" <<std::endl;}
 			      }
 			    worked = 1;
 			  }
@@ -3326,15 +3329,15 @@ void STLGeometry :: AddConeAndSpiralEdges()
 
 		  if (worked)
 		    {		      
-		      //(*testout) << "set edgepoint due to spirals: pn=" << i << endl;
+		      //std::cerr << "set edgepoint due to spirals: pn=" << i <<std::endl;
 		      SetLineEndPoint(pn);
 		    }
 		  if (spworked)
 		    {		
 		      /*      
-		      (*mycout) << "Warning: Critical Point " << tt.PNum(k) 
+		      (*mystd::cout) << "Warning: Critical Point " << tt.PNum(k) 
 			   << "( chart " << i << ", trig " << t
-			   << ") has been neutralized!!!" << endl;
+			   << ") has been neutralized!!!" <<std::endl;
 		      */
 		      cnt++;
 		    }
@@ -3391,8 +3394,8 @@ void STLGeometry :: AddConeAndSpiralEdges()
 			}
 		      if (thereOC && thereNotOC)
 			{
-			  //(*mycout) << "Special OCICnotC - point " << pn << " found!" << endl;
-			  //(*testout) << "set edgepoint due to spirals: pn=" << i << endl;
+			  //(*mystd::cout) << "Special OCICnotC - point " << pn << " found!" <<std::endl;
+			  //std::cerr << "set edgepoint due to spirals: pn=" << i <<std::endl;
 			  SetLineEndPoint(pn);
 			}
 		    }
@@ -3412,7 +3415,7 @@ void STLGeometry :: GetSortedTrianglesAroundPoint(int p, int starttrig, Array<in
   trigs.Append(acttrig);
   int i, j, t, ap1, ap2, locindex1(0), locindex2(0);
 
-  //(*mycout) << "trigs around point " << p << endl;
+  //(*mystd::cout) << "trigs around point " << p <<std::endl;
 
   int end = 0;
   while (!end)
@@ -3425,7 +3428,7 @@ void STLGeometry :: GetSortedTrianglesAroundPoint(int p, int starttrig, Array<in
 	  if (at.IsNeighbourFrom(nt))
 	    {
 	      at.GetNeighbourPoints(nt, ap1, ap2);
-	      if (ap2 == p) {Swap(ap1,ap2);}
+	      if (ap2 == p) {std::swap(ap1,ap2);}
 	      if (ap1 != p) {PrintSysError("In GetSortedTrianglesAroundPoint!!!");}
 	      
 	      for (j = 1; j <= 3; j++) 
@@ -3438,7 +3441,7 @@ void STLGeometry :: GetSortedTrianglesAroundPoint(int p, int starttrig, Array<in
 		  if (t != starttrig)
 		    {
 		      trigs.Append(t);
-		      //		      (*mycout) << "trig " << t << endl;
+		      //		      (*mystd::cout) << "trig " << t <<std::endl;
 		      acttrig = t;
 		    }
 		  else
@@ -3522,10 +3525,10 @@ void STLGeometry :: SmoothGeometry ()
   class STLGeometryRegister : public GeometryRegister
   {
   public:
-    virtual NetgenGeometry * Load (string filename) const;
+    virtual NetgenGeometry * Load (std::string filename) const;
   };
 
-  NetgenGeometry *  STLGeometryRegister :: Load (string filename) const
+  NetgenGeometry *  STLGeometryRegister :: Load (std::string filename) const
   {
     const char * cfilename = filename.c_str();
 
@@ -3533,7 +3536,7 @@ void STLGeometry :: SmoothGeometry ()
       {
 	PrintMessage (1, "Load STL geometry file ", cfilename);
 
-	ifstream infile(cfilename);
+	std::ifstream infile(cfilename);
 
 	STLGeometry * hgeom = STLGeometry :: Load (infile);
 	hgeom -> edgesfound = 0;
@@ -3543,7 +3546,7 @@ void STLGeometry :: SmoothGeometry ()
       {
 	PrintMessage (1, "Load STL binary geometry file ", cfilename);
 
-	ifstream infile(cfilename);
+	std::ifstream infile(cfilename);
 
 	STLGeometry * hgeom = STLGeometry :: LoadBinary (infile);
 	hgeom -> edgesfound = 0;
@@ -3553,7 +3556,7 @@ void STLGeometry :: SmoothGeometry ()
       {
 	PrintMessage (1, "Load naomi (F. Kickinger) geometry file ", cfilename);
 
-	ifstream infile(cfilename);
+	std::ifstream infile(cfilename);
 
 	STLGeometry * hgeom = STLGeometry :: LoadNaomi (infile);
 	hgeom -> edgesfound = 0;

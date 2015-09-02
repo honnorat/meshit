@@ -7,6 +7,9 @@
 /* Date:   26. Jan. 98                                                    */
 /**************************************************************************/
 
+#include "meshing3.hpp"
+
+namespace netgen {
 
 /*
   Functions for mesh-generations strategies
@@ -37,5 +40,5 @@ enum MESHING_STEP {
   MESHCONST_OPTVOLUME = 6
 };
 
-
+}
 #endif

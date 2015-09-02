@@ -1,5 +1,5 @@
- #include <mystdlib.h>
-#include "meshing.hpp"
+ #include <meshgen.hpp>
+#include "bisect.hpp"
 
 
 namespace netgen
@@ -417,7 +417,7 @@ namespace netgen
       
     if (wrongels)
       {
-	cout << "WARNING: " << wrongels << " illegal element(s) found" << endl;
+	std::cout << "WARNING: " << wrongels << " illegal element(s) found" <<std::endl;
 
 	int np = mesh.GetNP();
 	Array<Point<3> > should(np);
@@ -445,10 +445,10 @@ namespace netgen
 	  }
 
 
-	(*testout) << "bpoints:" << endl;
+	std::cerr << "bpoints:" <<std::endl;
 	for (int i = 1; i <= np; i++)
 	  if (boundp.Test(i))
-	    (*testout) << i << endl;
+	    std::cerr << i <<std::endl;
 
 	double lam = 0.5;
 
@@ -459,14 +459,14 @@ namespace netgen
 
 	    do
 	      {
-		//	      cout << "trials: " << cnttrials << endl;
+		//	      std::cout << "trials: " << cnttrials <<std::endl;
 		lam *= 0.5;
 		cnttrials--;
 
-		cout << "lam = " << lam << endl;
+		std::cout << "lam = " << lam <<std::endl;
 
 		factry = lam + (1-lam) * facok;
-		cout << "trying: " << factry << endl;
+		std::cout << "trying: " << factry <<std::endl;
 
 		for (int i = 1; i <= np; i++)
 		  if (boundp.Test(i))
@@ -479,7 +479,7 @@ namespace netgen
 		  else
 		    mesh.Point(i) = Point<3> (can.Get(i));
 	      
-		//	      (*testout) << "bad els: " << endl;
+		//	      std::cerr << "bad els: " <<std::endl;
 		wrongels = 0;
 		for (int i = 1; i <= ne; i++)
 		  {
@@ -497,16 +497,16 @@ namespace netgen
  
 
 			/*
-			  (*testout) << i << ": ";
+			  std::cerr << i << ": ";
 			  for (j = 1; j <= el.GetNP(); j++)
-			  (*testout) << el.PNum(j) << " ";
-			  (*testout) << endl;
+			  std::cerr << el.PNum(j) << " ";
+			  std::cerr <<std::endl;
 			*/
 		      }
 		    else
 		      mesh.VolumeElement(i).flags.badel = 0;
 		  }
-		cout << "wrongels = " << wrongels << endl;
+		std::cout << "wrongels = " << wrongels <<std::endl;
 	      }
 	    while (wrongels && cnttrials > 0);
 
@@ -526,7 +526,7 @@ namespace netgen
       {
 	if (illegalels.Test(i))
 	  {
-	    cout << "illegal element: " << i << endl;
+	    std::cout << "illegal element: " << i <<std::endl;
 	    mesh.VolumeElement(i).flags.badel = 1;	
 	  }
 	else
@@ -536,7 +536,7 @@ namespace netgen
     /*
       if (cnttrials <= 0)
       {
-      cerr << "ERROR: Sorry, illegal elements:" << endl;
+      std::cerr << "ERROR: Sorry, illegal elements:" <<std::endl;
       }
     */
   }

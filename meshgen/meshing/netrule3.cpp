@@ -1,7 +1,5 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
-
-
+#include <meshgen.hpp>
+#include "ruler3.hpp"
 
 namespace netgen
 {
@@ -122,10 +120,10 @@ void vnetrule :: SetFreeZoneTransformation (const Vector & allp, int tolclass)
     }
 
   /*
-  (*testout) << "Transformed freezone: " << endl;
+  std::cerr << "Transformed freezone: " << std::endl;
   for (i = 1; i <= transfreezone.Size(); i++)
-    (*testout) << transfreezone.Get(i) << " ";
-  (*testout) << endl;
+    std::cerr << transfreezone.Get(i) << " ";
+  std::cerr << std::endl;
   */
 }
 
@@ -133,7 +131,7 @@ int vnetrule :: ConvexFreeZone () const
 {
   int i, j, k, fs;
 
-  // (*mycout) << "Convex free zone...\n";
+  // (*mystd::cout) << "Convex free zone...\n";
   
   int ret1=1;
   // int ret2=1;
@@ -266,8 +264,8 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
     if (pi.Get(i)) cnt++;
 
   /*
-  (*testout) << "trig in free set : " << p1 << " - " << p2 << " - " << p3 << endl;
-  (*testout) << "common points: " << cnt << endl;
+  std::cerr << "trig in free set : " << p1 << " - " << p2 << " - " << p3 << std::endl;
+  std::cerr << "common points: " << cnt << std::endl;
   */
   if (!newone)
     cnt = 0;
@@ -312,7 +310,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
       Cross (v1, v2, n);
       n /= n.Length();
 
-      //      (*testout) << "Test new: " << endl;
+      //      std::cerr << "Test new: " << std::endl;
       for (i = 1; i <= freesetfaces.Size(); i++)
 	{
 	  if ( (freesetfaces.Get(i).i1 == lpiu) || 
@@ -339,7 +337,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 	      
 	      int out1 = (a * v1) > 0;
 	      int out2 = (a * v2) > 0;
-	      //	      (*testout) << "out1, out2 = " << out1 << ", " << out2 << endl;
+	      //	      std::cerr << "out1, out2 = " << out1 << ", " << out2 << std::endl;
 	      if (out1 && out2)
 		return 0;
 
@@ -379,21 +377,21 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 		{
 		  if (fabs (lambda1) > 1e-14 && fabs (lambda2) > 1e-14)
 		    {
-		      //		      (*mycout) << "lambda1 lambda2 < 0" << endl;
-		      (*testout) << "lambdai different" << endl;
-		      (*testout) << "v1 = " << v1 << endl;
-		      (*testout) << "v2 = " << v2 << endl;
-		      (*testout) << "n = " << n << endl;
-		      (*testout) << "a = " << a << endl;
-		      (*testout) << "an = " << an << endl;
-		      (*testout) << "a * v1 = " << (a * v1) << endl;
-		      (*testout) << "a * v2 = " << (a * v2) << endl;
-		      (*testout) << "an * v1 = " << (an * v1) << endl;
-		      (*testout) << "an * v2 = " << (an * v2) << endl;
+		      //		      (*mystd::cout) << "lambda1 lambda2 < 0" << std::endl;
+		      std::cerr << "lambdai different" << std::endl;
+		      std::cerr << "v1 = " << v1 << std::endl;
+		      std::cerr << "v2 = " << v2 << std::endl;
+		      std::cerr << "n = " << n << std::endl;
+		      std::cerr << "a = " << a << std::endl;
+		      std::cerr << "an = " << an << std::endl;
+		      std::cerr << "a * v1 = " << (a * v1) << std::endl;
+		      std::cerr << "a * v2 = " << (a * v2) << std::endl;
+		      std::cerr << "an * v1 = " << (an * v1) << std::endl;
+		      std::cerr << "an * v2 = " << (an * v2) << std::endl;
 		      
-		      (*testout) << "vii = " << vii11 << ", " << vii12 << ", " << vii22 << endl;
-		      (*testout) << "lambdai = " << lambda1 << ", " << lambda2 << endl;
-		      (*testout) << "rs = " << rs1 << ", " << rs2 << endl;
+		      std::cerr << "vii = " << vii11 << ", " << vii12 << ", " << vii22 << std::endl;
+		      std::cerr << "lambdai = " << lambda1 << ", " << lambda2 << std::endl;
+		      std::cerr << "rs = " << rs1 << ", " << rs2 << std::endl;
 		      continue;
 		    }
 		}
@@ -408,9 +406,9 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
       return 1;
 
       /*
-      (*testout) << "overlap trig " << p1 << p2 << p3 << endl;
-      (*testout) << "upi = " << upi << endl;
-      (*testout) << "v1 = " << v1 << " v2 = " << v2 << endl;
+      std::cerr << "overlap trig " << p1 << p2 << p3 << std::endl;
+      std::cerr << "upi = " << upi << std::endl;
+      std::cerr << "v1 = " << v1 << " v2 = " << v2 << std::endl;
       */
 
       switch (upi)
@@ -440,7 +438,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
       Cross (v1, v2, n);
       n /= n.Length();
 
-      //      (*testout) << "orig v1, v2 = " << v1 << ", " << v2 << endl;
+      //      std::cerr << "orig v1, v2 = " << v1 << ", " << v2 << std::endl;
 
       
       for (i = 1; i <= freesetfaces.Size(); i++)
@@ -450,10 +448,10 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 	       (freesetfaces.Get(i).i3 == lpiu) )
 	    {
 	      /*
-	      (*testout) << "v1, v2, now = " << v1 << ", " << v2 << endl;
+	      std::cerr << "v1, v2, now = " << v1 << ", " << v2 << std::endl;
 
 	      // freeface has point
-	      (*testout) << "freesetface: "
+	      std::cerr << "freesetface: "
 			 << freesetfaces.Get(i).i1 << " "
 			 << freesetfaces.Get(i).i2 << " "
 			 << freesetfaces.Get(i).i3 << " ";
@@ -462,27 +460,27 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 	      Vec3d a (freesetinequ.Get(i, 1),
 		       freesetinequ.Get(i, 2),
 		       freesetinequ.Get(i, 3));
-	      //	      (*testout) << "a = " <<  a << endl;
+	      //	      std::cerr << "a = " <<  a << std::endl;
 
 
 	      Vec3d an;
 	      Cross (a, n, an);
 	      double lan = an.Length();
 	      
-	      //	      (*testout) << "an = " << an << endl;
+	      //	      std::cerr << "an = " << an << std::endl;
 
 	      if (lan < 1e-10)
 		continue;
 
 	      an /= lan;
 
-	      //	      (*testout) << "a*v1 = " << (a*v1) << " a*v2 = " << (a*v2) << endl;
+	      //	      std::cerr << "a*v1 = " << (a*v1) << " a*v2 = " << (a*v2) << std::endl;
 	      
 	      int out1 = (a * v1) > 0;
 	      // int out2 = (a * v2) > 0;
 
 
-	      //	      (*testout) << "out1, 2 = " << out1 << ", " << out2 << endl;
+	      //	      std::cerr << "out1, 2 = " << out1 << ", " << out2 << std::endl;
 
 	      
 	      double vii11 = v1 * v1;
@@ -497,7 +495,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 	      double lambda1 = rs1 * vii22 - rs2 * vii12;
 	      double lambda2 = rs2 * vii11 - rs1 * vii12;
 
-	      //	      (*testout) << "lambda1, lambda2 = " << lambda1 << ", " << lambda2 << endl;
+	      //	      std::cerr << "lambda1, lambda2 = " << lambda1 << ", " << lambda2 << std::endl;
 
 
 	      if (fabs (lambda1) > fabs (lambda2))
@@ -516,21 +514,21 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 		{
 		  if (fabs (lambda1) > 1e-14 && fabs (lambda2) > 1e-14)
 		    {
-		      //		      (*mycout) << "lambda1 lambda2 < 0" << endl;
-		      (*testout) << "lambdai different" << endl;
-		      (*testout) << "v1 = " << v1 << endl;
-		      (*testout) << "v2 = " << v2 << endl;
-		      (*testout) << "n = " << n << endl;
-		      (*testout) << "a = " << a << endl;
-		      (*testout) << "an = " << an << endl;
-		      (*testout) << "a * v1 = " << (a * v1) << endl;
-		      (*testout) << "a * v2 = " << (a * v2) << endl;
-		      (*testout) << "an * v1 = " << (an * v1) << endl;
-		      (*testout) << "an * v2 = " << (an * v2) << endl;
+		      //		      (*mystd::cout) << "lambda1 lambda2 < 0" << std::endl;
+		      std::cerr << "lambdai different" << std::endl;
+		      std::cerr << "v1 = " << v1 << std::endl;
+		      std::cerr << "v2 = " << v2 << std::endl;
+		      std::cerr << "n = " << n << std::endl;
+		      std::cerr << "a = " << a << std::endl;
+		      std::cerr << "an = " << an << std::endl;
+		      std::cerr << "a * v1 = " << (a * v1) << std::endl;
+		      std::cerr << "a * v2 = " << (a * v2) << std::endl;
+		      std::cerr << "an * v1 = " << (an * v1) << std::endl;
+		      std::cerr << "an * v2 = " << (an * v2) << std::endl;
 		      
-		      (*testout) << "vii = " << vii11 << ", " << vii12 << ", " << vii22 << endl;
-		      (*testout) << "lambdai = " << lambda1 << ", " << lambda2 << endl;
-		      (*testout) << "rs = " << rs1 << ", " << rs2 << endl;
+		      std::cerr << "vii = " << vii11 << ", " << vii12 << ", " << vii22 << std::endl;
+		      std::cerr << "lambdai = " << lambda1 << ", " << lambda2 << std::endl;
+		      std::cerr << "rs = " << rs1 << ", " << rs2 << std::endl;
 		      continue;
 		    }
 		}
@@ -552,7 +550,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 
   if (cnt == 2)
     {
-      //      (*testout) << "tripoitns: " << p1 << " " << p2 << " " << p3 << endl;
+      //      std::cerr << "tripoitns: " << p1 << " " << p2 << " " << p3 << std::endl;
 
       // MARK(triinfz2);
 
@@ -700,7 +698,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
   lam1old = lam2old = lam1 = lam2 = 1.0 / 3.0;
 
 
-  //  testout << endl << endl << "Start minimizing" << endl;
+  //  testout << std::endl << std::endl << "Start minimizing" << std::endl;
 
   it = 0;
   int minit;
@@ -721,8 +719,8 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 
       if (it > minit)
 	{
-	  (*testout) << "it = " << it << endl;
-	  (*testout) << "lam1/2 = " << lam1 << "  " << lam2 << endl;
+	  std::cerr << "it = " << it << std::endl;
+	  std::cerr << "lam1/2 = " << lam1 << "  " << lam2 << std::endl;
 	}
 
       hpx = p1.X() + lam1 * v1x + lam2 * v2x;
@@ -772,12 +770,12 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 
       if (it > minit)
 	{
-	  (*testout) << "f = " << f
-		     << "  dfdlam = " << dflam1 << "  " << dflam2 << endl;
-	  (*testout) << "h = " << h11 << "  " << h12 << "  " << h22 << endl;
-	  (*testout) << "active: " << cntout << endl;
-	  (*testout) << "lam1-lam1old = " << (lam1 - lam1old) << endl;
-	  (*testout) << "lam2-lam2old = " << (lam2 - lam2old) << endl;
+	  std::cerr << "f = " << f
+		     << "  dfdlam = " << dflam1 << "  " << dflam2 << std::endl;
+	  std::cerr << "h = " << h11 << "  " << h12 << "  " << h22 << std::endl;
+	  std::cerr << "active: " << cntout << std::endl;
+	  std::cerr << "lam1-lam1old = " << (lam1 - lam1old) << std::endl;
+	  std::cerr << "lam2-lam2old = " << (lam2 - lam2old) << std::endl;
 	}
 
 
@@ -803,14 +801,14 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 
 
 	  if (it > minit)
-	    (*testout) << "c1/2 = " << c1 << "  " << c2 << endl;
+	    std::cerr << "c1/2 = " << c1 << "  " << c2 << std::endl;
 
 	  act1 = lam1 <= 1E-6 && c1 <= 0;
 	  act2 = lam2 <= 1E-6 && c2 <= 0;
 	  act3 = lam1 + lam2 >= 1 - 1E-6 && c1 + c2 >= 0;
 
 	  if (it > minit)
-	    (*testout) << "act1,2,3 = " << act1 << act2 << act3 << endl;
+	    std::cerr << "act1,2,3 = " << act1 << act2 << act3 << std::endl;
 
 	  if ( (act1 && act2) || (act1 && act3) || (act2 && act3) ) return 0;
 
@@ -833,7 +831,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 	    }
 
 	  if (it > minit)
-	    (*testout) << "c1/2 now = " << c1 << "  " << c2 << endl;
+	    std::cerr << "c1/2 now = " << c1 << "  " << c2 << std::endl;
 
 
 	  if (f > 100 * sqrt (sqr (c1) + sqr (c2))) return 0;
@@ -847,7 +845,8 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 	    alpha = (1 - lam1 - lam2) / (c1 + c2);
 
 	  if (it > minit)
-	    (*testout) << "alpha = " << alpha << endl;
+	    std::cerr << "alpha = " << alpha << std::endl;
+	    std::cerr << "alpha = " << alpha << std::endl;
 
 	  lam1 += alpha * c1;
 	  lam2 += alpha * c2;
@@ -914,12 +913,12 @@ int vnetrule :: IsQuadInFreeSet (const Point3d & p1, const Point3d & p2,
     if (pi.Get(i)) cnt++;
   
   /*
-  (*testout) << "test quad in freeset: " << p1 << " - " << p2 << " - " << p3 << " - " << p4 << endl;
-  (*testout) << "pi = ";
+  std::cerr << "test quad in freeset: " << p1 << " - " << p2 << " - " << p3 << " - " << p4 << std::endl;
+  std::cerr << "pi = ";
   for (i = 1; i <= pi.Size(); i++)
-    (*testout) << pi.Get(i) << " ";
-  (*testout) << endl;
-  (*testout) << "cnt = " << cnt  << endl;
+    std::cerr << pi.Get(i) << " ";
+  std::cerr << std::endl;
+  std::cerr << "cnt = " << cnt  << std::endl;
   */
   if (cnt == 4)
     {
@@ -1012,10 +1011,10 @@ int vnetrule :: TestOk () const
       }
 
 
-  //  (*testout) << endl;
+  //  std::cerr << std::endl;
   for (i = 1; i <= faces.Size(); i++)
     {
-      //      (*testout) << "face " << i << endl;
+      //      std::cerr << "face " << i << std::endl;
       for (j = 1; j <= faces.Get(i).GetNP(); j++)
 	{
 	  pi1 = 0; pi2 = 0;
@@ -1040,13 +1039,13 @@ int vnetrule :: TestOk () const
 		    edge1.DeleteElement(k);
 		    edge2.DeleteElement(k);
 		    k--;
-		    //		    (*testout) << "Del edge " << pi1 << "-" << pi2 << endl;
+		    //		    std::cerr << "Del edge " << pi1 << "-" << pi2 << std::endl;
 		  }
 	      if (!found)
 		{
 		  edge1.Append (pi2);
 		  edge2.Append (pi1);
-		  //		  (*testout) << "Add edge " << pi1 << "-" << pi2 << endl;
+		  //		  std::cerr << "Add edge " << pi1 << "-" << pi2 << std::endl;
 		}
 	    }
 	}
@@ -1073,7 +1072,7 @@ int vnetrule :: TestOk () const
     for (i = 1; i <= cntpused.Size(); i++)
     if (cntpused[i] < 3)
     {
-    (*mycout) << "Fall 3" << endl;
+    (*mystd::cout) << "Fall 3" << std::endl;
     return 0;
     }
 
@@ -1119,7 +1118,7 @@ int vnetrule :: TestOk () const
 
     if (edge1.Size() > 0)
     {
-    (*mycout) << "Fall 4" << endl;
+    (*mystd::cout) << "Fall 4" << std::endl;
     return 0;
     }
     */

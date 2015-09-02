@@ -1,5 +1,6 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <climits>
+#include <meshgen.hpp>
+#include "meshing3.hpp"
 
 
 namespace netgen
@@ -34,9 +35,9 @@ static double CalcElementBadness (const Array<Point3d> & points,
 
   l = v1.Length() + v2.Length() + v3.Length() + l4 + l5 + l6;
   
-  //  testout << "vol = " << vol << " l = " << l << endl;
+  //  testout << "vol = " << vol << " l = " << l <<std::endl;
   if (vol < 1e-8) return 1e10;
-  //  (*testout) << "l^3/vol = " << (l*l*l / vol) << endl;
+  //  std::cerr << "l^3/vol = " << (l*l*l / vol) <<std::endl;
   
   double err = pow (l*l*l/vol, 1.0/3.0) / 12;
   return err;
@@ -63,8 +64,6 @@ int Meshing3 :: ApplyRules
  )
 
 {
-  NgProfiler::RegionTimer regtot(97);
-
   int i, j, k, ri, nfok, npok, incnpok, refpi, locpi, locfi, locfr;
   float hf, err, minerr, teterr, minteterr;
   char ok, found, hc;
@@ -74,8 +73,6 @@ int Meshing3 :: ApplyRules
   Point3d np;
   int oldnp, noldlp, noldlf;
   const MiniElement2d * locface = NULL;
-  int loktestmode;
-
 
   Array<int> pused;        // point is already mapped
   Array<char> fused;       // face is already mapped
@@ -110,10 +107,6 @@ int Meshing3 :: ApplyRules
   pnearness = INT_MAX/10;
   for (j = 0; j < lfaces[0].GetNP(); j++)
     pnearness[lfaces[0][j]] = 0;
-
-  NgProfiler::RegionTimer reg2(98);
-  
-  NgProfiler::StartTimer (90);
 
   for (int loop = 0; loop < 2; loop++)
     {
@@ -159,9 +152,6 @@ int Meshing3 :: ApplyRules
     }
 
   
-  NgProfiler::StopTimer (90);
-  NgProfiler::StartTimer (91);
-
   // find bounding boxes of faces
 
   triboxes.SetSize (lfaces.Size());
@@ -172,10 +162,6 @@ int Meshing3 :: ApplyRules
       for (j = 1; j < face.GetNP(); j++)
 	triboxes[i].AddPoint (lpoints.Get(face[j]));
     }
-
-  NgProfiler::StopTimer (91);
-  NgProfiler::StartTimer (92);
-
   
   bool useedges = 0;
   for (ri = 0; ri < rules.Size(); ri++)
@@ -201,21 +187,12 @@ int Meshing3 :: ApplyRules
 	  }
     }
 
-  NgProfiler::StopTimer (92);
-
-  NgProfiler::RegionTimer reg3(99);
-
   pused.SetSize (lpoints.Size());
   fused.SetSize (lfaces.Size());
 
   found = 0;
   minerr = tolfak * tolerance * tolerance;
   minteterr = sloppy * tolerance;
-
-  if (testmode)
-    (*testout) << "cnt = " << cnt << " class = " << tolerance << endl;
-
-
 
   // impossible, if no rule can be applied at any tolerance class
   bool impossible = 1;
@@ -225,10 +202,6 @@ int Meshing3 :: ApplyRules
 
   for (ri = 1; ri <= rules.Size(); ri++)
     { 
-      int base = (lfaces[0].GetNP() == 3) ? 100 : 200;
-      NgProfiler::RegionTimer regx1(base);
-      NgProfiler::RegionTimer regx(base+ri);
-
       // sprintf (problems.Elem(ri), "");
       *problems.Elem(ri) = '\0';
 
@@ -241,18 +214,8 @@ int Meshing3 :: ApplyRules
 	{
 	  if (rule->GetQuality() < 100) impossible = 0;
 
-	  if (testmode)
-	    sprintf (problems.Elem(ri), "Quality not ok");
 	  continue;
 	}
-      
-      if (testmode)
-	sprintf (problems.Elem(ri), "no mapping found");
-      
-      loktestmode = testmode || rule->TestFlag ('t') || tolerance > 5;
-
-      if (loktestmode)
-	(*testout) << "Rule " << ri << " = " << rule->Name() << endl;
       
       pmap.SetSize (rule->GetNP());
       fmapi.SetSize (rule->GetNF());
@@ -283,8 +246,6 @@ int Meshing3 :: ApplyRules
 	*/
 
       nfok = 2;
-      NgProfiler::RegionTimer regfa(300);
-      NgProfiler::RegionTimer regx2(base+50+ri);
       while (nfok >= 2)
 	{
 	  
@@ -376,7 +337,7 @@ int Meshing3 :: ApplyRules
 		      
 		      if (rule->GetPointNr (nfok, j) <= 3 &&
 			  pmap.Get(rule->GetPointNr(nfok, j)) != locpi)
-			(*testout) << "change face1 point, mark1" << endl;
+			std::cerr << "change face1 point, mark1" <<std::endl;
 		      
 		      pmap.Set(rule->GetPointNr (nfok, j), locpi);
 		      pused.Elem(locpi)++;
@@ -408,16 +369,8 @@ int Meshing3 :: ApplyRules
 	  else
 	    
 	    { 
-	      NgProfiler::RegionTimer regfb(301);
-
 	      // all faces are mapped
 	      // now map all isolated points:
-	      
-	      if (loktestmode)
-		{
-		  (*testout) << "Faces Ok" << endl;
-		  sprintf (problems.Elem(ri), "Faces Ok");
-		}
 	      
 	      npok = 1;
 	      incnpok = 1;
@@ -485,7 +438,7 @@ int Meshing3 :: ApplyRules
 			      pmap.Set (npok, locpi);
 			      
 			      if (npok <= 3)
-				(*testout) << "set face1 point, mark3" << endl;
+				std::cerr << "set face1 point, mark3" <<std::endl;
 			      
 			      pused.Elem(locpi)++;
 			      npok++;
@@ -498,7 +451,7 @@ int Meshing3 :: ApplyRules
 			      pmap.Set (npok, 0);
 			      
 			      if (npok <= 3)
-				(*testout) << "set face1 point, mark4" << endl;
+				std::cerr << "set face1 point, mark4" <<std::endl;
 			      
 			      npok--;
 			      incnpok = 0;
@@ -509,19 +462,7 @@ int Meshing3 :: ApplyRules
 		  else
 		    
 		    {
-		      NgProfiler::RegionTimer regfa2(302);		      
-
 		      // all points are mapped
-		      
-		      if (loktestmode)
-			{
-			  (*testout) << "Mapping found!!: Rule " << rule->Name() << endl;
-			  for (i = 1; i <= pmap.Size(); i++)
-			    (*testout) << pmap.Get(i) << " ";
-			  (*testout) << endl;
-			  sprintf (problems.Elem(ri), "mapping found");
-			  (*testout) << rule->GetNP(1) << " = " << lfaces.Get(1).GetNP() << endl;
-			}
 		      
 		      ok = 1;
 		      
@@ -552,8 +493,6 @@ int Meshing3 :: ApplyRules
 			    }
 			  if (el.GetType() == PYRAMID) 
 			    { 
-			      if (loktestmode)
-				(*testout) << "map pyramid, rule = " << rule->Name() << endl;
 			      for (j = 1; j <= 2; j++)
 				{
 				  INDEX_2 in2;
@@ -571,8 +510,6 @@ int Meshing3 :: ApplyRules
 				  if (!connectedpairs.Used (in2)) 
 				    {
 				      ok = 0;
-				      if (loktestmode)
-					(*testout) << "no pair" << endl;
 				    }
 				}
 			    }
@@ -636,18 +573,7 @@ int Meshing3 :: ApplyRules
 			  ok = 0;
 			  sprintf (problems.Elem(ri), "Freezone not convex");
 
-			  if (loktestmode)
-			    (*testout) << "Freezone not convex" << endl;
 			}
-
-		      if (loktestmode)
-			{
-			  const Array<Point3d> & fz = rule->GetTransFreeZone();
-			  (*testout) << "Freezone: " << endl;
-			  for (i = 1; i <= fz.Size(); i++)
-			    (*testout) << fz.Get(i) << endl;
-			}
-		      
 
 		      // check freezone:
 		      
@@ -661,13 +587,6 @@ int Meshing3 :: ApplyRules
 				{
 				  if (rule->IsInFreeZone(lp))
 				    {
-				      if (loktestmode)
-					{
-					  (*testout) << "Point " << i 
-						     << " in Freezone" << endl;
-					  sprintf (problems.Elem(ri), 
-						   "locpoint %d in Freezone", i);
-					}
 				      ok = 0;
 				      break;
 				    }
@@ -730,61 +649,6 @@ int Meshing3 :: ApplyRules
 			      
 			      if (triin == 1)
 				{
-#ifdef TEST_JS
-				  ok = 0;
-
-				  if (loktestmode)
-				    {
-				      (*testout) << "El with " << lfaces.Get(i).GetNP() << " points in freezone: "
-						 << lfaces.Get(i).PNum(1) << " - " 
-						 << lfaces.Get(i).PNum(2) << " - "
-						 << lfaces.Get(i).PNum(3) << " - "
-						 << lfaces.Get(i).PNum(4) << endl;
-				      for (int lj = 1; lj <= lfaces.Get(i).GetNP(); lj++)
-					(*testout) << lpoints.Get(lfaces.Get(i).PNum(lj)) << " ";
-
-				      (*testout) << endl;
-
-				      sprintf (problems.Elem(ri), "triangle (%d, %d, %d) in Freezone",
-					       lfaces.Get(i).PNum(1), lfaces.Get(i).PNum(2),
-					       lfaces.Get(i).PNum(3));
-				    }
-#else
-				  if (loktestmode)
-				    {
-				      if (lfacei.GetNP() == 3)
-					{
-					  (*testout) << "Triangle in freezone: "
-						     << lfacei.PNum(1) << " - " 
-						     << lfacei.PNum(2) << " - "
-						     << lfacei.PNum(3) 
-						     << ", or "
-						     << lpoints.Get(lfacei.PNum(1)) << " - " 
-						     << lpoints.Get(lfacei.PNum(2)) << " - "
-						     << lpoints.Get(lfacei.PNum(3)) 
-						     << endl;
-					  (*testout) << "lpi = " << lpi.Get(1) << ", " 
-						     << lpi.Get(2) << ", " << lpi.Get(3) << endl;
-					}
-				      else
-					  (*testout) << "Quad in freezone: "
-						     << lfacei.PNum(1) << " - " 
-						     << lfacei.PNum(2) << " - "
-						     << lfacei.PNum(3) << " - "
-						     << lfacei.PNum(4) 
-						     << ", or "
-						     << lpoints.Get(lfacei.PNum(1)) << " - " 
-						     << lpoints.Get(lfacei.PNum(2)) << " - "
-						     << lpoints.Get(lfacei.PNum(3)) << " - "
-						     << lpoints.Get(lfacei.PNum(4)) 
-						     << endl;
-
-				      sprintf (problems.Elem(ri), "triangle (%d, %d, %d) in Freezone",
-					       int(lfaces.Get(i).PNum(1)), 
-					       int(lfaces.Get(i).PNum(2)),
-					       int(lfaces.Get(i).PNum(3)));
-				    }	
-
 				  hc = 0;
 				  for (k = rule->GetNOldF() + 1; k <= rule->GetNF(); k++)
 				    {
@@ -800,14 +664,6 @@ int Meshing3 :: ApplyRules
 						fmapi.Elem(k) = i;
 						hc = 1;
 
-						
- // 						(*testout) << "found from other side: " 
-//  							   << rule->Name() 
-//  							   << " ( " << pmap.Get (rule->GetPointNr(k, 1))
-//  							   << " - " << pmap.Get (rule->GetPointNr(k, 2))
-//  							   << " - " << pmap.Get (rule->GetPointNr(k, 3)) << " ) "
-//  							   << endl;
-
 						strcpy (problems.Elem(ri), "other");
 					      }
 					}
@@ -815,21 +671,8 @@ int Meshing3 :: ApplyRules
 				  
 				  if (!hc)
 				    {
-				      if (loktestmode)
-					{
-					  (*testout) << "Triangle in freezone: "
-						     << lfaces.Get(i).PNum(1) << " - " 
-						     << lfaces.Get(i).PNum(2) << " - "
-						     << lfaces.Get(i).PNum(3) << endl;
-
-					  sprintf (problems.Elem(ri), "triangle (%d, %d, %d) in Freezone",
-						   int (lfaces.Get(i).PNum(1)), 
-						   int (lfaces.Get(i).PNum(2)),
-						   int (lfaces.Get(i).PNum(3)));
-					}
 				      ok = 0;
 				    }
-#endif
 				}
 			    }
 			   
@@ -846,12 +689,6 @@ int Meshing3 :: ApplyRules
 			    }
 			  
 			  
-			  if (loktestmode)
-			    {
-			      (*testout) << "Rule ok" << endl;
-			      sprintf (problems.Elem(ri), "Rule ok, err = %f", err);
-			    }
-
 
 			  //			  newu = rule->GetOldUToNewU() * oldu;
 
@@ -915,11 +752,6 @@ int Meshing3 :: ApplyRules
 			      //if (n * v3 >= -1e-7*n.Length()*v3.Length()) // OR -1e-7???
 			      if (n * v3 >= -1e-9)
 				{
-				  if (loktestmode)
-				    {
-				      sprintf (problems.Elem(ri), "Orientation wrong");
-				      (*testout) << "Orientation wrong ("<< n*v3 << ")" << endl;
-				    }
 				  ok = 0;
 				}
 			    }
@@ -930,12 +762,6 @@ int Meshing3 :: ApplyRules
 			  for (i = rule->GetNOldP() + 1; i <= rule->GetNP() && ok; i++)
 			    if (!rule->IsInFreeZone (lpoints.Get(pmap.Get(i))))
 			      {
-				if (loktestmode)
-				  {
-				    (*testout) << "Newpoint " << lpoints.Get(pmap.Get(i))
-					       << " outside convex hull" << endl;
-				    sprintf (problems.Elem(ri), "newpoint outside convex hull");
-				  }
 				ok = 0;
 				
 			      }
@@ -964,10 +790,10 @@ int Meshing3 :: ApplyRules
 			  if (ok && teterr < 100 &&
 			      (rule->TestFlag('b') || tolerance > 10) )
 			    {
-			      (*mycout) << "Reset teterr " 
+			      (*mystd::cout) << "Reset teterr " 
 				   << rule->Name() 
 				   << " err = " << teterr 
-				   << endl;
+				   <<std::endl;
 			      teterr = 1;
 			    }
 			  */
@@ -1008,27 +834,19 @@ int Meshing3 :: ApplyRules
 			      if (oldlen < newlen) 
 				{
 				  ok = 0;
-				  if (loktestmode)
-				    sprintf (problems.Elem(ri), "oldlen < newlen");
 				}
 			    }
 			  
-
-			  if (loktestmode)
-			    (*testout) << "ok = " << int(ok) 
-				       << "teterr = " << teterr 
-				       << "minteterr = " << minteterr << endl;
-
 
 			  if (ok && teterr < tolerance)
 			    {
 			      canuse.Elem(ri) ++;
 			      /*
-			      (*testout) << "can use rule " << rule->Name() 
-					 << ", err = " << teterr << endl;
+			      std::cerr << "can use rule " << rule->Name() 
+					 << ", err = " << teterr <<std::endl;
 			      for (i = 1; i <= pmap.Size(); i++)
-				(*testout) << pmap.Get(i) << " ";
-			      (*testout) << endl;
+				std::cerr << pmap.Get(i) << " ";
+			      std::cerr <<std::endl;
 			      */
 
 			      if (strcmp (problems.Elem(ri), "other") == 0)
@@ -1049,21 +867,8 @@ int Meshing3 :: ApplyRules
 			  if (ok && teterr < minteterr)
 			    {
 
-			      if (loktestmode)
-				(*testout) << "use rule" << endl;
-
 			      found = ri;
 			      minteterr = teterr;
-			      
-			      if (testmode)
-				{
-				  for (i = 1; i <= rule->GetNOldP(); i++)
-				    {
-				      (*testout) << "P" << i << ": Ref: "
-						 << rule->GetPoint (i) << "  is: "
-						 << lpoints.Get(pmap.Get(i)) << endl;
-				    }
-				}
 			      
 			      tempnewpoints.SetSize (0);
 			      for (i = noldlp+1; i <= lpoints.Size(); i++)
@@ -1109,8 +914,6 @@ int Meshing3 :: ApplyRules
 	      
 	    }
 	}
-      if (loktestmode)
-	(*testout) << "end rule" << endl;
     }
 
   if (found)

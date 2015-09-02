@@ -7,6 +7,8 @@
 /* Date:   01. Jun. 95                                                    */
 /**************************************************************************/
 
+#include <iostream>
+
 namespace netgen 
 {
 
@@ -23,13 +25,13 @@ namespace netgen
 // #include <iostream>
 /** output stream for testing.
   testout is opened by main */
-DLL_HEADER extern ostream * testout;
+//DLL_HEADER extern std::ostream * testout;
 
-/** use instead of cout */
-extern ostream * mycout;
+/** use instead of std::cout */
+//extern std::ostream * mystd::cout;
 
 /** error output stream */
-extern ostream * myerr;
+//extern std::ostream * myerr;
 
 /** Error messages display.
   Error messages are displayed by this function */
@@ -41,17 +43,17 @@ DLL_HEADER extern void MyError (const char * ch);
 extern void MyBeep (int nr = 1);
 
 
-template <class T>
-inline void Swap (T & a, T & b)
-{
-  T temp = a;
-  a = b;
-  b = temp;
-}
+//template <class T>
+//inline void std::swap (T & a, T & b)
+//{
+//  T temp = a;
+//  a = b;
+//  b = temp;
+//}
 
 /*
 template <class T>
-inline void swap (T & a, T & b)
+inline void std::swap (T & a, T & b)
 {
   T temp = a;
   a = b;
@@ -84,8 +86,8 @@ public: ///
   twoint(int ii1, int ii2) {i1 = ii1; i2 = ii2;}
   friend int operator== (const twoint& t1, const twoint& t2);
   ///
-  void Swap() {int x = i1; i1 = i2; i2 = x;}
-  void Sort() {if (i1 > i2) {Swap();}}
+//  void std::swap() {int x = i1; i1 = i2; i2 = x;}
+  void Sort() {if (i1 > i2) {std::swap(i1,i2);}}
 };
 
 inline int operator== (const twoint& t1, const twoint& t2) 
@@ -113,7 +115,7 @@ public:
   ///
   twodouble(double id1, double id2) {d1 = id1; d2 = id2;}
   ///
-  void Swap() {double x = d1; d1 = d2; d2 = x;}
+//  void std::swap() {double x = d1; d1 = d2; d2 = x;}
 };
 
 class fourint { public: int i1, i2, i3, i4; fourint() {}; };
@@ -121,7 +123,7 @@ class fourint { public: int i1, i2, i3, i4; fourint() {}; };
 
 ///
 class INDEX_2;
-ostream & operator<<(ostream  & s, const INDEX_2 & i2);
+std::ostream & operator<<(std::ostream  & s, const INDEX_2 & i2);
 
 
 class INDEX_2
@@ -184,7 +186,7 @@ public:
   ///
   const int & operator[] (int j) const { return i[j]; }
   ///
-  friend ostream & operator<<(ostream  & s, const INDEX_2 & i2);
+  friend std::ostream & operator<<(std::ostream  & s, const INDEX_2 & i2);
 };
 
 
@@ -221,17 +223,17 @@ public:
 
   static INDEX_3 Sort (int i1, int i2, int i3)
   {
-    if (i1 > i2) Swap (i1, i2);
-    if (i2 > i3) Swap (i2, i3);
-    if (i1 > i2) Swap (i1, i2);
+    if (i1 > i2) std::swap (i1, i2);
+    if (i2 > i3) std::swap (i2, i3);
+    if (i1 > i2) std::swap (i1, i2);
     return INDEX_3 (i1, i2, i3);
   }
 
   INDEX_3 Sort ()
   {
-    if (i[0] > i[1]) Swap (i[0], i[1]);
-    if (i[1] > i[2]) Swap (i[1], i[2]);
-    if (i[0] > i[1]) Swap (i[0], i[1]);
+    if (i[0] > i[1]) std::swap (i[0], i[1]);
+    if (i[1] > i[2]) std::swap (i[1], i[2]);
+    if (i[0] > i[1]) std::swap (i[0], i[1]);
     return *this;
   }
 
@@ -260,7 +262,7 @@ public:
   const int & operator[] (int j) const { return i[j]; }
 
   ///
-  friend ostream & operator<<(ostream  & s, const INDEX_3 & i3);
+  friend std::ostream & operator<<(std::ostream  & s, const INDEX_3 & i3);
 };
 
 
@@ -317,7 +319,7 @@ public:
   const int & operator[] (int j) const { return i[j]; }
 
   ///
-  friend ostream & operator<<(ostream  & s, const INDEX_4 & i4);
+  friend std::ostream & operator<<(std::ostream  & s, const INDEX_4 & i4);
 };
 
 
@@ -374,7 +376,7 @@ public:
   ///
   const INDEX & I (int j) const { return i[j-1]; }
   ///
-  friend ostream & operator<<(ostream  & s, const INDEX_4Q & i4);
+  friend std::ostream & operator<<(std::ostream  & s, const INDEX_4Q & i4);
 };
 
 

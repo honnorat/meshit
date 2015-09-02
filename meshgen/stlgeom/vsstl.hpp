@@ -7,6 +7,9 @@
 /* Date:   05. Jan. 2011                                                  */
 /**************************************************************************/
 
+#include "../visualization/mvdraw.hpp"
+#include "stlgeom.hpp"
+
 namespace netgen
 {
 

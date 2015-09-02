@@ -1,6 +1,11 @@
 #ifndef FILE_MESHSURF
 #define FILE_MESHSURF
 
+#include "../meshing/meshing2.hpp"
+#include "../meshing/improve2.hpp"
+#include "../csg/csgeom.hpp"
+#include "surface.hpp"
+
 namespace netgen
 {
 

@@ -9,7 +9,9 @@
 /**************************************************************************/
 
 
+#include "meshclass.hpp"
 
+namespace netgen {
 
 class Refinement;
 
@@ -219,6 +221,6 @@ private:
   void CalcElementDShapes (SurfaceElementInfo & elinfo, const Point<2> & xi, MatrixFixWidth<2> & dshapes) const;
 };
 
-
+}
 
 #endif

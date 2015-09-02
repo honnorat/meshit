@@ -8,9 +8,8 @@
    Abstract data type Symbol Table
 */
 
-#include <mystdlib.h>
-#include <myadt.hpp>
-
+#include <meshgen.hpp>
+#include "symbolta.hpp"
 
 #ifndef FILE_SYMBOLTABLECC
 #define FILE_SYMBOLTABLECC

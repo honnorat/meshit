@@ -11,6 +11,9 @@
 /*
   global functions and variables
 */
+#include <string>
+#include "../general/array.hpp"
+#include "meshtype.hpp"
 
 namespace netgen
 {
@@ -25,7 +28,7 @@ namespace netgen
   /// calling parameters
   // extern Flags parameters;
 
-  // extern DLL_HEADER MeshingParameters mparam;
+   extern DLL_HEADER MeshingParameters mparam;
 
   extern Array<int> tets_in_qualclass;
 
@@ -46,7 +49,6 @@ namespace netgen
 
   extern volatile multithreadt multithread;
 
-  DLL_HEADER extern string ngdir;
   extern DebugParameters debugparam;
   extern bool verbose;  
 

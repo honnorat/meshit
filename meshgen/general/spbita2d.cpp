@@ -8,9 +8,9 @@
    Implementation of sparse 2 dimensional bitarray
 */
 
-
-#include <mystdlib.h>
-#include <myadt.hpp>
+#include <cstring>
+#include <meshgen.hpp>
+#include "spbita2d.hpp"
 
 namespace netgen
 {

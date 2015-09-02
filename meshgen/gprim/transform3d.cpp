@@ -1,8 +1,7 @@
-#include <mystdlib.h>
+#include <meshgen.hpp>
 
-#include <myadt.hpp>
-#include <gprim.hpp>
-#include <linalg.hpp>
+#include "transform3d.hpp"
+#include "../linalg/densemat.hpp"
 
 namespace netgen
 {
@@ -52,8 +51,8 @@ Transformation3d (const Point3d & c, double alpha,
   ht.Combine (ht2, r1);
   Combine (ht, tcinv);
 
-  // cout << "Rotation - Transformation:" << (*this) << endl;
-  //  (*testout) << "Rotation - Transformation:" << (*this) << endl;
+  // std::cout << "Rotation - Transformation:" << (*this) <<std::endl;
+  //  std::cerr << "Rotation - Transformation:" << (*this) <<std::endl;
 }
 
 
@@ -148,17 +147,17 @@ void Transformation3d :: SetAxisRotation (int dir, double alpha)
   lin[pos2][pos1] = -si;
 }
 
-ostream & operator<< (ostream & ost, Transformation3d & trans)
+std::ostream & operator<< (std::ostream & ost, Transformation3d & trans)
 {
   ost << "offset = ";
   for (int i = 0; i <= 2; i++)
     ost << trans.offset[i] << " ";
-  ost << endl << "linear = " << endl;
+  ost << std::endl << "linear = " << std::endl;
   for (int i = 0; i <= 2; i++)
     {
       for (int j = 0; j <= 2; j++)
 	ost << trans.lin[i][j] << " ";
-      ost << endl;
+      ost << std::endl;
     }
   return ost;
 }

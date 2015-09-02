@@ -14,18 +14,23 @@
 //
 //**************************************************************
 
+#include <meshgen.hpp>
+
 // string class
-#include <mystdlib.h>
-#include <myadt.hpp>
+//#include <mystdlib.h>
+//#include <myadt.hpp>
 
-#include <linalg.hpp>
-#include <gprim.hpp>
+//#include <linalg.hpp>
+//#include <gprim.hpp>
 
+#include <cstdio>
+#include "mystring.hpp"
+#include "../gprim/geom3d.hpp"
 
 namespace netgen
 {
 
-  void ReadEnclString(istream & in, string & str, const char encl)
+  void ReadEnclString(std::istream & in, std::string & str, const char encl)
   {
     char currchar;
     str = "";
@@ -57,7 +62,7 @@ namespace netgen
 
 void DefaultStringErrHandler()
 {
-  cerr << "Error : string operation out of range\n" << flush;
+  std::cerr << "Error : string operation out of range\n" << std::flush;
 }
 
 void (*MyStr::ErrHandler)() = DefaultStringErrHandler;
@@ -188,7 +193,7 @@ MyStr::MyStr(unsigned n, int)
   str[n] = 0;
 }
 
-MyStr::MyStr(const string & st)
+MyStr::MyStr(const std::string & st)
 {
   length = unsigned(st.length());
   if (length > SHORTLEN)
@@ -372,9 +377,9 @@ MyStr MyStr::operator () (unsigned l, unsigned r)
   }
 }
 
-string MyStr::cpp_string(void) const
+std::string MyStr::cpp_string(void) const
 {
-  string aux(str,length);
+  std::string aux(str,length);
   return aux;
 }
 

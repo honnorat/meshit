@@ -51,7 +51,7 @@ namespace netgen
         if (ne == 0)
         {
             // pure surface mesh
-            cout << "\nWrite Permas Surface Mesh" << endl;
+            std::cout << "\nWrite Permas Surface Mesh" <<std::endl;
             
             int elnr = 0;
             for (j = 1; j <= 2; j++)
@@ -61,11 +61,11 @@ namespace netgen
                 {
                 case 1:
                     nelp = 3;
-                    outfile << "$ELEMENT TYPE = TRIA3  ESET = ALLQUAD" << endl;		  
+                    outfile << "$ELEMENT TYPE = TRIA3  ESET = ALLQUAD" <<std::endl;		  
                     break;
                 case 2:
                     nelp = 4;
-                    outfile << "$ELEMENT TYPE = QUAD4  ESET = ALLQUAD" << endl;		  
+                    outfile << "$ELEMENT TYPE = QUAD4  ESET = ALLQUAD" <<std::endl;		  
                     break;
                 }
                 
@@ -79,20 +79,20 @@ namespace netgen
                     outfile << elnr << "  ";
                     for (k = 1; k <= nelp; k++)
                         outfile << " " << el.PNum(k);
-                    outfile << endl;
+                    outfile <<std::endl;
                     
                 }
             }
         }
         else
         {
-            cout << "\nWrite Permas Volume Mesh" << endl;
+            std::cout << "\nWrite Permas Volume Mesh" <<std::endl;
             
             int secondorder = (mesh.VolumeElement(1).GetNP() == 10);
             
             if (!secondorder)
             {
-                outfile << "$ELEMENT TYPE = TET4  ESET = ALLTET" << endl;
+                outfile << "$ELEMENT TYPE = TET4  ESET = ALLTET" <<std::endl;
                 for (i = 1; i <= ne; i++)
                 {
                     const Element & el = mesh.VolumeElement(i);
@@ -100,12 +100,12 @@ namespace netgen
                             << " " << el.PNum(1) 
                             << " " << el.PNum(2) 
                             << " " << el.PNum(3) 
-                            << " " << el.PNum(4) << endl;
+                            << " " << el.PNum(4) <<std::endl;
                 }
             }
             else
             {
-                outfile << "$ELEMENT TYPE = TET10  ESET = ALLTET" << endl;
+                outfile << "$ELEMENT TYPE = TET10  ESET = ALLTET" <<std::endl;
                 for (i = 1; i <= ne; i++)
                 {
                     const Element & el = mesh.VolumeElement(i);
@@ -115,18 +115,18 @@ namespace netgen
                             << " " << el.PNum(2) 
                             << " " << el.PNum(8) 
                             << " " << el.PNum(3) 
-                            << " " << el.PNum(6) << endl << "& "
+                            << " " << el.PNum(6) <<std::endl << "& "
                             << " " << el.PNum(7) 
                             << " " << el.PNum(9) 
                             << " " << el.PNum(10) 
-                            << " " << el.PNum(4) << endl;
+                            << " " << el.PNum(4) <<std::endl;
                 }
             }
             
-            outfile << endl << endl;
+            outfile <<std::endl <<std::endl;
             
             
-            outfile << "$SURFACE GEO  SURFID = 1  SFSET = ALLSUR" << endl;
+            outfile << "$SURFACE GEO  SURFID = 1  SFSET = ALLSUR" <<std::endl;
             for (i = 1; i <= nse; i++)
             {
                 const Element2d & el = mesh.SurfaceElement(i);
@@ -134,7 +134,7 @@ namespace netgen
                     outfile << "STRIA3"
                             << " " << el.PNum(1) 
                             << " " << el.PNum(2) 
-                            << " " << el.PNum(3) << endl;
+                            << " " << el.PNum(3) <<std::endl;
             }    
             
             for (i = 1; i <= nse; i++)
@@ -145,7 +145,7 @@ namespace netgen
                             << " " << el.PNum(1) 
                             << " " << el.PNum(2) 
                             << " " << el.PNum(3) 
-                            << " " << el.PNum(4) << endl;
+                            << " " << el.PNum(4) <<std::endl;
             }      
             
             for (i = 1; i <= nse; i++)
@@ -158,14 +158,14 @@ namespace netgen
                             << " " << el.PNum(2) 
                             << " " << el.PNum(5) 
                             << " " << el.PNum(3) 
-                            << " " << el.PNum(6) << endl;
+                            << " " << el.PNum(6) <<std::endl;
             }      
         }
         
         
-        outfile << endl << endl;
+        outfile <<std::endl <<std::endl;
         
-        outfile << "$COOR  NSET = ALLNODES" << endl;
+        outfile << "$COOR  NSET = ALLNODES" <<std::endl;
         
         outfile.precision(6);
         outfile.setf (ios::fixed, ios::floatfield);
@@ -197,10 +197,10 @@ namespace netgen
             strSitu = "SIT1";
 
         // Writing description header of configuration
-        out << "$ENTER COMPONENT  NAME = " << strComp << "  DOFTYPE = DISP MATH" << endl << endl;
-        out << "   $SITUATION  NAME = " << strSitu << endl;
-        out << "   $END SITUATION" << endl << endl;
-        out << "   $STRUCTURE" << endl;
+        out << "$ENTER COMPONENT  NAME = " << strComp << "  DOFTYPE = DISP MATH" <<std::endl <<std::endl;
+        out << "   $SITUATION  NAME = " << strSitu <<std::endl;
+        out << "   $END SITUATION" <<std::endl <<std::endl;
+        out << "   $STRUCTURE" <<std::endl;
         
         return 0;
     }

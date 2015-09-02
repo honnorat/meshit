@@ -26,10 +26,10 @@ bool BSplineCurve2d :: Inside (const Point<2> & p, double & dist) const
 
   Vec<2> n (v(0), -v(1));
   
-  cout << "p = " << p << ", hp = " << hp << endl;
+  std::cout << "p = " << p << ", hp = " << hp <<std::endl;
   dist = Dist (p, hp);
   double scal = (hp-p) * n;
-  cout << "scal = " << scal << endl;
+  std::cout << "scal = " << scal <<std::endl;
 
   return scal >= 0;
 }
@@ -86,7 +86,7 @@ Point<2> BSplineCurve2d :: Eval (double t) const
 
   static int cnt = 0;
   cnt++;
-  if (cnt % 100000 == 0) (*mycout) << "cnt = " << cnt << endl;
+  if (cnt % 100000 == 0) (*mystd::cout) << "cnt = " << cnt <<std::endl;
   
   n = int(t);   
   loct = t - n;
@@ -104,8 +104,8 @@ Point<2> BSplineCurve2d :: Eval (double t) const
   n4 = n3+1;
   if (n4 > points.Size()) n4 = 1;
 
-  //  (*mycout) << "t = " << t << " n = " << n << " loct = " << loct 
-  //      << " n1 = " << n1 << endl;
+  //  (*mystd::cout) << "t = " << t << " n = " << n << " loct = " << loct 
+  //      << " n1 = " << n1 <<std::endl;
 
   
   hp(0) = b1 * points.Get(n1)(0) + b2 * points.Get(n2)(0) +
@@ -187,7 +187,7 @@ void BSplineCurve2d :: Reduce (const Point<2> & p, double rad)
   int j; 
   double minx, miny, maxx, maxy;
   
-  //  (*testout) << "Reduce: " << p << "," << rad << endl;
+  //  std::cerr << "Reduce: " << p << "," << rad <<std::endl;
   
   redlevel++;
   
@@ -213,15 +213,15 @@ void BSplineCurve2d :: Reduce (const Point<2> & p, double rad)
 	  miny > p(1) + rad || maxy < p(1) - rad)
 	{
 	  intervallused.Elem(n1) = redlevel;
-	  //      (*testout) << 0;
+	  //      std::cerr << 0;
 	}
       else
 	{
-	  //      (*testout) << 1;
+	  //      std::cerr << 1;
 	  intervallused.Elem(n1) = 0;
 	}
     }
-  //  (*testout) << endl;
+  //  std::cerr <<std::endl;
 }
 
 void BSplineCurve2d :: UnReduce () 
@@ -235,8 +235,8 @@ void BSplineCurve2d :: UnReduce ()
   
 void BSplineCurve2d :: Print (ostream & ost) const
 {
-  ost << "SplineCurve: " << points.Size() << " points." << endl;
+  ost << "SplineCurve: " << points.Size() << " points." <<std::endl;
   for (int i = 1; i <= points.Size(); i++)
-    ost << "P" << i << " = " << points.Get(i) << endl;
+    ost << "P" << i << " = " << points.Get(i) <<std::endl;
 }
 }

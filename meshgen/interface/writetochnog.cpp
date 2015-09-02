@@ -22,16 +22,16 @@ namespace netgen
 void WriteTochnogFormat (const Mesh & mesh,
 			 const string & filename)
 {
-  cout << "\nWrite Tochnog Volume Mesh" << endl;
+  std::cout << "\nWrite Tochnog Volume Mesh" <<std::endl;
 
   ofstream outfile (filename.c_str());
 
-  outfile << "(Nodes and Elements generated with NETGEN" << endl;
-  outfile << " " << filename << ")" << endl;
+  outfile << "(Nodes and Elements generated with NETGEN" <<std::endl;
+  outfile << " " << filename << ")" <<std::endl;
 
   outfile.precision(8);
 
-  outfile << "(Nodes)" << endl;
+  outfile << "(Nodes)" <<std::endl;
 
   int np = mesh.GetNP();
   int ne = mesh.GetNE();
@@ -56,11 +56,11 @@ void WriteTochnogFormat (const Mesh & mesh,
       int non = el1.GetNP();
       if (non == 4)
 	{
-	  outfile << "(Elements, type=-tet4)" << endl;
+	  outfile << "(Elements, type=-tet4)" <<std::endl;
 	} 
       else
 	{
-	  cout << "unsupported Element type!!!" << endl;	  
+	  std::cout << "unsupported Element type!!!" <<std::endl;	  
 	}
 
       for (i = 1; i <= ne; i++)
@@ -72,7 +72,7 @@ void WriteTochnogFormat (const Mesh & mesh,
 	      actcnt++;
 	      if (el.GetNP() != non) 
 		{
-		  cout << "different element-types in a subdomain are not possible!!!" << endl;
+		  std::cout << "different element-types in a subdomain are not possible!!!" <<std::endl;
 		  continue;
 		}
 		  
@@ -87,7 +87,7 @@ void WriteTochnogFormat (const Mesh & mesh,
 		}
 	      else
 		{
-		  cout << "unsupported Element type!!!" << endl;
+		  std::cout << "unsupported Element type!!!" <<std::endl;
 		  for (j = 1; j <= el.GetNP(); j++)
 		    {
 		      outfile << el.PNum(j);
@@ -98,11 +98,11 @@ void WriteTochnogFormat (const Mesh & mesh,
 	    }
 	}	  
       indcnt++;
-      if (elemcnt == ne) {finished = 1; cout << "all elements found by Index!" << endl;}
+      if (elemcnt == ne) {finished = 1; std::cout << "all elements found by Index!" <<std::endl;}
       if (actcnt == 0) {finished = 1;}
     }
 
-  cout << "done" << endl;
+  std::cout << "done" <<std::endl;
 }
 
 }

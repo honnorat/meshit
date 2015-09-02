@@ -183,10 +183,10 @@ namespace netgen
               case SOL_SURFACE_NONCONTINUOUS:
                 ost << " -type=surfacenoncontinuous"; break;
               default:
-                cerr << "save solution data, case not handeld" << endl;
+                std::cerr << "save solution data, case not handeld" <<std::endl;
               }
       
-            ost << endl;
+            ost <<std::endl;
             for (int j = 0; j < sol.size; j++)
               {
                 for (int k = 0; k < sol.components; k++)
@@ -203,7 +203,7 @@ namespace netgen
         surf_fn.erase (strlen(filename)-4);
         surf_fn += "_surf.vtk";
 
-        cout << "surface mesh = " << surf_fn << endl;
+        std::cout << "surface mesh = " << surf_fn <<std::endl;
         
         ofstream surf_ost(surf_fn.c_str());
 
@@ -241,7 +241,7 @@ namespace netgen
               case QUAD: surf_ost << 9; break;
               case TRIG: surf_ost << 5; break;
               default:
-                cerr << "not implemented 2378" << endl;
+                std::cerr << "not implemented 2378" <<std::endl;
               }
             surf_ost << "\n";
           }
@@ -283,7 +283,7 @@ namespace netgen
               {
               case TET: ost << 10; break;
               default:
-                cerr << "not implemented 67324" << endl;
+                std::cerr << "not implemented 67324" <<std::endl;
               }
             ost << "\n";
           }
@@ -385,7 +385,7 @@ namespace netgen
           {
             double hmax = maxval;
             double hmin = minval;
-            if (invcolor) Swap (hmax, hmin);
+            if (invcolor) std::swap (hmax, hmin);
 
             if (fabs (hmax - hmin) > 1e-30) 
               glScaled (1.0 / (hmin - hmax), 0, 0);
@@ -690,7 +690,7 @@ namespace netgen
       cone_list = glGenLists (1);
       glNewList (cone_list, GL_COMPILE);
       DrawCone (Point<3> (0,0,0), Point<3> (0,0,1), 0.4);
-      glEndList();
+      gstd::endlist();
       }
     */
     
@@ -793,7 +793,7 @@ namespace netgen
         glEnable (GL_NORMALIZE);
         DrawSurfaceVectors();
 
-        glEndList ();
+        gstd::endlist ();
 
         surface_vector_timestamp = 
           max2 (mesh->GetTimeStamp(), solutiontimestamp);
@@ -803,7 +803,7 @@ namespace netgen
         clipplanetimestamp < solutiontimestamp)
       {
 
-        //      cout << "clipsolution = " << clipsolution << endl;
+        //      std::cout << "clipsolution = " << clipsolution <<std::endl;
         if (vispar.clipping.enable && clipsolution == 2)      
           {
             // lock->UnLock();
@@ -858,7 +858,7 @@ namespace netgen
               }
           }
 
-        glEndList ();
+        gstd::endlist ();
       }
 
 
@@ -875,7 +875,7 @@ namespace netgen
         glEnable (GL_NORMALIZE);
         DrawIsoSurface(sol, vsol, scalcomp);
 
-        glEndList ();
+        gstd::endlist ();
 
         isosurface_timestamp = 
           max2 (mesh->GetTimeStamp(), solutiontimestamp);
@@ -914,7 +914,7 @@ namespace netgen
 				 thick);
 		  }
 	      }
-	    glEndList();
+	    gstd::endlist();
 	  }
 	
       }
@@ -1049,7 +1049,7 @@ namespace netgen
               }
             glEnd();
           }
-        glEndList ();
+        gstd::endlist ();
 
         if (clipplane_isolinelist) glDeleteLists (clipplane_isolinelist, 1);
             
@@ -1084,7 +1084,7 @@ namespace netgen
                                   // trig.points[2].p,
                                   vali[0], vali[1], vali[2]);
                 }
-            glEndList ();
+            gstd::endlist ();
           }
         glEnd();
       }
@@ -1139,7 +1139,7 @@ namespace netgen
         glEnd();
       }
 
-    glEndList ();
+    gstd::endlist ();
   }
   
   void  VisualSceneSolution :: DrawSurfaceElements ()
@@ -1171,7 +1171,7 @@ namespace netgen
 	for ( int dest = 1; dest < ntasks; dest++ )
 	  glCallList (par_surfellists[dest]);
 	
-	glEndList();
+	gstd::endlist();
 	return;
       }
 #endif
@@ -1493,7 +1493,7 @@ namespace netgen
 
  	    GLuint vboId[3];
  	    glGenBuffersARB (3, &vboId[0]);
-// 	    cout << "vboId = " << vboId << endl;
+// 	    std::cout << "vboId = " << vboId <<std::endl;
 
  	    glBindBufferARB (GL_ARRAY_BUFFER_ARB, vboId[0]);
  	    glBufferDataARB (GL_ARRAY_BUFFER_ARB, points.Size()*sizeof(Point<3>), 
@@ -1572,7 +1572,7 @@ namespace netgen
               }
 	  }
       }
-    glEndList ();
+    gstd::endlist ();
 
 
 #ifdef PARALLELGL
@@ -1607,7 +1607,7 @@ namespace netgen
 	for ( int dest = 1; dest < ntasks; dest++ )
 	  glCallList (par_surfellists[dest]);
 	
-	glEndList();
+	gstd::endlist();
 	return;
       }
 #endif
@@ -1670,7 +1670,7 @@ namespace netgen
             glEnd ();
           }
       }
-    glEndList ();
+    gstd::endlist ();
 
 
 #ifdef PARALLELGL
@@ -1781,7 +1781,7 @@ namespace netgen
                                          double(iz)/n);
                         break;
                       default:
-                        cerr << "case not implementd 878234" << endl;
+                        std::cerr << "case not implementd 878234" <<std::endl;
                         ploc = 0.0;
                       }
                     if (compress[ii] != -1)
@@ -1989,8 +1989,8 @@ namespace netgen
     double inv12 = -mat12/det;
     double inv22 = mat11/det;
           
-    //    cout << "drawsurfacevectors. xoffset = " << xoffset << ", yoffset = ";
-    //    cout << yoffset << endl;
+    //    std::cout << "drawsurfacevectors. xoffset = " << xoffset << ", yoffset = ";
+    //    std::cout << yoffset <<std::endl;
     
     for (s = xoffset/gridsize; s <= 1+xoffset/gridsize; s += 1.0 / gridsize)
       if (s >= minx2d && s <= maxx2d)
@@ -2131,8 +2131,8 @@ namespace netgen
                   double inv12 = -mat12/det;
                   double inv22 = mat11/det;
           
-                  //      cout << "drawsurfacevectors. xoffset = " << xoffset << ", yoffset = ";
-                  //      cout << yoffset << endl;
+                  //      std::cout << "drawsurfacevectors. xoffset = " << xoffset << ", yoffset = ";
+                  //      std::cout << yoffset <<std::endl;
           
                   for (s = xoffset/gridsize; s <= 1+xoffset/gridsize; s += 1.0 / gridsize)
                   if (s >= minx2d && s <= maxx2d)
@@ -2264,7 +2264,7 @@ namespace netgen
                               Vec<3> v;
                               double values[6];
                               bool drawelem = GetSurfValues (vsol, sei, -1, lam1, lam2, values);
-                              (*testout) << "sei " << sei << " lam1 " << lam1 << " lam2 " << lam2 << " drawelem " << drawelem << endl;
+                              std::cerr << "sei " << sei << " lam1 " << lam1 << " lam2 " << lam2 << " drawelem " << drawelem <<std::endl;
                               
                               if (!vsol->iscomplex)
                                 for (int k = 0; k < 3; k++)
@@ -2287,17 +2287,17 @@ namespace netgen
                               double val = v.Length();
                               SetOpenGlColor  (val); // , minval, maxval, logscale); july 09
                               
-                              (*testout) << "v " << v << endl;
+                              std::cerr << "v " << v <<std::endl;
                               
                               if (val > 1e-10 * maxval)
                                 v *= (rad / val / gridsize * 0.5);
                               
-                              (*testout) << "v " << v << endl;
+                              std::cerr << "v " << v <<std::endl;
                               
                               if ( drawelem )
                                 {
                                   DrawCone (cp, cp+4*v, 0.8*rad / gridsize);
-                                  (*testout) << "cp " << cp << " rad " << rad << " gridsize " << gridsize << endl;
+                                  std::cerr << "cp " << cp << " rad " << rad << " gridsize " << gridsize <<std::endl;
                                 }
                               
                             }
@@ -2338,7 +2338,7 @@ namespace netgen
     else
       {
         p1 = hp2; p2 = hp1;
-        swap (val1, val2);
+        std::swap (val1, val2);
       }
 
     if (val3 < val4)
@@ -2348,7 +2348,7 @@ namespace netgen
     else
       {
         p3 = hp4; p4 = hp3;
-        swap (val3, val4);
+        std::swap (val3, val4);
       }
 
     val2 += 1e-10;
@@ -2596,7 +2596,7 @@ namespace netgen
                 break;
               }     
             default:
-              cerr << "case not implementd 23523" << endl;
+              std::cerr << "case not implementd 23523" <<std::endl;
             }
 
           for (int i = 0; i < np; i++)
@@ -2695,7 +2695,7 @@ namespace netgen
         }
 
       default:
-        cerr << "case not handled 7234" << endl;
+        std::cerr << "case not handled 7234" <<std::endl;
       }
     return 0;
   }
@@ -2763,7 +2763,7 @@ namespace netgen
                 break;
               }     
             default:
-              cerr << "case not implemented 234324" << endl;
+              std::cerr << "case not implemented 234324" <<std::endl;
             }
 
           for (int i = 0; i < np; i++)
@@ -2861,7 +2861,7 @@ namespace netgen
           return 1;
         }
       default:
-        cerr << "case not implemented 234234" << endl;
+        std::cerr << "case not implemented 234234" <<std::endl;
       }
     return 0;
   }
@@ -2891,7 +2891,7 @@ namespace netgen
           return ok;
         }
       default:
-        cerr << "case not handled 234234" << endl;
+        std::cerr << "case not handled 234234" <<std::endl;
       } 
     return 0;
   }
@@ -3110,7 +3110,7 @@ namespace netgen
           return ok;
         }
       default:
-        cerr << "case not implementd 6565" << endl;
+        std::cerr << "case not implementd 6565" <<std::endl;
       }
     return 0;
   }
@@ -3147,7 +3147,7 @@ namespace netgen
                 val =  values[comp-1];
               else
                 {
-                  // cout << "time = " << time << ", cos = " << cos(time) << endl;
+                  // std::cout << "time = " << time << ", cos = " << cos(time) <<std::endl;
      
                   // old version: val = values[comp-1]*cos(3*time) + values[comp]*sin(3*time);
                   // SZ: Sept 06 
@@ -3273,7 +3273,7 @@ namespace netgen
                       break;
                     }
                   default:
-                    cerr << "case not implementd 2342" << endl;
+                    std::cerr << "case not implementd 2342" <<std::endl;
                   }
                 break;
               }
@@ -3302,7 +3302,7 @@ namespace netgen
                       break;
                     }
                   default:
-                    cerr << "case not implemented 8712" << endl;
+                    std::cerr << "case not implemented 8712" <<std::endl;
                   }
                 break;
               }
@@ -3373,7 +3373,7 @@ namespace netgen
           bool ok;
 
           // ok = data->solclass->GetSurfValue (selnr, lam1, lam2, &values[0]);
-          // cout << "data->solclass = " << flush << data->solclass << endl;
+          // std::cout << "data->solclass = " << flush << data->solclass <<std::endl;
           ok = data->solclass->GetSurfValue (selnr, facetnr, xref, x, dxdxref, &values[0]);
           // ok = 1;
           // values[0] = 1.0;
@@ -3384,7 +3384,7 @@ namespace netgen
                 val =  values[comp-1];
               else
                 {
-                  // cout << "time = " << time << ", cos = " << cos(time) << endl;
+                  // std::cout << "time = " << time << ", cos = " << cos(time) <<std::endl;
      
                   // old version: val = values[comp-1]*cos(3*time) + values[comp]*sin(3*time);
                   // SZ: Sept 06 
@@ -3508,7 +3508,7 @@ namespace netgen
                       break;
                     }
                   default:
-                    cerr << "case not impl 234234" << endl;
+                    std::cerr << "case not impl 234234" <<std::endl;
                   }
                 break;
               }
@@ -3537,7 +3537,7 @@ namespace netgen
                       break;
                     }
                   default:
-                    cerr << "case not implented 3234" << endl;
+                    std::cerr << "case not implented 3234" <<std::endl;
                   }
                 break;
               }
@@ -3807,7 +3807,7 @@ namespace netgen
                           if (iz == n) ploc = Point<3> (0,0,1-1e-8);
                           break;
                         default:
-                          cerr << "clip plane trigs not implemented" << endl;
+                          std::cerr << "clip plane trigs not implemented" <<std::endl;
                           ploc = Point<3> (0,0,0);
                         }
                       if (compress[ii] != -1)
@@ -4082,7 +4082,7 @@ namespace netgen
 	for ( int dest = 1; dest < ntasks; dest++ )
 	  glCallList (parlists[dest]);
 	
-	glEndList();
+	gstd::endlist();
 	return;
       }
 #endif
@@ -4174,7 +4174,7 @@ namespace netgen
 					 &jacobi[0](0), &jacobi[1](0)-&jacobi[0](0),
 					 &mvalues[0], sol->components);
 	    
-	    // cout << "have multivalues, comps = " << sol->components << endl;
+	    // std::cout << "have multivalues, comps = " << sol->components <<std::endl;
 
 	    // if (!drawelem) ok = false;
 	    ok = drawelem;
@@ -4210,7 +4210,7 @@ namespace netgen
       }
     glEnd();
       }
-    glEndList ();
+    gstd::endlist ();
 
 
 #ifdef PARALLELGL
@@ -4570,7 +4570,7 @@ namespace netgen
             if(vssolution.fieldlines_vecfunction != -1 &&
                vssolution.vecfunction == -1)
               {
-                //cout << "WARNING: Setting vector function in Visualization toolbox to value from Fieldlines toolbox!" << endl;
+                //std::cout << "WARNING: Setting vector function in Visualization toolbox to value from Fieldlines toolbox!" <<std::endl;
                 vssolution.vecfunction = vssolution.fieldlines_vecfunction;
               }
                
@@ -4594,7 +4594,7 @@ namespace netgen
             vssolution.xoffset = 
               atof (Tcl_GetVar (interp, "::visoptions.xoffset", TCL_GLOBAL_ONLY));
 
-            //    cout << "x-offset:" << vssolution.xoffset << endl;
+            //    std::cout << "x-offset:" << vssolution.xoffset <<std::endl;
 
             vssolution.yoffset = 
               atof (Tcl_GetVar (interp, "::visoptions.yoffset", TCL_GLOBAL_ONLY));
@@ -4745,7 +4745,7 @@ namespace netgen
             vssolution.time = double (atoi (argv[2])) / 1000;
          
             vssolution.timetimestamp = NextTimeStamp();
-            cout << "\rtime = " << vssolution.time << "    " << flush;
+            std::cout << "\rtime = " << vssolution.time << "    " << flush;
           }
 
       }
@@ -4781,7 +4781,7 @@ namespace netgen
             for (i = 0; i < vssolution.GetNSolData(); i++)
               if (strcmp (vssolution.GetSolData(i)->name, argv[2]) == 0)
                 {
-                  cout << "found soldata " << i << endl;
+                  std::cout << "found soldata " << i <<std::endl;
                 }
           }
 
@@ -4819,7 +4819,7 @@ namespace netgen
 
         if (strcmp (argv[1], "setcomponent") == 0)
           {
-            cout << "set component " << argv[2] << endl;
+            std::cout << "set component " << argv[2] <<std::endl;
           }
 
         if (strcmp (argv[1], "getactivefield") == 0)

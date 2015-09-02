@@ -1,6 +1,8 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "geomsearch.hpp"
 
+#include "adfront3.hpp"
+#include "../general/ngexception.hpp"
 
 namespace netgen
 {
@@ -167,8 +169,8 @@ namespace netgen
             INDEX ind=ix+(iy-1)*size.i1+(iz-1)*size.i2*size.i1;
             if (ind < 1 || ind > size.i1 * size.i2 * size.i3)
               {
-                cerr << "Illegal hash-position";
-                cerr << "Position: " << ix << "," << iy << "," << iz << endl;
+                std::cerr << "Illegal hash-position";
+                std::cerr << "Position: " << ix << "," << iy << "," << iz << std::endl;
 		    throw NgException ("Illegal position in Geomsearch");
               }
             hashtable.Elem(ind)->Append(elemnum);		      
@@ -250,11 +252,11 @@ namespace netgen
     /*
       if (faces->Size() != 0 && hashcount % 200 == 0)
       {
-      (*mycout) << "n.o.f= " << faces->Size();
-      (*mycout) << ", n.o.lf= " << locfaces.Size();
-      (*mycout) << ", hashf= " << (double)cnt2/(double)faces->Size();
-      (*mycout) << " (" << (double)cnt1/(double)faces->Size();
-      (*mycout) << ", " << (double)cnt3/(double)faces->Size() << ")" << endl;
+      (*mystd::cout) << "n.o.f= " << faces->Size();
+      (*mystd::cout) << ", n.o.lf= " << locfaces.Size();
+      (*mystd::cout) << ", hashf= " << (double)cnt2/(double)faces->Size();
+      (*mystd::cout) << " (" << (double)cnt1/(double)faces->Size();
+      (*mystd::cout) << ", " << (double)cnt3/(double)faces->Size() << ")" <<std::endl;
       }
     */
 

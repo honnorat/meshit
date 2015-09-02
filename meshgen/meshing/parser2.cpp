@@ -1,5 +1,6 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <sstream>
+#include <meshgen.hpp>
+#include "meshing2.hpp"
 
 #ifdef WIN32
 #define COMMASIGN ':'
@@ -12,7 +13,7 @@ namespace netgen
 {
 
 
-void LoadMatrixLine (istream & ist, DenseMatrix & m, int line)
+void LoadMatrixLine (std::istream & ist, DenseMatrix & m, int line)
 {
   char ch;
   int pnum;
@@ -38,7 +39,7 @@ void LoadMatrixLine (istream & ist, DenseMatrix & m, int line)
 }
 
 
-void netrule :: LoadRule (istream & ist)
+void netrule :: LoadRule (std::istream & ist)
 {
   char buf[256];
   char ch;
@@ -64,14 +65,14 @@ void netrule :: LoadRule (istream & ist)
   delete [] name;
   name = new char[strlen (buf) + 1];
   strcpy (name, buf);
-  //(*testout) << "name " << name << endl;
-  //  (*mycout) << "Rule " << name << " found." << endl;
+  //std::cerr << "name " << name <<std::endl;
+  //  (*mystd::cout) << "Rule " << name << " found." <<std::endl;
 
   do
     {
       ist >> buf;
 
-      //(*testout) << "buf " << buf << endl;
+      //std::cerr << "buf " << buf <<std::endl;
 
       if (strcmp (buf, "quality") == 0)
 
@@ -139,7 +140,7 @@ void netrule :: LoadRule (istream & ist)
 	      ist >> ch;    // ')'
 
 
-	      //(*testout) << "read line " << lin.I1() << " " << lin.I2() << endl;
+	      //std::cerr << "read line " << lin.I1() << " " << lin.I2() <<std::endl;
 	      lines.Append (lin);
 	      linevecs.Append (points.Get(lin.I2()) - points.Get(lin.I1()));
 	      noldl++;
@@ -148,11 +149,11 @@ void netrule :: LoadRule (istream & ist)
 	      linetolerances.Elem(noldl).f2 = 0;
 	      linetolerances.Elem(noldl).f3 = 0;
 
-	      //(*testout) << "mapl1" << endl; 
+	      //std::cerr << "mapl1" <<std::endl; 
 	      ist >> ch;
 	      while (ch != ';')
 		{
-		  //(*testout) << "working on character \""<<ch<<"\""<< endl;
+		  //std::cerr << "working on character \""<<ch<<"\""<<std::endl;
 		  if (ch == '{')
 		    {
 		      ist >> linetolerances.Elem(noldl).f1;
@@ -167,15 +168,15 @@ void netrule :: LoadRule (istream & ist)
 		      dellines.Append (noldl);
 		      ist >> ch; // 'e'
 		      ist >> ch; // 'l'
-		      //(*testout) << "read del" << endl;
+		      //std::cerr << "read del" <<std::endl;
 		    }
 
 		  ist >> ch;
-		  //(*testout) << "read character \""<<ch<<"\""<< endl;
+		  //std::cerr << "read character \""<<ch<<"\""<<std::endl;
 		}
 
 	      ist >> ch;
-	      //(*testout) << "read next character \""<<ch<<"\""<< endl;
+	      //std::cerr << "read next character \""<<ch<<"\""<<std::endl;
 	    }
 	  
 
@@ -496,15 +497,15 @@ extern const char * quadrules[];
 void Meshing2 :: LoadRules (const char * filename, bool quad)
 {
   char buf[256];
-  istream * ist;
+  std::istream * ist;
   //char *tr1 = NULL;
-  string tr1;
+  std::string tr1;
 
   /*
   ifstream ist (filename);
   if (!ist.good())
     {
-      cerr << "Rule description file " << filename << " not found" << endl;
+      std::cerr << "Rule description file " << filename << " not found" <<std::endl;
       exit (1);
     }
   */
@@ -512,8 +513,8 @@ void Meshing2 :: LoadRules (const char * filename, bool quad)
 
   if (filename)
     {
-      //      (*mycout) << "rule-filename = " << filename << endl;
-      ist = new ifstream (filename);
+      //      (*mystd::cout) << "rule-filename = " << filename <<std::endl;
+      ist = new std::ifstream (filename);
     }
   else 
     {
@@ -536,7 +537,7 @@ void Meshing2 :: LoadRules (const char * filename, bool quad)
       size_t len = 0;
       while (*hcp)
 	{
-	  //	  (*testout) << "POS2 *hcp " << *hcp << endl;
+	  //	  std::cerr << "POS2 *hcp " << *hcp <<std::endl;
 	  len += strlen (*hcp);
 	  hcp++;
 	}
@@ -563,18 +564,18 @@ void Meshing2 :: LoadRules (const char * filename, bool quad)
       
 #ifdef WIN32
       // VC++ 2005 workaround
-	  for(string::size_type i=0; i<tr1.size(); i++)
+	  for(std::string::size_type i=0; i<tr1.size(); i++)
 	if(tr1[i] == ',')
 	  tr1[i] = ':';
 #endif
 
-      ist = new istringstream (tr1);
+      ist = new std::istringstream (tr1);
     }
 
 
   if (!ist->good())
     {
-      cerr << "Rule description file " << filename << " not found" << endl;
+      std::cerr << "Rule description file " << filename << " not found" <<std::endl;
       delete ist;
       exit (1);
     }
@@ -586,17 +587,17 @@ void Meshing2 :: LoadRules (const char * filename, bool quad)
 
       if (strcmp (buf, "rule") == 0)
 	{
-	  //(*testout) << "found rule" << endl;
+	  //std::cerr << "found rule" <<std::endl;
 	  netrule * rule = new netrule;
-	  //(*testout) << "fr1" << endl;
+	  //std::cerr << "fr1" <<std::endl;
 	  rule -> LoadRule(*ist);
-	  //(*testout) << "fr2" << endl;
+	  //std::cerr << "fr2" <<std::endl;
 	  
 	  rules.Append (rule);
 	}
-      //(*testout) << "loop" << endl;
+      //std::cerr << "loop" <<std::endl;
     }
-  //(*testout) << "POS3" << endl;
+  //std::cerr << "POS3" <<std::endl;
 
   delete ist;
   //delete [] tr1;

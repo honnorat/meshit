@@ -8,6 +8,9 @@
 /* Date:   1. Dez. 95                                                     */
 /**************************************************************************/
 
+#include <iostream>
+#include "meshsurf.hpp"
+
 namespace netgen
 {
 
@@ -44,9 +47,9 @@ namespace netgen
     virtual Point<3> GetSurfacePoint () const;
 
 
-    virtual void Print (ostream & ist) const;
-    virtual void Read (istream & ist);
-    void PrintCoeff (ostream & ost) const;
+    virtual void Print(std::ostream & ist) const;
+    virtual void Read (std::istream & ist);
+    void PrintCoeff (std::ostream & ost) const;
   };
 
 
@@ -79,7 +82,7 @@ namespace netgen
     virtual void DefineTangentialPlane (const Point<3> & ap1, 
 					const Point<3> & ap2);
     ///
-    virtual void ToPlane (const Point<3> & p3d, 
+    virtual void ToPlane (const Point3d & p3d, 
 			  Point<2> & pplane, double h,
 			  int & zone) const;
     ///
@@ -87,7 +90,7 @@ namespace netgen
 			    Point<3> & p3d, 
 			    double h) const;
     ///
-    virtual void Project (Point<3> & p) const;
+    virtual void Project (Point3d & p) const;
 
     ///
     virtual INSOLID_TYPE BoxInSolid (const BoxSphere<3> & box) const;
@@ -429,9 +432,9 @@ namespace netgen
 					   const Box<3> & bbox, 
 					   double facets) const;
     /// OK		 
-    virtual void Print (ostream & ist) const;
+    virtual void Print (std::ostream & ist) const;
     /// OK
-    virtual void Read (istream & ist);
+    virtual void Read (std::istream & ist);
   };
 
   /// ...end

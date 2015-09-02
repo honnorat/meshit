@@ -7,6 +7,11 @@
 /* Date:   1. Dez. 95                                                     */
 /**************************************************************************/
 
+#include <iostream>
+#include "../general/seti.hpp"
+
+#include "surface.hpp"
+
 namespace netgen 
 {
 
@@ -127,7 +132,7 @@ namespace netgen
     ///
     int OnFace (const Point<3> & p, const Vec<3> & v, double eps) const;
     ///
-    void Print (ostream & str) const;
+    void Print (std::ostream & str) const;
     ///
     void CalcSurfaceInverse ();
     ///
@@ -139,8 +144,8 @@ namespace netgen
     double GetMaxH () const
     { return maxh; }
 
-    void GetSolidData (ostream & ost, int first = 1) const;
-    static Solid * CreateSolid (istream & ist, const SYMBOLTABLE<Solid*> & solids);
+    void GetSolidData (std::ostream & ost, int first = 1) const;
+    static Solid * CreateSolid (std::istream & ist, const SYMBOLTABLE<Solid*> & solids);
 
 
     static BlockAllocator ball;
@@ -203,7 +208,7 @@ namespace netgen
   };
 
 
-  inline ostream & operator<< (ostream & ost, const Solid & sol)
+  inline std::ostream & operator<< (std::ostream & ost, const Solid & sol)
   {
     sol.Print (ost);
     return ost;

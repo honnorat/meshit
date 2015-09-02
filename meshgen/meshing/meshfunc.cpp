@@ -1,5 +1,9 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "meshfunc.hpp"
+#include "meshtool.hpp"
+#include "../general/ngexception.hpp"
+#include "global.hpp"
+#include "improve3.hpp"
 
 namespace netgen
 {
@@ -22,7 +26,7 @@ namespace netgen
 
      mesh3d.Compress();
 
-     //  mesh3d.PrintMemInfo (cout);
+     //  mesh3d.PrintMemInfo (std::cout);
 
      if (mp.checkoverlappingboundary)
         if (mesh3d.CheckOverlappingBoundary())
@@ -67,7 +71,7 @@ namespace netgen
 	 
 	 PrintMessage (2, "");
 	 PrintMessage (1, "Meshing subdomain ", k, " of ", mesh3d.GetNDomains());
-	 (*testout) << "Meshing subdomain " << k << endl;
+	 std::cerr << "Meshing subdomain " << k << std::endl;
 	 
 	 mp.maxh = min2 (globmaxh, mesh3d.MaxHDomain(k));
 	 
@@ -97,29 +101,23 @@ namespace netgen
 	
         for (int qstep = 1; qstep <= 3; qstep++)
 	  {
-	    // cout << "openquads = " << mesh3d.HasOpenQuads() << endl;
+	    // std::cout << "openquads = " << mesh3d.HasOpenQuads() <<std::endl;
 	    if (mesh3d.HasOpenQuads())
 	      {
-		string rulefile = ngdir;
-		
 		const char ** rulep = NULL;
 		switch (qstep)
 		  {
 		  case 1:
-		    rulefile += "/rules/prisms2.rls";
 		    rulep = prismrules2;
 		    break;
 		  case 2: // connect pyramid to triangle
-		    rulefile += "/rules/pyramids2.rls";
 		    rulep = pyramidrules2;
 		    break;
 		  case 3: // connect to vis-a-vis point
-		    rulefile += "/rules/pyramids.rls";
 		    rulep = pyramidrules;
 		    break;
 		  }
 		
-		//		Meshing3 meshing(rulefile);
 		Meshing3 meshing(rulep); 
 		
 		MeshingParameters mpquad = mp;
@@ -150,8 +148,8 @@ namespace netgen
 		for (int i = oldne + 1; i <= mesh3d.GetNE(); i++)
 		  mesh3d.VolumeElement(i).SetIndex (k);
 		
-		(*testout) 
-		  << "mesh has " << mesh3d.GetNE() << " prism/pyramid elements" << endl;
+		std::cerr 
+		  << "mesh has " << mesh3d.GetNE() << " prism/pyramid elements" << std::endl;
 		
 		mesh3d.FindOpenElements(k);
 	      }
@@ -205,7 +203,7 @@ namespace netgen
               if (cntsteps > mp.maxoutersteps) 
                  throw NgException ("Stop meshing since too many attempts");
 
-              string rulefile = ngdir + "/tetra.rls";
+              std::string rulefile = "./tetra.rls";
               PrintMessage (1, "start tetmeshing");
 
               //	  Meshing3 meshing(rulefile);
@@ -422,7 +420,7 @@ namespace netgen
   if (mesh3d.GetNOpenElements() != 0)
   {
   meshed = 0;
-  (*mycout) << "Open elements found, old" << endl;
+  (*mystd::cout) << "Open elements found, old" <<std::endl;
   const char * optstr = "mcmcmcmcm";
   int j;
   for (j = 1; j <= strlen(optstr); j++)
@@ -434,9 +432,9 @@ namespace netgen
   case 'm': mesh3d.ImproveMesh(2); break;
   }	  
 	  
-  (*mycout) << "Call remove" << endl;
+  (*mystd::cout) << "Call remove" <<std::endl;
   RemoveProblem (mesh3d);
-  (*mycout) << "Problem removed" << endl;
+  (*mystd::cout) << "Problem removed" <<std::endl;
   }
   else
   meshed = 1;
@@ -624,7 +622,7 @@ namespace netgen
       return MESHING3_OK;
     */
 
-    // (*mycout) << "optstring = " << mp.optimize3d << endl;
+    // (*mystd::cout) << "optstring = " << mp.optimize3d <<std::endl;
     /*
       const char * optstr = globflags.GetStringFlag ("optimize3d", "cmh");
       int optsteps = int (globflags.GetNumFlag ("optsteps3d", 2));

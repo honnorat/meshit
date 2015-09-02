@@ -18,7 +18,7 @@ namespace netgen
   void ReadFile (Mesh & mesh,
                  const string & hfilename)
   {
-    cout << "Read User File" << endl;
+    std::cout << "Read User File" <<std::endl;
 
     const char * filename = hfilename.c_str();
 
@@ -33,7 +33,7 @@ namespace netgen
          strcmp (&filename[strlen (filename)-5], ".surf") == 0 )
     
       {
-        cout << "Surface file" << endl;
+        std::cout << "Surface file" <<std::endl;
       
         ifstream in (filename);
       
@@ -64,21 +64,21 @@ namespace netgen
                 if (el.PNum(j) < PointIndex(1) || 
                     el.PNum(j) > PointIndex(np))
                   {
-                    cerr << "Point Number " << el.PNum(j) << " out of range 1..."
-                         << np << endl;
+                    std::cerr << "Point Number " << el.PNum(j) << " out of range 1..."
+                         << np <<std::endl;
                     return;
                   }
               }
             /*
               if (invert)
-              swap (el.PNum(2), el.PNum(3));
+              std::swap (el.PNum(2), el.PNum(3));
             */
 	  
             mesh.AddSurfaceElement (el);
           }
       
       
-        cout << "points: " << np << " faces: " << nbe << endl;
+        std::cout << "points: " << np << " faces: " << nbe <<std::endl;
       }
   
   
@@ -100,11 +100,11 @@ namespace netgen
         while (in.good())
           {
             in >> reco;
-	    cout << "reco = " << reco << endl;
+	    std::cout << "reco = " << reco <<std::endl;
 
             if (strcmp (reco, "2411") == 0)
               {
-                cout << "nodes found" << endl;
+                std::cout << "nodes found" <<std::endl;
 
                 while (1)
                   {
@@ -118,17 +118,17 @@ namespace netgen
                     in >> hi >> hi >> hi;
                     in >> p(0) >> p(1) >> p(2);
 
-		    cout << "p(" << pi << ") = "
-			 << p << endl;
+		    std::cout << "p(" << pi << ") = "
+			 << p <<std::endl;
 
                     mesh.AddPoint (p);
                   }
-		cout << "read " << mesh.GetNP() << " points" << endl;
+		std::cout << "read " << mesh.GetNP() << " points" <<std::endl;
               }
 
             if (strcmp (reco, "2412") == 0)
               {
-                cout << "elements found" << endl;
+                std::cout << "elements found" <<std::endl;
 
                 while (1)
                   {
@@ -140,7 +140,7 @@ namespace netgen
 		    if (label == -1) break;
 		    in >> fe_id >> phys_prop >> mat_prop >> color >> nnodes;
 		    
-		    cout << "fe_id = " << fe_id << " col = " << color << ", nnodes = " << nnodes << endl;
+		    std::cout << "fe_id = " << fe_id << " col = " << color << ", nnodes = " << nnodes <<std::endl;
 
 		    if (fe_id >= 11 && fe_id <= 32)
 		      in >> hi >> hi >> hi;
@@ -179,7 +179,7 @@ namespace netgen
 
         Point3d pmin, pmax;
         mesh.GetBox (pmin, pmax);
-        cout << "bounding-box = " << pmin << "-" << pmax << endl;
+        std::cout << "bounding-box = " << pmin << "-" << pmax <<std::endl;
       }
 
 
@@ -189,7 +189,7 @@ namespace netgen
     if ( (strlen (filename) > 7) &&
          strcmp (&filename[strlen (filename)-7], ".mesh2d") == 0 )
       {
-        cout << "Reading FEPP2D Mesh" << endl;
+        std::cout << "Reading FEPP2D Mesh" <<std::endl;
       
         char buf[100];
         int np, ne, nseg, i, j;
@@ -231,7 +231,7 @@ namespace netgen
     else if ( (strlen (filename) > 5) &&
               strcmp (&filename[strlen (filename)-5], ".mesh") == 0 )
       {
-        cout << "Reading Neutral Format" << endl;
+        std::cout << "Reading Neutral Format" <<std::endl;
       
         int np, ne, nse, i, j;
 
@@ -283,11 +283,11 @@ namespace netgen
             do
               {
                 in >> buf;
-                cout << "buf = " << buf << endl;
+                std::cout << "buf = " << buf <<std::endl;
                 if (strcmp (buf, "points") == 0)
                   {
                     in >> np;
-                    cout << "np = " << np << endl;
+                    std::cout << "np = " << np <<std::endl;
                   }
               }
             while (in.good());
@@ -305,7 +305,7 @@ namespace netgen
         pktfile[len-3] = 'p';
         pktfile[len-2] = 'k';
         pktfile[len-1] = 't';
-        cout << "pktfile = " << pktfile << endl;
+        std::cout << "pktfile = " << pktfile <<std::endl;
 
         int np, nse, i;
         int bcprop;
@@ -340,18 +340,18 @@ namespace netgen
             inemt >> p1 >> p2 >> p3 >> bcprop >> value;
 
             if (bcprop < 1 || bcprop > 4)
-              cerr << "bcprop out of range, bcprop = " << bcprop << endl;
+              std::cerr << "bcprop out of range, bcprop = " << bcprop <<std::endl;
             p1++;
             p2++;
             p3++;
             if (p1 < 1 || p1 > np || p2 < 1 || p2 > np || p3 < 1 || p3 > np)
               {
-                cout << "p1 = " << p1 << " p2 = " << p2 << " p3 = " << p3 << endl;
+                std::cout << "p1 = " << p1 << " p2 = " << p2 << " p3 = " << p3 <<std::endl;
               }
 
-            if (i > 110354) Swap (p2, p3);
+            if (i > 110354) std::swap (p2, p3);
             if (mesh.Point(p1)(0) < 0.25)
-              Swap (p2,p3);
+              std::swap (p2,p3);
 
             Element2d el(TRIG);
 
@@ -376,7 +376,7 @@ namespace netgen
         ifstream incyl ("ngusers/guenter/cylinder.surf");
         int npcyl, nsecyl; 
         incyl >> npcyl;
-        cout << "npcyl = " << npcyl << endl;
+        std::cout << "npcyl = " << npcyl <<std::endl;
         for (i = 1; i <= npcyl; i++)
           {
             Point3d p(0,0,0);
@@ -384,7 +384,7 @@ namespace netgen
             mesh.AddPoint (p);
           }
         incyl >> nsecyl;
-        cout << "nsecyl = " << nsecyl << endl;
+        std::cout << "nsecyl = " << nsecyl <<std::endl;
         for (i = 1; i <= nsecyl; i++)
           {
             incyl >> p1 >> p2 >> p3;

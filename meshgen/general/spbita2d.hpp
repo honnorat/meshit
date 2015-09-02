@@ -11,6 +11,8 @@
    Implementation of sparse 2 dimensional bitarray
 */
 
+#include "template.hpp"
+
 namespace netgen
 {
 

@@ -271,7 +271,7 @@ namespace netgen
 
       OCCSurface GetSurface (int surfi)
       {
-         cout << "OCCGeometry::GetSurface using PLANESPACE" << endl;
+         std::cout << "OCCGeometry::GetSurface using PLANESPACE" <<std::endl;
          return OCCSurface (TopoDS::Face(fmap(surfi)), PLANESPACE);
       }
 

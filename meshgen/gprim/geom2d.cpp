@@ -1,7 +1,5 @@
-#include <mystdlib.h>
-
-#include <myadt.hpp>
-#include <gprim.hpp>
+#include <meshgen.hpp>
+#include "geom2d.hpp"
 
 #ifndef M_PI
 #define M_PI        3.14159265358979323846
@@ -10,23 +8,23 @@
 namespace netgen
 {
 
-ostream & operator<<(ostream  & s, const Point2d & p)
+std::ostream & operator<<(std::ostream  & s, const Point2d & p)
 {
   return s << "(" << p.px << ", " << p.py << ")";
 }
 
-ostream & operator<<(ostream  & s, const Vec2d & v)
+std::ostream & operator<<(std::ostream  & s, const Vec2d & v)
 {
   return s << "(" << v.vx << ", " << v.vy << ")";
 }
 
 #ifdef none
-ostream & operator<<(ostream  & s, const Line2d & l)
+std::ostream & operator<<(std::ostream  & s, const Line2d & l)
   {
   return s << l.p1 << "-" << l.p2;
 }
 
-ostream & operator<<(ostream  & s, const TRIANGLE2D & t)
+std::ostream & operator<<(std::ostream  & s, const TRIANGLE2D & t)
 {
   return s << t.p1 << "-" << t.p2 << "-" << t.p3;
 }
@@ -158,7 +156,7 @@ int CrossPointBarycentric (const Line2d & l1, const Line2d & l2,
 int Parallel (const Line2d & l1, const Line2d & l2, double peps)
   {
   double p = fabs (Cross (l1.Delta(), l2.Delta()));
-  //  (*mycout) << endl << p << "  " <<  l1.Length() << "  " << l2.Length() << endl;
+  //  (*mystd::cout) <<std::endl << p << "  " <<  l1.Length() << "  " << l2.Length() <<std::endl;
   return p <= peps * l1.Length() * l2.Length();
 }
 

@@ -12,7 +12,11 @@
   The STLTopology contains topologic information as
   triangle->point, point->triangles, triangle->edge, 2-points->edge,...
 */
+#include "../general/hashtabl.hpp"
+#include "../gprim/adtree.hpp"
+#include "../gprim/geomobjects.hpp"
 
+namespace netgen {
 
 class STLGeometry;
 
@@ -228,11 +232,7 @@ public:
 
 
 
-ostream& operator<<(ostream& os, const STLTriangle& t);
-
-
-
-
+std::ostream& operator<<(std::ostream& os, const STLTriangle& t);
 
 
 
@@ -263,7 +263,7 @@ public:
 
 protected:
   STL_GEOM_STATUS status;
-  string statustext;
+  std::string statustext;
   
   bool topology_ok;
   bool orientation_ok;
@@ -272,9 +272,9 @@ public:
   STLTopology();
   virtual ~STLTopology();
 
-  static STLGeometry * LoadNaomi (istream & ist);
-  static STLGeometry * Load (istream & ist);
-  static STLGeometry * LoadBinary (istream & ist);
+  static STLGeometry * LoadNaomi (std::istream & ist);
+  static STLGeometry * Load (std::istream & ist);
+  static STLGeometry * LoadBinary (std::istream & ist);
 
   void Save (const char* filename) const;
   void SaveBinary (const char* filename, const char* aname) const;
@@ -332,7 +332,7 @@ public:
   bool Orientation_Ok() const { return orientation_ok; }
 
   STL_GEOM_STATUS GetStatus () const { return status; }
-  const string & GetStatusText () const { return statustext; }
+  const std::string & GetStatusText () const { return statustext; }
 
   void InvertTrig (int trig);
   void DeleteTrig (int trig);
@@ -357,6 +357,6 @@ public:
 
   const Box<3> & GetBoundingBox () const { return boundingbox; }
 };
-
+}
 
 #endif

@@ -1,15 +1,6 @@
-#include <mystdlib.h>
-#include <myadt.hpp>
-
-#include <linalg.hpp>
-#include <stlgeom.hpp>
-
-#include <meshing.hpp>
-#include <visual.hpp>
-
-
+#include <meshgen.hpp>
 #include "vsstl.hpp"
-
+#include "../general/autoptr.hpp"
 
 namespace netgen
 {
@@ -264,7 +255,7 @@ void VisualSceneSTLMeshing :: DrawScene ()
     {
       int showfilledtrias = vispar.stlshowfilledtrias;
 
-      //(*mycout) << "in " << showfilledtrias << ", NT=" << stlgeometry -> GetNT() << endl;
+      //(*mystd::cout) << "in " << showfilledtrias << ", NT=" << stlgeometry -> GetNT() <<std::endl;
 
       int chartnumber;
       if (vispar.stlshowmarktrias)
@@ -426,7 +417,7 @@ void VisualSceneSTLMeshing :: DrawScene ()
  
       if (stldoctor.showmarkedtrigs)
 	{
-	  //(*mycout) << "marked" << endl;
+	  //(*mystd::cout) << "marked" <<std::endl;
 	  glPolygonMode (GL_FRONT_AND_BACK, GL_LINE); //GL_LINE
 	  glPolygonOffset (pgoff*1, pgoff*1);
 	  glEnable (GL_POLYGON_OFFSET_FILL);
@@ -501,7 +492,7 @@ void VisualSceneSTLMeshing :: DrawScene ()
 	      if (stldoctor.showvicinity && !stlgeometry->Vicinity(j)) 
 		{continue;}
 
-	      //(*mycout) << " facenum = " << stlgeometry->GetTriangle(j).GetFaceNum() << " ";
+	      //(*mystd::cout) << " facenum = " << stlgeometry->GetTriangle(j).GetFaceNum() << " ";
 	      if (stlgeometry->GetTriangle(j).GetFaceNum() != facenumber) 
 		{continue;}
 	      
@@ -825,7 +816,7 @@ void VisualSceneSTLMeshing :: BuildScene (int zoomall)
 
 void VisualSceneSTLMeshing :: MouseDblClick (int px, int py)
 {
-  //  (*mycout) << "dblclick: " << px << " - " << py << endl;
+  //  (*mystd::cout) << "dblclick: " << px << " - " << py <<std::endl;
   
 
   int i, j, k, hits;
@@ -842,8 +833,8 @@ void VisualSceneSTLMeshing :: MouseDblClick (int px, int py)
   glGetIntegerv (GL_VIEWPORT, viewport);
 
   /*  
-  (*mycout) << "viewport = " << viewport[0] << " " 
-       << viewport[1] << " " << viewport[2] << " " << viewport[3] << endl;
+  (*mystd::cout) << "viewport = " << viewport[0] << " " 
+       << viewport[1] << " " << viewport[2] << " " << viewport[3] <<std::endl;
   */
 
   glMatrixMode (GL_PROJECTION); 
@@ -970,7 +961,7 @@ void VisualSceneSTLMeshing :: MouseDblClick (int px, int py)
 	
   hits = glRenderMode (GL_RENDER);
 
-  //  (*mycout) << "hits = " << hits << endl;
+  //  (*mystd::cout) << "hits = " << hits <<std::endl;
 
   //int minrec = -1;
   int minname = 0;
@@ -981,8 +972,8 @@ void VisualSceneSTLMeshing :: MouseDblClick (int px, int py)
       GLuint curdepth = selbuf[4*i+1];
 
       /*      
-      (*mycout) << selbuf[4*i] << " " << selbuf[4*i+1] << " " 
-	   << selbuf[4*i+2] << " " << selbuf[4*i+3] << endl;
+      (*mystd::cout) << selbuf[4*i] << " " << selbuf[4*i+1] << " " 
+	   << selbuf[4*i+2] << " " << selbuf[4*i+3] <<std::endl;
       */
       if (curname &&
 	  (curdepth < mindepth || !minname))
@@ -1173,7 +1164,7 @@ void VisualSceneSTLMeshing :: MouseDblClick (int px, int py)
 
   void VisualSceneSTLGeometry :: BuildScene (int zoomall)
   {
-    //  cout << "rebuild stl geometry scene" << endl;
+    //  std::cout << "rebuild stl geometry scene" <<std::endl;
 
     center = stlgeometry -> GetBoundingBox().Center();
     rad = stlgeometry -> GetBoundingBox().Diam() / 2;

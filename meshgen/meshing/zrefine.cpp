@@ -1,10 +1,8 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
-
-#include <csg.hpp>
+#include <meshgen.hpp>
 
 namespace netgen
 {
+#ifdef OLD
 
   // find singular edges
   void SelectSingularEdges (const Mesh & mesh, const CSGeometry & geom, 
@@ -203,9 +201,6 @@ namespace netgen
       }
   }
 
-
-
-#ifdef OLD
   void MakeCornerNodes (Mesh & mesh,
 			INDEX_HASHTABLE<int> & cornernodes)
   {
@@ -227,18 +222,17 @@ namespace netgen
       }
 
     /*
-      cout << "cornernodes: ";
+      std::cout << "cornernodes: ";
       for (i = 1; i <= edgesonpoint.Size(); i++)
       if (edgesonpoint.Get(i) >= 6)
       {
       cornernodes.Set (i, 1);
-      cout << i << " ";
+      std::cout << i << " ";
       }
-      cout << endl;
+      std::cout <<std::endl;
     */
     //  cornernodes.Set (5, 1);
   }
-#endif
 
 
   void RefinePrisms (Mesh & mesh, const CSGeometry * geom, 
@@ -390,14 +384,14 @@ namespace netgen
 		if (!refedges.Used(edge))
 		  {
 		    const Array<double> & slices = csid->GetSlices();
-		    //(*testout) << "idnr " << idnr << " i " << i << endl;
-		    //(*testout) << "slices " << slices << endl;
+		    //std::cerr << "idnr " << idnr << " i " << i <<std::endl;
+		    //std::cerr << "slices " << slices <<std::endl;
 		    double slicefac = slices.Get(slicenr);
 		    double slicefaclast = 
 		      (slicenr == slices.Size()) ? 1 : slices.Get(slicenr+1);
 		    
 		    Point3d np = p1 + (slicefac / slicefaclast) * (p2-p1);
-		    //(*testout) << "slicenr " << slicenr << " slicefac " << slicefac << " quot " << (slicefac / slicefaclast) << " np " << np << endl;
+		    //std::cerr << "slicenr " << slicenr << " slicefac " << slicefac << " quot " << (slicefac / slicefaclast) << " np " << np <<std::endl;
 		    npi = mesh.AddPoint (np);
 		    refedges.Set (edge, npi);
 		    found = 1;
@@ -489,7 +483,7 @@ namespace netgen
 
 		if (hasref && hasnonref)
 		  {
-		    //		  cout << "el " << i << " in closure" << endl;
+		    //		  std::cout << "el " << i << " in closure" <<std::endl;
 		    change = 1;
 		    for (j = 1; j <= 3; j++)
 		      {
@@ -514,7 +508,7 @@ namespace netgen
 
 	PrintMessage (5, "Do segments");
 
-	//      (*testout) << "closure formed, np = " << mesh.GetNP() << endl;
+	//      std::cerr << "closure formed, np = " << mesh.GetNP() <<std::endl;
 
 	int oldns = mesh.GetNSeg();
 
@@ -595,9 +589,9 @@ namespace netgen
 		    else
 		      {
 			/*
-			  (*testout) << "ERROR: prism " << i << " has hanging node !!" 
-			  << ", edge = " << edge << endl;
-			  cerr << "ERROR: prism " << i << " has hanging node !!" << endl;
+			  std::cerr << "ERROR: prism " << i << " has hanging node !!" 
+			  << ", edge = " << edge <<std::endl;
+			  std::cerr << "ERROR: prism " << i << " has hanging node !!" <<std::endl;
 			*/
 			npi[j-1] = 0;
 		      }
@@ -627,7 +621,7 @@ namespace netgen
 
 	// do surface elements
 	int oldnse = mesh.GetNSE();
-	//      cout << "oldnse = " << oldnse << endl;
+	//      std::cout << "oldnse = " << oldnse <<std::endl;
 	for (i = 1; i <= oldnse; i++)
 	  {
 	    Element2d & el = mesh.SurfaceElement (i);
@@ -738,4 +732,5 @@ namespace netgen
     minref = 0;
   }
 
+#endif
 }

@@ -1,5 +1,9 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "curvedelems.hpp"
+#include "clusters.hpp"
+#include "meshtool.hpp"
+#include "../general/ngexception.hpp"
+#include "../gprim/geomtest3d.hpp"
 
 namespace netgen
 {
@@ -89,7 +93,7 @@ namespace netgen
 
     bcnames.SetSize( mesh2.bcnames.Size() );
     for ( int i = 0; i < mesh2.bcnames.Size(); i++ )
-      if ( mesh2.bcnames[i] ) bcnames[i] = new string ( *mesh2.bcnames[i] );
+      if ( mesh2.bcnames[i] ) bcnames[i] = new std::string ( *mesh2.bcnames[i] );
       else bcnames[i] = 0;
 
     return *this;
@@ -249,7 +253,7 @@ namespace netgen
     /*
       else
       {
-      cerr << "edge points nrs > points.Size" << endl;
+      std::cerr << "edge points nrs > points.Size" <<std::endl;
       }
     */
 
@@ -292,7 +296,7 @@ namespace netgen
     /*
       else
       {
-      cerr << "surf points nrs > points.Size" << endl;      
+      std::cerr << "surf points nrs > points.Size" <<std::endl;      
       }
     */
 
@@ -300,7 +304,7 @@ namespace netgen
     surfelements.Append (el); 
 
     if (el.index > facedecoding.Size())
-      cerr << "has no facedecoding: fd.size = " << facedecoding.Size() << ", ind = " << el.index << endl;
+      std::cerr << "has no facedecoding: fd.size = " << facedecoding.Size() << ", ind = " << el.index << std::endl;
 
     surfelements.Last().next = facedecoding[el.index-1].firstelement;
     facedecoding[el.index-1].firstelement = si;
@@ -337,7 +341,7 @@ namespace netgen
     /*
       if (maxn > points.Size())
       {
-      cerr << "add vol element before point" << endl;
+      std::cerr << "add vol element before point" <<std::endl;
       }
     */
 
@@ -360,10 +364,10 @@ namespace netgen
 
 
 
-  void Mesh :: Save (const string & filename) const
+  void Mesh :: Save (const std::string & filename) const
   {
 
-    ofstream outfile(filename.c_str());
+    std::ofstream outfile(filename.c_str());
     // ogzstream outfile( (filename+".gz") .c_str());
 
     Save(outfile);
@@ -371,7 +375,7 @@ namespace netgen
 
 
 
-  void Mesh :: Save (ostream & outfile) const
+  void Mesh :: Save (std::ostream & outfile) const
   {
     int i, j;
 
@@ -488,7 +492,7 @@ namespace netgen
         outfile << seg.geominfo[0].trignum;  // stl dreiecke
         outfile << " ";
         outfile.width(8);
-        outfile << seg.geominfo[1].trignum; // << endl;  // stl dreieck
+        outfile << seg.geominfo[1].trignum; // <<std::endl;  // stl dreieck
 
         if (dimension == 3)
           {
@@ -533,8 +537,8 @@ namespace netgen
     outfile << "points" << "\n";
     outfile << GetNP() << "\n";
     outfile.precision(16);
-    outfile.setf (ios::fixed, ios::floatfield);
-    outfile.setf (ios::showpoint);
+    outfile.setf (std::ios::fixed, std::ios::floatfield);
+    outfile.setf (std::ios::showpoint);
 
     PointIndex pi;
     for (pi = PointIndex::BASE; 
@@ -590,11 +594,11 @@ namespace netgen
 
     if (cntmat)
       {
-        outfile << "materials" << endl;
-        outfile << cntmat << endl;
+        outfile << "materials" << std::endl;
+        outfile << cntmat << std::endl;
         for (i = 1; i <= materials.Size(); i++)
           if (materials.Get(i) && strlen (materials.Get(i)))
-            outfile << i << " " << materials.Get(i) << endl;
+            outfile << i << " " << materials.Get(i) << std::endl;
       }
 
 
@@ -604,10 +608,10 @@ namespace netgen
 
     if ( cntbcnames )
       {
-        outfile << "\n\nbcnames" << endl << bcnames.Size() << endl;
+        outfile << "\n\nbcnames" << std::endl << bcnames.Size() << std::endl;
         for ( i = 0; i < bcnames.Size(); i++ )
-          outfile << i+1 << "\t" << GetBCName(i) << endl;
-        outfile << endl << endl;
+          outfile << i+1 << "\t" << GetBCName(i) << std::endl;
+        outfile << std::endl << std::endl;
       }
 
     /*
@@ -644,7 +648,7 @@ namespace netgen
       bcprops.SetSize(0);
       if ( cntbcnames )
       {
-      outfile << "\nbcnames" << endl << cntbcnames << endl;
+      outfile << "\nbcnames" <<std::endl << cntbcnames <<std::endl;
       if ( GetDimension() == 2 )
       {
       for (i = 1; i <= GetNSeg(); i++)
@@ -653,7 +657,7 @@ namespace netgen
       if ( ! bcprops.Contains(seg.si) && seg.GetBCName() != "" )
       {
       bcprops.Append(seg.si);
-      outfile << seg.si << "\t" << seg.GetBCName() << endl;
+      outfile << seg.si << "\t" << seg.GetBCName() <<std::endl;
       }
       }
       }
@@ -669,12 +673,12 @@ namespace netgen
       name != "" )
       {
       bcprops.Append(bcp);
-      outfile << bcp << "\t" << name << endl;
+      outfile << bcp << "\t" << name <<std::endl;
       }
       }
       }
       }
-      outfile << endl << endl;
+      outfile <<std::endl <<std::endl;
       }
     */
 
@@ -684,10 +688,10 @@ namespace netgen
 
     if (cnt_sing)
       {
-        outfile << "singular_points" << endl << cnt_sing << endl;
+        outfile << "singular_points" << std::endl << cnt_sing << std::endl;
         for (PointIndex pi = points.Begin(); pi < points.End(); pi++)
           if ((*this)[pi].Singularity()>=1.) 
-            outfile << int(pi) << "\t" << (*this)[pi].Singularity() << endl;
+            outfile << int(pi) << "\t" << (*this)[pi].Singularity() << std::endl;
       }
 
     cnt_sing = 0;
@@ -695,10 +699,10 @@ namespace netgen
       if ( segments[si].singedge_left ) cnt_sing++;
     if (cnt_sing)
       {
-        outfile << "singular_edge_left" << endl << cnt_sing << endl;
+        outfile << "singular_edge_left" << std::endl << cnt_sing << std::endl;
         for (SegmentIndex si = 0; si < GetNSeg(); si++)
           if ( segments[si].singedge_left )
-            outfile << int(si) << "\t" << segments[si].singedge_left << endl;
+            outfile << int(si) << "\t" << segments[si].singedge_left << std::endl;
       }
 
     cnt_sing = 0;
@@ -706,10 +710,10 @@ namespace netgen
       if ( segments[si].singedge_right ) cnt_sing++;
     if (cnt_sing)
       {
-        outfile << "singular_edge_right" << endl << cnt_sing << endl;
+        outfile << "singular_edge_right" << std::endl << cnt_sing << std::endl;
         for (SegmentIndex si = 0; si < GetNSeg(); si++)
           if ( segments[si].singedge_right  )
-            outfile << int(si) << "\t" << segments[si].singedge_right << endl;
+            outfile << int(si) << "\t" << segments[si].singedge_right << std::endl;
       }
 
 
@@ -720,11 +724,11 @@ namespace netgen
 
     if (cnt_sing)
       {
-        outfile << "singular_face_inside" << endl << cnt_sing << endl;
+        outfile << "singular_face_inside" << std::endl << cnt_sing << std::endl;
         for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++)
           if ( GetFaceDescriptor ((*this)[sei].GetIndex()).domin_singular) 
             outfile << int(sei)  << "\t" << 
-              GetFaceDescriptor ((*this)[sei].GetIndex()).domin_singular  << endl;
+              GetFaceDescriptor ((*this)[sei].GetIndex()).domin_singular  << std::endl;
       }
 
     cnt_sing = 0;
@@ -732,11 +736,11 @@ namespace netgen
       if ( GetFaceDescriptor ((*this)[sei].GetIndex()).domout_singular) cnt_sing++;
     if (cnt_sing)
       {
-        outfile << "singular_face_outside" << endl << cnt_sing << endl;
+        outfile << "singular_face_outside" << std::endl << cnt_sing << std::endl;
         for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++)
           if ( GetFaceDescriptor ((*this)[sei].GetIndex()).domout_singular) 
             outfile << int(sei) << "\t" 
-                    << GetFaceDescriptor ((*this)[sei].GetIndex()).domout_singular << endl;
+                    << GetFaceDescriptor ((*this)[sei].GetIndex()).domout_singular << std::endl;
       }
 
 
@@ -746,12 +750,12 @@ namespace netgen
     int cnt_facedesc = GetNFD();
     if (cnt_facedesc)
     {
-       outfile << endl << endl << "#   Surfnr     Red     Green     Blue" << endl;
-       outfile << "face_colours" << endl << cnt_facedesc << endl;
+       outfile << std::endl << std::endl << "#   Surfnr     Red     Green     Blue" << std::endl;
+       outfile << "face_colours" << std::endl << cnt_facedesc << std::endl;
 
        outfile.precision(8);
-       outfile.setf(ios::fixed, ios::floatfield);
-       outfile.setf(ios::showpoint);
+       outfile.setf(std::ios::fixed, std::ios::floatfield);
+       outfile.setf(std::ios::showpoint);
 
        for(i = 1; i <= cnt_facedesc; i++)
        {
@@ -763,7 +767,7 @@ namespace netgen
           outfile << GetFaceDescriptor(i).SurfColour().Y() << " ";
           outfile.width(12);
           outfile << GetFaceDescriptor(i).SurfColour().Z();
-          outfile << endl;
+          outfile << std::endl;
        }
     }
 
@@ -771,10 +775,10 @@ namespace netgen
 
 
 
-  void Mesh :: Load (const string & filename)
+  void Mesh :: Load (const std::string & filename)
   {
 
-    ifstream infile(filename.c_str());
+    std::ifstream infile(filename.c_str());
     if (!infile.good())
       throw NgException ("mesh file not found");
 
@@ -784,7 +788,7 @@ namespace netgen
 
 
 
-  void Mesh :: Load (istream & infile)
+  void Mesh :: Load (std::istream & infile)
   {
 
     char str[100];
@@ -837,7 +841,7 @@ namespace netgen
 		if (domin == 0) 
 		  {
 		    invert_el = true;
-		    Swap (domin, domout);
+		    std::swap (domin, domout);
 		  }
 		*/
 		
@@ -1013,7 +1017,7 @@ namespace netgen
             for (i = 1; i <= n; i++)
               {
                 int nr;
-                string mat;
+                std::string mat;
                 infile >> nr >> mat;
                 SetMaterial (nr, mat.c_str());
               }
@@ -1026,9 +1030,9 @@ namespace netgen
             SetNBCNames(n);
             for ( i = 1; i <= n; i++ )
               {
-                string nextbcname;
+                std::string nextbcname;
                 infile >> bcnrs[i-1] >> nextbcname;
-                bcnames[bcnrs[i-1]-1] = new string(nextbcname);
+                bcnames[bcnrs[i-1]-1] = new std::string(nextbcname);
               }
 
             if ( GetDimension() == 2 )
@@ -1174,23 +1178,23 @@ namespace netgen
 
     CalcSurfacesOfNode ();
  
-    if (ntasks == 1) // sequential run only
-      {
+//    if (ntasks == 1) // sequential run only
+//      {
 	topology -> Update();
 	clusters -> Update();
-      }
+//      }
 
     SetNextMajorTimeStamp();
-    //  PrintMemInfo (cout);
+    //  PrintMemInfo (std::cout);
   }
 
 
 
 
 
-  void Mesh :: Merge (const string & filename, const int surfindex_offset)
+  void Mesh :: Merge (const std::string & filename, const int surfindex_offset)
   {
-    ifstream infile(filename.c_str());
+    std::ifstream infile(filename.c_str());
     if (!infile.good())
       throw NgException ("mesh file not found");
 
@@ -1200,7 +1204,7 @@ namespace netgen
 
 
 
-  void Mesh :: Merge (istream & infile, const int surfindex_offset)
+  void Mesh :: Merge (std::istream & infile, const int surfindex_offset)
   {
     char str[100];
     int i, n;
@@ -1402,7 +1406,7 @@ namespace netgen
             for (i = 1; i <= n; i++)
               {
                 int nr;
-                string mat;
+                std::string mat;
                 infile >> nr >> mat;
                 SetMaterial (nr+oldnd, mat.c_str());
               }
@@ -1436,9 +1440,9 @@ namespace netgen
         for (int j = 0; j < 4; j++)
           if ( (*this)[ei][j] <= PointIndex::BASE-1)
             {
-              (*testout) << "El " << ei << " has 0 nodes: ";
+              std::cerr << "El " << ei << " has 0 nodes: ";
               for (int k = 0; k < 4; k++)
-                (*testout) << (*this)[ei][k];
+                std::cerr << (*this)[ei][k];
               break;
             }
       }
@@ -1491,7 +1495,7 @@ namespace netgen
               }
           }
         else 
-          cerr << "illegal elemenet for buildboundaryedges" << endl;
+          std::cerr << "illegal elemenet for buildboundaryedges" << std::endl;
       }
 
 
@@ -1685,7 +1689,7 @@ namespace netgen
   {
     if (fixpoints.Size() != GetNP())
       {
-        cerr << "Mesh::FixPoints: sizes don't fit" << endl;
+        std::cerr << "Mesh::FixPoints: sizes don't fit" << std::endl;
         return;
       }
     int np = GetNP();
@@ -1699,9 +1703,6 @@ namespace netgen
 
   void Mesh :: FindOpenElements (int dom)
   {
-    static int timer = NgProfiler::CreateTimer ("Mesh::FindOpenElements");
-    NgProfiler::RegionTimer reg (timer);
-
     int np = GetNP();
     int ne = GetNE();
     int nse = GetNSE();
@@ -1903,13 +1904,13 @@ namespace netgen
                                   if (i2.I1() == 0)
                                     {
                                       PrintSysError ("more elements on face");
-                                      (*testout)  << "more elements on face!!!" << endl;
-                                      (*testout) << "el = " << el << endl;
-                                      (*testout) << "hel = " << hel << endl;
-                                      (*testout) << "face = " << i3 << endl;
-                                      (*testout) << "points = " << endl;
+                                      std::cerr  << "more elements on face!!!" << std::endl;
+                                      std::cerr << "el = " << el << std::endl;
+                                      std::cerr << "hel = " << hel << std::endl;
+                                      std::cerr << "face = " << i3 << std::endl;
+                                      std::cerr << "points = " << std::endl;
                                       for (int jj = 1; jj <= 3; jj++)
-                                        (*testout) << "p = " << Point(i3.I(jj)) << endl;
+                                        std::cerr << "p = " << Point(i3.I(jj)) << std::endl;
                                     }
                                 }
                             }
@@ -2000,7 +2001,7 @@ namespace netgen
       i2.Sort();
 
       if (!boundaryedges->Used (i2))
-      cerr << "WARNING: no boundedge, but seg edge: " << i2 << endl;
+      std::cerr << "WARNING: no boundedge, but seg edge: " << i2 <<std::endl;
 
       boundaryedges -> Set (i2, 2);
       segmentht -> Set (i2, i-1);
@@ -2042,8 +2043,7 @@ namespace netgen
 
             if (faceht.Used (key))
               {
-                cerr << "ERROR: Segment " << seg << " already used" << endl;
-                (*testout) << "ERROR: Segment " << seg << " already used" << endl;
+                std::cerr << "ERROR: Segment " << seg << " already used" << std::endl;
               }
 
             faceht.Set (key, data);
@@ -2060,8 +2060,7 @@ namespace netgen
             INDEX_2 key(seg[1], seg[0]);
             if (!faceht.Used(key))
               {
-                cerr << "ERROR: Segment " << seg << " brother not used" << endl;
-                (*testout) << "ERROR: Segment " << seg << " brother not used" << endl;
+                std::cerr << "ERROR: Segment " << seg << " brother not used" << std::endl;
               }
           }
       }
@@ -2082,7 +2081,7 @@ namespace netgen
                 INDEX_2 data;
 
                 if (seg.I1() <= 0 || seg.I2() <= 0)
-                  cerr << "seg = " << seg << endl;
+                  std::cerr << "seg = " << seg << std::endl;
 
                 if (faceht.Used(seg))
                   {
@@ -2098,41 +2097,41 @@ namespace netgen
                         PrintWarning ("hash table si not fitting for segment: ",
                                        seg.I1(), "-", seg.I2(), " other = ",
                                        data.I2());
-			// cout << "me: index = " << el.GetIndex() << ", el = " << el << endl;
+			// std::cout << "me: index = " << el.GetIndex() << ", el = " << el <<std::endl;
 
 			/*
-			bout << "has index = " << seg << endl;
-			bout << "hash value = " << faceht.HashValue (seg) << endl;
+			bout << "has index = " << seg <<std::endl;
+			bout << "hash value = " << faceht.HashValue (seg) <<std::endl;
 
 			if (data.I2() > 0)
 			  {
 			    int io = data.I2();
-			    cout << "other trig: index = " << SurfaceElement(io).GetIndex()
-				 << ", el = " << SurfaceElement(io) << endl;
+			    std::cout << "other trig: index = " << SurfaceElement(io).GetIndex()
+				 << ", el = " << SurfaceElement(io) <<std::endl;
 			  }
 			else
 			  {
-			    cout << "other seg " << -data.I2() << ", si = " << data.I1() << endl;
+			    std::cout << "other seg " << -data.I2() << ", si = " << data.I1() <<std::endl;
 			  }
 
 			
-			bout << "me: index = " << el.GetIndex() << ", el = " << el << endl;
+			bout << "me: index = " << el.GetIndex() << ", el = " << el <<std::endl;
 			if (data.I2() > 0)
 			  {
 			    int io = data.I2();
 			    bout << "other trig: index = " << SurfaceElement(io).GetIndex()
-				 << ", el = " << SurfaceElement(io) << endl;
+				 << ", el = " << SurfaceElement(io) <<std::endl;
 			  } 
 			else
 			  {
-			    bout << "other seg " << -data.I2() << ", si = " << data.I1() << endl;
+			    bout << "other seg " << -data.I2() << ", si = " << data.I1() <<std::endl;
 			  }
 			*/
                       }
                   }
                 else
                   {
-                    Swap (seg.I1(), seg.I2());
+                    std::swap (seg.I1(), seg.I2());
                     data.I1() = el.GetIndex();
                     data.I2() = i;
 
@@ -2146,28 +2145,28 @@ namespace netgen
     if (buggy)
       {
 	for (int i = 1; i <= GetNSeg(); i++)
-	  bout << "seg" << i << " " << LineSegment(i) << endl;
+	  bout << "seg" << i << " " << LineSegment(i) <<std::endl;
 
 	for (int i = 1; i <= GetNSE(); i++)
 	  bout << "sel" << i << " " << SurfaceElement(i) << " ind = " 
-	       << SurfaceElement(i).GetIndex() << endl;
+	       << SurfaceElement(i).GetIndex() <<std::endl;
 
-	bout << "hashtable: " << endl;
+	bout << "hashtable: " <<std::endl;
 	for (int j = 1; j <= faceht.GetNBags(); j++)
 	  {
-	    bout << "bag " << j << ":" << endl;
+	    bout << "bag " << j << ":" <<std::endl;
 	    for (int k = 1; k <= faceht.GetBagSize(j); k++)
 	      {
 		INDEX_2 i2, data;
 		faceht.GetData (j, k, i2, data);
-		bout << "key = " << i2 << ", data = " << data << endl;
+		bout << "key = " << i2 << ", data = " << data <<std::endl;
 	      }
 	  }
 	exit(1);
       }
     */
 
-    (*testout) << "open segments: " << endl;
+    std::cerr << "open segments: " << std::endl;
     opensegments.SetSize(0);
     for (int i = 1; i <= faceht.GetNBags(); i++)
       for (int j = 1; j <= faceht.GetBagSize(i); j++)
@@ -2195,7 +2194,7 @@ namespace netgen
                         seg.geominfo[1] = el.GeomInfoPi(k);
                     }
 
-                  (*testout) << "trig seg: ";
+                  std::cerr << "trig seg: ";
                 }
               else
                 {
@@ -2204,24 +2203,24 @@ namespace netgen
                   seg.geominfo[0] = lseg.geominfo[0];
                   seg.geominfo[1] = lseg.geominfo[1];
 
-                  (*testout) << "line seg: ";
+                  std::cerr << "line seg: ";
                 }
 
-              (*testout) << seg[0] << " - " << seg[1] 
+              std::cerr << seg[0] << " - " << seg[1] 
                          << " len = " << Dist (Point(seg[0]), Point(seg[1]))
-                         << endl;
+                         << std::endl;
 
               opensegments.Append (seg);
               if (seg.geominfo[0].trignum <= 0 || seg.geominfo[1].trignum <= 0)
                 {
-                  (*testout) << "Problem with open segment: " << seg << endl;
+                  std::cerr << "Problem with open segment: " << seg << std::endl;
                 }
 
             }
         }
 
     PrintMessage (3, opensegments.Size(), " open segments found");
-    (*testout) << opensegments.Size() << " open segments found" << endl;
+    std::cerr << opensegments.Size() << " open segments found" << std::endl;
 
     /*
       ptyps.SetSize (GetNP());
@@ -2396,7 +2395,7 @@ namespace netgen
       }
 
     PrintMessage (5, "free: ", cntfree, ", fixed: ", GetNE()-cntfree);
-    (*testout) << "free: " << cntfree << ", fixed: " << GetNE()-cntfree << endl;
+    std::cerr << "free: " << cntfree << ", fixed: " << GetNE()-cntfree << std::endl;
 
     for (pi = PointIndex::BASE; 
          pi < GetNP()+PointIndex::BASE; pi++)
@@ -2428,7 +2427,7 @@ namespace netgen
     if(hloc < hmin)
       hloc = hmin;
 
-    //cout << "restrict h in " << p << " to " << hloc << endl;
+    //std::cout << "restrict h in " << p << " to " << hloc <<std::endl;
     if (!lochfunc)
       {
         PrintWarning("RestrictLocalH called, creating mesh-size tree");
@@ -2448,7 +2447,7 @@ namespace netgen
     if(hloc < hmin)
       hloc = hmin;
 
-    // cout << "restrict h along " << p1 << " - " << p2 << " to " << hloc << endl;
+    // std::cout << "restrict h along " << p1 << " - " << p2 << " to " << hloc <<std::endl;
     int i;
     int steps = int (Dist (p1, p2) / hloc) + 2;
     Vec3d v(p1, p2);
@@ -2592,8 +2591,8 @@ namespace netgen
                     if (hedge > hel)
                       hel = hedge;
                     //		  lochfunc->SetH (Center (p1, p2), 2 * Dist (p1, p2));
-                    //		  (*testout) << "trigseth, p1,2 = " << el.PNumMod(j) << ", " << el.PNumMod(j+1) 
-                    //			     << " h = " << (2 * Dist(p1, p2)) << endl;
+                    //		  std::cerr << "trigseth, p1,2 = " << el.PNumMod(j) << ", " << el.PNumMod(j+1) 
+                    //			     << " h = " << (2 * Dist(p1, p2)) <<std::endl;
                   }
               }
 
@@ -2637,7 +2636,7 @@ namespace netgen
           }
       }
     /*
-      cerr << "do vol" << endl;
+      std::cerr << "do vol" <<std::endl;
       for (i = 1; i <= GetNE(); i++)
       {
       const Element & el = VolumeElement(i);
@@ -2650,7 +2649,7 @@ namespace netgen
       const Point3d & p1 = Point (el.PNum(j));
       const Point3d & p2 = Point (el.PNum(k));
       lochfunc->SetH (Center (p1, p2), 2 * Dist (p1, p2));
-      (*testout) << "set vol h to " << (2 * Dist (p1, p2)) << endl;
+      std::cerr << "set vol h to " << (2 * Dist (p1, p2)) <<std::endl;
 
       }
       }
@@ -2679,7 +2678,7 @@ namespace netgen
       }
     */
     //  lochfunc -> Convexify();
-    //  lochfunc -> PrintMemInfo (cout);
+    //  lochfunc -> PrintMemInfo (std::cout);
   }
 
 
@@ -2710,7 +2709,7 @@ namespace netgen
             hl = Dist(p1,p2);
             RestrictLocalH(p1,hl);
             RestrictLocalH(p2,hl);
-            //cout << "restricted h at " << p1 << " and " << p2 << " to " << hl << endl;
+            //std::cout << "restricted h at " << p1 << " and " << p2 << " to " << hl <<std::endl;
           }
       }
 
@@ -2781,12 +2780,12 @@ namespace netgen
 
 
                 /*	      
-                  (*testout) << "pi1,2, 3, 4 = " << i2.I1() << ", " << i2.I2() << ", " << pi3 << ", " << pi4
+                  std::cerr << "pi1,2, 3, 4 = " << i2.I1() << ", " << i2.I2() << ", " << pi3 << ", " << pi4
                   << " p1 = " << Point(i2.I1()) 
                   << ", p2 = " << Point(i2.I2()) 
                   //			 << ", p3 = " << Point(pi3) 
                   //			 << ", p4 = " << Point(pi4) 
-                  << ", rad = " << rad << endl;
+                  << ", rad = " << rad <<std::endl;
                 */
               }
             else
@@ -2923,7 +2922,7 @@ namespace netgen
 
     if (!meshsizefilename) return;
 
-    ifstream msf(meshsizefilename);
+    std::ifstream msf(meshsizefilename);
 
     // Philippose - 09/03/2009
     // Adding print message information in case the specified 
@@ -3081,14 +3080,14 @@ namespace netgen
     BitArrayChar<PointIndex::BASE> pused(GetNP());
 
     /*
-      (*testout) << "volels: " << endl;
+      std::cerr << "volels: " <<std::endl;
       for (i = 1; i <= volelements.Size(); i++)
       {
       for (j = 1; j <= volelements.Get(i).GetNP(); j++)
-      (*testout) << volelements.Get(i).PNum(j) << " ";
-      (*testout) << endl;
+      std::cerr << volelements.Get(i).PNum(j) << " ";
+      std::cerr <<std::endl;
       }
-      (*testout) << "np: " << GetNP() << endl;
+      std::cerr << "np: " << GetNP() <<std::endl;
     */
 
     for (int i = 0; i < volelements.Size(); i++)
@@ -3262,7 +3261,7 @@ namespace netgen
             {
               PrintError ("Edge ", i2.I1() , " - ", i2.I2(), " multiple times in surface mesh");
 
-              (*testout) << "Edge " << i2 << " multiple times in surface mesh" << endl;
+              std::cerr << "Edge " << i2 << " multiple times in surface mesh" << std::endl;
               i2s = i2;
               i2s.Sort();
               for (int k = 1; k <= nf; k++)
@@ -3275,7 +3274,7 @@ namespace netgen
                       edge.Sort();
 
                       if (edge == i2s) 
-                        (*testout) << "edge of element " << sel << endl;
+                        std::cerr << "edge of element " << sel << std::endl;
                     }
                 }
 
@@ -3352,7 +3351,7 @@ namespace netgen
                  (*this)[tri[0]].GetLayer() != (*this)[tri[2]].GetLayer())
               {
                 incons_layers = 1;
-                cout << "inconsistent layers in triangle" << endl;
+                std::cout << "inconsistent layers in triangle" << std::endl;
               }
 
 
@@ -3369,31 +3368,31 @@ namespace netgen
                 PrintWarning ("Intersecting elements " 
                               ,i, " and ", inters.Get(j));
 
-                (*testout) << "Intersecting: " << endl;
-                (*testout) << "openelement " << i << " with open element " << inters.Get(j) << endl;
+                std::cerr << "Intersecting: " << std::endl;
+                std::cerr << "openelement " << i << " with open element " << inters.Get(j) << std::endl;
 
-                cout << "el1 = " << tri << endl;
-                cout << "el2 = " << tri2 << endl;
-                cout << "layer1 = " <<  (*this)[tri[0]].GetLayer() << endl;
-                cout << "layer2 = " <<  (*this)[tri2[0]].GetLayer() << endl;
+                std::cout << "el1 = " << tri << std::endl;
+                std::cout << "el2 = " << tri2 << std::endl;
+                std::cout << "layer1 = " <<  (*this)[tri[0]].GetLayer() << std::endl;
+                std::cout << "layer2 = " <<  (*this)[tri2[0]].GetLayer() << std::endl;
 
 
                 for (k = 1; k <= 3; k++)
-                  (*testout) << tri.PNum(k) << "  ";
-                (*testout) << endl;
+                  std::cerr << tri.PNum(k) << "  ";
+                std::cerr << std::endl;
                 for (k = 1; k <= 3; k++)
-                  (*testout) << tri2.PNum(k) << "  ";
-                (*testout) << endl;
+                  std::cerr << tri2.PNum(k) << "  ";
+                std::cerr << std::endl;
 
                 for (k = 0; k <= 2; k++)
-                  (*testout) << *trip1[k] << "   ";
-                (*testout) << endl;
+                  std::cerr << *trip1[k] << "   ";
+                std::cerr << std::endl;
                 for (k = 0; k <= 2; k++)
-                  (*testout) << *trip2[k] << "   ";
-                (*testout) << endl;
+                  std::cerr << *trip2[k] << "   ";
+                std::cerr << std::endl;
 
-                (*testout) << "Face1 = " << GetFaceDescriptor(tri.GetIndex()) << endl;
-                (*testout) << "Face1 = " << GetFaceDescriptor(tri2.GetIndex()) << endl;
+                std::cerr << "Face1 = " << GetFaceDescriptor(tri.GetIndex()) << std::endl;
+                std::cerr << "Face1 = " << GetFaceDescriptor(tri2.GetIndex()) << std::endl;
 
                 /*
                   INDEX_3 i3(tri.PNum(1), tri.PNum(2), tri.PNum(3));
@@ -3463,7 +3462,7 @@ namespace netgen
 
         if (!segmentht)
           {
-            cerr << "no segmentht allocated" << endl;
+            std::cerr << "no segmentht allocated" << std::endl;
             return 0;
           }
 
@@ -3590,7 +3589,7 @@ namespace netgen
                 }
             if (alledges)
               {
-                // cout << "tet illegal due to unmarked node" << endl;
+                // std::cout << "tet illegal due to unmarked node" <<std::endl;
                 el.SetLegal (0);
                 return 0;
               }
@@ -3692,7 +3691,7 @@ namespace netgen
                       INDEX_2 i2(el.PNumMod(j), el.PNumMod(j+1));
                       if (edges.Used(i2))
                         foundrev = 1;
-                      swap (i2.I1(), i2.I2());
+                      std::swap(i2.I1(), i2.I2());
                       if (edges.Used(i2))
                         found = 1;
                     }
@@ -3700,7 +3699,7 @@ namespace netgen
                   if (found || foundrev)
                     {
                       if (foundrev)
-                        swap (el.PNum(2), el.PNum(3));
+                        std::swap(el.PNum(2), el.PNum(3));
 
                       changed = 1;
                       for (j = 1; j <= 3; j++)
@@ -3770,7 +3769,7 @@ namespace netgen
             if (minpi >= 4)
               {
                 for (int j = 1; j <= 3; j++)
-                  swap (el.PNum(j), el.PNum(j+3));
+                  std::swap(el.PNum(j), el.PNum(j+3));
                 minpi -= 3;
               }
 
@@ -3802,12 +3801,12 @@ namespace netgen
                 min2 (el.PNum(3), el.PNum(5)))
               {
                 min2pi = &ntets[0][0];
-                // (*testout) << "version 1 ";
+                // std::cerr << "version 1 ";
               }
             else
               {
                 min2pi = &ntets[1][0];
-                // (*testout) << "version 2 ";
+                // std::cerr << "version 2 ";
               }
 
 
@@ -3825,7 +3824,7 @@ namespace netgen
                     if (nel.PNum(k) == nel.PNum(l))
                       legal = 0;
 
-                // (*testout) << nel << " ";
+                // std::cerr << nel << " ";
                 if (legal)
                   {
                     if (firsttet)
@@ -3839,8 +3838,8 @@ namespace netgen
                       }
                   }
               }
-            if (firsttet) cout << "no legal";
-            (*testout) << endl;
+            if (firsttet) std::cout << "no legal";
+            std::cerr << std::endl;
           }
 
 
@@ -3866,7 +3865,7 @@ namespace netgen
             if (minpi >= 5)
               {
                 for (int j = 1; j <= 4; j++)
-                  swap (el.PNum(j), el.PNum(j+4));
+                  std::swap(el.PNum(j), el.PNum(j+4));
                 minpi -= 4;
               }
 
@@ -3953,7 +3952,7 @@ namespace netgen
           {
             // pyramid, to 2 tets
 
-            // cout << "pyramid: " << el << endl;
+            // std::cout << "pyramid: " << el <<std::endl;
 
             static const int ntets[2][8] =
               { { 1, 2, 3, 5, 1, 3, 4, 5 },
@@ -3974,7 +3973,7 @@ namespace netgen
                   nel[k] = el[min2pi[4*j + k]-1];
                 nel.SetIndex (el.GetIndex());
 
-                // cout << "pyramid-tet: " << nel << endl;
+                // std::cout << "pyramid-tet: " << nel <<std::endl;
 
                 bool legal = 1;
                 for (int k = 0; k < 3; k++)
@@ -3984,7 +3983,7 @@ namespace netgen
 
                 if (legal)
                   {
-                    (*testout) << nel << " ";
+                    std::cerr << nel << " ";
                     if (firsttet)
                       VolumeElement(i) = nel;
                     else
@@ -3993,8 +3992,8 @@ namespace netgen
                     firsttet = 0;
                   }
               }
-            if (firsttet) cout << "no legal";
-            (*testout) << endl;
+            if (firsttet) std::cout << "no legal";
+            std::cerr << std::endl;
           }
       }
 
@@ -4005,7 +4004,7 @@ namespace netgen
         Element2d el = SurfaceElement(i);
         if (el.GetNP() == 4)
           {
-            (*testout) << "split el: " << el << " to ";
+            std::cerr << "split el: " << el << " to ";
 
             static const int ntris[2][6] =
               { { 1, 2, 3, 1, 3, 4 },
@@ -4020,7 +4019,7 @@ namespace netgen
               min2pi = &ntris[1][0];
 
             for (int j = 0; j <6; j++)
-              (*testout) << min2pi[j] << " ";
+              std::cerr << min2pi[j] << " ";
 
 
             int firsttri = 1;
@@ -4039,7 +4038,7 @@ namespace netgen
 
                 if (legal)
                   {
-                    (*testout) << nel << " ";
+                    std::cerr << nel << " ";
                     if (firsttri)
                       {
                         SurfaceElement(i) = nel;
@@ -4051,7 +4050,7 @@ namespace netgen
                       }
                   }
               }
-            (*testout) << endl;
+            std::cerr << std::endl;
 
           }
       }
@@ -4074,7 +4073,7 @@ namespace netgen
             double vol = (Vec3d (p1, p2) * 
                           Cross (Vec3d (p1, p3), Vec3d(p1, p4)));
             if (vol > 0)
-              swap (el.PNum(3), el.PNum(4));
+              std::swap(el.PNum(3), el.PNum(4));
           }
 
 
@@ -4088,7 +4087,7 @@ namespace netgen
   {
     if (elementsearchtreets == GetTimeStamp()) return;
 
-#pragma omp critical (buildsearchtree)
+//#pragma omp critical (buildsearchtree)
     {
       if (elementsearchtreets != GetTimeStamp())
         {
@@ -4288,10 +4287,10 @@ namespace netgen
             // int retval = 
             SolveLinearSystem (col1, col2, col3, rhs, sol);
 
-            //(*testout) << "retval " << retval << endl;
+            //std::cerr << "retval " << retval <<std::endl;
 
-            //(*testout) << "col1 " << col1 << " col2 " << col2 << " col3 " << col3 << " rhs " << rhs << endl;
-            //(*testout) << "sol " << sol << endl;
+            //std::cerr << "col1 " << col1 << " col2 " << col2 << " col3 " << col3 << " rhs " << rhs <<std::endl;
+            //std::cerr << "sol " << sol <<std::endl;
 
             if (sol.X() >= -eps && sol.Y() >= -eps && 
                 sol.X() + sol.Y() <= 1+eps)
@@ -4320,8 +4319,8 @@ namespace netgen
                                          const int element) const
   {
     //bool oldresult = PointContainedIn3DElementOld(p,lami,element);
-    //(*testout) << "old result: " << oldresult
-    //       << " lam " << lami[0] << " " << lami[1] << " " << lami[2] << endl;
+    //std::cerr << "old result: " << oldresult
+    //       << " lam " << lami[0] << " " << lami[1] << " " << lami[2] <<std::endl;
 
     //if(!curvedelems->IsElementCurved(element-1))
     //  return PointContainedIn3DElementOld(p,lami,element);
@@ -4372,8 +4371,8 @@ namespace netgen
         delta = deltalam.Length2();
 
         i++;
-        //(*testout) << "pcie i " << i << " delta " << delta << " p " << p << " x " << x << " lam " << lam << endl;
-        //<< "Jac " << Jac << endl;
+        //std::cerr << "pcie i " << i << " delta " << delta << " p " << p << " x " << x << " lam " << lam <<std::endl;
+        //<< "Jac " << Jac <<std::endl;
       }
 
     if(i==maxits)
@@ -4614,7 +4613,7 @@ namespace netgen
             if(PointContainedIn3DElementOld(p,lami,ii)) 
               {
                 ps_startelement = ii;
-                (*testout) << "WARNING: found element of point " << p <<" only for uncurved mesh" << endl;
+                std::cerr << "WARNING: found element of point " << p <<" only for uncurved mesh" << std::endl;
                 return ii;
               }
           }
@@ -4660,18 +4659,18 @@ namespace netgen
         double vlam[3];
         int velement = GetElementOfPoint(p,vlam,NULL,build_searchtree,allowindex);
 
-        //(*testout) << "p " << p << endl;
-        //(*testout) << "velement " << velement << endl;
+        //std::cerr << "p " << p <<std::endl;
+        //std::cerr << "velement " << velement <<std::endl;
 
         Array<int> faces;
         topology->GetElementFaces(velement,faces);
 
-        //(*testout) << "faces " << faces << endl;
+        //std::cerr << "faces " << faces <<std::endl;
 
         for(int i=0; i<faces.Size(); i++)
           faces[i] = topology->GetFace2SurfaceElement(faces[i]);
 
-        //(*testout) << "surfel " << faces << endl;
+        //std::cerr << "surfel " << faces <<std::endl;
 
         for(int i=0; i<faces.Size(); i++)
           {
@@ -4688,8 +4687,8 @@ namespace netgen
               {
                 if(PointContainedIn2DElement(p,lami,faces[i],true))
                   {
-                    //(*testout) << "found point " << p << " in sel " << faces[i]
-                    //	       << ", lam " << lami[0] << ", " << lami[1] << ", " << lami[2] << endl;
+                    //std::cerr << "found point " << p << " in sel " << faces[i]
+                    //	       << ", lam " << lami[0] << ", " << lami[1] << ", " << lami[2] <<std::endl;
                     return faces[i];
                   }
               }
@@ -5003,22 +5002,6 @@ namespace netgen
 
   void Mesh :: GetSurfaceElementsOfFace (int facenr, Array<SurfaceElementIndex> & sei) const
   {
-    static int timer = NgProfiler::CreateTimer ("GetSurfaceElementsOfFace");
-    NgProfiler::RegionTimer reg (timer);
-
-
-     /*
-     sei.SetSize (0);
-     for (SurfaceElementIndex i = 0; i < GetNSE(); i++)
-     {
-        if ( (*this)[i].GetIndex () == facenr && (*this)[i][0] >= PointIndex::BASE &&
-           !(*this)[i].IsDeleted() )
-        {
-           sei.Append (i);
-        }
-     }
-     */
-
      /* Philippose - 01/10/2009
      Commented out the following lines, and activated the originally 
      commented out lines above because of a bug which causes corruption 
@@ -5039,16 +5022,6 @@ namespace netgen
 
         si = (*this)[si].next;
      }
-     
-     /*
-     // *testout << "with list = " << endl << sei << endl;
-
-     if (size1 != sei.Size()) 
-     {
-        cout << "size mismatch" << endl;
-        exit(1);
-     }
-     */
   }
 
 
@@ -5085,10 +5058,10 @@ namespace netgen
           {
             badel = 1;
             illegaltets++;
-            (*testout) << "illegal tet: " << i << " ";
+            std::cerr << "illegal tet: " << i << " ";
             for (j = 1; j <= el.GetNP(); j++)
-              (*testout) << el.PNum(j) << " ";
-            (*testout) << endl;
+              std::cerr << el.PNum(j) << " ";
+            std::cerr << std::endl;
           }
 
 
@@ -5200,10 +5173,10 @@ namespace netgen
 
           if (leg1 != leg2) 
           {
-          cerr << "legal differs!!" << endl;
-          (*testout) << "legal differs" << endl;
-          (*testout) << "elnr = " << i << ", el = " << el
-          << " leg1 = " << leg1 << ", leg2 = " << leg2 << endl;
+          std::cerr << "legal differs!!" <<std::endl;
+          std::cerr << "legal differs" <<std::endl;
+          std::cerr << "elnr = " << i << ", el = " << el
+          << " leg1 = " << leg1 << ", leg2 = " << leg2 <<std::endl;
           }
 
           //      el.flags.illegal = !LegalTet (el);
@@ -5464,7 +5437,7 @@ namespace netgen
     const TABLE<int> & conto)
     {
     int i, n2;
-    //  (*testout) << "connect " << node << " to " << tonode << endl;
+    //  std::cerr << "connect " << node << " to " << tonode <<std::endl;
     for (i = 1; i <= conto.EntrySize(node); i++)
     {
     n2 = conto.Get(node, i);
@@ -5541,18 +5514,18 @@ namespace netgen
     bcnames = 0;
   }
 
-  void Mesh ::SetBCName ( int bcnr, const string & abcname )
+  void Mesh ::SetBCName ( int bcnr, const std::string & abcname )
   {
     if ( bcnames[bcnr] ) delete bcnames[bcnr];
     if ( abcname != "default" )
-      bcnames[bcnr] = new string ( abcname );
+      bcnames[bcnr] = new std::string ( abcname );
     else
       bcnames[bcnr] = 0;
   }
 
-  const string & Mesh ::GetBCName ( int bcnr ) const
+  const std::string & Mesh ::GetBCName ( int bcnr ) const
   {
-    static string defaultstring = "default";
+    static std::string defaultstring = "default";
 
     if ( !bcnames.Size() )
       return defaultstring;
@@ -5615,31 +5588,31 @@ namespace netgen
 
 
 
-  void Mesh :: PrintMemInfo (ostream & ost) const
+  void Mesh :: PrintMemInfo (std::ostream & ost) const
   {
-    ost << "Mesh Mem:" << endl;
+    ost << "Mesh Mem:" << std::endl;
 
     ost << GetNP() << " Points, of size " 
         << sizeof (Point3d) << " + " << sizeof(POINTTYPE) << " = "
-        << GetNP() * (sizeof (Point3d) + sizeof(POINTTYPE)) << endl;
+        << GetNP() * (sizeof (Point3d) + sizeof(POINTTYPE)) << std::endl;
 
     ost << GetNSE() << " Surface elements, of size " 
         << sizeof (Element2d) << " = " 
-        << GetNSE() * sizeof(Element2d) << endl;
+        << GetNSE() * sizeof(Element2d) << std::endl;
 
     ost << GetNE() << " Volume elements, of size " 
         << sizeof (Element) << " = " 
-        << GetNE() * sizeof(Element) << endl;
+        << GetNE() * sizeof(Element) << std::endl;
 
     ost << "surfs on node:";
-    surfacesonnode.PrintMemInfo (cout);
+    surfacesonnode.PrintMemInfo (std::cout);
 
     ost << "boundaryedges: ";
     if (boundaryedges)
-      boundaryedges->PrintMemInfo (cout);
+      boundaryedges->PrintMemInfo (std::cout);
 
     ost << "surfelementht: ";
     if (surfelementht)
-      surfelementht->PrintMemInfo (cout);
+      surfelementht->PrintMemInfo (std::cout);
   }
 }

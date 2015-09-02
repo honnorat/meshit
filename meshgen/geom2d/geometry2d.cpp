@@ -4,8 +4,11 @@
 
 */
 
-#include <meshing.hpp>
-#include <geometry2d.hpp>
+#include <meshgen.hpp>
+#include "geometry2d.hpp"
+#include "../general/flags.hpp"
+#include "../general/ngexception.hpp"
+#include "../meshing/basegeom.hpp"
 
 namespace netgen
 {
@@ -24,7 +27,7 @@ namespace netgen
   void SplineGeometry2d :: Load (const char * filename)
   {
 
-    ifstream infile;
+    std::ifstream infile;
     Point<2> x;
     char buf[50];
 
@@ -32,9 +35,9 @@ namespace netgen
     infile.open (filename);
   
     if ( ! infile.good() )
-      throw NgException(string ("Input file '") + 
-			string (filename) +
-			string ("' not available!"));
+      throw NgException(std::string ("Input file '") + 
+			std::string (filename) +
+			std::string ("' not available!"));
 
     TestComment ( infile );
   
@@ -62,7 +65,7 @@ namespace netgen
 
 
   // herbert: fixed TestComment
-  void SplineGeometry2d :: TestComment ( ifstream & infile )
+  void SplineGeometry2d :: TestComment ( std::ifstream & infile )
   {
     bool comment = true;
     char ch;
@@ -90,7 +93,7 @@ namespace netgen
 
 
 
-  void SplineGeometry2d :: LoadData ( ifstream & infile )
+  void SplineGeometry2d :: LoadData ( std::ifstream & infile )
   {      
     enum { D = 2 };
 
@@ -158,7 +161,7 @@ namespace netgen
       
 	infile >> leftdom >> rightdom;
 
-	// cout << "add spline " << i << ", left = " << leftdom << ", right = " << rightdom << endl;
+	// std::cout << "add spline " << i << ", left = " << leftdom << ", right = " << rightdom <<std::endl;
       
 	infile >> buf;
 	// type of spline segement
@@ -231,7 +234,7 @@ namespace netgen
 	  {
 	    int mybc = spex->bc-1;
 	    delete bcnames[mybc];
-	    bcnames[mybc] = new string (flags.GetStringFlag("bcname","") );
+	    bcnames[mybc] = new std::string (flags.GetStringFlag("bcname","") );
 	  }
       }
   }
@@ -239,7 +242,7 @@ namespace netgen
 
 
 
-  void SplineGeometry2d :: LoadDataNew ( ifstream & infile )
+  void SplineGeometry2d :: LoadDataNew ( std::ifstream & infile )
   {
     enum { D = 2 };
     int nump, numseg, leftdom, rightdom;
@@ -263,7 +266,7 @@ namespace netgen
 	infile >> pointnr;
 	if ( pointnr > nump )
 	  {
-	    throw NgException(string ("Point number greater than total number of points") );
+	    throw NgException(std::string ("Point number greater than total number of points") );
 	  }
 	for(int j=0; j<D; j++)
 	  infile >> x(j);
@@ -329,7 +332,7 @@ namespace netgen
       
 	infile >> leftdom >> rightdom;
 
-	// cout << "add spline " << i << ", left = " << leftdom << endl;
+	// std::cout << "add spline " << i << ", left = " << leftdom <<std::endl;
 
 	infile >> buf;
 	// type of spline segement
@@ -417,7 +420,7 @@ namespace netgen
 	  {
 	    int mybc = spex->bc-1;
 	    if ( bcnames[mybc] ) delete bcnames[mybc];
-	    bcnames[mybc] = new string (flags.GetStringFlag("bcname","") );
+	    bcnames[mybc] = new std::string (flags.GetStringFlag("bcname","") );
 	  }
 
 	if ( hd != 1 )
@@ -474,7 +477,7 @@ namespace netgen
 
 
 
-  void SplineGeometry2d :: LoadDataV2 ( ifstream & infile )
+  void SplineGeometry2d :: LoadDataV2 ( std::ifstream & infile )
   { 
     enum { D = 2 };
     // new parser by Astrid Sinwel
@@ -487,7 +490,7 @@ namespace netgen
     char buf[50], ch;
     int pointnr;
 
-    string keyword;
+    std::string keyword;
 
     Array < GeomPoint<D> > infilepoints (0);
     Array <int> pointnrs (0);
@@ -671,7 +674,7 @@ namespace netgen
 		      for(int k=0; k<D; k++)
 			infile >> pts[j](k);	    		    
 		    if(order<2)		      
-			cerr<<"Minimum order of 2 is required!!"<<endl;
+			std::cerr<<"Minimum order of 2 is required!!"<<std::endl;
 		    else if(order==2)
 		      spline = new BSplineSeg<D,2> (pts);
 		      else if(order==3)
@@ -679,7 +682,7 @@ namespace netgen
 		      else if(order==4)
 			spline = new BSplineSeg<D,4> (pts);
 		      else if(order>4)		      
-			cerr<<"Maximum allowed order is 4!!"<<endl;
+			std::cerr<<"Maximum allowed order is 4!!"<<std::endl;
 		  }
 	      
 		//      infile >> spline->reffak;
@@ -737,9 +740,9 @@ namespace netgen
 		  {
 		    int mybc = spex->bc-1;
 		    for ( int ii = bcnames.Size(); ii <= mybc; ii++ )
-		      bcnames.Append ( new string ("default"));
+		      bcnames.Append ( new std::string ("default"));
 		    if ( bcnames[mybc] ) delete bcnames[mybc];
-		    bcnames[mybc] = new string (flags.GetStringFlag("bcname","") );
+		    bcnames[mybc] = new std::string (flags.GetStringFlag("bcname","") );
 		  }
 
 		TestComment(infile);
@@ -846,7 +849,7 @@ namespace netgen
 	double t = (i-0.5)*dt;
 	double fun = min3 (hcurve, t/elto0 + h1, (l-t)/elto0 + h2);
 	double curv = spline.CalcCurvature (t/l);
-	cout << "curv = " << curv << endl;
+	std::cout << "curv = " << curv <<std::endl;
 	if (curv < 1e-10) curv = 1e-10;
 	fun = min2 (fun, 0.1/curv);
 	sum += dt / fun;
@@ -888,7 +891,7 @@ namespace netgen
 
 
 
-  string SplineGeometry2d :: GetBCName( const int  bcnr ) const
+  std::string SplineGeometry2d :: GetBCName( const int  bcnr ) const
   {
     if ( bcnames.Size() >= bcnr)
       if (bcnames[bcnr-1] )
@@ -896,7 +899,7 @@ namespace netgen
     return "default";
   }
 
-  string * SplineGeometry2d :: BCNamePtr( const int bcnr ) 
+  std::string * SplineGeometry2d :: BCNamePtr( const int bcnr ) 
   {
     if ( bcnr > bcnames.Size() )
       return 0;
@@ -950,10 +953,10 @@ namespace netgen
   class SplineGeometryRegister : public GeometryRegister
   {
   public:
-    virtual NetgenGeometry * Load (string filename) const;
+    virtual NetgenGeometry * Load (std::string filename) const;
   };
 
-  NetgenGeometry *  SplineGeometryRegister :: Load (string filename) const
+  NetgenGeometry *  SplineGeometryRegister :: Load (std::string filename) const
   {
     const char * cfilename = filename.c_str();
     if (strcmp (&cfilename[strlen(cfilename)-4], "in2d") == 0)
@@ -961,7 +964,7 @@ namespace netgen
 	PrintMessage (1, "Load 2D-Spline geometry file ", cfilename);
 	
 
-	ifstream infile(cfilename);
+	std::ifstream infile(cfilename);
 
 	SplineGeometry2d * hgeom = new SplineGeometry2d();
 	hgeom -> Load (cfilename);

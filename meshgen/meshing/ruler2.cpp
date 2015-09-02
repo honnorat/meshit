@@ -1,5 +1,5 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "meshing2.hpp"
 
 namespace netgen
 {
@@ -30,15 +30,6 @@ namespace netgen
 	return 1e8;
       }
 
-    if (testmode)
-      {
-	(*testout) << "l = " << l12 << " + " << l13 << " + " << l23 << " = " 
-		   << cir << ", area = " << area << endl;
-	(*testout) << "shapeerr = " << 10 * (c * cir * cir / area - 1) << endl
-		   << "sizeerr = " << 1/l12 + l12 + 1/l13 + l13 + 1/l23 + l23 - 6
-		   << endl;
-      }
-
     return 10 * (c * cir * cir / area - 1)
       + 1/l12 + l12 + 1/l13 + l13 + 1/l23 + l23 - 6;
   }
@@ -54,11 +45,6 @@ namespace netgen
 			     Array<INDEX> & dellines, int tolerance,
 			     const MeshingParameters & mp)
   {
-    static int timer = NgProfiler::CreateTimer ("meshing2::ApplyRules");
-    NgProfiler::RegionTimer reg (timer);
-
-
-
     double maxerr = 0.5 + 0.3 * tolerance;
     double minelerr = 2 + 0.5 * tolerance * tolerance;
 
@@ -79,23 +65,6 @@ namespace netgen
 
     elements.SetSize (0);
     dellines.SetSize (0);
-
-    testmode = debugparam.debugoutput;
-
-#ifdef LOCDEBUG
-    int loctestmode = testmode;
-
-    if (loctestmode)
-      {
-	(*testout) << endl << endl << "Check new environment" << endl;
-	(*testout) << "tolerance = " << tolerance << endl;
-	for (int i = 1; i <= lpoints.Size(); i++)
-	  (*testout) << "P" << i << " = " << lpoints.Get(i) << endl;
-	(*testout) << endl;
-	for (int i = 1; i <= llines1.Size(); i++)
-	  (*testout) << "(" << llines1.Get(i).I1() << "-" << llines1.Get(i).I2() << ")" << endl;
-      }
-#endif
 
     // check every rule
 
@@ -201,10 +170,6 @@ namespace netgen
     pused = 0;
 
 
-    static int timer1 = NgProfiler::CreateTimer ("meshing2::ApplyRules 1");
-    NgProfiler::RegionTimer reg1 (timer1);
-
-
     for (int ri = 1; ri <= rules.Size(); ri++)
       {
 	// NgProfiler::RegionTimer reg(timers[ri-1]);
@@ -212,7 +177,7 @@ namespace netgen
 
 #ifdef LOCDEBUG
 	if (loctestmode)
-	  (*testout) << "Rule " << rule->Name() << endl;
+	  std::cerr << "Rule " << rule->Name() <<std::endl;
 #endif
 
 	if (rule->GetQuality() > tolerance) continue;
@@ -231,8 +196,6 @@ namespace netgen
 	    pmap.Elem(rule->GetLine(1)[j]) = llines[0][j];
 	    pused.Elem(llines[0][j])++;
 	  }
-
-
 
 	int nlok = 2;
 
@@ -269,7 +232,7 @@ namespace netgen
 			ok = 0;
 #ifdef LOCDEBUG
 			if(loctestmode)
-			  (*testout) << "not ok pos1" << endl;
+			  std::cerr << "not ok pos1" <<std::endl;
 #endif
 			continue;
 		      }
@@ -285,7 +248,7 @@ namespace netgen
 				ok = 0;
 #ifdef LOCDEBUG
 				if(loctestmode)
-				  (*testout) << "not ok pos2" << endl;
+				  std::cerr << "not ok pos2" <<std::endl;
 #endif
 				break;
 			      }
@@ -300,13 +263,13 @@ namespace netgen
 #ifdef LOCDEBUG
 				if(loctestmode)
 				  {
-				    (*testout) << "nok pos3" << endl;
+				    std::cerr << "nok pos3" <<std::endl;
 				    //if(rule->CalcPointDist (refpi, lpoints.Get(loclin[j])) > maxerr)
-				    //(*testout) << "r1" << endl;
+				    //std::cerr << "r1" <<std::endl;
 				    //if(!legalpoints.Get(loclin[j]))
-				    //(*testout) << "r2 legalpoints " << legalpoints << " loclin " << loclin << " j " << j << endl;
+				    //std::cerr << "r2 legalpoints " << legalpoints << " loclin " << loclin << " j " << j <<std::endl;
 				    //if(pused.Get(loclin[j]))
-				    //(*testout) << "r3" << endl;
+				    //std::cerr << "r3" <<std::endl;
 				  }
 #endif
 				break;
@@ -432,7 +395,7 @@ namespace netgen
 
 #ifdef LOCDEBUG
 			if (loctestmode)
-			  (*testout) << "lines and points mapped" << endl;
+			  std::cerr << "lines and points mapped" <<std::endl;
 #endif
 
 			ok = 1;
@@ -448,7 +411,7 @@ namespace netgen
 				ok = 0;
 #ifdef LOCDEBUG
 				if (loctestmode)
-				  (*testout) << "Orientation " << i << " not ok" << endl;
+				  std::cerr << "Orientation " << i << " not ok" <<std::endl;
 #endif
 				break;
 			      }
@@ -475,18 +438,18 @@ namespace netgen
 			    ok = 0;
 #ifdef LOCDEBUG
 			    if (loctestmode) 
-			      (*testout) << "freezone not convex" << endl;
+			      std::cerr << "freezone not convex" <<std::endl;
 #endif
 			    /*
 			      static int cnt = 0;
 			      cnt++;
 			      if (cnt % 100 == 0)
 			      {
-			      cout << "freezone not convex, cnt = " << cnt << "; rule = " << rule->Name() << endl;
-			      (*testout) << "freezone not convex, cnt = " << cnt << "; rule = " << rule->Name() << endl;
-			      (*testout) << "tol = " << tolerance << endl;
-			      (*testout) << "maxerr = " << maxerr << "; minerr = " << minelerr << endl;
-			      (*testout) << "freezone = " << rule->GetTransFreeZone() << endl;
+			      std::cout << "freezone not convex, cnt = " << cnt << "; rule = " << rule->Name() <<std::endl;
+			      std::cerr << "freezone not convex, cnt = " << cnt << "; rule = " << rule->Name() <<std::endl;
+			      std::cerr << "tol = " << tolerance <<std::endl;
+			      std::cerr << "maxerr = " << maxerr << "; minerr = " << minelerr <<std::endl;
+			      std::cerr << "freezone = " << rule->GetTransFreeZone() <<std::endl;
 			      }
 			    */
 			  }
@@ -501,7 +464,7 @@ namespace netgen
 				ok = 0;
 #ifdef LOCDEBUG
 				if (loctestmode)
-				  (*testout) << "Point " << i << " in freezone" << endl;
+				  std::cerr << "Point " << i << " in freezone" <<std::endl;
 #endif
 				break;
 			      }
@@ -515,7 +478,7 @@ namespace netgen
 				ok = 0;
 #ifdef LOCDEBUG
 				if (loctestmode)
-				  (*testout) << "Point " << i << " in freezone" << endl;
+				  std::cerr << "Point " << i << " in freezone" <<std::endl;
 #endif
 				break;
 			      }
@@ -532,8 +495,8 @@ namespace netgen
 				ok = 0;
 #ifdef LOCDEBUG
 				if (loctestmode)
-				  (*testout) << "line " << llines.Get(i).I1() << "-"
-					     << llines.Get(i).I2() << " in freezone" << endl;
+				  std::cerr << "line " << llines.Get(i).I1() << "-"
+					     << llines.Get(i).I2() << " in freezone" <<std::endl;
 #endif
 				break;
 			      }
@@ -549,8 +512,8 @@ namespace netgen
 				ok = 0;
 #ifdef LOCDEBUG
 				if (loctestmode)
-				  (*testout) << "line " << llines.Get(i).I1() << "-"
-					     << llines.Get(i).I2() << " in freezone" << endl;
+				  std::cerr << "line " << llines.Get(i).I1() << "-"
+					     << llines.Get(i).I2() << " in freezone" <<std::endl;
 #endif
 				break;
 			      }
@@ -568,7 +531,7 @@ namespace netgen
 			{
 			ok = 0;
 			if (loctestmode)
-			(*testout) << "Orientation " << i << " not ok" << endl;
+			std::cerr << "Orientation " << i << " not ok" <<std::endl;
 			}
 			}
 			*/
@@ -578,7 +541,7 @@ namespace netgen
 
 #ifdef LOCDEBUG
 			if (loctestmode)
-			  (*testout) << "rule ok" << endl;
+			  std::cerr << "rule ok" <<std::endl;
 #endif
 
 			// Setze neue Punkte:
@@ -636,14 +599,14 @@ namespace netgen
 			      hf = elements.Get(i).CalcJacobianBadness (lpoints) * 5;
 #ifdef LOCDEBUG
 			    if (loctestmode)
-			      (*testout) << "r " << rule->Name() << "bad = " << hf << endl;
+			      std::cerr << "r " << rule->Name() << "bad = " << hf <<std::endl;
 #endif
 			    if (hf > elerr) elerr = hf;
 			  }
 
 #ifdef LOCDEBUG
 			if (loctestmode)
-			  (*testout) << "error = " << elerr;
+			  std::cerr << "error = " << elerr;
 #endif
 
 			canuse.Elem(ri) ++;
@@ -653,18 +616,18 @@ namespace netgen
 #ifdef LOCDEBUG
 			    if (loctestmode)
 			      {
-				(*testout) << "rule = " << rule->Name() << endl;
-				(*testout) << "class = " << tolerance << endl;
-				(*testout) << "lpoints: " << endl;
+				std::cerr << "rule = " << rule->Name() <<std::endl;
+				std::cerr << "class = " << tolerance <<std::endl;
+				std::cerr << "lpoints: " <<std::endl;
 				for (int i = 1; i <= lpoints.Size(); i++)
-				  (*testout) << lpoints.Get(i) << endl;
-				(*testout) << "llines: " << endl;
+				  std::cerr << lpoints.Get(i) <<std::endl;
+				std::cerr << "llines: " <<std::endl;
 				for (int i = 1; i <= llines.Size(); i++)
-				  (*testout) << llines.Get(i).I1() << " " << llines.Get(i).I2() << endl;
+				  std::cerr << llines.Get(i).I1() << " " << llines.Get(i).I2() <<std::endl;
 
-				(*testout) << "Freezone: ";
+				std::cerr << "Freezone: ";
 				for (int i = 1; i <= rule -> GetTransFreeZone().Size(); i++)
-				  (*testout) << rule->GetTransFreeZone().Get(i) << endl;
+				  std::cerr << rule->GetTransFreeZone().Get(i) <<std::endl;
 			      }
 #endif
 

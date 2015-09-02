@@ -21,7 +21,7 @@ void WriteJCMFormat (const Mesh & mesh,
 {
   if (mesh.GetDimension() != 3)
   {
-    cout <<"\n Error: Dimension 3 only supported by this output format!"<<endl;
+    std::cout <<"\n Error: Dimension 3 only supported by this output format!"<std::endl;
     return;
   }
 
@@ -54,20 +54,20 @@ void WriteJCMFormat (const Mesh & mesh,
         {
           if (identmap1.Elem(el.PNum(j)) == el.PNum(jj))
           {
-            cout << "\n Error: two points on a tetrahedron identified (1) with each other"
-                 << "\n REFINE MESH !" << endl;
+            std::cout << "\n Error: two points on a tetrahedron identified (1) with each other"
+                 << "\n REFINE MESH !" <<std::endl;
             return;
           }
           if (identmap2.Elem(el.PNum(j)) == el.PNum(jj))
           {
-            cout << "\n Error: two points on a tetrahedron identified (2) with each other"
-                 << "\n REFINE MESH !" << endl;
+            std::cout << "\n Error: two points on a tetrahedron identified (2) with each other"
+                 << "\n REFINE MESH !" <<std::endl;
             return;
           }
           if (identmap3.Elem(el.PNum(j)) == el.PNum(jj))
           {
-            cout << "\n Error: two points on a tetrahedron identified (3) with each other"
-                 << "\n REFINE MESH !" << endl;
+            std::cout << "\n Error: two points on a tetrahedron identified (3) with each other"
+                 << "\n REFINE MESH !" <<std::endl;
             return;
           }
         }      
@@ -78,14 +78,14 @@ void WriteJCMFormat (const Mesh & mesh,
   }
   if ( ne != (ntets+nprisms))
   {
-    cout<< "\n Error in determining number of volume elements!\n"
-        << "\n Prisms and tetrahedra only implemented in the JCMwave format!\n"<<endl;
+    std::cout<< "\n Error in determining number of volume elements!\n"
+        << "\n Prisms and tetrahedra only implemented in the JCMwave format!\n"<std::endl;
     return;
   }
 
   if (nprisms > 0)
-    cout << " Please note: Boundaries at infinity have to carry the bc-attribute '-bc="
-         << bc_at_infinity <<"'."<<endl; 
+    std::cout << " Please note: Boundaries at infinity have to carry the bc-attribute '-bc="
+         << bc_at_infinity <<"'."<std::endl; 
 
   // number of surface elements
   int nse = mesh.GetNSE();
@@ -151,7 +151,7 @@ void WriteJCMFormat (const Mesh & mesh,
   }
 
   outfile << "# Points\n";
-  cout << " Please note: The unit of length in the .geo file is assumed to be 'microns'."<<endl; 
+  std::cout << " Please note: The unit of length in the .geo file is assumed to be 'microns'."<std::endl; 
   for (i = 1; i <= np; i++)
   {
     const Point<3> & p = mesh.Point(i);
@@ -196,7 +196,7 @@ void WriteJCMFormat (const Mesh & mesh,
   }
   if ( counter != ntets)
   {
-    cout<< "\n Error in determining number of tetras!\n"<<endl;
+    std::cout<< "\n Error in determining number of tetras!\n"<std::endl;
     return;
   }
 
@@ -256,7 +256,7 @@ void WriteJCMFormat (const Mesh & mesh,
       }
       else 
       {
-        cout << "\n Error in determining prism point numbering!\n"<<endl;
+        std::cout << "\n Error in determining prism point numbering!\n"<std::endl;
         return;
       }
       outfile << el.GetIndex() << "\n\n";
@@ -264,7 +264,7 @@ void WriteJCMFormat (const Mesh & mesh,
   }
   if ( counter != nprisms)
   {
-    cout<< "\n Error in determining number of prisms!\n"<<endl;
+    std::cout<< "\n Error in determining number of prisms!\n"<std::endl;
     return;
   }
 
@@ -358,7 +358,7 @@ void WriteJCMFormat (const Mesh & mesh,
                pointsOnTetras.Get(el.PNum(1)))
         ct = 3;
       else
-        cout << "\nWarning: Quadrilateral with inconsistent points found!"<<endl;
+        std::cout << "\nWarning: Quadrilateral with inconsistent points found!"<std::endl;
       
       for (j = 1; j <= 4; j++)
       {
@@ -371,7 +371,7 @@ void WriteJCMFormat (const Mesh & mesh,
       if (mesh.GetFaceDescriptor (el.GetIndex()).BCProperty() == bc_at_infinity)
       {
         outfile << "-2\n\n";
-        cout << "\nWarning: Quadrilateral at infinity found (this should not occur)!"<<endl;
+        std::cout << "\nWarning: Quadrilateral at infinity found (this should not occur)!"<std::endl;
       }
       else if ( identmap1.Elem(el.PNum(1)) &&
                 identmap1.Elem(el.PNum(2)) &&
@@ -423,7 +423,7 @@ void WriteJCMFormat (const Mesh & mesh,
     }
   }
 
-  cout << " JCMwave grid file written." << endl;
+  std::cout << " JCMwave grid file written." <<std::endl;
 }
 
 }

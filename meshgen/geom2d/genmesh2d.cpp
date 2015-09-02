@@ -1,5 +1,7 @@
-#include <meshing.hpp>
-#include <geometry2d.hpp>
+#include <meshgen.hpp>
+#include "geometry2d.hpp"
+#include "../general/netgenout.hpp"
+#include "../meshing/meshing2.hpp"
 
 namespace netgen
 {
@@ -34,12 +36,12 @@ namespace netgen
     for (int i = 0; i < n-1; i++)
       {
 	double hnext = hi[i] + gradh * (xi[i+1]-xi[i]).Length();
-	hi[i+1] = min(hi[i+1], hnext);
+	hi[i+1] = std::min(hi[i+1], hnext);
       } 
     for (int i = n-1; i > 1; i--)
       {
 	double hnext = hi[i] + gradh * (xi[i-1]-xi[i]).Length();
-	hi[i-1] = min(hi[i-1], hnext);
+	hi[i-1] = std::min(hi[i-1], hnext);
       }
 
     points.SetSize (0);
@@ -214,16 +216,16 @@ namespace netgen
 	const GeomPoint<2> & p1 = spline.StartPI();
 	const GeomPoint<2> & p2 = spline.EndPI();
 
-	double h1 = min (p1.hmax, h/p1.refatpoint);
+	double h1 = std::min (p1.hmax, h/p1.refatpoint);
 	mesh2d.RestrictLocalH (Point<3>(p1(0),p1(1),0), h1);
-	double h2 = min (p2.hmax, h/p2.refatpoint);
+	double h2 = std::min (p2.hmax, h/p2.refatpoint);
 	mesh2d.RestrictLocalH (Point<3>(p2(0),p2(1),0), h2);
 
 	double len = spline.Length();
 	mesh2d.RestrictLocalHLine (Point<3>(p1(0),p1(1),0), 
 				   Point<3>(p2(0),p2(1),0), len/mp.segmentsperedge);
 
-	double hcurve = min (spline.hmax, h/spline.reffak);
+	double hcurve = std::min (spline.hmax, h/spline.reffak);
 	double hl = GetDomainMaxh (spline.leftdom);
 	if (hl > 0) hcurve = min2 (hcurve, hl);
 	double hr = GetDomainMaxh (spline.rightdom);
@@ -276,7 +278,7 @@ namespace netgen
     double diam2 = Dist2(pmin, pmax);
 
     if (printmessage_importance>0)
-      cout << "copy edge, from = " << from << " to " << to << endl;
+      std::cout << "copy edge, from = " << from << " to " << to << std::endl;
   
     for (int i = 1; i <= mesh.GetNSeg(); i++)
       {

@@ -7,7 +7,10 @@
 /* Date:   01. Okt. 95                                                    */
 /**************************************************************************/
 
+#include "adfront2.hpp"
+#include "ruler2.hpp"
 
+namespace netgen {
 
 enum MESHING2_RESULT
 {
@@ -151,7 +154,7 @@ protected:
 
 
 
-
+}
 
 
 #endif

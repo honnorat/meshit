@@ -1,8 +1,7 @@
-#include <meshing.hpp>
-#include <geometry2d.hpp>
-#include <visual.hpp>
+#include <meshgen.hpp>
 
 #include "vsgeom2d.hpp"
+#include "../general/parthreads.hpp"
 
 namespace netgen
 {

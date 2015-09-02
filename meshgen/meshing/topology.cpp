@@ -1,5 +1,6 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "topology.hpp"
+#include "../general/ngexception.hpp"
 
 namespace netgen
 {
@@ -18,7 +19,7 @@ namespace netgen
       
 	if (i <= j)
 	  {
-	    Swap (data[i], data[j]);
+	    std::swap (data[i], data[j]);
 	    i++; j--;
 	  }
       }
@@ -59,14 +60,6 @@ namespace netgen
 
   void MeshTopology :: Update()
   {
-    static int timer = NgProfiler::CreateTimer ("topology");
-    NgProfiler::RegionTimer reg (timer);
-
-#ifdef PARALLEL
-    // ParallelMeshTopology & paralleltop = mesh.GetParallelTopology();
-#endif
-
-  
     if (timestamp > mesh.GetTimeStamp()) return;
   
     int ne = mesh.GetNE();
@@ -77,15 +70,12 @@ namespace netgen
     int nfa = 0;
     int ned = edge2vert.Size();
 
-    if (id == 0)
-      PrintMessage (3, "Update mesh topology");
-
-    (*testout) << " UPDATE MESH TOPOLOGY " << endl; 
-    (*testout) << "ne   = " << ne << endl;
-    (*testout) << "nse  = " << nse << endl;
-    (*testout) << "nseg = " << nseg << endl;
-    (*testout) << "np   = " << np << endl;
-    (*testout) << "nv   = " << nv << endl;
+    std::cerr << " UPDATE MESH TOPOLOGY " <<std::endl; 
+    std::cerr << "ne   = " << ne <<std::endl;
+    std::cerr << "nse  = " << nse <<std::endl;
+    std::cerr << "nseg = " << nseg <<std::endl;
+    std::cerr << "np   = " << np <<std::endl;
+    std::cerr << "nv   = " << nv <<std::endl;
   
     delete vert2element;
     delete vert2surfelement;
@@ -152,12 +142,6 @@ namespace netgen
 
     if (buildedges)
       {
-	static int timer1 = NgProfiler::CreateTimer ("topology::buildedges");
-	NgProfiler::RegionTimer reg1 (timer1);
-	
-	if (id == 0)
-	  PrintMessage (5, "Update edges ");
-      
 	edges.SetSize(ne);
 	surfedges.SetSize(nse); 
 	segedges.SetSize(nseg);
@@ -300,7 +284,7 @@ namespace netgen
 		    INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
 	      
 		    int edgedir = (edge.I1() > edge.I2());
-		    if (edgedir) swap (edge.I1(), edge.I2());
+		    if (edgedir) std::swap (edge.I1(), edge.I2());
 	     
 		    if (edge.I1() != i) continue;
                     
@@ -327,7 +311,7 @@ namespace netgen
 		    INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
 	      
 		    int edgedir = (edge.I1() > edge.I2());
-		    if (edgedir) swap (edge.I1(), edge.I2());
+		    if (edgedir) std::swap (edge.I1(), edge.I2());
 	     
 		    if (edge.I1() != i) continue;
 
@@ -348,7 +332,7 @@ namespace netgen
 		INDEX_2 edge(el[0], el[1]);
 	      
 		int edgedir = (edge.I1() > edge.I2());
-		if (edgedir) swap (edge.I1(), edge.I2());
+		if (edgedir) std::swap (edge.I1(), edge.I2());
 	      
 		if (edge.I1() != i) continue;
 
@@ -368,16 +352,6 @@ namespace netgen
     // generate faces
     if (buildfaces) 
       {
-	static int timer2 = NgProfiler::CreateTimer ("topology::buildfaces");
-	static int timer2a = NgProfiler::CreateTimer ("topology::buildfacesa");
-	static int timer2b = NgProfiler::CreateTimer ("topology::buildfacesb");
-	static int timer2c = NgProfiler::CreateTimer ("topology::buildfacesc");
-	NgProfiler::RegionTimer reg2 (timer2);
-
-	if (id == 0)
-	  PrintMessage (5, "Update faces ");
-
-        NgProfiler::StartTimer (timer2a);
 
 	faces.SetSize(ne);
 	surffaces.SetSize(nse);
@@ -401,338 +375,8 @@ namespace netgen
 	for (int i = PointIndex::BASE; i < nv+PointIndex::BASE; i++)
 	  {
 	    int onv = vert2oldface[i].Size() + (*vert2element)[i].Size() + (*vert2surfelement)[i].Size();
-	    max_face_on_vertex = max (onv, max_face_on_vertex);
+	    max_face_on_vertex = std::max (onv, max_face_on_vertex);
 	  }
-	
-
-
-
-
-        NgProfiler::StopTimer (timer2a);
-        NgProfiler::StartTimer (timer2b);
-
-        /*
-	for (int pass = 1; pass <= 2; pass++)
-	  {
-            cout << "pass = " << pass << endl;
-	    nfa = oldnfa;
-	    for (int v = PointIndex::BASE; v < nv+PointIndex::BASE; v++)
-	      {
-		int first_fa = nfa;
-
-		INDEX_3_CLOSED_HASHTABLE<int> vert2face(2*max_face_on_vertex+10); 
-		
-		for (int j = 0; j < vert2oldface[v].Size(); j++)
-		  {
-		    int fnr = vert2oldface[v][j];
-		    INDEX_3 face (face2vert[fnr].I1(),
-				  face2vert[fnr].I2(),
-				  face2vert[fnr].I3());
-		    vert2face.Set (face, fnr+1);
-		  }
-
-
-		if (pass == 2)
-                  {
-                    // *testout << "pass 2, nfa = " << nfa << "; face2vert.Size() = " << face2vert.Size() << endl;
-                    for (int j = nfa; j < face2vert.Size(); j++)
-                      {
-                        if (face2vert[j][0] == v)
-                          {
-                            INDEX_3 face (face2vert[j].I1(),
-                                          face2vert[j].I2(),
-                                          face2vert[j].I3());
-                            vert2face.Set (face, j+1);
-                            nfa++;
-                          }
-                        else
-                          break;
-                      }
-                  }
-
-		// cout << "inherited faces: " << endl << vert2face << endl;
-
-
-		for (int j = 0; j < (*vert2element)[v].Size(); j++)
-		  {
-                    // NgProfiler::RegionTimer reg3 (timer2d);
-
-		    ElementIndex elnr = (*vert2element)[v][j];
-		    const Element & el = mesh[elnr];
-	  
-		    int nelfaces = GetNFaces (el.GetType());
-		    const ELEMENT_FACE * elfaces = GetFaces0 (el.GetType());
-	  
-		    for (int j = 0; j < nelfaces; j++)
-		      if (elfaces[j][3] < 0)
-                        
-			{ // triangle
-			  int facenum, facedir;
-			  INDEX_3 face(el[elfaces[j][0]], el[elfaces[j][1]], 
-                                       el[elfaces[j][2]]);
-                          
-			  facedir = 0;
-			  if (face.I1() > face.I2())
-			    { swap (face.I1(), face.I2()); facedir += 1; }
-			  if (face.I2() > face.I3())
-			    { swap (face.I2(), face.I3()); facedir += 2; }
-			  if (face.I1() > face.I2())
-			    { swap (face.I1(), face.I2()); facedir += 4; }
-		      
-			  if (face.I1() != v) continue;
-                          
-			  if (vert2face.Used (face))
-			    facenum = vert2face.Get(face);
-			  else
-			    {
-                              if (pass == 2) cout << "hier in pass 2" << endl;
-			      nfa++;
-			      vert2face.Set (face, nfa);
-			      facenum = nfa;
-			  
-			      INDEX_4 hface(face.I1(),face.I2(),face.I3(),0);
-			      face2vert.Append (hface);
-			    }
-			  faces[elnr][j] = 8*(facenum-1)+facedir+1;
-			}
-                    
-		      else
-		    
-			{
-			  // quad
-			  int facenum, facedir;
-			  INDEX_4Q face4(el[elfaces[j][0]], el[elfaces[j][1]],
-					 el[elfaces[j][2]], el[elfaces[j][3]]);
-		      
-			  facedir = 0;
-			  if (min2 (face4.I1(), face4.I2()) > 
-			      min2 (face4.I4(), face4.I3())) 
-			    {  // z - flip
-			      facedir += 1; 
-			      swap (face4.I1(), face4.I4());
-			      swap (face4.I2(), face4.I3());
-			    }
-			  if (min2 (face4.I1(), face4.I4()) >
-			      min2 (face4.I2(), face4.I3())) 
-			    {  // x - flip
-			      facedir += 2; 
-			      swap (face4.I1(), face4.I2());
-			      swap (face4.I3(), face4.I4());
-			    }
-			  if (face4.I2() > face4.I4())
-			    {  // diagonal flip
-			      facedir += 4; 
-			      swap (face4.I2(), face4.I4());
-			    }
-
-		
-			  INDEX_3 face(face4.I1(), face4.I2(), face4.I3());
-
-			  if (face.I1() != v) continue;
-		      
-			  if (vert2face.Used (face))
-			    {
-			      facenum = vert2face.Get(face);
-			    }
-			  else
-			    {
-                              if (pass == 2) cout << "hier in pass 2" << endl;
-			      nfa++;
-			      vert2face.Set (face, nfa);
-			      facenum = nfa;
-			  
-			      INDEX_4 hface(face4.I1(),face4.I2(),face4.I3(),face4.I4());
-			      face2vert.Append (hface);
-			    }
-		      
-			  faces[elnr][j] = 8*(facenum-1)+facedir+1;
-			}
-		  }
-
-		for (int j = 0; j < (*vert2surfelement)[v].Size(); j++)
-		  {
-		    int elnr = (*vert2surfelement)[v][j];
-		    // cout << "surfelnr = " << elnr << endl;
-		    const Element2d & el = mesh.SurfaceElement (elnr);
-		
-		    const ELEMENT_FACE * elfaces = GetFaces1 (el.GetType());
-		
-		    if (elfaces[0][3] == 0)
-	    
-		      { // triangle
-	      
-			int facenum;
-			int facedir;
-		    
-			INDEX_3 face(el.PNum(elfaces[0][0]),
-				     el.PNum(elfaces[0][1]),
-				     el.PNum(elfaces[0][2]));
-		    
-			// cout << "face = " << face << endl;
-
-			facedir = 0;
-			if (face.I1() > face.I2())
-			  {
-			    swap (face.I1(), face.I2());
-			    facedir += 1;
-			  }
-			if (face.I2() > face.I3())
-			  {
-			    swap (face.I2(), face.I3());
-			    facedir += 2;
-			  }
-			if (face.I1() > face.I2())
-			  {
-			    swap (face.I1(), face.I2());
-			    facedir += 4;
-			  }
-		    
-			if (face.I1() != v) continue;
-		    
-			if (vert2face.Used (face))
-			  facenum = vert2face.Get(face);
-			else
-			  {
-			    nfa++;
-			    vert2face.Set (face, nfa);
-			    facenum = nfa;
-			
-			    INDEX_4 hface(face.I1(),face.I2(),face.I3(),0);
-			    face2vert.Append (hface);
-			  }
-
-			surffaces.Elem(elnr) = 8*(facenum-1)+facedir+1;
-		      }
-	  
-		    else
-	    
-		      {
-			// quad
-			int facenum;
-			int facedir;
-		    
-			INDEX_4Q face4(el.PNum(elfaces[0][0]),
-				       el.PNum(elfaces[0][1]),
-				       el.PNum(elfaces[0][2]),
-				       el.PNum(elfaces[0][3]));
-		    
-			facedir = 0;
-			if (min2 (face4.I1(), face4.I2()) > 
-			    min2 (face4.I4(), face4.I3())) 
-			  {  // z - orientation
-			    facedir += 1; 
-			    swap (face4.I1(), face4.I4());
-			    swap (face4.I2(), face4.I3());
-			  }
-			if (min2 (face4.I1(), face4.I4()) >
-			    min2 (face4.I2(), face4.I3())) 
-			  {  // x - orientation
-			    facedir += 2; 
-			    swap (face4.I1(), face4.I2());
-			    swap (face4.I3(), face4.I4());
-			  }
-			if (face4.I2() > face4.I4())
-			  { 
-			    facedir += 4; 
-			    swap (face4.I2(), face4.I4());
-			  }
-		    
-			INDEX_3 face(face4.I1(), face4.I2(), face4.I3());
-			if (face.I1() != v) continue;
-		    
-			if (vert2face.Used (face))
-			  facenum = vert2face.Get(face);
-			else
-			  {
-			    nfa++;
-			    vert2face.Set (face, nfa);
-			    facenum = nfa;
-			
-			    INDEX_4 hface(face4.I1(),face4.I2(),face4.I3(),face4.I3());
-			    face2vert.Append (hface);
-			  }
-		    
-			surffaces.Elem(elnr) = 8*(facenum-1)+facedir+1;
-		      }
-		  }
-
-		// sort faces
-		// *testout << "faces = " << face2vert << endl;
-		if (pass == 1)
-		  {
-                    // *testout << "pass1, sort from " << first_fa << " to " << nfa << endl;
-		    for (int i = first_fa; i < nfa; i++)
-		      for (int j = first_fa+1; j < nfa; j++)
-			if (face2vert[j] < face2vert[j-1])
-			  Swap (face2vert[j-1], face2vert[j]);
-		  }
-		// *testout << "faces, sorted = " << face2vert << endl;
-	      }
-
-
-	    face2vert.SetAllocSize (nfa);            
-	  }
-        */
-
-        /*
-          // timing tests
-	static int timer_touch = NgProfiler::CreateTimer ("topology::buildfaces - touch els");
-	static int timer_touch2 = NgProfiler::CreateTimer ("topology::buildfaces - touch els vert");
-
-        NgProfiler::StartTimer (timer_touch);
-
-        int sum = 0;
-        for (ElementIndex ei = 0; ei < mesh.GetNE(); ei++)
-          {		    
-            const Element & el = mesh[ei];
-            for (int j = 0; j < el.GetNP(); j++)
-              sum += el[j];
-          }
-
-        NgProfiler::StopTimer (timer_touch);
-
-        NgProfiler::StartTimer (timer_touch2);
-
-        for (int v = PointIndex::BASE; v < nv+PointIndex::BASE; v++)
-          {
-            INDEX_3_CLOSED_HASHTABLE<int> vert2face(2*max_face_on_vertex+10); 
-            
-            for (int pass = 1; pass <= 2; pass++)
-              for (int j = 0; j < (*vert2element)[v].Size(); j++)
-                {
-                  // NgProfiler::RegionTimer reg3 (timer2d);
-                  
-                  ElementIndex elnr = (*vert2element)[v][j];
-                  const Element & el = mesh[elnr];
-
-
-                  int nelfaces = GetNFaces (el.GetType());
-                  const ELEMENT_FACE * elfaces = GetFaces0 (TET);
-	  
-                  for (int j = 0; j < 4; j++)
-                    { // triangle
-                      INDEX_3 face(el[elfaces[j][0]], el[elfaces[j][1]], 
-                                   el[elfaces[j][2]]);
-                      
-                      int facedir = 0;
-                      if (face.I1() > face.I2())
-                        { swap (face.I1(), face.I2()); facedir += 1; }
-                      if (face.I2() > face.I3())
-                        { swap (face.I2(), face.I3()); facedir += 2; }
-                      if (face.I1() > face.I2())
-                        { swap (face.I1(), face.I2()); facedir += 4; }
-                      
-                      sum += face.I1();
-                      sum += face.I1() < face.I2();
-                    }
-                }
-          }
-        
-        NgProfiler::StopTimer (timer_touch2);
-        *testout << "sum" << sum << endl;
-        */
-
-
 
         nfa = oldnfa;
         for (int v = PointIndex::BASE; v < nv+PointIndex::BASE; v++)
@@ -791,11 +435,11 @@ namespace netgen
                           
 			  int facedir = 0;
 			  if (face.I1() > face.I2())
-			    { swap (face.I1(), face.I2()); facedir += 1; }
+			    { std::swap (face.I1(), face.I2()); facedir += 1; }
 			  if (face.I2() > face.I3())
-			    { swap (face.I2(), face.I3()); facedir += 2; }
+			    { std::swap (face.I2(), face.I3()); facedir += 2; }
 			  if (face.I1() > face.I2())
-			    { swap (face.I1(), face.I2()); facedir += 4; }
+			    { std::swap (face.I1(), face.I2()); facedir += 4; }
 		      
 			  if (face.I1() != v) continue;
 
@@ -831,20 +475,20 @@ namespace netgen
 			      min2 (face4.I4(), face4.I3())) 
 			    {  // z - flip
 			      facedir += 1; 
-			      swap (face4.I1(), face4.I4());
-			      swap (face4.I2(), face4.I3());
+			      std::swap (face4.I1(), face4.I4());
+			      std::swap (face4.I2(), face4.I3());
 			    }
 			  if (min2 (face4.I1(), face4.I4()) >
 			      min2 (face4.I2(), face4.I3())) 
 			    {  // x - flip
 			      facedir += 2; 
-			      swap (face4.I1(), face4.I2());
-			      swap (face4.I3(), face4.I4());
+			      std::swap (face4.I1(), face4.I2());
+			      std::swap (face4.I3(), face4.I4());
 			    }
 			  if (face4.I2() > face4.I4())
 			    {  // diagonal flip
 			      facedir += 4; 
-			      swap (face4.I2(), face4.I4());
+			      std::swap (face4.I2(), face4.I4());
 			    }
 
 		
@@ -858,7 +502,7 @@ namespace netgen
 			    }
 			  else
 			    {
-                              if (pass == 2) cout << "hier in pass 2" << endl;
+                              if (pass == 2) std::cout << "hier in pass 2" <<std::endl;
 			      nfa++;
 			      vert2face.Set (face, nfa);
 			      facenum = nfa;
@@ -876,7 +520,7 @@ namespace netgen
 		for (int j = 0; j < (*vert2surfelement)[v].Size(); j++)
 		  {
 		    int elnr = (*vert2surfelement)[v][j];
-		    // cout << "surfelnr = " << elnr << endl;
+		    // std::cout << "surfelnr = " << elnr <<std::endl;
 		    const Element2d & el = mesh.SurfaceElement (elnr);
 		
 		    const ELEMENT_FACE * elfaces = GetFaces1 (el.GetType());
@@ -892,22 +536,22 @@ namespace netgen
 				     el.PNum(elfaces[0][1]),
 				     el.PNum(elfaces[0][2]));
 		    
-			// cout << "face = " << face << endl;
+			// std::cout << "face = " << face <<std::endl;
 
 			facedir = 0;
 			if (face.I1() > face.I2())
 			  {
-			    swap (face.I1(), face.I2());
+			    std::swap (face.I1(), face.I2());
 			    facedir += 1;
 			  }
 			if (face.I2() > face.I3())
 			  {
-			    swap (face.I2(), face.I3());
+			    std::swap (face.I2(), face.I3());
 			    facedir += 2;
 			  }
 			if (face.I1() > face.I2())
 			  {
-			    swap (face.I1(), face.I2());
+			    std::swap (face.I1(), face.I2());
 			    facedir += 4;
 			  }
 		    
@@ -947,20 +591,20 @@ namespace netgen
 			    min2 (face4.I4(), face4.I3())) 
 			  {  // z - orientation
 			    facedir += 1; 
-			    swap (face4.I1(), face4.I4());
-			    swap (face4.I2(), face4.I3());
+			    std::swap (face4.I1(), face4.I4());
+			    std::swap (face4.I2(), face4.I3());
 			  }
 			if (min2 (face4.I1(), face4.I4()) >
 			    min2 (face4.I2(), face4.I3())) 
 			  {  // x - orientation
 			    facedir += 2; 
-			    swap (face4.I1(), face4.I2());
-			    swap (face4.I3(), face4.I4());
+			    std::swap (face4.I1(), face4.I2());
+			    std::swap (face4.I3(), face4.I4());
 			  }
 			if (face4.I2() > face4.I4())
 			  { 
 			    facedir += 4; 
-			    swap (face4.I2(), face4.I4());
+			    std::swap (face4.I2(), face4.I4());
 			  }
 		    
 			INDEX_3 face(face4.I1(), face4.I2(), face4.I3());
@@ -990,7 +634,7 @@ namespace netgen
                     for (int i = 0; i < nfa-first_fa; i++)
 		      for (int j = first_fa+1; j < nfa-i; j++)
 			if (face2vert[j] < face2vert[j-1])
-			  Swap (face2vert[j-1], face2vert[j]);
+			  std::swap (face2vert[j-1], face2vert[j]);
 		  }
 	      }
 	  }
@@ -998,36 +642,11 @@ namespace netgen
 
         face2vert.SetAllocSize (nfa);            
 
-
-
-
-
-	// *testout << "face2vert = " << endl << face2vert << endl;
-
-
-
-        NgProfiler::StopTimer (timer2b);
-        NgProfiler::StartTimer (timer2c);
-
-
-
-
 	
 	face2surfel.SetSize (nfa);
 	face2surfel = 0;
 	for (int i = 1; i <= nse; i++)
 	  face2surfel.Elem(GetSurfaceElementFace(i)) = i;
-
-	/*
-	  cout << "build table complete" << endl;
-
-	  cout << "faces = " << endl;
-
-	  cout << "face2vert = " << endl << face2vert << endl;
-	  cout << "surffaces = " << endl << surffaces << endl;
-	  cout << "face2surfel = " << endl << face2surfel << endl;
-	*/
-
 	
 	surf2volelement.SetSize (nse);
 	for (int i = 1; i <= nse; i++)
@@ -1055,7 +674,7 @@ namespace netgen
 
 
 #ifdef PARALLEL
-	// (*testout) << " RESET Paralleltop" << endl;
+	// std::cerr << " RESET Paralleltop" <<std::endl;
 	// paralleltop.Reset ();
 #endif
 
@@ -1079,9 +698,9 @@ namespace netgen
 	    for (int i = 0; i < nfa; i++)
 	      {
 		/*
-		  (*testout) << "face " << i << " has " << int(face_els[i]) << " els, " 
+		  std::cerr << "face " << i << " has " << int(face_els[i]) << " els, " 
 		  << int(face_surfels[i]) << " surfels, tot = "
-		  << face_els[i] + face_surfels[i] << endl; 
+		  << face_els[i] + face_surfels[i] <<std::endl; 
 		*/
 		if (face_els[i] + face_surfels[i] == 1)
 		  {
@@ -1095,13 +714,13 @@ namespace netgen
 		    else
 #endif
 		      {
-			(*testout) << "illegal face : " << i << endl;
-			(*testout) << "points = " << face2vert[i] << endl;
-			(*testout) << "pos = ";
+			std::cerr << "illegal face : " << i <<std::endl;
+			std::cerr << "points = " << face2vert[i] <<std::endl;
+			std::cerr << "pos = ";
 			for (int j = 0; j < 4; j++)
 			  if (face2vert[i].I(j+1) >= 1)
-			    (*testout) << mesh[(PointIndex)face2vert[i].I(j+1)] << " ";
-			(*testout) << endl;
+			    std::cerr << mesh[(PointIndex)face2vert[i].I(j+1)] << " ";
+			std::cerr <<std::endl;
 
 			FlatArray<ElementIndex> vertels = GetVertexElements (face2vert[i].I(1));
 			for (int k = 0; k < vertels.Size(); k++)
@@ -1111,13 +730,13 @@ namespace netgen
 			    for (int l = 0; l < nf; l++)
 			      if (elfaces[l] == i)
 				{
-				  // (*testout) << "is face of element " << vertels[k] << endl;
+				  // std::cerr << "is face of element " << vertels[k] <<std::endl;
 			    
 				  if (mesh.coarsemesh && mesh.hpelements->Size() == mesh.GetNE() )
 				    {
 				      const HPRefElement & hpref_el =
 					(*mesh.hpelements) [ mesh[vertels[k]].hp_elnr];
-				      (*testout) << "coarse eleme = " << hpref_el.coarse_elnr << endl;
+				      std::cerr << "coarse eleme = " << hpref_el.coarse_elnr <<std::endl;
 				    }
 
 				}
@@ -1125,47 +744,9 @@ namespace netgen
 		      }
 		  }
 	      }
-
-	    if (cnt_err && ntasks == 1)
-	      cout << cnt_err << " elements are not matching !!!" << endl;
 	  }
-        NgProfiler::StopTimer (timer2c);
       }
     
-
-#ifdef PARALLEL
-    if (id != 0)  
-      {
-	// if ( paralleltop.DoCoarseUpdate() )
-	// paralleltop.UpdateCoarseGrid();
-      }
-#endif
- 
- 
-  
-    /* 
-       for (i = 1; i <= ne; i++)
-       {
-       (*testout) << "Element " << i << endl;
-       (*testout) << "PNums " << endl; 
-       for( int l=1;l<=8;l++) *testout << mesh.VolumeElement(i).PNum(l) << "\t"; 
-       *testout << endl; 
-       (*testout) << "edges: " << endl;
-       for (j = 0; j < 9; j++)
-       (*testout) << edges.Elem(i)[j] << " ";
-       (*testout) << "faces: " << endl;
-       for (j = 0; j < 6; j++)m
-       (*testout) << faces.Elem(i)[j] << " ";
-       }
-
-       for (i = 1; i <= nse; i++)
-       {
-       (*testout) << "SElement " << i << endl;
-       (*testout) << "PNums " << endl; 
-       for( int l=1;l<=4;l++) *testout << mesh.SurfaceElement(i).PNum(l) << "\t"; 
-       *testout << endl; 
-       }
-    */
     timestamp = NextTimeStamp();
   }
 
@@ -1256,7 +837,7 @@ namespace netgen
       case HEX:
 	return hex_points;
       default:
-	cerr << "Ng_ME_GetVertices, illegal element type " << et << endl;
+	std::cerr << "Ng_ME_GetVertices, illegal element type " << et <<std::endl;
       }
     return 0;
   }
@@ -1291,7 +872,7 @@ namespace netgen
     
     else
       {
-        cerr << "GetElementFaces with orientation currently not supported" << endl;
+        std::cerr << "GetElementFaces with orientation currently not supported" <<std::endl;
         /*
           for (int i = 1; i <= nfa; i++)
           {
@@ -1526,11 +1107,10 @@ namespace netgen
 
   void MeshTopology :: GetEdgeVertices (int ednr, int & v1, int & v2) const
   {
-    // cout << "id = " << id << "getedgevertices, ednr = " << ednr << ", ned = " << edge2vert.Size() << "&v1 = " << &v1 << endl;
+    // std::cout << "id = " << id << "getedgevertices, ednr = " << ednr << ", ned = " << edge2vert.Size() << "&v1 = " << &v1 <<std::endl;
     if (ednr < 1 || ednr > edge2vert.Size())
-      cerr << "illegal edge nr: " << ednr << ", numedges = " << edge2vert.Size() 
-	   << " id = " << id 
-	   << endl;
+      std::cerr << "illegal edge nr: " << ednr << ", numedges = " << edge2vert.Size() 
+	   << std::endl;
     v1 = edge2vert.Get(ednr)[0];
     v2 = edge2vert.Get(ednr)[1];
   }
@@ -1559,7 +1139,7 @@ namespace netgen
     /*  ArrayMem<int,4> fp; 
 	fp[0] = pi[0]; 
 	for(int k=1;k<pi.Size();k++) 
-	if(fp[k]>fp[0]) swap(fp[k],fp[0]); 
+	if(fp[k]>fp[0]) std::swap(fp[k],fp[0]); 
   
 	fp[1] = fp[0]+ */ 
   
@@ -1634,8 +1214,8 @@ namespace netgen
 		  }
 	      }
 	  
-	    // *testout << " Face " << fnr << endl; 
-	    // *testout << " GetFaceEdges " << fedges << endl;
+	    // std::cerr << " Face " << fnr <<std::endl; 
+	    // std::cerr << " GetFaceEdges " << fedges <<std::endl;
 	  
 	    return;
 	  }

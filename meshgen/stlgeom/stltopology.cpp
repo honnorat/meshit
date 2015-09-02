@@ -1,12 +1,10 @@
-#include <mystdlib.h>
-
-#include <myadt.hpp>
-#include <linalg.hpp>
-#include <gprim.hpp>
-
-#include <meshing.hpp>
+#include <meshgen.hpp>
+#include "stltopology.hpp"
 
 #include "stlgeom.hpp"
+#include "../meshing/msghandler.hpp"
+#include "../meshing/global.hpp"
+
 
 namespace netgen
 {
@@ -27,7 +25,7 @@ STLTopology :: ~STLTopology()
 
 
 
-STLGeometry *  STLTopology :: LoadBinary (istream & ist)
+STLGeometry *  STLTopology :: LoadBinary (std::istream & ist)
 {
   STLGeometry * geom = new STLGeometry();
   Array<STLReadTriangle> readtrigs;
@@ -89,7 +87,7 @@ STLGeometry *  STLTopology :: LoadBinary (istream & ist)
 
 void STLTopology :: SaveBinary (const char* filename, const char* aname) const
 {
-  ofstream ost(filename);
+  std::ofstream ost(filename);
   PrintFnStart("Write STL binary file '",filename,"'");
 
   if (sizeof(int) != 4 || sizeof(float) != 4) 
@@ -148,17 +146,17 @@ void STLTopology :: SaveBinary (const char* filename, const char* aname) const
 
 void STLTopology :: SaveSTLE (const char* filename) const
 {
-  ofstream outf (filename);
+  std::ofstream outf (filename);
   int i, j;
   
-  outf << GetNT() << endl;
+  outf << GetNT() <<std::endl;
   for (i = 1; i <= GetNT(); i++)
     {
       const STLTriangle & t = GetTriangle(i);
       for (j = 1; j <= 3; j++)
 	{
 	  const Point3d p = GetPoint(t.PNum(j));
-	  outf << p.X() << " " << p.Y() << " " << p.Z() << endl;
+	  outf << p.X() << " " << p.Y() << " " << p.Z() <<std::endl;
 	}
     }
 
@@ -170,7 +168,7 @@ void STLTopology :: SaveSTLE (const char* filename) const
 	ned++;
     }
   
-  outf << ned << endl;
+  outf << ned <<std::endl;
 
   for (i = 1; i <= GetNTE(); i++)
     {
@@ -179,14 +177,14 @@ void STLTopology :: SaveSTLE (const char* filename) const
 	for (j = 1; j <= 2; j++)
 	  {
 	    const Point3d p = GetPoint(edge.PNum(j));
-	    outf << p.X() << " " << p.Y() << " " << p.Z() << endl;
+	    outf << p.X() << " " << p.Y() << " " << p.Z() <<std::endl;
 	  }
     }      
 }
 
 
 
-STLGeometry *  STLTopology :: LoadNaomi (istream & ist)
+STLGeometry *  STLTopology :: LoadNaomi (std::istream & ist)
 {
   int i;
   STLGeometry * geom = new STLGeometry();
@@ -267,7 +265,7 @@ void STLTopology :: Save (const char* filename) const
 { 
   PrintFnStart("Write stl-file '",filename, "'");
 
-  ofstream fout(filename);
+  std::ofstream fout(filename);
   fout << "solid\n";
 
   char buf1[50];
@@ -307,9 +305,9 @@ void STLTopology :: Save (const char* filename) const
 
   
   // write also NETGEN surface mesh:
-  ofstream fout2("geom.surf");
-  fout2 << "surfacemesh" << endl;
-  fout2 << GetNP() << endl;
+  std::ofstream fout2("geom.surf");
+  fout2 << "surfacemesh" <<std::endl;
+  fout2 << GetNP() <<std::endl;
   for (i = 1; i <= GetNP(); i++)
     {
       for (j = 0; j < 3; j++)
@@ -318,10 +316,10 @@ void STLTopology :: Save (const char* filename) const
 	  fout2 << GetPoint(i)(j);
 	}
 
-      fout2 << endl;
+      fout2 <<std::endl;
     }
 
-  fout2 << GetNT() << endl;
+  fout2 << GetNT() <<std::endl;
   for (i = 1; i <= GetNT(); i++)
     {
       const STLTriangle & t = GetTriangle(i);  
@@ -330,12 +328,12 @@ void STLTopology :: Save (const char* filename) const
 	  fout2.width(8);
 	  fout2 << t.PNum(j);
 	}
-      fout2 << endl;
+      fout2 <<std::endl;
     }
 }
 
 
-STLGeometry *  STLTopology ::Load (istream & ist)
+STLGeometry *  STLTopology ::Load (std::istream & ist)
 {
   STLGeometry * geom = new STLGeometry();
 
@@ -411,10 +409,10 @@ STLGeometry *  STLTopology ::Load (istream & ist)
 		}
               else
                 {
-                  cout << "Skipping flat triangle " 
+                  std::cout << "Skipping flat triangle " 
                        << "l1 = " << Dist(pts[0], pts[1])
                        << ", l2 = " << Dist(pts[0], pts[2])
-                       << ", l3 = " << Dist(pts[2], pts[1]) << endl;
+                       << ", l3 = " << Dist(pts[2], pts[1]) <<std::endl;
                 }
 
 	    }
@@ -503,9 +501,9 @@ void STLTopology :: InitSTLGeometry(const Array<STLReadTriangle> & readtrigs)
 	      pointtree->Insert (p, foundpos);
 	    }
           if (Dist(p, points.Get(foundpos)) > 1e-10)
-            cout << "identify close points: " << p << " " << points.Get(foundpos) 
+            std::cout << "identify close points: " << p << " " << points.Get(foundpos) 
                  << ", dist = " << Dist(p, points.Get(foundpos))
-                 << endl;
+                 <<std::endl;
 	  st[k] = foundpos;
 	}
 
@@ -678,7 +676,7 @@ void STLTopology :: FindNeighbourTrigs()
     {
       if (trigsperpoint.EntrySize(i) < 3)
 	{
-	  (*testout) << "ERROR: Point " << i << " has " << trigsperpoint.EntrySize(i) << " triangles!!!" << endl;
+	  std::cerr << "ERROR: Point " << i << " has " << trigsperpoint.EntrySize(i) << " triangles!!!" <<std::endl;
 	}
     }
   */
@@ -798,7 +796,7 @@ void STLTopology :: FindNeighbourTrigs()
 		    {
 		      if (GetTriangle(i).IsWrongNeighbourFrom(GetTriangle(tr)))
 			{
-			  /*(*testout) << "ERROR: triangle " << i << " has a wrong neighbour triangle!!!" << endl;*/
+			  /*std::cerr << "ERROR: triangle " << i << " has a wrong neighbour triangle!!!" <<std::endl;*/
 			  wrongneighbourfound ++;
 			}
 		      
@@ -830,7 +828,7 @@ void STLTopology :: FindNeighbourTrigs()
 
 	  multithread.terminate = 1;
 #ifdef STAT_STREAM
-	  (*statout) << "non-conform stl geometry \\hline" << endl;
+	  (*statout) << "non-conform stl geometry \\hline" <<std::endl;
 #endif
 	}
     }

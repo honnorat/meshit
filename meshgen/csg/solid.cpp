@@ -46,7 +46,7 @@ namespace netgen
 
   Solid :: ~Solid ()
   {
-    // cout << "delete solid, op = " << int(op) << endl;
+    // std::cout << "delete solid, op = " << int(op) <<std::endl;
     delete [] name;
 
     switch (op)
@@ -66,7 +66,7 @@ namespace netgen
 	}
       case TERM:
 	{
-	  // cout << "has term" << endl;
+	  // std::cout << "has term" <<std::endl;
 	  delete prim;
 	  break;
 	}
@@ -452,14 +452,14 @@ namespace netgen
 	  }
       }
     *str = 0;
-    //  cout << "Read string (" << hstr << ")" 
-    //       << "put back: " << ch << endl;
+    //  std::cout << "Read string (" << hstr << ")" 
+    //       << "put back: " << ch <<std::endl;
   }
 
 
   Solid * CreateSolidExpr (istream & ist, const SYMBOLTABLE<Solid*> & solids)
   {
-    //  cout << "create expr" << endl;
+    //  std::cout << "create expr" <<std::endl;
 
     Solid *s1, *s2;
     char str[100];
@@ -468,12 +468,12 @@ namespace netgen
     ReadString (ist, str);
     if (strcmp (str, "OR") == 0)
       {
-	//      cout << " OR ";
+	//      std::cout << " OR ";
 	s2 = CreateSolidExpr (ist, solids);
 	return new Solid (Solid::UNION, s1, s2);
       }
 
-    //  cout << "no OR found, put back string: " << str << endl;
+    //  std::cout << "no OR found, put back string: " << str <<std::endl;
     for (int i = int(strlen(str))-1; i >= 0; i--)
       ist.putback (str[i]);
 
@@ -482,7 +482,7 @@ namespace netgen
 
   Solid * CreateSolidTerm (istream & ist, const SYMBOLTABLE<Solid*> & solids)
   {
-    //  cout << "create term" << endl;
+    //  std::cout << "create term" <<std::endl;
 
     Solid *s1, *s2;
     char str[100];
@@ -491,13 +491,13 @@ namespace netgen
     ReadString (ist, str);
     if (strcmp (str, "AND") == 0)
       {
-	//      cout << " AND ";
+	//      std::cout << " AND ";
 	s2 = CreateSolidTerm (ist, solids);
 	return new Solid (Solid::SECTION, s1, s2);
       }
 
 
-    //  cout << "no AND found, put back string: " << str << endl;
+    //  std::cout << "no AND found, put back string: " << str <<std::endl;
     for (int i = int(strlen(str))-1; i >= 0; i--)
       ist.putback (str[i]);
 
@@ -515,7 +515,7 @@ namespace netgen
       {
 	s1 = CreateSolidExpr (ist, solids);
 	ist >> ch;  // ')'
-	//      cout << "close back " << ch << endl;
+	//      std::cout << "close back " << ch <<std::endl;
 	return s1;
       }
     ist.putback (ch);
@@ -523,19 +523,19 @@ namespace netgen
     ReadString (ist, str);
     if (strcmp (str, "NOT") == 0)
       {
-	//      cout << " NOT ";
+	//      std::cout << " NOT ";
 	s1 = CreateSolidPrim (ist, solids);
 	return new Solid (Solid::SUB, s1);
       }
 
-    (*testout) << "get terminal " << str << endl;
+    std::cerr << "get terminal " << str <<std::endl;
     s1 = solids.Get(str);
     if (s1)
       {
-	//      cout << "primitive: " << str << endl;
+	//      std::cout << "primitive: " << str <<std::endl;
 	return s1;
       }
-    cerr << "syntax error" << endl;
+    std::cerr << "syntax error" <<std::endl;
 
     return NULL;
   }
@@ -545,9 +545,9 @@ namespace netgen
   {
     Solid * nsol =  CreateSolidExpr (ist, solids);
     nsol = new Solid (ROOT, nsol);
-    (*testout) << "Print new sol: ";
-    nsol -> Print (*testout);
-    (*testout) << endl;
+    std::cerr << "Print new sol: ";
+    nsol -> Print std::cerr;
+    std::cerr <<std::endl;
     return nsol;
   }
 
@@ -969,7 +969,7 @@ namespace netgen
     int in, strin;
     surfids.SetSize (0);
 
-    // *testout << "tangentialedgesolid,sol = " << (*this) << endl;
+    // std::cerr << "tangentialedgesolid,sol = " << (*this) <<std::endl;
     RecTangentialEdgeSolid (p, t, t2, m, tansol, surfids, in, strin, eps);
 
     if (tansol)
@@ -990,16 +990,16 @@ namespace netgen
 	  INSOLID_TYPE ist = prim->PointInSolid(p, eps);
 
 	  /*
-	  (*testout) << "tangedgesolid, p = " << p << ", t = " << t 
+	  std::cerr << "tangedgesolid, p = " << p << ", t = " << t 
 		     << " for prim " << typeid (*prim).name() 
-		     << " with surf " << prim->GetSurface() << endl;
-	  (*testout) << "ist = " << ist << endl;
+		     << " with surf " << prim->GetSurface() <<std::endl;
+	  std::cerr << "ist = " << ist <<std::endl;
 	  */
 
 	  if (ist == DOES_INTERSECT)
 	    ist = prim->VecInSolid4 (p, t, t2, m, eps);
 
-	  // (*testout) << "ist2 = " << ist << endl;
+	  // std::cerr << "ist2 = " << ist <<std::endl;
 
 	  in = (ist == IS_INSIDE || ist == DOES_INTERSECT);
 	  strin = (ist == IS_INSIDE);
@@ -1334,9 +1334,9 @@ namespace netgen
 
     /*
     if (redsol)
-      (*testout) << "getrecsolid, redsol = " << endl << (*redsol) << endl;
+      std::cerr << "getrecsolid, redsol = " <<std::endl << (*redsol) <<std::endl;
     else
-      (*testout) << "redsol is null" << endl;
+      std::cerr << "redsol is null" <<std::endl;
     */
 
     return redsol;
@@ -1547,14 +1547,14 @@ namespace netgen
 		      /*
 		      else
 			{
-			  *testout << "QUAD NOT OK" << endl;
-			  *testout << "v = " << v << ", v2 = " << v2 << endl;
-			  *testout << "v * grad = " << v*grad << endl;
-			  *testout << "v2 * grad = " << v2*grad << endl;
-			  *testout << "v H v = " << v*(hesse*v) << endl;
-			  *testout << "grad = " << grad << endl;
-			  *testout << "hesse = " << hesse << endl;
-			  *testout << "hv2 = " << v2 * grad + v * (hesse * v) << endl;
+			  std::cerr << "QUAD NOT OK" <<std::endl;
+			  std::cerr << "v = " << v << ", v2 = " << v2 <<std::endl;
+			  std::cerr << "v * grad = " << v*grad <<std::endl;
+			  std::cerr << "v2 * grad = " << v2*grad <<std::endl;
+			  std::cerr << "v H v = " << v*(hesse*v) <<std::endl;
+			  std::cerr << "grad = " << grad <<std::endl;
+			  std::cerr << "hesse = " << hesse <<std::endl;
+			  std::cerr << "hv2 = " << v2 * grad + v * (hesse * v) <<std::endl;
 			}
 		      */
 		    }
@@ -1589,7 +1589,7 @@ namespace netgen
       {
       case TERM: case TERM_REF:
 	{
-	  // *testout << "check vecinsolid4, p = " << p << ", v = " << v << "; m = " << m << endl;
+	  // std::cerr << "check vecinsolid4, p = " << p << ", v = " << v << "; m = " << m <<std::endl;
 	  if (prim->VecInSolid4 (p, v, v2, m, eps) == DOES_INTERSECT)
 	    {
 	      prim->GetTangentialVecSurfaceIndices2 (p, v, m, surfind, eps);
@@ -1600,12 +1600,12 @@ namespace netgen
 		    {
 		      Vec<3> grad;
 		      prim->GetSurface(j).CalcGradient (p, grad);
-		      *testout << "grad = " << grad << endl;
+		      std::cerr << "grad = " << grad <<std::endl;
 		      if (sqr (grad * v) < 1e-6 * v.Length2() * grad.Length2()  && 
 			  sqr (grad * m) < 1e-6 * m.Length2() * grad.Length2() )   // new, 18032006 JS
 			  
 			{
-			  *testout << "add surf " << prim->GetSurfaceId(j) << endl;
+			  std::cerr << "add surf " << prim->GetSurfaceId(j) <<std::endl;
 			  if (!surfind.Contains (prim->GetSurfaceId(j)))
 			    surfind.Append (prim->GetSurfaceId(j));
 			}

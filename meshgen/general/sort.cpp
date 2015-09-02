@@ -10,8 +10,8 @@
 
 
 #include <algorithm>
-#include <mystdlib.h>
-#include <myadt.hpp>
+#include <meshgen.hpp>
+#include "sort.hpp"
 
 namespace netgen
 {
@@ -30,7 +30,7 @@ namespace netgen
       for (j = 1; j <= n-1; j++)
 	if (values.Get(order.Elem(j)) > values.Get(order.Elem(j+1)))
 	  {
-	    Swap (order.Elem(j), order.Elem(j+1));
+	    std::swap (order.Elem(j), order.Elem(j+1));
 	  }
   }
 
@@ -53,7 +53,7 @@ namespace netgen
       
 	if (i <= j)
 	  {
-	    Swap (order.Elem(i), order.Elem(j));
+	    std::swap (order.Elem(i), order.Elem(j));
 	    i++; j--;
 	  }
       }

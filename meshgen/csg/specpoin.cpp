@@ -60,7 +60,7 @@ namespace netgen
 	<< " s1/s2 = " << s1 << "/" << s2;
     str << " layer = " << layer
 	<< " unconditional = " << unconditional
-	<< endl;
+	<<std::endl;
   }
 
 
@@ -83,8 +83,8 @@ namespace netgen
     points = &apoints;
 
     size = geometry->MaxSize();
-    (*testout) << "Find Special Points" << endl;
-    (*testout) << "maxsize = " << size << endl;
+    std::cerr << "Find Special Points" <<std::endl;
+    std::cerr << "maxsize = " << size <<std::endl;
 
     cpeps1 = 1e-6; 
     epeps1 = 1e-3; 
@@ -107,15 +107,15 @@ namespace netgen
       {
 	const TopLevelObject * tlo = geometry->GetTopLevelObject(i);
 
-	(*testout) << "tlo " << i << ":" << endl
-		   << *tlo->GetSolid() << endl;
+	std::cerr << "tlo " << i << ":" <<std::endl
+		   << *tlo->GetSolid() <<std::endl;
 
 	if (tlo->GetSolid())
 	  {
 	    Array<Point<3> > hpts;
 	    tlo->GetSolid()->CalcOnePrimitiveSpecialPoints (box, hpts);
             // if (hpts.Size())
-            //  cout << "oneprimitivespecialpoints = " << hpts << endl;
+            //  std::cout << "oneprimitivespecialpoints = " << hpts <<std::endl;
 	    for (int j = 0; j < hpts.Size(); j++)
 	      AddPoint (hpts[j], tlo->GetLayer());
 	  }
@@ -145,8 +145,8 @@ namespace netgen
 		AddPoint (auxpoint,1);
 
 #ifdef DEVELOP
-		(*testout) << "added identpoint " << auxpoint << "; proj. of "
-			   <<  (*points)[j] << endl;
+		std::cerr << "added identpoint " << auxpoint << "; proj. of "
+			   <<  (*points)[j] <<std::endl;
 #endif
 		break;
 	      }
@@ -162,9 +162,9 @@ namespace netgen
     PrintMessage (3, "Found points ", apoints.Size());
 
     for (int i = 0; i < boxesinlevel.Size(); i++)
-      (*testout) << "level " << i << " has " 
-		 << boxesinlevel[i] << " boxes" << endl;
-    (*testout) << "numprim_histogramm = " << endl << numprim_hist << endl;
+      std::cerr << "level " << i << " has " 
+		 << boxesinlevel[i] << " boxes" <<std::endl;
+    std::cerr << "numprim_histogramm = " <<std::endl << numprim_hist <<std::endl;
   }
   
 
@@ -177,15 +177,15 @@ namespace netgen
     // boxes.Append (box);
 
 #ifdef DEVELOP
-    *testout << "lev " << level << ", box = " << box << endl;
-    *testout << "calccp = " << calccp << ", calcep = " << calcep << endl;
-    *testout << "locsol = " << *sol << endl;
+    std::cerr << "lev " << level << ", box = " << box <<std::endl;
+    std::cerr << "calccp = " << calccp << ", calcep = " << calcep <<std::endl;
+    std::cerr << "locsol = " << *sol <<std::endl;
 #endif
 
     if (multithread.terminate)
       {
-	*testout << "boxes = " << boxes << endl;
-	*testout << "boxesinlevel = " << boxesinlevel << endl;
+	std::cerr << "boxes = " << boxes <<std::endl;
+	std::cerr << "boxesinlevel = " << boxesinlevel <<std::endl;
 	throw NgException ("Meshing stopped");
       }
 
@@ -223,7 +223,7 @@ namespace netgen
     int numprim = locsurf.Size();
 
 #ifdef DEVELOP
-    (*testout) << "numprim = " << numprim << endl;
+    std::cerr << "numprim = " << numprim <<std::endl;
 #endif
 
     numprim_hist[numprim]++;
@@ -261,7 +261,7 @@ namespace netgen
 	*/
 
 #ifdef DEVELOP
-	(*testout) << "nquad " << nquad << " nplane " << nplane << endl;
+	std::cerr << "nquad " << nquad << " nplane " << nplane <<std::endl;
 #endif
 
 	if (nquad == numprim && nplane >= numprim-1)
@@ -305,7 +305,7 @@ namespace netgen
 			    // if (sol -> IsIn (pts[j], 1e-6*size) && !sol->IsStrictIn (pts[j], 1e-6*size))
 			      {
 				if (AddPoint (pts[j], layer))
-				  (*testout) << "cross point found, 1: " << pts[j] << endl;
+				  std::cerr << "cross point found, 1: " << pts[j] <<std::endl;
 			      }  
 			    delete tansol;
 			  }
@@ -321,7 +321,7 @@ namespace netgen
 			ComputeCrossPoints (dynamic_cast<const Plane*> (geometry->GetSurface(locsurf[k1])),
 					    dynamic_cast<const Plane*> (geometry->GetSurface(locsurf[k2])),
 					    qsurf, pts);
-			//(*testout) << "checking pot. crosspoints: " << pts << endl;
+			//std::cerr << "checking pot. crosspoints: " << pts <<std::endl;
 
 			for (int j = 0; j < pts.Size(); j++)
 			  if (Dist (pts[j], box.Center()) < box.Diam()/2)
@@ -349,7 +349,7 @@ namespace netgen
 				//if (sol -> IsIn (pts[j], 1e-6*size) && !sol->IsStrictIn (pts[j], 1e-6*size) )
 				{
 				  if (AddPoint (pts[j], layer))
-				    (*testout) << "cross point found, 2: " << pts[j] << endl;
+				    std::cerr << "cross point found, 2: " << pts[j] <<std::endl;
 				}  
 			      delete tansol;
 			    }
@@ -371,7 +371,7 @@ namespace netgen
 			      // sol -> IsIn (pts[j], 1e-6*size) && !sol->IsStrictIn (pts[j], 1e-6*size) )
 			      {
 				if (AddPoint (pts[j], layer))
-				  (*testout) << "extremal point found, 1: " << pts[j] << endl;
+				  std::cerr << "extremal point found, 1: " << pts[j] <<std::endl;
 			      }  
 			    delete tansol;
 			  }
@@ -425,7 +425,7 @@ namespace netgen
 			    // if (sol -> IsIn (pts[j], 1e-6*size) && !sol->IsStrictIn (pts[j], 1e-6*size))
 			    {
 			      if (AddPoint (pts[j], layer))
-				(*testout) << "cross point found, 1: " << pts[j] << endl;
+				std::cerr << "cross point found, 1: " << pts[j] <<std::endl;
 			    }  
 			  delete tansol;
 			}
@@ -448,7 +448,7 @@ namespace netgen
 			  // sol -> IsIn (pts[j], 1e-6*size) && !sol->IsStrictIn (pts[j], 1e-6*size) )
 			  {
 			    if (AddPoint (pts[j], layer))
-			      (*testout) << "extremal point found, spheres: " << pts[j] << endl;
+			      std::cerr << "extremal point found, spheres: " << pts[j] <<std::endl;
 			  }  
 			delete tansol;
 		      }
@@ -484,7 +484,7 @@ namespace netgen
 		   geometry->GetSurface(locsurf.Get(k3)), box );
 	      
 #ifdef DEVELOP
-		(*testout) << "k1,2,3 = " << k1 << "," << k2 << "," << k3 << ", nc = " << nc << ", deg = " << deg << endl;
+		std::cerr << "k1,2,3 = " << k1 << "," << k2 << "," << k3 << ", nc = " << nc << ", deg = " << deg <<std::endl;
 #endif
 
 
@@ -493,7 +493,7 @@ namespace netgen
 	      }
 
 #ifdef DEVELOP
-        (*testout) << "dec = " << decision << ", surcp = " << surecrossp << endl;
+        std::cerr << "dec = " << decision << ", surcp = " << surecrossp <<std::endl;
 #endif
 
 	if (decision && surecrossp)
@@ -549,12 +549,12 @@ namespace netgen
 			    if (found1 && found2 && found3)
 			      if (AddPoint (pp, layer))
 				{
-				  (*testout) << "Crosspoint found: " << pp 
+				  std::cerr << "Crosspoint found: " << pp 
 					     << " diam = " << box.Diam()
 					     << ",  surfs: " 
 					     << locsurf.Get(k1) << "," 
 					     << locsurf.Get(k2) << "," 
-					     << locsurf.Get(k3) << endl;
+					     << locsurf.Get(k3) <<std::endl;
 				}
 			  }
 		      }
@@ -568,17 +568,17 @@ namespace netgen
 
     possibleexp = (numprim >= 2) && calcep;
 
-    // (*testout) << "l = " << level << "locsize = " << locsurf.Size() << " possexp = " << possibleexp << "\n";
+    // std::cerr << "l = " << level << "locsize = " << locsurf.Size() << " possexp = " << possibleexp << "\n";
     if (possibleexp && (numprim <= check_crosspoint || level >= 50))
       {
 	decision = 1;
 	sureexp = 0;
 
 	/*
-	(*testout) << "extremal surfs = ";
+	std::cerr << "extremal surfs = ";
 	for (int k5 = 0; k5 < locsurf.Size(); k5++)
-	  (*testout) << typeid(*geometry->GetSurface(locsurf[k5])).name() << " ";
-	(*testout) << "\n";
+	  std::cerr << typeid(*geometry->GetSurface(locsurf[k5])).name() << " ";
+	std::cerr << "\n";
 	*/
 
 	for (int k1 = 0; k1 < locsurf.Size() - 1; k1++)
@@ -587,7 +587,7 @@ namespace netgen
 	      const Surface * surf1 = geometry->GetSurface(locsurf[k1]);
 	      const Surface * surf2 = geometry->GetSurface(locsurf[k2]);
 	      /*
-	      (*testout) << "edgecheck, types = " << typeid(*surf1).name() << ", " << typeid(*surf2).name()
+	      std::cerr << "edgecheck, types = " << typeid(*surf1).name() << ", " << typeid(*surf2).name()
 			 << "edge-newton-conv = " << EdgeNewtonConvergence (surf1, surf2, p)
 			 << "edge-deg = " << EdgeDegenerated (surf1, surf2, box)
 			 << "\n";
@@ -602,7 +602,7 @@ namespace netgen
 		}
 	    }
 
-	// (*testout) << "l = " << level << " dec/sureexp = " << decision << sureexp << endl;
+	// std::cerr << "l = " << level << " dec/sureexp = " << decision << sureexp <<std::endl;
 
 	if (decision && sureexp)
 	  {
@@ -619,13 +619,13 @@ namespace netgen
 		      Point<3> pp;
 		      if (IsEdgeExtremalPoint (surf1, surf2, p, pp, box.Diam()/2))
 			{
-			  (*testout) << "extremalpoint (nearly) found:" << pp << endl;
+			  std::cerr << "extremalpoint (nearly) found:" << pp <<std::endl;
 
 			  if (Dist (pp, box.Center()) < box.Diam()/2 &&
 			      sol -> IsIn (pp, 1e-6*size) && !sol->IsStrictIn (pp, 1e-6*size) )
 			    {
 			      if (AddPoint (pp, layer))
-				(*testout) << "Extremal point found: " << pp << endl;//"(eps="<<1e-9*size<<")"<< endl;
+				std::cerr << "Extremal point found: " << pp <<std::endl;//"(eps="<<1e-9*size<<")"<<std::endl;
 			    }  
 			}            
 		    }
@@ -636,7 +636,7 @@ namespace netgen
       }
  
 
-    // (*testout) << "l = " << level << " poss cp/ep sure exp = " << possiblecrossp << " " << possibleexp << " " << sureexp << "\n";
+    // std::cerr << "l = " << level << " poss cp/ep sure exp = " << possiblecrossp << " " << possibleexp << " " << sureexp << "\n";
     if (possiblecrossp || possibleexp)
       {
 	BoxSphere<3> sbox;
@@ -714,10 +714,10 @@ namespace netgen
 
 
 #ifdef DEVELOP
-        *testout << "check Newton: " << "beta = " << beta << ", gamma = " << gamma << ", eta = " << eta << endl;
+        std::cerr << "check Newton: " << "beta = " << beta << ", gamma = " << gamma << ", eta = " << eta <<std::endl;
         double rad = 1.0 / (beta * gamma);
-        *testout << "rad = " << rad << endl;
-	*testout << "rs = " << rs << endl;
+        std::cerr << "rad = " << rad <<std::endl;
+	std::cerr << "rs = " << rs <<std::endl;
 #endif
         
 	return (beta * gamma * eta < 0.1) && (2 > box.Diam()*beta*gamma);
@@ -794,7 +794,7 @@ namespace netgen
 	if (sol.Length2() < 1e-24 && i > 1) i = 1;
 
 #ifdef DEVELOP
-        *testout << "CrossPointNewton, err = " << sol.Length2() << endl;
+        std::cerr << "CrossPointNewton, err = " << sol.Length2() <<std::endl;
 #endif
 	p -= sol;
       }
@@ -920,7 +920,7 @@ namespace netgen
 	f1->CalcGradient (p, g1);
 	f2->CalcGradient (p, g2);
 
-	//(*testout) << "p " << p << " f1 " << vrs(0) << " f2 " << vrs(1) << " g1 " << g1 << " g2 " << g2 << endl;
+	//std::cerr << "p " << p << " f1 " << vrs(0) << " f2 " << vrs(1) << " g1 " << g1 << " g2 " << g2 <<std::endl;
 
 	for (int j = 0; j < 3; j++)
 	  {
@@ -1063,9 +1063,9 @@ namespace netgen
 	jacobi(2,2) = y(2);
 
 	/*
-	(*testout) << "p " << p << " f1 " << rs(0) << " f2 " << rs(1) << endl
-		   << " jacobi " << jacobi << endl
-		   << " rhs " << rs << endl;
+	std::cerr << "p " << p << " f1 " << rs(0) << " f2 " << rs(1) <<std::endl
+		   << " jacobi " << jacobi <<std::endl
+		   << " rhs " << rs <<std::endl;
 	*/	
 
 	jacobi.Solve (rs, x);
@@ -1112,10 +1112,10 @@ namespace netgen
 
     if (Abs2 (x) > 1e-20)
       {
-	(*testout) << "Error: extremum Newton not convergent" << endl;
-	(*testout) << "dir = " << dir << endl;
-	(*testout) << "p = " << p << endl;
-	(*testout) << "x = " << x << endl;
+	std::cerr << "Error: extremum Newton not convergent" <<std::endl;
+	std::cerr << "dir = " << dir <<std::endl;
+	std::cerr << "p = " << p <<std::endl;
+	std::cerr << "x = " << x <<std::endl;
       }
   }
 
@@ -1389,8 +1389,8 @@ namespace netgen
 		    pts.Append (Point<3> (sol+alpha1*t));
 		    pts.Append (Point<3> (sol+alpha2*t));
 		    /*
-		    cout << "sol1 = " << sol + alpha1 * t
-			 << ", sol2 = " << sol + alpha2 * t << endl;
+		    std::cout << "sol1 = " << sol + alpha1 * t
+			 << ", sol2 = " << sol + alpha2 * t <<std::endl;
 		    */
 		  }
 	      }
@@ -1422,10 +1422,10 @@ namespace netgen
     double r2 = sphere2 -> Radius();
 
     /*
-    *testout << "\n\ncompute extremalpoint, sphere-sphere" << endl;
-    *testout << "c1 = " << c1 << ", r1 = " << r1 << endl;
-    *testout << "c2 = " << c2 << ", r2 = " << r2 << endl;
-    *testout << "dist = " << Abs (c2-c1) << ", r1+r2 = " << r1+r2 << endl;
+    std::cerr << "\n\ncompute extremalpoint, sphere-sphere" <<std::endl;
+    std::cerr << "c1 = " << c1 << ", r1 = " << r1 <<std::endl;
+    std::cerr << "c2 = " << c2 << ", r2 = " << r2 <<std::endl;
+    std::cerr << "dist = " << Abs (c2-c1) << ", r1+r2 = " << r1+r2 <<std::endl;
     */
 
     Vec<3> v12 = c2 - c1;
@@ -1443,7 +1443,7 @@ namespace netgen
       if (fabs (v12(j)) > v12(dir))
 	dir = j;
     
-    // *testout << "dir = " << dir << endl;
+    // std::cerr << "dir = " << dir <<std::endl;
 
     Vec<3> ei = 0.0;
     ei(dir) = 1;
@@ -1479,8 +1479,8 @@ namespace netgen
     rhs(1) = b2;
 
 
-    // *testout << "mat = " << endl << mat << endl;
-    // *testout << "rhs = " << endl << rhs << endl;
+    // std::cerr << "mat = " <<std::endl << mat <<std::endl;
+    // std::cerr << "rhs = " <<std::endl << rhs <<std::endl;
 
     Vec<3> t = Cross (a1, a2);
     if (Abs2(t) > 0)
@@ -1488,12 +1488,12 @@ namespace netgen
 	mat.Solve (rhs, sol);
 	
 	/*
-	*testout << "sol = " << endl << sol << endl;
+	std::cerr << "sol = " <<std::endl << sol <<std::endl;
 
-	*testout << "a * sol = " << mat * sol << endl;
+	std::cerr << "a * sol = " << mat * sol <<std::endl;
 
-	*testout << "c1-sol = " << Abs (Vec<3>(c1)-sol) << endl;
-	*testout << "c2-sol = " << Abs (Vec<3>(c2)-sol) << endl;
+	std::cerr << "c1-sol = " << Abs (Vec<3>(c1)-sol) <<std::endl;
+	std::cerr << "c2-sol = " << Abs (Vec<3>(c2)-sol) <<std::endl;
 	*/
 
 	// solve quadratic equation along line  sol + alpha t ....
@@ -1515,11 +1515,11 @@ namespace netgen
 		pts.Append (Point<3> (sol+alpha1*t));
 		pts.Append (Point<3> (sol+alpha2*t));
 
-		// *testout << "pts = " << endl << pts << endl;
+		// std::cerr << "pts = " <<std::endl << pts <<std::endl;
 
 		/*
-		  cout << "sol1 = " << sol + alpha1 * t
-		  << ", sol2 = " << sol + alpha2 * t << endl;
+		  std::cout << "sol1 = " << sol + alpha1 * t
+		  << ", sol2 = " << sol + alpha2 * t <<std::endl;
 		*/
 	      }
 	  }
@@ -1561,9 +1561,9 @@ namespace netgen
     v = Cross (g1, g2);
     f3 = fabs (v(dir-1));
 
-    //  (*testout) << "f3 = " << f3 << "  r = " << r 
+    //  std::cerr << "f3 = " << f3 << "  r = " << r 
     //             << "normbound = " 
-    //             << (hn1 * (gn2 + r * hn2) + hn2 * (gn1 + r * hn1)) << endl;
+    //             << (hn1 * (gn2 + r * hn2) + hn2 * (gn1 + r * hn1)) <<std::endl;
  
     return (f3 <= 3 * r * (hn1 * (gn2 + r * hn2) + hn2 * (gn1 + r * hn1)));
     }
@@ -1623,14 +1623,14 @@ namespace netgen
 
     a.Solve (rs, x);
 
-    //  (*testout) << "g1 = " << g1 << " g2 = " << g2 << endl;
-    //  (*testout) << "lam = " << x << endl;
-    //  (*testout) << "h2 = " << h2 << endl;
+    //  std::cerr << "g1 = " << g1 << " g2 = " << g2 <<std::endl;
+    //  std::cerr << "lam = " << x <<std::endl;
+    //  std::cerr << "h2 = " << h2 <<std::endl;
 
     leftside = fabs (x(0) * ( t * (h1 * t)) + 
     x(1) * ( t * (h2 * t)));
 
-    //  (*testout) << "leftside = " << leftside << endl;
+    //  std::cerr << "leftside = " << leftside <<std::endl;
 
     if (leftside < epeps2 * Abs2 (v)) return 1;  
 
@@ -1678,7 +1678,7 @@ namespace netgen
 
     double geomsize = ageometry.MaxSize();
  
-    (*testout) << "AnalyzeSpecialPoints\n";
+    std::cerr << "AnalyzeSpecialPoints\n";
 
     if (!apoints.Size()) return;
 
@@ -1707,7 +1707,7 @@ namespace netgen
       bbox.Add (apoints[i]);
     bbox.Increase (0.1 * bbox.Diam());
 
-    (*testout) << "points = " << apoints << endl;
+    std::cerr << "points = " << apoints <<std::endl;
 
     Point3dTree searchtree (bbox.PMin(), bbox.PMax());
     Array<int> locsearch;
@@ -1725,7 +1725,7 @@ namespace netgen
 	    Point<3> p = apoints[i];
 	    
 #ifdef DEVELOP
-	    *testout << "                               test point " << p << endl;
+	    std::cerr << "                               test point " << p <<std::endl;
 #endif	    
 
 	    if (tlo->GetLayer() != apoints[i].GetLayer())
@@ -1751,8 +1751,8 @@ namespace netgen
 	    
 
 #ifdef DEVELOP
-	    *testout << "surfs = " << surfind << endl;
-	    *testout << "rep_surfs = " << rep_surfind << endl;
+	    std::cerr << "surfs = " << surfind <<std::endl;
+	    std::cerr << "rep_surfs = " << rep_surfind <<std::endl;
 #endif
 
 	    if (!locsol) continue;
@@ -1815,7 +1815,7 @@ namespace netgen
 		    continue;
 
 #ifdef DEVELOP
-		  *testout << "           tangential vector " << t << endl;
+		  std::cerr << "           tangential vector " << t <<std::endl;
 #endif
 
 		  t.Normalize();
@@ -1827,7 +1827,7 @@ namespace netgen
 
 		
 #ifdef DEVELOP
-		  *testout << "           j " << j << " k " << k << endl;
+		  std::cerr << "           j " << j << " k " << k <<std::endl;
 #endif  
 
 		  if (!surf)
@@ -1873,12 +1873,12 @@ namespace netgen
 			rep_surfind2[j2] = ageometry.GetSurfaceClassRepresentant (surfind2[j2]);
 
 #ifdef DEVELOP
-		      (*testout) << "surfind2 = " << endl << surfind2 << endl;
+		      std::cerr << "surfind2 = " <<std::endl << surfind2 <<std::endl;
 #endif
 		      Array<int> surfind2_aux(surfind2);
 		      ageometry.GetIndependentSurfaceIndices (surfind2_aux);
 #ifdef DEVELOP
-		      (*testout) << "surfind2,rep = " << endl << surfind2_aux << endl;
+		      std::cerr << "surfind2,rep = " <<std::endl << surfind2_aux <<std::endl;
 #endif
 
 		      bool ok = true;
@@ -1894,7 +1894,7 @@ namespace netgen
 			ok = false;
 
 #ifdef DEVELOP
-		      (*testout) << "ok,1 = " << ok << endl;
+		      std::cerr << "ok,1 = " << ok <<std::endl;
 #endif
 
 		      // there must be 2 different tangential faces to the edge
@@ -1935,7 +1935,7 @@ namespace netgen
 			}
 
 #ifdef DEVELOP
-		      (*testout) << "cnt_tang = " << cnt_tang_faces << endl;
+		      std::cerr << "cnt_tang = " << cnt_tang_faces <<std::endl;
 #endif
 
 		      if (cnt_tang_faces < 1)
@@ -1952,13 +1952,13 @@ namespace netgen
 		    !locsol->VectorStrictIn (p, t);
 		  
 #ifdef DEVELOP
-		  (*testout) << "isedge,1 = " << isedge << "\n";
+		  std::cerr << "isedge,1 = " << isedge << "\n";
 #endif		
   
 		  // there must exist at least two different faces on edge
 		  if (isedge)
 		    {
-		      // *testout << "succ 1" << endl;
+		      // std::cerr << "succ 1" <<std::endl;
 		      int cnts = 0;
 		      for (int m = 0; m < surfind.Size(); m++)
 			{
@@ -1996,7 +1996,7 @@ namespace netgen
 		  if (isedge)
 		    {
 #ifdef DEVELOP
-		      *testout << "success" << endl;
+		      std::cerr << "success" <<std::endl;
 #endif
 		      int spi = -1;
 		      
@@ -2074,8 +2074,8 @@ namespace netgen
 	if(same.Size() < 3)
 	  for(int j=0; j<same.Size(); j++)
 	    {
-	      (*testout) << "setting " << specpoints[same[j]].p << "; " << specpoints[same[j]].v << "; " 
-			 <<specpoints[same[j]].unconditional << " to conditional" << endl;
+	      std::cerr << "setting " << specpoints[same[j]].p << "; " << specpoints[same[j]].v << "; " 
+			 <<specpoints[same[j]].unconditional << " to conditional" <<std::endl;
 	      specpoints[same[j]].unconditional=0;
 	    }
       }

@@ -1,8 +1,15 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+//#include <mystdlib.h>
+//#include "meshing.hpp"
 
 #define noDEBUG
 
+#include <meshgen.hpp>
+#include <sstream>
+#include "bisect.hpp"
+#include "../general/netgenout.hpp"
+#include "../general/ngexception.hpp"
+#include "../gprim/geomfuncs.hpp"
+#include "validate.hpp"
 
 namespace netgen
 {
@@ -50,7 +57,7 @@ namespace netgen
     }
   };
 
-  ostream & operator<< (ostream & ost, const MarkedTet & mt)
+  std::ostream & operator<< (std::ostream & ost, const MarkedTet & mt)
   {
     for(int i=0; i<4; i++)
       ost << mt.pnums[i] << " ";
@@ -65,7 +72,7 @@ namespace netgen
     ost << mt.incorder << " " << int(mt.order) << "\n";
     return ost;
   }
-  istream & operator>> (istream & ost, MarkedTet & mt)
+  std::istream & operator>> (std::istream & ost, MarkedTet & mt)
   {
     for(int i=0; i<4; i++)
       ost >> mt.pnums[i];
@@ -113,7 +120,7 @@ namespace netgen
   };
 
   
-  ostream & operator<< (ostream & ost, const MarkedPrism & mp)
+  std::ostream & operator<< (std::ostream & ost, const MarkedPrism & mp)
   {
     for(int i=0; i<6; i++)
       ost << mp.pnums[i] << " ";
@@ -121,7 +128,7 @@ namespace netgen
     ost << mp.matindex << " " << mp.marked << " " << mp.markededge << " " << mp.incorder << " " << int(mp.order) << "\n";
     return ost;
   }
-  istream & operator>> (istream & ist, MarkedPrism & mp)
+  std::istream & operator>> (std::istream & ist, MarkedPrism & mp)
   {
     for(int i=0; i<6; i++)
       ist >> mp.pnums[i];
@@ -151,7 +158,7 @@ namespace netgen
   };
     
   
-  ostream & operator<< (ostream & ost, const MarkedIdentification & mi)
+  std::ostream & operator<< (std::ostream & ost, const MarkedIdentification & mi)
   {
     ost << mi.np << " ";
     for(int i=0; i<2*mi.np; i++)
@@ -159,7 +166,7 @@ namespace netgen
     ost << mi.marked << " " << mi.markededge << " " << mi.incorder << " " << int(mi.order) << "\n";
     return ost;
   }
-  istream & operator>> (istream & ist, MarkedIdentification & mi)
+  std::istream & operator>> (std::istream & ist, MarkedIdentification & mi)
   {
     ist >> mi.np;
     for(int i=0; i<2*mi.np; i++)
@@ -193,7 +200,7 @@ namespace netgen
     unsigned int order:6;
   };
   
-  ostream & operator<< (ostream & ost, const MarkedTri & mt)
+  std::ostream & operator<< (std::ostream & ost, const MarkedTri & mt)
   {
     for(int i=0; i<3; i++)
       ost << mt.pnums[i] << " ";
@@ -202,7 +209,7 @@ namespace netgen
     ost << mt.marked << " " << mt.markededge << " " << mt.surfid << " " << mt.incorder << " " << int(mt.order) << "\n";
     return ost;
   } 
-  istream & operator>> (istream & ist, MarkedTri & mt)
+  std::istream & operator>> (std::istream & ist, MarkedTri & mt)
   {
     for(int i=0; i<3; i++)
       ist >> mt.pnums[i];
@@ -235,7 +242,7 @@ namespace netgen
     unsigned int order:6;
   };
 
-  ostream & operator<< (ostream & ost, const MarkedQuad & mt)
+  std::ostream & operator<< (std::ostream & ost, const MarkedQuad & mt)
   {
     for(int i=0; i<4; i++)
       ost << mt.pnums[i] << " ";
@@ -244,7 +251,7 @@ namespace netgen
     ost << mt.marked << " " << mt.markededge << " " << mt.surfid << " " << mt.incorder << " " << int(mt.order) << "\n";
     return ost;
   } 
-  istream & operator>> (istream & ist, MarkedQuad & mt)
+  std::istream & operator>> (std::istream & ist, MarkedQuad & mt)
   {
     for(int i=0; i<4; i++)
       ist >> mt.pnums[i];
@@ -260,16 +267,16 @@ namespace netgen
 
 
 
-  void PrettyPrint(ostream & ost, const MarkedTet & mt)
+  void PrettyPrint(std::ostream & ost, const MarkedTet & mt)
   {
     int te1 = mt.tetedge1;
     int te2 = mt.tetedge2;
     int order = mt.order;
 
     ost << "MT: " << mt.pnums[0] << " - " << mt.pnums[1] << " - " 
-	<< mt.pnums[2] << " - " << mt.pnums[3] << endl
+	<< mt.pnums[2] << " - " << mt.pnums[3] << std::endl
 	<< "marked edge: " << te1 << " - " << te2
-	<< ", order = " << order << endl;
+	<< ", order = " << order << std::endl;
     //for (int k = 0; k < 4; k++)
     //  ost << int(mt.faceedges[k]) << "  ";
     for (int k = 0; k < 4; k++)
@@ -281,9 +288,9 @@ namespace netgen
 	for(int i=0; i<3; i++)
 	  for(int j=i+1; j<4; j++)
 	    if(i != k && j != k && int(mt.faceedges[k]) == 6-k-i-j)
-	      ost << " marked edge " << mt.pnums[i] << " " << mt.pnums[j] << endl;
+	      ost << " marked edge " << mt.pnums[i] << " " << mt.pnums[j] << std::endl;
       }
-    ost << endl;
+    ost << std::endl;
   }
 
 
@@ -369,7 +376,7 @@ namespace netgen
 	      {
 		INDEX_2 i2(el.PNum(tip[j][0]), el.PNum(tip[j][1]));
 		i2.Sort();
-		//(*testout) << "edge " << i2 << endl;
+		//std::cerr << "edge " << i2 <<std::endl;
 		if (!edgenumber.Used(i2))
 		  {
 		    cntedges++;
@@ -415,7 +422,7 @@ namespace netgen
 		}
 	      default:
 		{
-		  cerr << "Error: Sort for Bisect, SE has " << el.GetNP() << " points" << endl;
+		  std::cerr << "Error: Sort for Bisect, SE has " << el.GetNP() << " points" << std::endl;
 		  ned = 0;
 		}
 	      }
@@ -494,7 +501,7 @@ namespace netgen
 		    int eclass1 = edgenumber.Get (e1);
 		    int eclass2 = edgenumber.Get (e2);
 
-		    //		  (*testout) << "identify edges " << eclass1 << "-" << eclass2 << endl;
+		    //		  std::cerr << "identify edges " << eclass1 << "-" << eclass2 <<std::endl;
 
 		    if (eclasses.Get(eclass1) >
 			eclasses.Get(eclass2))
@@ -566,9 +573,9 @@ namespace netgen
 
 // 	for (i = 1; i <= cntedges; i++)
 // 	  {
-// 	    (*testout) << "edge " << i << ": " 
+// 	    std::cerr << "edge " << i << ": " 
 // 		       << edges.Get(i).I1() << "-" << edges.Get(i).I2()
-// 		       << ", class = " << eclasses.Get(i) << endl;
+// 		       << ", class = " << eclasses.Get(i) <<std::endl;
 // 	  }
 	
 	// compute classlength:
@@ -1041,23 +1048,23 @@ namespace netgen
   
 
   
-  void PrettyPrint(ostream & ost, const MarkedTri & mt)
+  void PrettyPrint(std::ostream & ost, const MarkedTri & mt)
   {
-    ost << "MarkedTrig: " << endl;
-    ost << "  pnums = "; for (int i=0; i<3; i++) ost << mt.pnums[i] << " "; ost << endl; 
-    ost << "  marked = " << mt.marked << ", markededge=" << mt.markededge << endl;
+    ost << "MarkedTrig: " << std::endl;
+    ost << "  pnums = "; for (int i=0; i<3; i++) ost << mt.pnums[i] << " "; ost << std::endl; 
+    ost << "  marked = " << mt.marked << ", markededge=" << mt.markededge << std::endl;
     for(int i=0; i<2; i++)
       for(int j=i+1; j<3; j++)
 	if(mt.markededge == 3-i-j)
-	  ost << "  marked edge pnums = " << mt.pnums[i] << " " << mt.pnums[j] << endl;
+	  ost << "  marked edge pnums = " << mt.pnums[i] << " " << mt.pnums[j] << std::endl;
   }
 
 
-  void PrettyPrint(ostream & ost, const MarkedQuad & mq)
+  void PrettyPrint(std::ostream & ost, const MarkedQuad & mq)
   {
-    ost << "MarkedQuad: " << endl;
-    ost << "  pnums = "; for (int i=0; i<4; i++) ost << mq.pnums[i] << " "; ost << endl; 
-    ost << "  marked = " << mq.marked << ", markededge=" << mq.markededge << endl;
+    ost << "MarkedQuad: " << std::endl;
+    ost << "  pnums = "; for (int i=0; i<4; i++) ost << mq.pnums[i] << " "; ost << std::endl; 
+    ost << "  marked = " << mq.marked << ", markededge=" << mq.markededge << std::endl;
   }
 
 
@@ -1070,7 +1077,7 @@ namespace netgen
   {
     for (int i = 0; i < 4; i++)
       mq.pnums[i] = el[i];
-    Swap (mq.pnums[2], mq.pnums[3]);  
+    std::swap (mq.pnums[2], mq.pnums[3]);  
 
     mq.marked = 0;
     mq.markededge = 0;
@@ -1208,7 +1215,7 @@ namespace netgen
 		    MarkedTet & newtet1, MarkedTet & newtet2)
   {
 #ifdef DEBUG
-    *testout << "bisect tet " << oldtet << endl;
+    std::cerr << "bisect tet " << oldtet << std::endl;
 #endif    
     
   
@@ -1251,8 +1258,8 @@ namespace netgen
     newtet2.marked = nm;
 
 #ifdef DEBUG
-    *testout << "newtet1,before = " << newtet1 << endl;
-    *testout << "newtet2,before = " << newtet2 << endl;
+    std::cerr << "newtet1,before = " << newtet1 << std::endl;
+    std::cerr << "newtet2,before = " << newtet2 << std::endl;
 #endif
 
     for (int i = 0; i < 4; i++)
@@ -1281,17 +1288,17 @@ namespace netgen
 	      newtet2.faceedges[oldtet.tetedge2] = oldtet.tetedge1;
             
 #ifdef DEBUG
-            *testout << "i = " << i << ", j = " << j << " k = " << k 
+            std::cerr << "i = " << i << ", j = " << j << " k = " << k 
                      << " oldtet.tetedge1 = " << oldtet.tetedge1 
                      << " oldtet.tetedge2 = " << oldtet.tetedge2
                      << "   6-oldtet.tetedge1-j-k = " <<  6 - oldtet.tetedge1 - j - k 
                      << "   6-oldtet.tetedge1-j-k = " <<  short(6 - oldtet.tetedge1 - j - k)
-                     << endl;
-            *testout << "vis1 = " << vis1 << ", vis2 = " << vis2 << endl;
+                     << std::endl;
+            std::cerr << "vis1 = " << vis1 << ", vis2 = " << vis2 << std::endl;
             for (int j = 0; j < 4; j++)
               if (newtet2.faceedges[j] > 3)
                 {
-                  *testout << "ERROR1" << endl;
+                  std::cerr << "ERROR1" << std::endl;
                 }
 #endif
 	  }
@@ -1322,7 +1329,7 @@ namespace netgen
             for (int j = 0; j < 4; j++)
               if (newtet2.faceedges[j] > 3)
                 {
-                  *testout << "ERROR2" << endl;
+                  std::cerr << "ERROR2" << std::endl;
                 }
 #endif
 	  }
@@ -1335,8 +1342,8 @@ namespace netgen
     newtet2.incorder = 0;
     newtet2.order = oldtet.order;
 
-    *testout << "newtet1 =  " << newtet1 << endl;
-    *testout << "newtet2 =  " << newtet2 << endl;
+    std::cerr << "newtet1 =  " << newtet1 << std::endl;
+    std::cerr << "newtet2 =  " << newtet2 << std::endl;
   }
 
 
@@ -1643,7 +1650,7 @@ namespace netgen
 				    mesh.Point(e2.I2()));
 		int newp = mesh.AddPoint(np);
 		cutedges.Set(e2,newp);
-		(*testout) << "DAAA" << endl;
+		std::cerr << "DAAA" <<std::endl;
 	      }
 	  }
       }
@@ -1805,7 +1812,7 @@ namespace netgen
   void ConnectToNodeRec (int node, int tonode, 
 			 const TABLE<int> & conto, Array<int> & connecttonode)
   {
-    //  (*testout) << "connect " << node << " to " << tonode << endl;
+    //  std::cerr << "connect " << node << " to " << tonode <<std::endl;
     for (int i = 1; i <= conto.EntrySize(node); i++)
       {
 	int n2 = conto.Get(node, i);
@@ -1827,7 +1834,7 @@ namespace netgen
   T_MQUADS mquads;
 
 
-  void WriteMarkedElements(ostream & ost)
+  void WriteMarkedElements(std::ostream & ost)
   {
     ost << "Marked Elements\n";
 
@@ -1850,12 +1857,12 @@ namespace netgen
     ost << mquads.Size() << "\n";
     for(int i=0; i<mquads.Size(); i++)
       ost << mquads[i];
-    ost << endl;
+    ost << std::endl;
   }
 
-  bool ReadMarkedElements(istream & ist, const Mesh & mesh)
+  bool ReadMarkedElements(std::istream & ist, const Mesh & mesh)
   {
-    string auxstring("");
+    std::string auxstring("");
     if(ist)
       ist >> auxstring;
 
@@ -1912,7 +1919,7 @@ namespace netgen
   void BisectTetsCopyMesh (Mesh & mesh, const class CSGeometry *,
 			   BisectionOptions & opt,
 			   const Array< Array<int,PointIndex::BASE>* > & idmaps,
-			   const string & refinfofile)
+			   const std::string & refinfofile)
   {
     // mtets.SetName ("bisection, tets");
     // mprisms.SetName ("bisection, prisms");
@@ -1934,7 +1941,7 @@ namespace netgen
     if(refinfofile != "")
       {
 	PrintMessage(3,"Reading marked-element information from \"",refinfofile,"\"");
-	ifstream ist(refinfofile.c_str());
+	std::ifstream ist(refinfofile.c_str());
 
 	readok = ReadMarkedElements(ist,mesh);
 
@@ -1994,7 +2001,7 @@ namespace netgen
 			se.Sort();
 			if (shortedges.Used (se))
 			  {
-			    //		      cout << "tet converted to prism" << endl;
+			    //		      std::cout << "tet converted to prism" <<std::endl;
 			    
 			    foundse = 1;
 			    int p3 = 1;
@@ -2013,11 +2020,11 @@ namespace netgen
 			      for (int m = 0; m < 3; m++)
 				if (pi[m] > pi[m+1])
 				  {
-				    Swap (pi[m], pi[m+1]);
+				    std::swap (pi[m], pi[m+1]);
 				    cnt++;
 				  }
 			    if (cnt % 2)
-			      Swap (p3, p4);
+			      std::swap (p3, p4);
 			    
 			    Element hel = el;
 			    hel.PNum(1) = el.PNum(j);
@@ -2115,7 +2122,7 @@ namespace netgen
   
     if (printmessage_importance>0)
     {
-      ostringstream str1,str2;
+      std::ostringstream str1,str2;
       str1 << "copied " << mtets.Size() << " tets, " << mprisms.Size() << " prisms";
       str2 << "       " << mtris.Size() << " trigs, " << mquads.Size() << " quads";
 
@@ -2154,8 +2161,8 @@ namespace netgen
       mids_old[mids[i].pnums[0]]->Append(mids[i]);
     for(int i=0; i<mtris.Size(); i++)
       {
-	(*testout) << "i " << i << endl;
-	(*testout) << "mtris[i] " << mtris[i].pnums[0] << " " << mtris[i].pnums[1] << " " << mtris[i].pnums[2] << endl; 
+	std::cerr << "i " << i <<std::endl;
+	std::cerr << "mtris[i] " << mtris[i].pnums[0] << " " << mtris[i].pnums[1] << " " << mtris[i].pnums[2] <<std::endl; 
 	mtris_old[mtris[i].pnums[0]]->Append(mtris[i]);
       }
     for(int i=0; i<mquads.Size(); i++)
@@ -2224,7 +2231,7 @@ namespace netgen
 		    se.Sort();
 		    if (shortedges.Used (se))
 		      {
-//		      cout << "tet converted to prism" << endl;
+//		      std::cout << "tet converted to prism" <<std::endl;
 
 			foundse = 1;
 			int p3 = 1;
@@ -2243,11 +2250,11 @@ namespace netgen
 			  for (m = 0; m < 3; m++)
 			    if (pi[m] > pi[m+1])
 			      {
-				Swap (pi[m], pi[m+1]);
+				std::swap (pi[m], pi[m+1]);
 				cnt++;
 			      }
 			if (cnt % 2)
-			  Swap (p3, p4);
+			  std::swap (p3, p4);
 
 			Element hel = el;
 			hel.PNum(1) = el.PNum(j);
@@ -2418,14 +2425,14 @@ namespace netgen
       {
 	MarkedTet & mt = mtets_old[m];
 
-	//(*testout) << "old mt " << mt;
+	//std::cerr << "old mt " << mt;
 	
 	INDEX_2 edge (mt.pnums[mt.tetedge1],mt.pnums[mt.tetedge2]);
 	edge.Sort();
 	if(edgenumber.Used(edge))
 	  {
 	    int val = edgenumber.Get(edge);
-	    //(*testout) << "set voledge " << edge << " from " << val;
+	    //std::cerr << "set voledge " << edge << " from " << val;
 	    if(val <= maxnum)
 	      {
 		val += 2*maxnum;
@@ -2436,7 +2443,7 @@ namespace netgen
 		val += maxnum;
 		edgenumber.Set(edge,val);
 	      }
-	    //(*testout) << " to " << val << endl;
+	    //std::cerr << " to " << val <<std::endl;
 	  }
 	
 	for(int k=0; k<4; k++)
@@ -2450,13 +2457,13 @@ namespace netgen
 		  if(edgenumber.Used(edge))
 		    {
 		      int val = edgenumber.Get(edge);
-		      //(*testout) << "set faceedge " << edge << " from " << val;
+		      //std::cerr << "set faceedge " << edge << " from " << val;
 		      if(val <= maxnum)
 			{
 			  val += maxnum;
 			  edgenumber.Set(edge,val);
 			}
-		      //(*testout) << " to " << val << endl;
+		      //std::cerr << " to " << val <<std::endl;
 		    }		      
 		}
       }
@@ -2488,21 +2495,21 @@ namespace netgen
 	      
 	      mtets.Append (mt);
 	    
-	      //(*testout) << "mtet " << mtets.Last() << endl;
+	      //std::cerr << "mtet " << mtets.Last() <<std::endl;
 	      break;
 	    }
 	  case PYRAMID:
 	    {
-	      cerr << "Refinement :: UpdateEdgeMarks not yet implemented for pyramids"
-		   << endl;
+	      std::cerr << "Refinement :: UpdateEdgeMarks not yet implemented for pyramids"
+		   << std::endl;
 	      break;
 	    }
 	    
 	  case PRISM:
 	  case PRISM12:
 	    {
-	      cerr << "Refinement :: UpdateEdgeMarks not yet implemented for prisms"
-		   << endl;
+	      std::cerr << "Refinement :: UpdateEdgeMarks not yet implemented for prisms"
+		   << std::endl;
 	      break;
 	    }
           default:
@@ -2517,17 +2524,6 @@ namespace netgen
        {
 	 const Element2d & el = mesh[sei];
 
-	 /*
-	 for(int k=0; k<3; k++)
-	   auxind3[k] = el[k];
-
-	 auxind3.Sort();
-	 
-	 int pos = oldfaces[auxind3[0]]->Pos(auxind3);
-	 if(pos < 0)
-	   cout << "UIUIUI" << endl;
-	 */	 
-	 
 	 switch (el.GetType())
 	   {
 	   case TRIG:
@@ -2575,9 +2571,9 @@ namespace netgen
 		   MarkedTri mt;
 		   BTDefineMarkedTri (el, edgenumber, mt);
 		   mtris.Append (mt);
-		   (*testout) << "(new) ";
+		   std::cerr << "(new) ";
 		 }
-	       (*testout) << "mtri " << mtris.Last();
+	       std::cerr << "mtri " << mtris.Last();
 	       break;
 	     }
 	     
@@ -2618,15 +2614,7 @@ namespace netgen
     PrintMessage(1,"Mesh bisection");
     PushStatus("Mesh bisection");
 
-    static int timer = NgProfiler::CreateTimer ("Bisect");
-    NgProfiler::RegionTimer reg1 (timer);
-    
-    
-
-    static int localizetimer = NgProfiler::CreateTimer("localize edgepoints");
-    NgProfiler::RegionTimer * loct = new NgProfiler::RegionTimer(localizetimer);   
     LocalizeEdgePoints(mesh);
-    delete loct;
 
     Array< Array<int,PointIndex::BASE>* > idmaps;
     for(int i=1; i<=mesh.GetIdentifications().GetMaxNr(); i++)
@@ -2639,13 +2627,13 @@ namespace netgen
       }
 
     
-    string refelementinfofileread = "";
-    string refelementinfofilewrite = "";
+    std::string refelementinfofileread = "";
+    std::string refelementinfofilewrite = "";
 
     if(opt.refinementfilename)
       {
-	ifstream inf(opt.refinementfilename);
-	string st;
+	std::ifstream inf(opt.refinementfilename);
+	std::string st;
 	inf >> st;
 	if(st == "refinementinfo")
 	  {
@@ -2757,10 +2745,10 @@ namespace netgen
 	int marked = 0;
 	if (opt.refinementfilename)
 	  {
-	    ifstream inf(opt.refinementfilename);
+	    std::ifstream inf(opt.refinementfilename);
 	    PrintMessage(3,"load refinementinfo from file ",opt.refinementfilename);
 
-	    string st;
+	    std::string st;
 	    inf >> st;
 	    if(st == "refinementinfo")
 	      // new version
@@ -2802,7 +2790,7 @@ namespace netgen
 			  {
 			    inf >> st;
 			    bool isint = true;
-				for(string::size_type ii=0; isint && ii<st.size(); ii++)
+				for(std::string::size_type ii=0; isint && ii<st.size(); ii++)
 			      isint = (isdigit(st[ii]) != 0);
 			    
 			    while(inf && isint)
@@ -2812,7 +2800,7 @@ namespace netgen
 
 				inf >> st;
 				isint = true;
-				for(string::size_type ii=0; isint && ii<st.size(); ii++)
+				for(std::string::size_type ii=0; isint && ii<st.size(); ii++)
 				  isint = (isdigit(st[ii]) != 0);
 			      }
 			  }
@@ -2864,7 +2852,7 @@ namespace netgen
 			      }
 
 
-			    ostringstream strstr;
+			    std::ostringstream strstr;
 			    strstr.precision(2);
 			    strstr << "marked " << float(cnt)/float(mesh.GetNE())*100. 
 #ifdef WIN32
@@ -2946,7 +2934,7 @@ namespace netgen
 		    cntm++;
 		}
 
-	    // (*testout) << "mtets = " << mtets << endl;
+	    // std::cerr << "mtets = " << mtets <<std::endl;
 
 	    /*
 	      for (i = 1; i <= mtris.Size(); i++)
@@ -2957,7 +2945,7 @@ namespace netgen
 
 	    if (printmessage_importance>0)
 	      {
-		ostringstream str;
+		std::ostringstream str;
 		str << "marked elements: " << cntm;
 		PrintMessage(4,str.str());
 	      }
@@ -2990,7 +2978,7 @@ namespace netgen
 
               if (printmessage_importance>0)
 		{
-		  ostringstream str;
+		  std::ostringstream str;
 		  str << "with surface-elements: " << cntm;
 		  PrintMessage(4,str.str());
 		}
@@ -3018,8 +3006,8 @@ namespace netgen
 			cntm++;
 		      }
 		  }
-		cout << "trigs: " << mtris.Size() << " ";
-		cout << "marked: " << cntm << endl;
+		std::cout << "trigs: " << mtris.Size() << " ";
+		std::cout << "marked: " << cntm <<std::endl;
 	      }
             */ 
             
@@ -3033,7 +3021,7 @@ namespace netgen
 	if (!marked) break;
         
 
-	//(*testout) << "mtets " << mtets << endl;
+	//std::cerr << "mtets " << mtets <<std::endl;
 
 	if (opt.refine_p)
 	  {
@@ -3160,11 +3148,11 @@ namespace netgen
 
 	int hangingvol, hangingsurf, hangingedge;
 
-	//cout << "write?" << endl;
+	//std::cout << "write?" <<std::endl;
 	//string yn;
 	//cin >> yn;
 
-	(*testout) << "refine volume elements" << endl;
+	std::cerr << "refine volume elements" << std::endl;
 	do
 	  {
 	    // refine volume elements
@@ -3180,7 +3168,7 @@ namespace netgen
 
 		  oldtet = mtets.Get(i);
 		  //if(yn == "y")
-		  //  (*testout) << "bisected tet " << oldtet;
+		  //  std::cerr << "bisected tet " << oldtet;
 		  INDEX_2 edge(oldtet.pnums[oldtet.tetedge1],
 			       oldtet.pnums[oldtet.tetedge2]);
 		  edge.Sort();
@@ -3202,10 +3190,10 @@ namespace netgen
 		  mtets.Append (newtet2);
 
 #ifdef DEBUG
-                  *testout << "tet1 has elnr = " << i << ", tet2 has elnr = " << mtets.Size() << endl;
+                  std::cerr << "tet1 has elnr = " << i << ", tet2 has elnr = " << mtets.Size() <<std::endl;
 #endif
 		  //if(yn == "y")
-		  //  (*testout) << "and got " << newtet1 << "and " << newtet2 << endl;
+		  //  std::cerr << "and got " << newtet1 << "and " << newtet2 <<std::endl;
 
 		  mesh.mlparentelement.Append (i);
 		}
@@ -3253,7 +3241,7 @@ namespace netgen
 
 		  BTBisectPrism (oldprism, newp1, newp2, newprism1, newprism2);
 		  //if(yn == "y")
-		  //  (*testout) << "bisected prism " << oldprism << "and got " << newprism1 << "and " << newprism2 << endl;
+		  //  std::cerr << "bisected prism " << oldprism << "and got " << newprism1 << "and " << newprism2 <<std::endl;
 		  mprisms.Elem(i) = newprism1;
 		  mprisms.Append (newprism2);
 		}
@@ -3325,7 +3313,7 @@ namespace netgen
 		  INDEX_2 edge(oldpi1, oldpi2);
 		  edge.Sort();
 
-		  //		cerr << "edge = " << edge.I1() << "-" << edge.I2() << endl;
+		  //		std::cerr << "edge = " << edge.I1() << "-" << edge.I2() <<std::endl;
 
 		  if (cutedges.Used (edge))
 		    {
@@ -3344,18 +3332,18 @@ namespace netgen
 		  //  geom->GetSurface(si)->Project (mesh.Point(newp));
 		  PointGeomInfo npgi;
 		
-//                   cerr << "project point " << newp << " old: " << mesh.Point(newp);
+//                   std::cerr << "project point " << newp << " old: " << mesh.Point(newp);
                   if (mesh[newp].Type() != EDGEPOINT)
                     PointBetween (mesh.Point (oldpi1), mesh.Point (oldpi2),
                                   0.5, si,
                                   oldtri.pgeominfo[(oldtri.markededge+1)%3],
                                   oldtri.pgeominfo[(oldtri.markededge+2)%3],
                                   mesh.Point (newp), npgi);
-//                   cerr << " new: " << mesh.Point(newp) << endl;
+//                   std::cerr << " new: " << mesh.Point(newp) <<std::endl;
 		
 		  BTBisectTri (oldtri, newp, npgi, newtri1, newtri2);
 		  //if(yn == "y")
-		  //  (*testout) << "bisected tri " << oldtri << "and got " << newtri1 << "and " << newtri2 << endl;
+		  //  std::cerr << "bisected tri " << oldtri << "and got " << newtri1 << "and " << newtri2 <<std::endl;
 		
 		
 		  mtris.Elem(i) = newtri1;
@@ -3428,24 +3416,24 @@ namespace netgen
 		  //		geom->GetSurface(si)->Project (mesh.Point(newp1));
 		  //		geom->GetSurface(si)->Project (mesh.Point(newp2));
 
-//                   (*testout)
-//                   cerr << "project point 1 " << newp1 << " old: " << mesh.Point(newp1);
+//                   std::cerr
+//                   std::cerr << "project point 1 " << newp1 << " old: " << mesh.Point(newp1);
                   PointBetween (mesh.Point (edge1.I1()), mesh.Point (edge1.I2()),
 				0.5, si,
 				pgi11,
 				pgi12,
 				mesh.Point (newp1), npgi1);
-// 		  (*testout)
-//                   cerr << " new: " << mesh.Point(newp1) << endl;
+// 		  std::cerr
+//                   std::cerr << " new: " << mesh.Point(newp1) <<std::endl;
 
 		
-//                   cerr << "project point 2 " << newp2 << " old: " << mesh.Point(newp2);
+//                   std::cerr << "project point 2 " << newp2 << " old: " << mesh.Point(newp2);
                   PointBetween (mesh.Point (edge2.I1()), mesh.Point (edge2.I2()),
 				0.5, si,
 				pgi21,
 				pgi22,
 				mesh.Point (newp2), npgi2);
-//                   cerr << " new: " << mesh.Point(newp2) << endl;
+//                   std::cerr << " new: " << mesh.Point(newp2) <<std::endl;
 		
 
 		  BTBisectQuad (oldquad, newp1, npgi1, newp2, npgi2,
@@ -3483,12 +3471,12 @@ namespace netgen
 		  
  
 //                     
-//                     cerr << "move edgepoint " << newpi << " from " << mesh.Point(newpi);
+//                     std::cerr << "move edgepoint " << newpi << " from " << mesh.Point(newpi);
 		    PointBetween (mesh.Point (seg[0]), mesh.Point (seg[1]),
 				  0.5, seg.surfnr1, seg.surfnr2, 
 				  seg.epgeominfo[0], seg.epgeominfo[1],
 				  mesh.Point (newpi), newepgi);
-// 		    cerr << " to " << mesh.Point (newpi) << endl;
+// 		    std::cerr << " to " << mesh.Point (newpi) <<std::endl;
 
 		    
 		    nseg1.epgeominfo[1] = newepgi;
@@ -3505,12 +3493,12 @@ namespace netgen
         if (printmessage_importance>0)
 	  {
 	    ostringstream strstr;
-	    strstr << mtets.Size() << " tets" << endl
-		   << mtris.Size() << " trigs" << endl;
+	    strstr << mtets.Size() << " tets" <<std::endl
+		   << mtris.Size() << " trigs" <<std::endl;
 	    if (mprisms.Size())
 	      {
-		strstr << mprisms.Size() << " prisms" << endl
-		       << mquads.Size() << " quads" << endl;
+		strstr << mprisms.Size() << " prisms" <<std::endl
+		       << mquads.Size() << " quads" <<std::endl;
 	      }
 	    strstr << mesh.GetNP() << " points";
 	    PrintMessage(4,strstr.str());
@@ -3527,7 +3515,7 @@ namespace netgen
       }
 
 
-    // (*testout) << "mtets = " << mtets << endl;
+    // std::cerr << "mtets = " << mtets <<std::endl;
 
     if (opt.refine_hp)
       {
@@ -3662,7 +3650,7 @@ namespace netgen
 	el.SetIndex (mquads.Get(i).surfid);
 	for (int j = 1; j <= 4; j++)
 	  el.PNum(j) = mquads.Get(i).pnums[j-1];
-	Swap (el.PNum(3), el.PNum(4));
+	std::swap (el.PNum(3), el.PNum(4));
 	mesh.AddSurfaceElement (el);
       }
 
@@ -3705,70 +3693,7 @@ namespace netgen
 	  mesh.mlbetweennodes.Elem(newpi) = edge;
 	}
 
-
-    /*
-      mesh.PrintMemInfo (cout);
-      cout << "tets ";
-      mtets.PrintMemInfo (cout);
-      cout << "prims ";
-      mprisms.PrintMemInfo (cout);
-      cout << "tris ";
-      mtris.PrintMemInfo (cout);
-      cout << "quads ";
-      mquads.PrintMemInfo (cout);
-      cout << "cutedges ";
-      cutedges.PrintMemInfo (cout);
-    */
-
-
-    /*
-
-    // find connected nodes (close nodes)
-    TABLE<int> conto(np);
-    for (i = 1; i <= mprisms.Size(); i++)
-    for (j = 1; j <= 6; j++)
-    {
-    int n1 = mprisms.Get(i).pnums[j-1];
-    int n2 = mprisms.Get(i).pnums[(j+2)%6];
-    //	    if (n1 != n2)
-    {
-    int found = 0;
-    for (k = 1; k <= conto.EntrySize(n1); k++)
-    if (conto.Get(n1, k) == n2)
-    {
-    found = 1;
-    break;
-    }
-    if (!found)
-    conto.Add (n1, n2);
-    }
-    }
-    mesh.connectedtonode.SetSize(np);
-    for (i = 1; i <= np; i++)
-    mesh.connectedtonode.Elem(i) = 0;
-  
-
-    //       (*testout) << "connection table: " << endl;
-    //       for (i = 1; i <= np; i++)
-    //       {
-    //       (*testout) << "node " << i << ": ";
-    // 	  for (j = 1; j <= conto.EntrySize(i); j++)
-    // 	  (*testout) << conto.Get(i, j) << " ";
-    // 	  (*testout) << endl;
-    // 	}
-
-  
-    for (i = 1; i <= np; i++)
-    if (mesh.connectedtonode.Elem(i) == 0)
-    {
-    mesh.connectedtonode.Elem(i) = i;
-    ConnectToNodeRec (i, i, conto, mesh.connectedtonode);
-    }
-    */  
-
     //  mesh.BuildConnectedNodes();
-
-    
 
 
     mesh.ComputeNVertices();
@@ -3851,10 +3776,6 @@ namespace netgen
 
     //mesh.Save("before.vol");
 
-    static int reptimer = NgProfiler::CreateTimer("check/repair");
-	NgProfiler::RegionTimer * regt(NULL);
-    regt = new NgProfiler::RegionTimer(reptimer); 
-
     Array<ElementIndex> bad_elts;
     Array<double> pure_badness;
    
@@ -3877,7 +3798,7 @@ namespace netgen
 	
         if (printmessage_importance>0)
 	  {
-	    ostringstream strstr;
+	    std::ostringstream strstr;
 	    for(int ii=0; ii<bad_elts.Size(); ii++)
 	      strstr << "bad element " << bad_elts[ii] << "\n";
 	    PrintMessage(1,strstr.str());
@@ -3911,15 +3832,15 @@ namespace netgen
 	      }
 	    catch(NgException & ex)
 	      {
-		PrintMessage(1,string("Problem: ") + ex.What());
+		PrintMessage(1,std::string("Problem: ") + ex.What());
 	      }
 
 
             if (printmessage_importance>0)
             {
-	      ostringstream strstr;
-              strstr << "Time for Repair: " << double(clock() - t1)/double(CLOCKS_PER_SEC) << endl
-		     << "bad elements after repair: " << bad_elts << endl;
+	      std::ostringstream strstr;
+              strstr << "Time for Repair: " << double(clock() - t1)/double(CLOCKS_PER_SEC) << std::endl
+		     << "bad elements after repair: " << bad_elts << std::endl;
 	      PrintMessage(1,strstr.str());
             }
 	    
@@ -3929,20 +3850,10 @@ namespace netgen
 	    if(idmaps.Size() == 0)
 	      UpdateEdgeMarks(mesh,idmaps);
 	    
-	    /*
-	    if(1==1)
-	      UpdateEdgeMarks(mesh,idmaps);
-	    else
-	      mesh.mglevels = 1;
-	    */
-	    
 	    //mesh.ImproveMesh();
 	    
 	  }
       }
-    delete regt;
-
-
     
     for(int i=0; i<idmaps.Size(); i++)
       delete idmaps[i];
@@ -3956,7 +3867,7 @@ namespace netgen
     if(refelementinfofilewrite != "")
       {
 	PrintMessage(3,"writing marked-elements information to \"",refelementinfofilewrite,"\"");
-	ofstream ofst(refelementinfofilewrite.c_str());
+	std::ofstream ofst(refelementinfofilewrite.c_str());
 
 	WriteMarkedElements(ofst);
 
@@ -4013,7 +3924,7 @@ namespace netgen
 				   const EdgePointGeomInfo & ap2,
 				   Point<3> & newp, EdgePointGeomInfo & newgi) const
   {
-    cout << "base class edge point between" << endl;
+    std::cout << "base class edge point between" << std::endl;
     newp = p1+secpoint*(p2-p1);
   }
 
@@ -4021,14 +3932,14 @@ namespace netgen
   Vec<3> Refinement :: GetTangent (const Point<3> & p, int surfi1, int surfi2,
                                    const EdgePointGeomInfo & ap1) const
   {
-    cerr << "Refinement::GetTangent not overloaded" << endl;
+    std::cerr << "Refinement::GetTangent not overloaded" << std::endl;
     return Vec<3> (0,0,0);
   }
 
   Vec<3> Refinement :: GetNormal (const Point<3> & p, int surfi1, 
                                   const PointGeomInfo & gi) const
   {
-    cerr << "Refinement::GetNormal not overloaded" << endl;
+    std::cerr << "Refinement::GetNormal not overloaded" << std::endl;
     return Vec<3> (0,0,0);
   }
 
@@ -4036,11 +3947,11 @@ namespace netgen
   void Refinement :: ProjectToSurface (Point<3> & p, int surfi) const
   {
     if (printmessage_importance>0)
-      cerr << "Refinement :: ProjectToSurface    ERROR: no geometry set" << endl;
+      std::cerr << "Refinement :: ProjectToSurface    ERROR: no geometry set" << std::endl;
   };
 
   void Refinement :: ProjectToEdge (Point<3> & p, int surfi1, int surfi2, const EdgePointGeomInfo & egi) const
   {
-    cerr << "Refinement::ProjectToEdge not overloaded" << endl;
+    std::cerr << "Refinement::ProjectToEdge not overloaded" << std::endl;
   }
 }

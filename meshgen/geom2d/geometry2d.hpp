@@ -7,12 +7,14 @@
 /* Date:   20. Jul. 02                                                     */
 /* *************************************************************************/
 
-#include <myadt.hpp>
-#include <gprim.hpp>
+//#include <myadt.hpp>
+//#include <gprim.hpp>
 
-
-// #include "../gprim/spline.hpp"
-// #include "../gprim/splinegeometry.hpp"
+//#include <fstream>
+#include <string>
+#include "../gprim/spline.hpp"
+#include "../gprim/splinegeometry.hpp"
+#include "../meshing/basegeom.hpp"
 #include "geom2dmesh.hpp"
 
 namespace netgen
@@ -96,7 +98,7 @@ namespace netgen
       return seg.MaxCurvature();
     }
 
-    virtual string GetType () const
+    virtual std::string GetType () const
     {
       return seg.GetType();
     }
@@ -123,7 +125,7 @@ namespace netgen
     Array<bool> quadmeshing;
     Array<bool> tensormeshing;
     Array<int> layer;
-    Array<string*> bcnames;
+    Array<std::string*> bcnames;
     double elto0;
 
 
@@ -132,11 +134,11 @@ namespace netgen
 
     DLL_HEADER void Load (const char * filename);
 
-    DLL_HEADER void LoadData( ifstream & infile );
-    DLL_HEADER void LoadDataNew ( ifstream & infile );
-    DLL_HEADER void LoadDataV2 ( ifstream & infile );
+    DLL_HEADER void LoadData( std::ifstream & infile );
+    DLL_HEADER void LoadDataNew ( std::ifstream & infile );
+    DLL_HEADER void LoadDataV2 ( std::ifstream & infile );
 
-    void TestComment ( ifstream & infile ) ;
+    void TestComment ( std::ifstream & infile ) ;
 
     
 
@@ -179,9 +181,9 @@ namespace netgen
     }
 
 
-    string GetBCName ( const int bcnr ) const;
+    std::string GetBCName ( const int bcnr ) const;
 
-    string * BCNamePtr ( const int bcnr );
+    std::string * BCNamePtr ( const int bcnr );
 
     
     DLL_HEADER virtual Refinement & GetRefinement () const; 

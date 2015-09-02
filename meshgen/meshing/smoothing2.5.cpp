@@ -1,7 +1,10 @@
-#include <mystdlib.h>
+#include <meshgen.hpp>
 
-#include "meshing.hpp"
-#include <opti.hpp>
+#include "improve2.hpp"
+#include "improve3.hpp"
+#include "global.hpp"
+#include "../general/ngexception.hpp"
+#include "../linalg/opti.hpp"
 
 namespace netgen
 {
@@ -39,13 +42,6 @@ namespace netgen
 	return;
       }
       
-
-
-    static int timer = NgProfiler::CreateTimer ("MeshSmoothing 2D");
-    NgProfiler::RegionTimer reg (timer);
-
-
-
     CheckMeshApproximation (mesh);
 
     int i, j, k;
@@ -225,12 +221,12 @@ namespace netgen
 		fact = fact/2.;
 	    
 	    
-		//cout << "origp " << origp << " newp " << mesh[pi];
+		//std::cout << "origp " << origp << " newp " << mesh[pi];
 	    
 		ngi = gi1;
 		moveisok = (ProjectPointGI (surfi, mesh[pi], ngi) != 0);
 
-		//cout << " projected " << mesh[pi] << endl;
+		//std::cout << " projected " << mesh[pi] <<std::endl;
 
 		// point lies on same chart in stlsurface
 		
@@ -239,7 +235,7 @@ namespace netgen
 		    for (j = 0; j < locelements.Size(); j++)
 		      mesh[locelements[j]].GeomInfoPi(locrots[j]) = ngi;
 
-		    //cout << "moved " << origp << " to " << mesh[pi] << endl;
+		    //std::cout << "moved " << origp << " to " << mesh[pi] <<std::endl;
 		  }
 		else
 		  {
@@ -250,7 +246,7 @@ namespace netgen
 	  }
 	else
 	  {
-	    cout << "el not ok (point " << pi << ": " << mesh[pi] << ")" << endl;
+	    std::cout << "el not ok (point " << pi << ": " << mesh[pi] << ")" <<std::endl;
 	  }
       }
 

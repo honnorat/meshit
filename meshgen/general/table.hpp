@@ -7,6 +7,8 @@
 /* Date:   01. Jun. 95                                                    */
 /**************************************************************************/
 
+#include "array.hpp"
+
 namespace netgen
 {
 
@@ -194,7 +196,7 @@ public:
     { BASE_TABLE::AllocateElementsOneBlock (sizeof(T)); }
 
 
-  inline void PrintMemInfo (ostream & ost) const
+  inline void PrintMemInfo (std::ostream & ost) const
   {
     int els = AllocatedElements(); 
     ost << "table: allocaed " << els 
@@ -202,7 +204,7 @@ public:
 	<< els * sizeof(T) 
 	<< " bytes in " << Size() << " bags."
 	<< " used: " << UsedElements()
-	<< endl;
+	<< std::endl;
   }
 
   /// Access entry.
@@ -210,7 +212,7 @@ public:
   { 
 #ifdef DEBUG
     if (i-BASE < 0 || i-BASE >= data.Size())
-      cout << "table out of range, i = " << i << ", s = " << data.Size() << endl;
+      std::cout << "table out of range, i = " << i << ", s = " << data.Size() << std::endl;
 #endif
 
     return FlatArray<T> (data[i-BASE].size, (T*)data[i-BASE].col);
@@ -219,7 +221,7 @@ public:
 
 
 template <class T, int BASE>
-inline ostream & operator<< (ostream & ost, const TABLE<T,BASE> & table)
+inline std::ostream & operator<< (std::ostream & ost, const TABLE<T,BASE> & table)
 {
   for (int i = BASE; i < table.Size()+BASE; i++)
     {
@@ -228,7 +230,7 @@ inline ostream & operator<< (ostream & ost, const TABLE<T,BASE> & table)
       ost << "(" << row.Size() << ") ";
       for (int j = 0; j < row.Size(); j++)
 	ost << row[j] << " ";
-      ost << endl;
+      ost << std::endl;
     }
   return ost;
 }

@@ -122,7 +122,7 @@ namespace netgen
          prop->SetParameters (parmid.X(), parmid.Y());
          if (!prop->IsCurvatureDefined())
          {
-            (*testout) << "curvature not defined!" << endl;
+            std::cerr << "curvature not defined!" <<std::endl;
             return;
          }
          curvature = max(fabs(prop->MinCurvature()),
@@ -131,7 +131,7 @@ namespace netgen
          prop->SetParameters (par0.X(), par0.Y());
          if (!prop->IsCurvatureDefined())
          {
-            (*testout) << "curvature not defined!" << endl;
+            std::cerr << "curvature not defined!" <<std::endl;
             return;
          }
          curvature = max(curvature,max(fabs(prop->MinCurvature()),
@@ -140,7 +140,7 @@ namespace netgen
          prop->SetParameters (par1.X(), par1.Y());
          if (!prop->IsCurvatureDefined())
          {
-            (*testout) << "curvature not defined!" << endl;
+            std::cerr << "curvature not defined!" <<std::endl;
             return;
          }
          curvature = max(curvature,max(fabs(prop->MinCurvature()),
@@ -149,17 +149,17 @@ namespace netgen
          prop->SetParameters (par2.X(), par2.Y());
          if (!prop->IsCurvatureDefined())
          {
-            (*testout) << "curvature not defined!" << endl;
+            std::cerr << "curvature not defined!" <<std::endl;
             return;
          }
          curvature = max(curvature,max(fabs(prop->MinCurvature()),
             fabs(prop->MaxCurvature())));
 
-         //(*testout) << "curvature " << curvature << endl;
+         //std::cerr << "curvature " << curvature <<std::endl;
 
          if (curvature < 1e-3)
          {
-            //(*testout) << "curvature too small (" << curvature << ")!" << endl;
+            //std::cerr << "curvature too small (" << curvature << ")!" <<std::endl;
             return;
             // return war bis 10.2.05 auskommentiert
          }
@@ -177,13 +177,13 @@ namespace netgen
 
       if (h < maxside && depth < 10)
       {
-         //cout << "\r h " << h << flush;
+         //std::cout << "\r h " << h << flush;
          gp_Pnt2d pm;
 
-         //cout << "h " << h << " maxside " << maxside << " depth " << depth << endl;
-         //cout << "par0 " << par0.X() << " " << par0.Y()
+         //std::cout << "h " << h << " maxside " << maxside << " depth " << depth <<std::endl;
+         //std::cout << "par0 " << par0.X() << " " << par0.Y()
          //<< " par1 " << par1.X() << " " << par1.Y()
-         //   << " par2 " << par2.X() << " " << par2.Y()<< endl;
+         //   << " par2 " << par2.X() << " " << par2.Y()<<std::endl;
 
          if(ls == 0)
          {
@@ -224,7 +224,7 @@ namespace netgen
          p3d = Point3d(pnt2.X(), pnt2.Y(), pnt2.Z());
          mesh.RestrictLocalH (p3d, h);
 
-         //(*testout) << "p = " << p3d << ", h = " << h << ", maxside = " << maxside << endl;
+         //std::cerr << "p = " << p3d << ", h = " << h << ", maxside = " << maxside <<std::endl;
 
       }
    }
@@ -263,8 +263,8 @@ namespace netgen
             1.0/mesh.GetH(Point3d(pnt.X(), pnt.Y(), pnt.Z()))*
             pnt.Distance(oldpnt);
 
-         //(*testout) << "mesh.GetH(Point3d(pnt.X(), pnt.Y(), pnt.Z())) " << mesh.GetH(Point3d(pnt.X(), pnt.Y(), pnt.Z()))
-         //	   <<  " pnt.Distance(oldpnt) " << pnt.Distance(oldpnt) << endl;
+         //std::cerr << "mesh.GetH(Point3d(pnt.X(), pnt.Y(), pnt.Z())) " << mesh.GetH(Point3d(pnt.X(), pnt.Y(), pnt.Z()))
+         //	   <<  " pnt.Distance(oldpnt) " << pnt.Distance(oldpnt) <<std::endl;
 
          olddist = dist;
          dist = pnt.Distance(oldpnt);
@@ -293,7 +293,7 @@ namespace netgen
             nsubedges = i;
             ps.SetSize(nsubedges-1);
             params.SetSize(nsubedges+1);
-            cout << "divide edge: local h too small" << endl;
+            std::cout << "divide edge: local h too small" <<std::endl;
          }
       } while (i < nsubedges);
 
@@ -302,7 +302,7 @@ namespace netgen
 
       if (params[nsubedges] <= params[nsubedges-1])
       {
-         cout << "CORRECTED" << endl;
+         std::cout << "CORRECTED" <<std::endl;
          ps.SetSize (nsubedges-2);
          params.SetSize (nsubedges);
          params[nsubedges] = s1;
@@ -317,13 +317,13 @@ namespace netgen
       const char * savetask = multithread.task;
       multithread.task = "Edge meshing";
 
-      (*testout) << "edge meshing" << endl;
+      std::cerr << "edge meshing" <<std::endl;
 
       int nvertices = geom.vmap.Extent();
       int nedges = geom.emap.Extent();
 
-      (*testout) << "nvertices = " << nvertices << endl;
-      (*testout) << "nedges = " << nedges << endl;
+      std::cerr << "nvertices = " << nvertices <<std::endl;
+      std::cerr << "nedges = " << nedges <<std::endl;
 
       double eps = 1e-6 * geom.GetBoundingBox().Diam();
 
@@ -345,7 +345,7 @@ namespace netgen
                   mesh.AddPoint (mp);
       }
 
-      (*testout) << "different vertices = " << mesh.GetNP() << endl;
+      std::cerr << "different vertices = " << mesh.GetNP() <<std::endl;
 
 
       int first_ep = mesh.GetNP()+1;
@@ -385,7 +385,7 @@ namespace netgen
       int edgenr = 0;
 
 
-      (*testout) << "faces = " << geom.fmap.Extent() << endl;
+      std::cerr << "faces = " << geom.fmap.Extent() <<std::endl;
       int curr = 0;
 
       for (int i3 = 1; i3 <= geom.fmap.Extent(); i3++)
@@ -402,7 +402,7 @@ namespace netgen
          TopoDS_Face face2 = TopoDS::Face(exp2.Current());
          if (geom.fmap.FindIndex(face2) == facenr)
          {
-         //		      if (face.Orientation() != face2.Orientation()) swap (solidnr0, solidnr1);
+         //		      if (face.Orientation() != face2.Orientation()) std::swap (solidnr0, solidnr1);
          }
          }
          */
@@ -434,7 +434,7 @@ namespace netgen
             for (TopExp_Explorer exp3 (wire, TopAbs_EDGE); exp3.More(); exp3.Next())
             {
                curr++;
-               (*testout) << "edge nr " << curr << endl;
+               std::cerr << "edge nr " << curr <<std::endl;
 
                multithread.percent = 100 * curr / double (total);
                if (multithread.terminate) return;
@@ -442,7 +442,7 @@ namespace netgen
                TopoDS_Edge edge = TopoDS::Edge (exp3.Current());
                if (BRep_Tool::Degenerated(edge))
                {
-                  //(*testout) << "ignoring degenerated edge" << endl;
+                  //std::cerr << "ignoring degenerated edge" <<std::endl;
                   continue;
                }
 
@@ -454,8 +454,8 @@ namespace netgen
 
                   if (system.Mass() < eps)
                   {
-                     cout << "ignoring edge " << geom.emap.FindIndex (edge)
-                        << ". closed edge with length < " << eps << endl;
+                     std::cout << "ignoring edge " << geom.emap.FindIndex (edge)
+                        << ". closed edge with length < " << eps <<std::endl;
                      continue;
                   }
                }
@@ -511,13 +511,13 @@ namespace netgen
                      else
                      {
                         mesh.AddPoint (mp[i-1]);
-                        (*testout) << "add meshpoint " << mp[i-1] << endl;
+                        std::cerr << "add meshpoint " << mp[i-1] <<std::endl;
                         pnums[i] = mesh.GetNP();
                      }
                }
-               (*testout) << "NP = " << mesh.GetNP() << endl;
+               std::cerr << "NP = " << mesh.GetNP() <<std::endl;
 
-               //(*testout) << pnums[pnums.Size()-1] << endl;
+               //std::cerr << pnums[pnums.Size()-1] <<std::endl;
 
                for (int i = 1; i <= mp.Size()+1; i++)
                {
@@ -546,7 +546,7 @@ namespace netgen
                   /*
                   if (occface->IsUPeriodic())
                   {
-                  cout << "U Periodic" << endl;
+                  std::cout << "U Periodic" <<std::endl;
                   if (fabs(seg.epgeominfo[1].u-seg.epgeominfo[0].u) >
                   fabs(seg.epgeominfo[1].u-
                   (seg.epgeominfo[0].u-occface->UPeriod())))
@@ -560,7 +560,7 @@ namespace netgen
 
                   if (occface->IsVPeriodic())
                   {
-                  cout << "V Periodic" << endl;
+                  std::cout << "V Periodic" <<std::endl;
                   if (fabs(seg.epgeominfo[1].v-seg.epgeominfo[0].v) >
                   fabs(seg.epgeominfo[1].v-
                   (seg.epgeominfo[0].v-occface->VPeriod())))
@@ -575,10 +575,10 @@ namespace netgen
 
                   if (edge.Orientation() == TopAbs_REVERSED)
                   {
-                     swap (seg[0], seg[1]);
-                     swap (seg.epgeominfo[0].dist, seg.epgeominfo[1].dist);
-                     swap (seg.epgeominfo[0].u, seg.epgeominfo[1].u);
-                     swap (seg.epgeominfo[0].v, seg.epgeominfo[1].v);
+                     std::swap (seg[0], seg[1]);
+                     std::swap (seg.epgeominfo[0].dist, seg.epgeominfo[1].dist);
+                     std::swap (seg.epgeominfo[0].u, seg.epgeominfo[1].u);
+                     std::swap (seg.epgeominfo[0].v, seg.epgeominfo[1].v);
                   }
 
                   mesh.AddSegment (seg);
@@ -591,8 +591,8 @@ namespace netgen
       }
 
       //	for(i=1; i<=mesh.GetNSeg(); i++)
-      //		(*testout) << "edge " << mesh.LineSegment(i).edgenr << " face " << mesh.LineSegment(i).si
-      //				<< " p1 " << mesh.LineSegment(i)[0] << " p2 " << mesh.LineSegment(i)[1] << endl;
+      //		std::cerr << "edge " << mesh.LineSegment(i).edgenr << " face " << mesh.LineSegment(i).si
+      //				<< " p1 " << mesh.LineSegment(i)[0] << " p2 " << mesh.LineSegment(i)[1] <<std::endl;
       //	exit(10);
 
       mesh.CalcSurfacesOfNode();
@@ -630,12 +630,12 @@ namespace netgen
       {
          if(1==0 && !geom.fvispar[k-1].IsDrawable())
          {
-            (*testout) << "ignoring face " << k << endl;
-            cout << "ignoring face " << k << endl;
+            std::cerr << "ignoring face " << k <<std::endl;
+            std::cout << "ignoring face " << k <<std::endl;
             continue;
          }
 
-         (*testout) << "mesh face " << k << endl;
+         std::cerr << "mesh face " << k <<std::endl;
          multithread.percent = 100 * k / (mesh.GetNFD() + VSMALL);
          geom.facemeshstatus[k-1] = -1;
 
@@ -643,7 +643,7 @@ namespace netgen
          /*
          if (k != 42)
          {
-         cout << "skipped" << endl;
+         std::cout << "skipped" <<std::endl;
          continue;
          }
          */
@@ -665,12 +665,12 @@ namespace netgen
             PrintMessage (2, "Face ", k, " / ", mesh.GetNFD(), " (parameter space projection)");
 
          if (surfmesherror)
-            cout << "Surface meshing error occured before (in " << surfmesherror << " faces)" << endl;
+            std::cout << "Surface meshing error occured before (in " << surfmesherror << " faces)" <<std::endl;
 
          //      Meshing2OCCSurfaces meshing(f2, bb);
          meshing.SetStartTime (starttime);
 
-         //(*testout) << "Face " << k << endl << endl;
+         //std::cerr << "Face " << k <<std::endl <<std::endl;
 
 
          if (meshing.GetProjectionType() == PLANESPACE)
@@ -708,8 +708,8 @@ namespace netgen
                   gi1.v = seg.epgeominfo[1].v;
 
                   meshing.AddBoundaryElement (glob2loc.Get(seg[0]), glob2loc.Get(seg[1]), gi0, gi1);
-                  //(*testout) << gi0.u << " " << gi0.v << endl;
-                  //(*testout) << gi1.u << " " << gi1.v << endl;
+                  //std::cerr << gi0.u << " " << gi0.v <<std::endl;
+                  //std::cerr << gi1.u << " " << gi1.v <<std::endl;
                }
             }
          }
@@ -766,8 +766,8 @@ namespace netgen
                   }
 
                   meshing.AddBoundaryElement (locpnum[0], locpnum[1], gi0, gi1);
-                  //(*testout) << gi0.u << " " << gi0.v << endl;
-                  //(*testout) << gi1.u << " " << gi1.v << endl;
+                  //std::cerr << gi0.u << " " << gi0.v <<std::endl;
+                  //std::cerr << gi1.u << " " << gi1.v <<std::endl;
 
                }
             }
@@ -796,13 +796,13 @@ namespace netgen
 
          catch (SingularMatrixException)
          {
-            (*myerr) << "Singular Matrix" << endl;
+            (*myerr) << "Singular Matrix" <<std::endl;
             res = MESHING2_GIVEUP;
          }
 
          catch (UVBoundsException)
          {
-            (*myerr) << "UV bounds exceeded" << endl;
+            (*myerr) << "UV bounds exceeded" <<std::endl;
             res = MESHING2_GIVEUP;
          }
 
@@ -817,7 +817,7 @@ namespace netgen
 
                mesh.Compress();
 
-               cout << "retry Surface " << k << endl;
+               std::cout << "retry Surface " << k <<std::endl;
 
                k--;
                projecttype*=-1;
@@ -846,18 +846,18 @@ namespace netgen
 
 //      ofstream problemfile("occmesh.rep");
 
-//      problemfile << "SURFACEMESHING" << endl << endl;
+//      problemfile << "SURFACEMESHING" <<std::endl <<std::endl;
 
       if (surfmesherror)
       {
-         cout << "WARNING! NOT ALL FACES HAVE BEEN MESHED" << endl;
-         cout << "SURFACE MESHING ERROR OCCURED IN " << surfmesherror << " FACES:" << endl;
+         std::cout << "WARNING! NOT ALL FACES HAVE BEEN MESHED" <<std::endl;
+         std::cout << "SURFACE MESHING ERROR OCCURED IN " << surfmesherror << " FACES:" <<std::endl;
          for (int i = 1; i <= geom.fmap.Extent(); i++)
             if (geom.facemeshstatus[i-1] == -1)
             {
-               cout << "Face " << i << endl;
-//               problemfile << "problem with face " << i << endl;
-//               problemfile << "vertices: " << endl;
+               std::cout << "Face " << i <<std::endl;
+//               problemfile << "problem with face " << i <<std::endl;
+//               problemfile << "vertices: " <<std::endl;
                TopExp_Explorer exp0,exp1,exp2;
                for ( exp0.Init(TopoDS::Face (geom.fmap(i)), TopAbs_WIRE); exp0.More(); exp0.Next() )
                {
@@ -869,21 +869,21 @@ namespace netgen
                      {
                         TopoDS_Vertex vertex = TopoDS::Vertex(exp2.Current());
                         gp_Pnt point = BRep_Tool::Pnt(vertex);
-//                        problemfile << point.X() << " " << point.Y() << " " << point.Z() << endl;
+//                        problemfile << point.X() << " " << point.Y() << " " << point.Z() <<std::endl;
                      }
                   }
                }
-//               problemfile << endl;
+//               problemfile <<std::endl;
 
             }
-            cout << endl << endl;
-            cout << "for more information open IGES/STEP Topology Explorer" << endl;
+            std::cout <<std::endl <<std::endl;
+            std::cout << "for more information open IGES/STEP Topology Explorer" <<std::endl;
 //            problemfile.close();
             throw NgException ("Problem in Surface mesh generation");
       }
       else
       {
-//         problemfile << "OK" << endl << endl;
+//         problemfile << "OK" <<std::endl <<std::endl;
 //         problemfile.close();
       }
 
@@ -903,7 +903,7 @@ namespace netgen
          //      if (k != 42) continue;
          //      if (k != 36) continue;
 
-         //      (*testout) << "optimize face " << k << endl;
+         //      std::cerr << "optimize face " << k <<std::endl;
          multithread.percent = 100 * k / (mesh.GetNFD() + VSMALL);
 
          FaceDescriptor & fd = mesh.GetFaceDescriptor(k);
@@ -911,7 +911,7 @@ namespace netgen
          PrintMessage (1, "Optimize Surface ", k);
          for (i = 1; i <= mparam.optsteps2d; i++)
          {
-            //	  (*testout) << "optstep " << i << endl;
+            //	  std::cerr << "optstep " << i <<std::endl;
             if (multithread.terminate) return;
 
             {
@@ -922,8 +922,8 @@ namespace netgen
                //meshopt.SetMetricWeight (0.2);
                meshopt.SetWriteStatus (0);
 
-               //	    (*testout) << "EdgeSwapping (mesh, (i > mparam.optsteps2d/2))" << endl;
-               meshopt.EdgeSwapping (mesh, (i > mparam.optsteps2d/2));
+               //	    std::cerr << "Edgestd::swapping (mesh, (i > mparam.optsteps2d/2))" <<std::endl;
+               meshopt.Edgestd::swapping (mesh, (i > mparam.optsteps2d/2));
             }
 
             if (multithread.terminate) return;
@@ -935,7 +935,7 @@ namespace netgen
                meshopt.SetMetricWeight (mparam.elsizeweight);
                meshopt.SetWriteStatus (0);
 
-               //	    (*testout) << "ImproveMesh (mesh)" << endl;
+               //	    std::cerr << "ImproveMesh (mesh)" <<std::endl;
                meshopt.ImproveMesh (mesh, mparam);
             }
 
@@ -947,7 +947,7 @@ namespace netgen
                meshopt.SetMetricWeight (mparam.elsizeweight);
                meshopt.SetWriteStatus (0);
 
-               //	    (*testout) << "CombineImprove (mesh)" << endl;
+               //	    std::cerr << "CombineImprove (mesh)" <<std::endl;
                meshopt.CombineImprove (mesh);
             }
 
@@ -960,7 +960,7 @@ namespace netgen
                meshopt.SetMetricWeight (mparam.elsizeweight);
                meshopt.SetWriteStatus (0);
 
-               //	    (*testout) << "ImproveMesh (mesh)" << endl;
+               //	    std::cerr << "ImproveMesh (mesh)" <<std::endl;
                meshopt.ImproveMesh (mesh, mparam);
             }
          }
@@ -1029,7 +1029,7 @@ namespace netgen
 
             if (len < mincurvelength)
             {
-               (*testout) << "ignored" << endl;
+               std::cerr << "ignored" <<std::endl;
                continue;
             }
 
@@ -1109,7 +1109,7 @@ namespace netgen
 
                mesh.RestrictLocalH (Point3d(pnt.X(), pnt.Y(), pnt.Z()), ComputeH (fabs(curvature)));
             }
-            // (*testout) << "edge " << i << " max. curvature: " << maxcur << endl;
+            // std::cerr << "edge " << i << " max. curvature: " << maxcur <<std::endl;
          }
 
          multithread.task = "Setting local mesh size (face curvature)";
@@ -1148,10 +1148,10 @@ namespace netgen
                //maxside = max (maxside, p[0].Distance(p[1]));
                //maxside = max (maxside, p[0].Distance(p[2]));
                //maxside = max (maxside, p[1].Distance(p[2]));
-               //cout << "\rFace " << i << " pos11 ntriangles " << ntriangles << " maxside " << maxside << flush;
+               //std::cout << "\rFace " << i << " pos11 ntriangles " << ntriangles << " maxside " << maxside << flush;
 
                RestrictHTriangle (par[0], par[1], par[2], &prop, mesh, 0);
-               //cout << "\rFace " << i << " pos12 ntriangles " << ntriangles << flush;
+               //std::cout << "\rFace " << i << " pos12 ntriangles " << ntriangles << flush;
             }
          }
 
@@ -1243,9 +1243,9 @@ namespace netgen
 
                if (mindist < 1e-3)
                {
-                  (*testout) << "extremely small local h: " << mindist
-                     << " --> setting to 1e-3" << endl;
-                  (*testout) << "somewhere near " << line.p0 << " - " << line.p1 << endl;
+                  std::cerr << "extremely small local h: " << mindist
+                     << " --> setting to 1e-3" <<std::endl;
+                  std::cerr << "somewhere near " << line.p0 << " - " << line.p1 <<std::endl;
                   mindist = 1e-3;
                }
 
@@ -1295,7 +1295,7 @@ namespace netgen
          OCCFindEdges (geom, *mesh);
 
          /*
-         cout << "Removing redundant points" << endl;
+         std::cout << "Removing redundant points" <<std::endl;
 
          int i, j;
          int np = mesh->GetNP();
@@ -1316,7 +1316,7 @@ namespace netgen
          for (i = 1; i <= np; i++)
          if (equalto[i-1])
          {
-         cout << "Point " << i << " is equal to Point " << equalto[i-1] << endl;
+         std::cout << "Point " << i << " is equal to Point " << equalto[i-1] <<std::endl;
          for (j = 1; j <= mesh->GetNSeg(); j++)
          {
          Segment & seg = mesh->LineSegment(j);
@@ -1325,14 +1325,14 @@ namespace netgen
          }
          }
 
-         cout << "Removing degenerated segments" << endl;
+         std::cout << "Removing degenerated segments" <<std::endl;
          for (j = 1; j <= mesh->GetNSeg(); j++)
          {
          Segment & seg = mesh->LineSegment(j);
          if (seg[0] == seg[1])
          {
          mesh->DeleteSegment(j);
-         cout << "Deleting Segment " << j << endl;
+         std::cout << "Deleting Segment " << j <<std::endl;
          }
          }
 
@@ -1348,15 +1348,15 @@ namespace netgen
          {
          Handle(Geom_Surface) hf2 =
          BRep_Tool::Surface(TopoDS::Face(geom.fmap(j)));
-         if (hf1 == hf2) cout << "face " << i << " and face " << j << " lie on same surface" << endl;
+         if (hf1 == hf2) std::cout << "face " << i << " and face " << j << " lie on same surface" <<std::endl;
          }
          }
          */
 
 #ifdef LOG_STREAM
-         (*logout) << "Edges meshed" << endl
-            << "time = " << GetTime() << " sec" << endl
-            << "points: " << mesh->GetNP() << endl;
+         (*logout) << "Edges meshed" <<std::endl
+            << "time = " << GetTime() << " sec" <<std::endl
+            << "points: " << mesh->GetNP() <<std::endl;
 #endif
       }
 
@@ -1369,15 +1369,15 @@ namespace netgen
          if (multithread.terminate) return TCL_OK;
 
 #ifdef LOG_STREAM
-         (*logout) << "Surfaces meshed" << endl
-            << "time = " << GetTime() << " sec" << endl
-            << "points: " << mesh->GetNP() << endl;
+         (*logout) << "Surfaces meshed" <<std::endl
+            << "time = " << GetTime() << " sec" <<std::endl
+            << "points: " << mesh->GetNP() <<std::endl;
 #endif
 
 #ifdef STAT_STREAM
          (*statout) << mesh->GetNSeg() << " & "
             << mesh->GetNSE() << " & - &"
-            << GetTime() << " & " << endl;
+            << GetTime() << " & " <<std::endl;
 #endif
 
          //      MeshQuality2d (*mesh);
@@ -1396,12 +1396,12 @@ namespace netgen
 /*
          ofstream problemfile("occmesh.rep",ios_base::app);
 
-         problemfile << "VOLUMEMESHING" << endl << endl;
+         problemfile << "VOLUMEMESHING" <<std::endl <<std::endl;
          if(res != MESHING3_OK)
-            problemfile << "ERROR" << endl << endl;
+            problemfile << "ERROR" <<std::endl <<std::endl;
          else
-            problemfile << "OK" << endl
-            << mesh->GetNE() << " elements" << endl << endl;
+            problemfile << "OK" <<std::endl
+            << mesh->GetNE() << " elements" <<std::endl <<std::endl;
 
          problemfile.close();
 */
@@ -1420,9 +1420,9 @@ namespace netgen
 #endif
 
 #ifdef LOG_STREAM
-         (*logout) << "Volume meshed" << endl
-            << "time = " << GetTime() << " sec" << endl
-            << "points: " << mesh->GetNP() << endl;
+         (*logout) << "Volume meshed" <<std::endl
+            << "time = " << GetTime() << " sec" <<std::endl
+            << "points: " << mesh->GetNP() <<std::endl;
 #endif
       }
 
@@ -1439,26 +1439,26 @@ namespace netgen
 #ifdef STAT_STREAM
          (*statout) << GetTime() << " & "
             << mesh->GetNE() << " & "
-            << mesh->GetNP() << " " << '\\' << '\\' << " \\" << "hline" << endl;
+            << mesh->GetNP() << " " << '\\' << '\\' << " \\" << "hline" <<std::endl;
 #endif
 
 #ifdef LOG_STREAM
-         (*logout) << "Volume optimized" << endl
-            << "time = " << GetTime() << " sec" << endl
-            << "points: " << mesh->GetNP() << endl;
+         (*logout) << "Volume optimized" <<std::endl
+            << "time = " << GetTime() << " sec" <<std::endl
+            << "points: " << mesh->GetNP() <<std::endl;
 #endif
 
-         // cout << "Optimization complete" << endl;
+         // std::cout << "Optimization complete" <<std::endl;
 
       }
 
-      (*testout) << "NP: " << mesh->GetNP() << endl;
+      std::cerr << "NP: " << mesh->GetNP() <<std::endl;
       for (int i = 1; i <= mesh->GetNP(); i++)
-         (*testout) << mesh->Point(i) << endl;
+         std::cerr << mesh->Point(i) <<std::endl;
 
-      (*testout) << endl << "NSegments: " << mesh->GetNSeg() << endl;
+      std::cerr <<std::endl << "NSegments: " << mesh->GetNSeg() <<std::endl;
       for (int i = 1; i <= mesh->GetNSeg(); i++)
-         (*testout) << mesh->LineSegment(i) << endl;
+         std::cerr << mesh->LineSegment(i) <<std::endl;
 
       return TCL_OK;
    }

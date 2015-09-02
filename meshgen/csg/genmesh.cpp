@@ -44,9 +44,9 @@ namespace netgen
   
     PrintMessage (5, "done");
 
-    (*testout) << specpoints.Size() << " special points:" << endl;
+    std::cerr << specpoints.Size() << " special points:" <<std::endl;
     for (int i = 0; i < specpoints.Size(); i++)
-      specpoints[i].Print (*testout);
+      specpoints[i].Print std::cerr;
 
     /*
       for (int i = 1; i <= geom.identifications.Size(); i++)
@@ -77,24 +77,24 @@ namespace netgen
 
     for (int i = 1; i <= mesh.GetNSeg(); i++)
       {
-	//(*testout) << "segment " << mesh.LineSegment(i) << endl;
+	//std::cerr << "segment " << mesh.LineSegment(i) <<std::endl;
 	int ok = 0;
 	for (int k = 1; k <= mesh.GetNFD(); k++)
 	  if (mesh.GetFaceDescriptor(k).SegmentFits (mesh.LineSegment(i)))
 	    {
 	      ok = k;
-	      //(*testout) << "fits to " << k << endl;
+	      //std::cerr << "fits to " << k <<std::endl;
 	    }
 
 	if (!ok)
 	  {
 	    ok = mesh.AddFaceDescriptor (FaceDescriptor (mesh.LineSegment(i)));
-	    //(*testout) << "did not find, now " << ok << endl;
+	    //std::cerr << "did not find, now " << ok <<std::endl;
 	  }
 
-	//(*testout) << "change from " << mesh.LineSegment(i).si;
+	//std::cerr << "change from " << mesh.LineSegment(i).si;
 	mesh.LineSegment(i).si = ok;
-	//(*testout) << " to " << mesh.LineSegment(i).si << endl;
+	//std::cerr << " to " << mesh.LineSegment(i).si <<std::endl;
       }
 
     if (geom.identifications.Size())
@@ -103,8 +103,8 @@ namespace netgen
 	for (int i = 0; i < geom.identifications.Size(); i++)
 	  {
 	    geom.identifications[i]->IdentifyPoints (mesh);
-	    //(*testout) << "identification " << i << " is " 
-	    //	       << *geom.identifications[i] << endl;
+	    //std::cerr << "identification " << i << " is " 
+	    //	       << *geom.identifications[i] <<std::endl;
 	    
 	  }
 	for (int i = 0; i < geom.identifications.Size(); i++)
@@ -173,7 +173,7 @@ namespace netgen
 	      
 	      mat.Solve (rhs, sol);
 
-	      //(*testout) << "mat " << mat << endl << "rhs " << rhs << endl << "sol " << sol << endl;
+	      //std::cerr << "mat " << mat <<std::endl << "rhs " << rhs <<std::endl << "sol " << sol <<std::endl;
 	      
 	      if (sol(0) > 1e-6 && sol(0) < 1-1e-6 &&
 		  sol(1) > 1e-6 && sol(1) < 1-1e-6 &&
@@ -181,34 +181,34 @@ namespace netgen
 		{
 		  Point<3> ip = pi1 + sol(0) * vi;
 		  
-		  //(*testout) << "ip " << ip << endl;
+		  //std::cerr << "ip " << ip <<std::endl;
 
 		  Point<3> pip = ip;
 		  ProjectToEdge (geom.GetSurface (mesh[si].surfnr1),
 				 geom.GetSurface (mesh[si].surfnr2), pip);
 		  
-		  //(*testout) << "Dist (ip, pip_si) " << Dist (ip, pip) << endl;
+		  //std::cerr << "Dist (ip, pip_si) " << Dist (ip, pip) <<std::endl;
 		  if (Dist (ip, pip) > 1e-6*geom.MaxSize()) continue;
 		  pip = ip;
 		  ProjectToEdge (geom.GetSurface (mesh[sj].surfnr1),
 				 geom.GetSurface (mesh[sj].surfnr2), pip);
 
-		  //(*testout) << "Dist (ip, pip_sj) " << Dist (ip, pip) << endl;
+		  //std::cerr << "Dist (ip, pip_sj) " << Dist (ip, pip) <<std::endl;
 		  if (Dist (ip, pip) > 1e-6*geom.MaxSize()) continue;
 		  
 		  
 		  
-		  cout << "Intersection at " << ip << endl;
+		  std::cout << "Intersection at " << ip <<std::endl;
 		  
 		  geom.AddUserPoint (ip);
 		  spoints.Append (MeshPoint (ip, mesh[mesh[si][0]].GetLayer()));
 		  mesh.AddPoint (ip);
 		  
-		  (*testout) << "found intersection at " << ip << endl;
-		  (*testout) << "sol = " << sol << endl;
-		  (*testout) << "res = " << (rhs - mat*sol) << endl;
-		  (*testout) << "segs = " << pi1 << " - " << pi2 << endl;
-		  (*testout) << "and = " << pj1 << " - " << pj2 << endl << endl;
+		  std::cerr << "found intersection at " << ip <<std::endl;
+		  std::cerr << "sol = " << sol <<std::endl;
+		  std::cerr << "res = " << (rhs - mat*sol) <<std::endl;
+		  std::cerr << "segs = " << pi1 << " - " << pi2 <<std::endl;
+		  std::cerr << "and = " << pj1 << " - " << pj2 <<std::endl <<std::endl;
 		}
 	    }
 	}  
@@ -403,8 +403,8 @@ namespace netgen
 
 	FaceDescriptor & fd = mesh.GetFaceDescriptor(k);
 
-	(*testout) << "Surface " << k << endl;
-	(*testout) << "Face Descriptor: " << fd << endl;
+	std::cerr << "Surface " << k <<std::endl;
+	std::cerr << "Face Descriptor: " << fd <<std::endl;
 	PrintMessage (1, "Surface ", k, " / ", mesh.GetNFD());
 
 	int oldnf = mesh.GetNSE();
@@ -430,12 +430,12 @@ namespace netgen
 	  if (mesh[si].si == k)
 	    {
 	      segments.Append (mesh[si]);
-	      (*testout) << "appending segment " << mesh[si] << endl;
+	      std::cerr << "appending segment " << mesh[si] <<std::endl;
 	      //<< " from " << mesh[mesh[si][0]]
-	      //	 << " to " <<mesh[mesh[si][1]]<< endl;
+	      //	 << " to " <<mesh[mesh[si][1]]<<std::endl;
 	    }
 
-	(*testout) << "num-segments " << segments.Size() << endl;
+	std::cerr << "num-segments " << segments.Size() <<std::endl;
 
 	for (int i = 1; i <= geom.identifications.Size(); i++)
 	  {
@@ -475,9 +475,9 @@ namespace netgen
 	    if (hi < maxh) maxh = hi;
 	  }
 
-	(*testout) << "domin = " << fd.DomainIn() << ", domout = " << fd.DomainOut()
+	std::cerr << "domin = " << fd.DomainIn() << ", domout = " << fd.DomainOut()
 		   << ", tlo-surf = " << fd.TLOSurface()
-		   << " mpram.maxh = " << mparam.maxh << ", maxh = " << maxh << endl;
+		   << " mpram.maxh = " << mparam.maxh << ", maxh = " << maxh <<std::endl;
 
 	mparam.checkoverlap = 0;
 
@@ -518,7 +518,7 @@ namespace netgen
 		  meshopt.SetMetricWeight (mparam.elsizeweight);
 		  meshopt.SetWriteStatus (0);
 		  
-		  meshopt.EdgeSwapping (mesh, (i > mparam.optsteps2d/2));
+		  meshopt.Edgestd::swapping (mesh, (i > mparam.optsteps2d/2));
 		}
 		
 		if (multithread.terminate) return;
@@ -579,8 +579,8 @@ namespace netgen
 
 	    FaceDescriptor & fd = mesh.GetFaceDescriptor(k);
 
-	    (*testout) << "Surface " << k << endl;
-	    (*testout) << "Face Descriptor: " << fd << endl;
+	    std::cerr << "Surface " << k <<std::endl;
+	    std::cerr << "Face Descriptor: " << fd <<std::endl;
 	    PrintMessage (2, "Surface ", k);
 
 	    int oldnf = mesh.GetNSE();
@@ -696,9 +696,9 @@ namespace netgen
 	PrintMessage (5, "find points done");
 
 #ifdef LOG_STREAM
-	(*logout) << "Special points found" << endl
-		  << "time = " << GetTime() << " sec" << endl
-		  << "points: " << mesh->GetNP() << endl << endl;
+	(*logout) << "Special points found" <<std::endl
+		  << "time = " << GetTime() << " sec" <<std::endl
+		  << "points: " << mesh->GetNP() <<std::endl <<std::endl;
 #endif
       }
 
@@ -712,9 +712,9 @@ namespace netgen
 	FindEdges (geom, *mesh, true);
 	if (multithread.terminate) return TCL_OK;
 #ifdef LOG_STREAM      
-	(*logout) << "Edges meshed" << endl
-		  << "time = " << GetTime() << " sec" << endl
-		  << "points: " << mesh->GetNP() << endl;
+	(*logout) << "Edges meshed" <<std::endl
+		  << "time = " << GetTime() << " sec" <<std::endl
+		  << "points: " << mesh->GetNP() <<std::endl;
 #endif
       
       
@@ -750,9 +750,9 @@ namespace netgen
 	if (multithread.terminate) return TCL_OK;
       
 #ifdef LOG_STREAM
-	(*logout) << "Surfaces meshed" << endl
-		  << "time = " << GetTime() << " sec" << endl
-		  << "points: " << mesh->GetNP() << endl;
+	(*logout) << "Surfaces meshed" <<std::endl
+		  << "time = " << GetTime() << " sec" <<std::endl
+		  << "points: " << mesh->GetNP() <<std::endl;
 #endif      
       
 	if (mparam.uselocalh && 0)
@@ -770,15 +770,15 @@ namespace netgen
 	  }
 
 #ifdef LOG_STREAM      
-	(*logout) << "Surfaces remeshed" << endl
-		  << "time = " << GetTime() << " sec" << endl
-		  << "points: " << mesh->GetNP() << endl;
+	(*logout) << "Surfaces remeshed" <<std::endl
+		  << "time = " << GetTime() << " sec" <<std::endl
+		  << "points: " << mesh->GetNP() <<std::endl;
 #endif      
       
 #ifdef STAT_STREAM
 	(*statout) << mesh->GetNSeg() << " & "
 		   << mesh->GetNSE() << " & - &" 
-		   << GetTime() << " & " << endl;
+		   << GetTime() << " & " <<std::endl;
 #endif  
 
 	MeshQuality2d (*mesh);
@@ -814,9 +814,9 @@ namespace netgen
 #endif      
       
 #ifdef LOG_STREAM
-	(*logout) << "Volume meshed" << endl
-		  << "time = " << GetTime() << " sec" << endl
-		  << "points: " << mesh->GetNP() << endl;
+	(*logout) << "Volume meshed" <<std::endl
+		  << "time = " << GetTime() << " sec" <<std::endl
+		  << "points: " << mesh->GetNP() <<std::endl;
 #endif
       }
 
@@ -834,13 +834,13 @@ namespace netgen
 #ifdef STAT_STREAM
 	(*statout) << GetTime() << " & "
 		   << mesh->GetNE() << " & "
-		   << mesh->GetNP() << " " << '\\' << '\\' << " \\" << "hline" << endl;
+		   << mesh->GetNP() << " " << '\\' << '\\' << " \\" << "hline" <<std::endl;
 #endif      
 
 #ifdef LOG_STREAM      
-	(*logout) << "Volume optimized" << endl
-		  << "time = " << GetTime() << " sec" << endl
-		  << "points: " << mesh->GetNP() << endl;
+	(*logout) << "Volume optimized" <<std::endl
+		  << "time = " << GetTime() << " sec" <<std::endl
+		  << "points: " << mesh->GetNP() <<std::endl;
 #endif
       }
 

@@ -19,10 +19,13 @@
    TopEdge .... edge in topology, boundary of STL triangles (many)
    Edge .... Edges which will occur in the mesh (confirmed edges, less)
 */
-
-
-#include <meshing.hpp>
-
+#include "../meshing/basegeom.hpp"
+#include "../meshing/meshtype.hpp"
+#include "meshstlsurface.hpp"
+#include "stltopology.hpp"
+#include "stltool.hpp"
+#include "stlline.hpp"
+ 
 
 namespace netgen
 {
@@ -38,20 +41,6 @@ namespace netgen
     return true;
   }
   
-  extern DLL_HEADER MeshingParameters mparam;
-  
-
-
-#include "stltopology.hpp"
-#include "stltool.hpp"
-#include "stlline.hpp"
- 
-
-
-
-
-
-
   class STLEdgeDataList
   {
     Array<int> storedstatus;
@@ -83,8 +72,8 @@ namespace netgen
 
     int GetNConfEdges() const;
 
-    void Write(ofstream& of) const;
-    void Read(ifstream& ifs);
+    void Write(std::ofstream& of) const;
+    void Read(std::ifstream& ifs);
 
     void BuildLineWithEdge(int ep1, int ep2, Array<twoint>& line);
     void BuildClusterWithEdge(int ep1, int ep2, Array<twoint>& line);
@@ -185,7 +174,7 @@ namespace netgen
 
     void Clear();
 
-    virtual void Save (string filename) const;
+    virtual void Save (std::string filename) const;
 
 
     void STLInfo(double* data);

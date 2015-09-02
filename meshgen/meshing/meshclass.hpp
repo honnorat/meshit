@@ -7,6 +7,19 @@
 /* Date:   20. Nov. 99                                                    */
 /**************************************************************************/
 
+#include <iostream>
+#include <string>
+#include "meshtype.hpp"
+#include "localh.hpp"
+#include "../gprim/adtree.hpp"
+#include "../general/bitarray.hpp"
+#include "../general/symbolta.hpp"
+#include "../general/parthreads.hpp"
+#include "../gprim/geomops.hpp"
+
+#include "hprefinement.hpp"
+#include "topology.hpp"
+
 /*
   The mesh class
 */
@@ -85,7 +98,7 @@ namespace netgen
     Array<char*> materials;
 
     /// labels for boundary conditions
-    Array<string*> bcnames;
+    Array<std::string*> bcnames;
 
     /// Periodic surface, close surface, etc. identifications
     Identifications * ident;
@@ -462,17 +475,17 @@ namespace netgen
     DLL_HEADER void Compress ();
 
     ///
-    void Save (ostream & outfile) const;
+    void Save (std::ostream & outfile) const;
     ///
-    void Load (istream & infile);
+    void Load (std::istream & infile);
     ///
-    void Merge (istream & infile, const int surfindex_offset = 0);
+    void Merge (std::istream & infile, const int surfindex_offset = 0);
     ///
-    void Save (const string & filename) const;
+    void Save (const std::string & filename) const;
     ///
-    void Load (const string & filename);
+    void Load (const std::string & filename);
     ///
-    void Merge (const string & filename, const int surfindex_offset = 0);
+    void Merge (const std::string & filename, const int surfindex_offset = 0);
 
 
     ///
@@ -508,7 +521,7 @@ namespace netgen
     /**
        if values non-null, return values in 4-double array:
        triangle angles min/max, tetangles min/max
-       if null, output results on cout
+       if null, output results on std::cout
     */
     void CalcMinMaxAngle (double badellimit, double * retvalues = NULL);
 
@@ -570,11 +583,11 @@ namespace netgen
     
     DLL_HEADER void SetNBCNames ( int nbcn );
 
-    DLL_HEADER void SetBCName ( int bcnr, const string & abcname );
+    DLL_HEADER void SetBCName ( int bcnr, const std::string & abcname );
 
-    const string & GetBCName ( int bcnr ) const;
+    const std::string & GetBCName ( int bcnr ) const;
 
-    string * GetBCNamePtr ( int bcnr )
+    std::string * GetBCNamePtr ( int bcnr )
     { return bcnames[bcnr]; }
 
     ///
@@ -676,8 +689,8 @@ namespace netgen
       void Add (const Element2d & sel)
       {
 	if (sel.GetNP() == 3)
-	  area += Cross ( mesh[sel[1]]-mesh[sel[0]],
-			  mesh[sel[2]]-mesh[sel[0]] ).Length() / 2;
+	  area += Cross ( mesh.Point(sel[1])-mesh.Point(sel[0]),
+			  mesh.Point(sel[2])-mesh.Point(sel[0]) ).Length() / 2;
 	else
 	  area += Cross (Vec3d (mesh.Point (sel.PNum(1)),
 				mesh.Point (sel.PNum(3))),
@@ -728,7 +741,7 @@ namespace netgen
     ///
     friend void OptimizeRestart (Mesh & mesh3d);
     ///
-    void PrintMemInfo (ostream & ost) const;
+    void PrintMemInfo (std::ostream & ost) const;
     /// 
     friend class Meshing3;
 
@@ -779,9 +792,9 @@ namespace netgen
 
   };
 
-  inline ostream& operator<<(ostream& ost, const Mesh& mesh)
+  inline std::ostream& operator<<(std::ostream& ost, const Mesh& mesh)
   {
-    ost << "mesh: " << endl;
+    ost << "mesh: " << std::endl;
     mesh.Save(ost);
     return ost;
   }

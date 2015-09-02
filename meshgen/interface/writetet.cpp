@@ -20,7 +20,7 @@ namespace netgen
     if(!mesh.PureTetMesh())
       throw NgException("Can only export pure tet mesh in this format");
 
-    cout << "starting .tet export to file " << filename << endl;
+    std::cout << "starting .tet export to file " << filename <<std::endl;
 
 
     Array<int> point_ids,edge_ids,face_ids;
@@ -77,9 +77,9 @@ namespace netgen
 	
 	if(maxbc >= mindomain)
 	  {
-	    cout << "WARNING: writing version " << version << "." << subversion << " tetfile not possible, ";
+	    std::cout << "WARNING: writing version " << version << "." << subversion << " tetfile not possible, ";
 	    version = 1; subversion = 1;
-	    cout << "using version " << version << "." << subversion << endl;
+	    std::cout << "using version " << version << "." << subversion <<std::endl;
 	  }
       }
 
@@ -410,13 +410,13 @@ namespace netgen
 	    << dS1 << " " << dS2 << " " << alphaDeg <<"\n\n"	\
 	    << "// Periodic UnitCell origin in global coords (x3D,y3D,z3D):\n" \
 	    << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n" \
-	    << x3D << " " << y3D << " " << z3D << "\n" << endl;
+	    << x3D << " " << y3D << " " << z3D << "\n" <<std::endl;
 
     if(version == 2)
       {
 	outfile << "// Model entity count: Vertices, Edges, Faces, Cells:\n" \
 		<< "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n" \
-		<< modelverts << " " << modeledges << " " << modelfaces << " " << modelcells << endl << endl;
+		<< modelverts << " " << modeledges << " " << modelfaces << " " << modelcells <<std::endl <<std::endl;
       }
 
 
@@ -425,7 +425,7 @@ namespace netgen
     outfile << numelems << " " 
 	    << numfaces << " "
 	    << numedges << " " 
-	    << numnodes << endl << endl;
+	    << numnodes <<std::endl <<std::endl;
 
     outfile << "// NodeID, X, Y, Z, Type (0=Reg 1=PMaster 2=PSlave 3=CPMaster 4=CPSlave), "<< uidpid <<":\n" \
 	    << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
@@ -488,7 +488,7 @@ namespace netgen
 		n8++;
 	      }
 	    else
-	      cerr << "ERROR: Identification group size = " << group.Size() << endl;
+	      std::cerr << "ERROR: Identification group size = " << group.Size() <<std::endl;
 	  }
 	
       }
@@ -508,7 +508,7 @@ namespace netgen
 	  outfile << "0";
 	outfile << "\n";
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     outfile << "\n// Number of Periodic Master Nodes:\n" \
 	    << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n" \
@@ -530,7 +530,7 @@ namespace netgen
 	delete id_groups[i];
 	id_groups[i] = NULL;
       }
-    outfile << endl;
+    outfile <<std::endl;
 	
 	
     outfile << "// Number of Corner Periodic Master Nodes:\n"	      \
@@ -557,7 +557,7 @@ namespace netgen
 	delete id_groups[i];
 	id_groups[i] = NULL;
       }
-    outfile << endl;
+    outfile <<std::endl;
 
 
     outfile << "// Number of Cubic Periodic Master Nodes:\n"	     \
@@ -580,7 +580,7 @@ namespace netgen
 	delete id_groups[i];
 	id_groups[i] = NULL;
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     
 
@@ -618,11 +618,11 @@ namespace netgen
 		  }
 		else if(possible.Size() > 0)
 		  {
-		    cerr << "ERROR: too many possible edge identifications" << endl;
-		    (*testout) << "ERROR: too many possible edge identifications" << endl
-			       << "*vertex_to_edge["<<vid[0]<<"] " << *vertex_to_edge[vid[0]] << endl
-			       << "*vertex_to_edge["<<vid[1]<<"] " << *vertex_to_edge[vid[1]] << endl
-			       << "possible " << possible << endl;
+		    std::cerr << "ERROR: too many possible edge identifications" <<std::endl;
+		    std::cerr << "ERROR: too many possible edge identifications" <<std::endl
+			       << "*vertex_to_edge["<<vid[0]<<"] " << *vertex_to_edge[vid[0]] <<std::endl
+			       << "*vertex_to_edge["<<vid[1]<<"] " << *vertex_to_edge[vid[1]] <<std::endl
+			       << "possible " << possible <<std::endl;
 		  }
 	      }
 	  }
@@ -683,11 +683,11 @@ namespace netgen
 	      }
 	    else
 	      {
-		cerr << "ERROR: edge identification group size = " << group.Size() << endl;
-		(*testout) << "edge group " << group << endl;
+		std::cerr << "ERROR: edge identification group size = " << group.Size() <<std::endl;
+		std::cerr << "edge group " << group <<std::endl;
 		for(int j=0; j<idmaps_edge.Size(); j++)
 		  {
-		    (*testout) << "edge id map " << j << endl << *idmaps_edge[j] << endl;
+		    std::cerr << "edge id map " << j <<std::endl << *idmaps_edge[j] <<std::endl;
 		  }
 	      }
 	  }
@@ -735,11 +735,11 @@ namespace netgen
 	      }
 	    else
 	      {
-		cerr << "ERROR: edge identification group size = " << group.Size() << endl;
-		(*testout) << "edge group " << group << endl;
+		std::cerr << "ERROR: edge identification group size = " << group.Size() <<std::endl;
+		std::cerr << "edge group " << group <<std::endl;
 		for(int j=0; j<idmaps_edge.Size(); j++)
 		  {
-		    (*testout) << "edge id map " << j << endl << *idmaps_edge[j] << endl;
+		    std::cerr << "edge id map " << j <<std::endl << *idmaps_edge[j] <<std::endl;
 		  }
 	      }
 	  }
@@ -751,7 +751,7 @@ namespace netgen
       outfile << i+1 << " " << nodenum[edge2node[i][0]] << " " << nodenum[edge2node[i][1]] 
 	      << " " << id_type[i+1] << " " << edge_ids[i] << "\n";
 
-    outfile << endl;
+    outfile <<std::endl;
 
     
 
@@ -775,7 +775,7 @@ namespace netgen
 	delete id_groups[i];
 	id_groups[i] = NULL;
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     outfile << "// Number of Corner Periodic Master Edges:\n"		\
 	    << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"\
@@ -797,7 +797,7 @@ namespace netgen
 	delete id_groups[i];
 	id_groups[i] = NULL;
       }
-    outfile << endl;
+    outfile <<std::endl;
 
 
     outfile << "// FaceID, EdgeID0, EdgeID1, EdgeID2, FaceType (0=Reg 1=PMaster 2=PSlave), "<<uidpid<<":\n" \
@@ -836,7 +836,7 @@ namespace netgen
 		    (*idmaps[j])[i+1] = possible[0];
 		  }
 		else if(possible.Size() > 0)
-		  cerr << "ERROR: too many possible face identifications" << endl;
+		  std::cerr << "ERROR: too many possible face identifications" <<std::endl;
 	      }
 	  }
 
@@ -886,7 +886,7 @@ namespace netgen
 	    if(group.Size() == 2)
 	      n2++;
 	    else
-	      cerr << "ERROR: face identification group size = " << group.Size() << endl;
+	      std::cerr << "ERROR: face identification group size = " << group.Size() <<std::endl;
 	  }
 	
       }
@@ -913,7 +913,7 @@ namespace netgen
 
 	outfile << " " << face_ids[i] <<"\n";
       }
-    outfile << endl;
+    outfile <<std::endl;
 
 
     outfile << "// Number of Periodic Master Faces:\n"\
@@ -935,7 +935,7 @@ namespace netgen
 
 	delete id_groups[i];
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     
 
@@ -954,7 +954,7 @@ namespace netgen
 	    outfile << mesh[i].GetIndex() << "\n";
 	  }
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     outfile << "// ElemID, NodeID0, NodeID1, NodeID2, NodeID3:\n" \
 	    << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
@@ -966,7 +966,7 @@ namespace netgen
 	  outfile << elnum[i] << " "
 		  << nodenum[mesh[i][1]] << " " << nodenum[mesh[i][0]] << " " << nodenum[mesh[i][2]] << " " << nodenum[mesh[i][3]] << "\n";
       }
-    outfile << endl;
+    outfile <<std::endl;
     
 
     
@@ -978,7 +978,7 @@ namespace netgen
 	    << "// Number of Ports (Ports are a subset of Object2D list):\n" \
 	    << "// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n" \
 	    << numports << "\n"						\
-	    << endl;
+	    <<std::endl;
 
 
     Array< Array<int> * > groups;
@@ -1038,7 +1038,7 @@ namespace netgen
 	    outfile << "\n";
 	  }
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     
     for(int i=0; i<groups.Size(); i++)
@@ -1058,7 +1058,7 @@ namespace netgen
 	for(int j=0; j<groups[i]->Size(); j++)
 	  outfile << (*groups[i])[j] << "\n";
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     
     for(int i=0; i<groups.Size(); i++)
@@ -1083,7 +1083,7 @@ namespace netgen
 	for(int j=0; j<groups[i]->Size(); j++)
 	  outfile << (*groups[i])[j] << "\n";
       }
-    outfile << endl;
+    outfile <<std::endl;
 
     for(int i=0; i<groups.Size(); i++)
       delete groups[i];
@@ -1091,6 +1091,6 @@ namespace netgen
 
     outfile.close();
 
-    cout << ".tet export done" << endl;
+    std::cout << ".tet export done" <<std::endl;
   }
 }

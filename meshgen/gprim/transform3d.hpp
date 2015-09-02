@@ -7,6 +7,9 @@
 /* Date:   22. Mar. 98                                                     */
 /* *************************************************************************/
 
+#include <iostream>
+#include "geom3d.hpp"
+
 /*
   Affine - Linear mapping in 3D space
  */
@@ -15,7 +18,7 @@ namespace netgen
 {
 
 class Transformation3d;
-ostream & operator<< (ostream & ost, Transformation3d & trans);
+std::ostream & operator<< (std::ostream & ost, Transformation3d & trans);
 
 class Transformation3d
 {
@@ -65,7 +68,7 @@ public:
 	    lin[i-1][1] * from.X(2) + lin[i-1][2] * from.X(3);
 	}
     }
-  friend ostream & operator<< (ostream & ost, Transformation3d & trans);
+  friend std::ostream & operator<< (std::ostream & ost, Transformation3d & trans);
 };
 
 
@@ -124,8 +127,8 @@ public:
     ht.Combine (ht2, r1);
     Combine (ht, tcinv);
     
-    // cout << "Rotation - Transformation:" << (*this) << endl;
-    //  (*testout) << "Rotation - Transformation:" << (*this) << endl;
+    // std::cout << "Rotation - Transformation:" << (*this) <<std::endl;
+    //  std::cerr << "Rotation - Transformation:" << (*this) <<std::endl;
   }
 
   /// 
@@ -185,7 +188,7 @@ public:
 };
 
 template <int D>
-ostream & operator<< (ostream & ost, Transformation<D> & trans);
+std::ostream & operator<< (std::ostream & ost, Transformation<D> & trans);
 
 
 }

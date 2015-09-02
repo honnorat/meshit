@@ -6,6 +6,7 @@
 /* Author: Joachim Schoeberl                                              */
 /* Date:   07. Jan. 00                                                    */
 /**************************************************************************/
+#include "../general/array.hpp"
 
 namespace netgen
 {

@@ -8,6 +8,9 @@
 /* Date:   10. Oct. 96                                                   */
 /**************************************************************************/
 
+#include <iostream>
+#include "symbolta.hpp"
+
 namespace netgen
 {
 
@@ -50,7 +53,7 @@ public:
   /// Save flags to file
   DLL_HEADER void SaveFlags (const char * filename) const;
   /// write flags to stream
-  DLL_HEADER void PrintFlags (ostream & ost) const;
+  DLL_HEADER void PrintFlags (std::ostream & ost) const;
   /// Load flags from file
   DLL_HEADER void LoadFlags (const char * filename);
   /// set flag of form -name=hello -val=0.5 -defined

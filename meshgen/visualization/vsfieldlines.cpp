@@ -73,7 +73,7 @@ namespace netgen
 
   void RKStepper :: StartNextValCalc(const Point3d & astartval, const double astartt, const double ah, const bool aadaptive)
   {
-    //cout << "Starting RK-Step with h=" << ah << endl;
+    //std::cout << "Starting RK-Step with h=" << ah <<std::endl;
 
     stepcount = 0;
     h = ah;
@@ -88,7 +88,7 @@ namespace netgen
     bool finished(false);
     
     
-    //cout << "stepcount " << stepcount << endl;
+    //std::cout << "stepcount " << stepcount <<std::endl;
     
     if(stepcount <= steps)
       {
@@ -141,13 +141,13 @@ namespace netgen
 		  {
 		    finished = true;
 		    notrestarted++;
-		    //(*testout) << "finished RK-Step, new h=" << ah << " tolerance " << tolerance << " err " << err << endl;
+		    //std::cerr << "finished RK-Step, new h=" << ah << " tolerance " << tolerance << " err " << err <<std::endl;
 		  }
 		else
 		  {
 		    //ah *= 0.9;
 		    notrestarted = 0;
-		    //(*testout) << "restarting h " << 2.*h << " ah " << ah << " tolerance " << tolerance << " err " << err << endl;
+		    //std::cerr << "restarting h " << 2.*h << " ah " << ah << " tolerance " << tolerance << " err " << err <<std::endl;
 		    StartNextValCalc(startval_bak,startt_bak, ah, adaptive);
 		  }
 	      }
@@ -229,14 +229,14 @@ namespace netgen
 
     int calculated = 0;
 
-    cout << endl;
+    std::cout <<std::endl;
 
 
 
 
     for(int i=0; i<potential_startpoints.Size(); i++)
       {
-	cout << "\rFieldline Calculation " << int(100.*i/potential_startpoints.Size()) << "%"; cout.flush();
+	std::cout << "\rFieldline Calculation " << int(100.*i/potential_startpoints.Size()) << "%"; std::cout.flush();
 
 	if(randomized)
 	  SetCriticalValue((double(rand())/RAND_MAX)*crit);
@@ -267,7 +267,7 @@ namespace netgen
 
 	if(usable) calculated++;
       }
-    cout << "\rFieldline Calculation " << 100 << "%" << endl;
+    std::cout << "\rFieldline Calculation " << 100 << "%" <<std::endl;
     
   }
 
@@ -345,7 +345,7 @@ namespace netgen
 
 
     int startelnr = mesh.GetElementOfPoint(startpoint,startlami,true) - 1;
-    (*testout) << "p = " << startpoint << "; elnr = " << startelnr << endl;
+    std::cerr << "p = " << startpoint << "; elnr = " << startelnr <<std::endl;
     if (startelnr == -1)
       return;
       
@@ -363,7 +363,7 @@ namespace netgen
     if(critical_value > 0 && fabs(startval) < critical_value)
       return;
 
-    //cout << "p = " << startpoint << "; elnr = " << startelnr << endl;
+    //std::cout << "p = " << startpoint << "; elnr = " << startelnr <<std::endl;
 
 
       
@@ -388,7 +388,7 @@ namespace netgen
 	  {
 	    if(v.Length() < 1e-12*rad)
 	      {
-		(*testout) << "Current fieldlinecalculation came to a stillstand at " << points.Last() << endl;
+		std::cerr << "Current fieldlinecalculation came to a stillstand at " << points.Last() <<std::endl;
 		break;
 	      }
 
@@ -414,7 +414,7 @@ namespace netgen
 
 	    if (elnr == -1)
 	      {
-		//cout << "direction " <<dir << " reached the wall." << endl;
+		//std::cout << "direction " <<dir << " reached the wall." <<std::endl;
 		break;
 	      }
 
@@ -423,14 +423,14 @@ namespace netgen
 	    drawelems.Append(drawelem);
 
 	    if(points.Size() % 40 == 0 && points.Size() > 1)
-	      (*testout) << "Points in current fieldline: " << points.Size() << ", current position: " << newp << endl;
+	      std::cerr << "Points in current fieldline: " << points.Size() << ", current position: " << newp <<std::endl;
 
 	    if(maxpoints > 0 && points.Size() >= maxpoints)
 	      {
 		break;
 	      }
 
-	    //cout << "length " << length << " h " << h << " vals.Last() " << vals.Last()  << " maxlength " << maxlength << endl;
+	    //std::cout << "length " << length << " h " << h << " vals.Last() " << vals.Last()  << " maxlength " << maxlength <<std::endl;
 	  }
 	dirstart.Append(points.Size());
       }
@@ -488,7 +488,7 @@ namespace netgen
 
     infile = new ifstream(fieldlines_filename.c_str());
 
-    //cout << "reading from file " << fieldlines_filename << endl;
+    //std::cout << "reading from file " << fieldlines_filename <<std::endl;
 
     int numpoints = 0;
 
@@ -514,7 +514,7 @@ namespace netgen
     delete infile;
 
 
-    //cout << numpoints << " startpoints" << endl;
+    //std::cout << numpoints << " startpoints" <<std::endl;
 
     startpoints.SetSize(numpoints);
     
@@ -550,7 +550,7 @@ namespace netgen
 	      }
 	  }
 
-	//cout << "startpoints " << startpoints << endl;
+	//std::cout << "startpoints " << startpoints <<std::endl;
       }
 
     delete infile;
@@ -565,11 +565,11 @@ namespace netgen
   {
     Array<SurfaceElementIndex> elements_2d;
     
-    //cout << "fieldlines_startface " << fieldlines_startface << endl;
+    //std::cout << "fieldlines_startface " << fieldlines_startface <<std::endl;
     mesh->GetSurfaceElementsOfFace(fieldlines_startface,elements_2d);
     if(elements_2d.Size() == 0)
       {
-	cerr << "No Elements on selected face (?)" << endl;
+	std::cerr << "No Elements on selected face (?)" <<std::endl;
 	return;
       }
     Vec3d v1,v2,cross;
@@ -704,7 +704,7 @@ namespace netgen
 	else
 	  phi = 0;
 
-	cout << "phi = " << phi << endl;
+	std::cout << "phi = " << phi <<std::endl;
 
 	double phaser = cos(phi), phasei = sin(phi);
 	
@@ -715,7 +715,7 @@ namespace netgen
 	linecalc.GenerateFieldLines(startpoints,num_fieldlines / num_fieldlineslists+1,
 				    fieldlineslist+ln,minval,maxval,logscale,phaser,phasei);
 
-        glEndList ();
+        gstd::endlist ();
 
       }
   }

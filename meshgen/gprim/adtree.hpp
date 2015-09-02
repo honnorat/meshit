@@ -8,6 +8,12 @@
 /* Redesigned by Wolfram Muehlhuber, May 1998                              */
 /* *************************************************************************/
 
+#include <iostream>
+
+#include <meshgen.hpp>
+
+#include "../general/optmem.hpp"
+#include "geomobjects.hpp"
 
 namespace netgen
 {
@@ -74,10 +80,10 @@ public:
   void DeleteElement (int pi);
 
 
-  void Print (ostream & ost) const
+  void Print (std::ostream & ost) const
     { PrintRec (ost, root); }
 
-  void PrintRec (ostream & ost, const ADTreeNode * node) const;
+  void PrintRec (std::ostream & ost, const ADTreeNode * node) const;
 };
 
 
@@ -119,10 +125,10 @@ public:
   void DeleteElement (int pi);
 
 
-  void Print (ostream & ost) const
+  void Print (std::ostream & ost) const
     { PrintRec (ost, root); }
 
-  void PrintRec (ostream & ost, const ADTreeNode3 * node) const;
+  void PrintRec (std::ostream & ost, const ADTreeNode3 * node) const;
 };
 
 
@@ -365,18 +371,18 @@ public:
   void DeleteElement (int pi);
 
   
-  void Print (ostream & ost) const
+  void Print (std::ostream & ost) const
   { PrintRec (ost, root); }
   int Depth () const
   { return DepthRec (root); }
   int Elements () const
   { return ElementsRec (root); }
 
-  void PrintRec (ostream & ost, const ADTreeNode6 * node) const;
+  void PrintRec (std::ostream & ost, const ADTreeNode6 * node) const;
   int DepthRec (const ADTreeNode6 * node) const;
   int ElementsRec (const ADTreeNode6 * node) const;
 
-  void PrintMemInfo (ostream & ost) const;
+  void PrintMemInfo (std::ostream & ost) const;
 };
 
 

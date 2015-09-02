@@ -1,8 +1,12 @@
 #ifndef FILE_IMPROVE3
 #define FILE_IMPROVE3
 
+#include "../linalg/opti.hpp"
+#include "meshtool.hpp"
 
-extern double CalcTotalBad (const Mesh::T_POINTS & points, 
+namespace netgen {
+
+    extern double CalcTotalBad (const Mesh::T_POINTS & points, 
 			    const Mesh::T_VOLELEMENTS & elements,
 			    const MeshingParameters & mp);
 
@@ -120,6 +124,6 @@ public:
   inline void UnSetNV(void) {onplane = false;}
 };
 
-
+}
 
 #endif

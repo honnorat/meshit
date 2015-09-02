@@ -50,8 +50,8 @@ void WriteGmshFormat (const Mesh & mesh,
 
    if (ne > 0 && mesh.VolumeElement(1).GetNP() == 4)
       {
-      cout << "Write GMSH Format \n";
-      cout << "The GMSH format is available for linear tetrahedron elements only in 3D\n" << endl;
+      std::cout << "Write GMSH Format \n";
+      std::cout << "The GMSH format is available for linear tetrahedron elements only in 3D\n" <<std::endl;
 
       int inverttets = mparam.inverttets;
       int invertsurf = mparam.inverttrigs;
@@ -137,7 +137,7 @@ void WriteGmshFormat (const Mesh & mesh,
    */
       else if (ne == 0)   /// means that there's no 3D element
               {
-              cout << "\n Write Gmsh Surface Mesh (triangle and/or quadrangles)" << endl;
+              std::cout << "\n Write Gmsh Surface Mesh (triangle and/or quadrangles)" <<std::endl;
 
               /// Write nodes
               outfile << "$NOD\n";
@@ -190,7 +190,7 @@ void WriteGmshFormat (const Mesh & mesh,
 
      else
     {
-    cout << " Invalide element type for Gmsh volume Format !\n";
+    std::cout << " Invalide element type for Gmsh volume Format !\n";
     }
 
 

@@ -1,6 +1,8 @@
 #ifndef FILE_BCFUNCTIONS
 #define FILE_BCFUNCTIONS
 
+#include "meshclass.hpp"
+
 // Philippose - 14/03/2009
 // Auxiliary functions for OCC Geometry
 // Use this file and the corresponding ".cpp" 
@@ -43,11 +45,11 @@ namespace netgen
           - BC Prop 3: 8500 : Colour 0 (no colour defined)
    */
    //extern void OCCAutoColourBcProps(Mesh & mesh, OCCGeometry & occgeometry, const char *occcolourfile);
-   extern void AutoColourBcProps(Mesh & mesh, const char *bccolourfile);
+   void AutoColourBcProps(Mesh & mesh, const char *bccolourfile);
 
-   extern void GetFaceColours(Mesh & mesh, Array<Vec3d> & face_colours);
+   void GetFaceColours(Mesh & mesh, Array<Vec3d> & face_colours);
 
-   extern bool ColourMatch(Vec3d col1, Vec3d col2, double eps = 2.5e-05);
+   bool ColourMatch(Vec3d col1, Vec3d col2, double eps = 2.5e-05);
 }
 #endif
 

@@ -1,6 +1,10 @@
 #ifndef VALIDATE_HPP
 #define VALIDATE_HPP
 
+#include "meshclass.hpp"
+#include "../general/array.hpp"
+#include "../general/bitarray.hpp"
+
 namespace netgen
 {
   

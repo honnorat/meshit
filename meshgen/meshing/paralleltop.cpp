@@ -23,7 +23,7 @@ namespace netgen
 
   void ParallelMeshTopology :: Reset ()
   {
-    *testout << "ParallelMeshTopology::Reset" << endl;
+    std::cerr << "ParallelMeshTopology::Reset" <<std::endl;
     
     if ( ntasks == 1 ) return;
 
@@ -118,7 +118,7 @@ namespace netgen
     int timer = NgProfiler::CreateTimer ("UpdateCoarseGridGlobal");
     NgProfiler::RegionTimer reg(timer);
 
-    *testout << "ParallelMeshTopology :: UpdateCoarseGridGlobal" << endl;
+    std::cerr << "ParallelMeshTopology :: UpdateCoarseGridGlobal" <<std::endl;
 
     const MeshTopology & topology = mesh.GetTopology();
 
@@ -209,7 +209,7 @@ namespace netgen
     NgProfiler::RegionTimer reg(timer);
 
 
-    (*testout) << "UPDATE COARSE GRID PARALLEL TOPOLOGY " << endl;
+    std::cerr << "UPDATE COARSE GRID PARALLEL TOPOLOGY " <<std::endl;
     if (id == 0)
       PrintMessage (1, "update parallel topology");
 

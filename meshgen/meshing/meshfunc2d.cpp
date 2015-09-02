@@ -1,14 +1,13 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "improve2.hpp"
+#include "meshfunc.hpp"
+#include "global.hpp"
 
 namespace netgen
 {
 
   DLL_HEADER void Optimize2d (Mesh & mesh, MeshingParameters & mp)
   {
-    static int timer = NgProfiler::CreateTimer ("optimize2d");
-    NgProfiler::RegionTimer reg(timer);
-
     mesh.CalcSurfacesOfNode();
 
     const char * optstr = mp.optimize2d;
@@ -49,7 +48,7 @@ namespace netgen
 		break;
 	      }
 	    default:
-	      cerr << "Optimization code " << optstr[j-1] << " not defined" << endl;
+	      std::cerr << "Optimization code " << optstr[j-1] << " not defined" << std::endl;
 	    }  
 	}
   }

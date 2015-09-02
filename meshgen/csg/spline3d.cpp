@@ -106,7 +106,7 @@ void spline3d :: Evaluate (double t, Point<3> & p) const
   static int cnt = 0;
   
   cnt++;
-  if (cnt % 10000 == 0) (*mycout) << "Evaluate calls: " << cnt << endl;
+  if (cnt % 10000 == 0) (*mystd::cout) << "Evaluate calls: " << cnt <<std::endl;
 
   while (t < 0) t += GetNumSegments();
   while (t >= GetNumSegments()) t -= GetNumSegments();
@@ -199,9 +199,9 @@ double spline3d :: ProjectToSpline (Point<3> & p, double optt) const
       dval = (valu - vall) / (2 * dt);
 
       if (its % 100 == 99)    
-	(*testout) << "optt = " << optt 
+	std::cerr << "optt = " << optt 
 		   << " val = " << val 
-		   << " dval = " << dval << endl;
+		   << " dval = " << dval <<std::endl;
       optt -= val / dval;
       its++;
       if (fabs(val) < 1e-8 && cnt > 5) cnt = 5;
@@ -217,7 +217,7 @@ double spline3d :: ProjectToSpline (Point<3> & p, double optt) const
 splinetube :: splinetube (const spline3d & amiddlecurve, double ar)
   : Surface(), middlecurve (amiddlecurve), r(ar)
 {
-  (*mycout) << "Splinetube Allocated, r = " << r << endl;
+  (*mystd::cout) << "Splinetube Allocated, r = " << r <<std::endl;
 
 }
   
@@ -245,12 +245,12 @@ void splinetube :: DefineTangentialPlane (const Point<3> & ap1,
   e2y(1) = e2x(0);
   e2y(0) = -e2x(1);
   
-  //  (*testout) << "Defineplane: " << endl
-  //  	<< "p1 = " << p1 << "   p2 = " << p2 << endl
-  //  	<< "pc = " << cp << endl
-  //  	<< "ex = " << ex << " ey = " << ey << " ez = " << ez << endl
-  //  	<< "phi = " << phi << "  z = " << z << endl
-  //  	<< "e2x = " << e2x << " e2y = " << e2y << endl;
+  //  std::cerr << "Defineplane: " <<std::endl
+  //  	<< "p1 = " << p1 << "   p2 = " << p2 <<std::endl
+  //  	<< "pc = " << cp <<std::endl
+  //  	<< "ex = " << ex << " ey = " << ey << " ez = " << ez <<std::endl
+  //  	<< "phi = " << phi << "  z = " << z <<std::endl
+  //  	<< "e2x = " << e2x << " e2y = " << e2y <<std::endl;
 }
   
 void splinetube :: ToPlane (const Point<3> & p3d, Point<2> & pplain, double h, 
@@ -325,7 +325,7 @@ Point<3> splinetube :: GetSurfacePoint () const
   middlecurve.EvaluateTangent (0, t);
   n = t.GetNormal ();
   n *= r;
-  (*mycout) << "p = " << p << " t = " << t << "  n = " << n << endl;
+  (*mystd::cout) << "p = " << p << " t = " << t << "  n = " << n <<std::endl;
   return p + n;
 }
 
@@ -333,11 +333,11 @@ void splinetube :: Print (ostream & str) const
 {
   int i;
   str << "SplineTube, " 
-      << middlecurve.GetNumSegments () << " segments, r = " << r << endl;
+      << middlecurve.GetNumSegments () << " segments, r = " << r <<std::endl;
   for (i = 1; i <= middlecurve.GetNumSegments(); i++)
     str << middlecurve.P1(i) << " - " 
 	<< middlecurve.P2(i) << " - " 
-	<< middlecurve.P3(i) << endl;
+	<< middlecurve.P3(i) <<std::endl;
 }
 
 

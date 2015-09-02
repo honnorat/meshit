@@ -1,7 +1,4 @@
-#include <mystdlib.h>
-#include <myadt.hpp>
-
-#include <linalg.hpp>
+#include <meshgen.hpp>
 #include "opti.hpp"
 
 namespace netgen
@@ -19,7 +16,7 @@ void LinearOptimize (const DenseMatrix & a, const Vector & b,
     
   if (a.Width() != 3)
     {
-    cerr << "LinearOptimize only implemented for 3 unknowns" << endl;
+    std::cerr << "LinearOptimize only implemented for 3 unknowns" << std::endl;
     return;
     }
     
@@ -52,10 +49,10 @@ void LinearOptimize (const DenseMatrix & a, const Vector & b,
 
 /*        
         testout -> precision(12);
-        (*testout) << "i = (" << i1 << "," << i2 << "," << i3 
+        std::cerr << "i = (" << i1 << "," << i2 << "," << i3 
            << "), f = " << f << " x = " << x << " res = " << res 
            <<  " resmin = " << res.Min() 
-           << " res2 = " << res2 << " prod = " << prod << endl;
+           << " res2 = " << res2 << " prod = " << prod <<std::endl;
 */
 
 	

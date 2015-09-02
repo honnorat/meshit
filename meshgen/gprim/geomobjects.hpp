@@ -7,14 +7,13 @@
 /* Date:   20. Jul. 02                                                     */
 /* *************************************************************************/
 
+#include <cmath>
+#include "../general/array.hpp"
 
 namespace netgen
 {
-
-
   template <int D> class Vec;
   template <int D> class Point;
-
 
   template <int D>
   class Point
@@ -222,8 +221,8 @@ namespace netgen
     {
       for (int i = 0; i < D; i++)
 	{
-	  pmin(i) = min2(p1(i), p2(i));
-	  pmax(i) = max2(p1(i), p2(i));
+	  pmin(i) = std::min(p1(i), p2(i));
+	  pmax(i) = std::max(p1(i), p2(i));
 	}
     }
 

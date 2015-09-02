@@ -1,3 +1,9 @@
+#ifndef MESHDOC_H
+#define MESHDOC_H
+
+#include "mvdraw.hpp"
+
+namespace netgen {
 
 class VisualSceneMeshDoctor : public VisualScene
 {
@@ -35,3 +41,6 @@ public:
 
 
 extern MeshDoctorParameters meshdoctor;
+}
+
+#endif

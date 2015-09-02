@@ -1,11 +1,8 @@
-#include <mystdlib.h>
-
-#include "meshing.hpp"
-#ifdef SOLIDGEOM
-#include <csg.hpp>
-#endif
-#include <opti.hpp>
-
+#include <meshgen.hpp>
+#include "improve3.hpp"
+#include "findip.hpp"
+#include "global.hpp"
+#include "../general/ngexception.hpp"
 
 namespace netgen
 {
@@ -434,7 +431,7 @@ namespace netgen
 	    {
 	      Element2d face;
 	      el.GetFace (k, face);
-	      Swap (face.PNum(2), face.PNum(3));
+	      std::swap (face.PNum(2), face.PNum(3));
 	      faces.Append (face);
 	    }
       }
@@ -443,25 +440,25 @@ namespace netgen
     int hi = FindInnerPoint (points, faces, hp);
     if (hi)
       {
-	// cout << "inner point found" << endl;
+	// std::cout << "inner point found" <<std::endl;
 	points[actpind] = Point<3> (hp);
       }
     else
       ;
-    //      cout << "no inner point found" << endl;
+    //      std::cout << "no inner point found" <<std::endl;
 
     /*
     Point3d hp2;
     int hi2 = FindInnerPoint (points, faces, hp2);
     if (hi2)
       {
-	cout << "new: inner point found" << endl;
+	std::cout << "new: inner point found" <<std::endl;
       }
     else
-      cout << "new: no inner point found" << endl;
+      std::cout << "new: no inner point found" <<std::endl;
   
-    (*testout) << "hi(orig) = " << hi << ", hi(new) = " << hi2;
-    if (hi != hi2) (*testout) << "hi different" << endl;
+    std::cerr << "hi(orig) = " << hi << ", hi(new) = " << hi2;
+    if (hi != hi2) std::cerr << "hi different" <<std::endl;
     */
 
     return hi;
@@ -1076,7 +1073,7 @@ FuncGrad (const Vector & x, Vector & g) const
       for (k = 1; k <= el.GetNP(); k++)
 	if (el.PNum(k) == actpind)
 	  lpi = k;
-      if (!lpi) cerr << "loc point not found" << endl;
+      if (!lpi) std::cerr << "loc point not found" <<std::endl;
 
       badness += elements.Get(eli).
 	CalcJacobianBadnessGradient (points, lpi, hderiv);
@@ -1092,7 +1089,7 @@ FuncGrad (const Vector & x, Vector & g) const
 
 	  hbad = elements.Get(eli).
 	    CalcJacobianBadnessDirDeriv (points, lpi, vdir, hderiv);
-	  //(*testout) << "hderiv " << k << ": " << hderiv << endl;
+	  //std::cerr << "hderiv " << k << ": " << hderiv <<std::endl;
 	  g.Elem(k) += hderiv;
 	  if (k == 1)
 	    badness += hbad;
@@ -1108,7 +1105,7 @@ FuncGrad (const Vector & x, Vector & g) const
       g(2) -= scal*nv(2);
     }
 
-  //(*testout) << "g = " << g << endl;
+  //std::cerr << "g = " << g <<std::endl;
 
   
   points.Elem(actpind) = hp; 
@@ -1149,7 +1146,7 @@ FuncDeriv (const Vector & x, const Vector & dir, double & deriv) const
       for (k = 1; k <= el.GetNP(); k++)
 	if (el.PNum(k) == actpind)
 	  lpi = k;
-      if (!lpi) cerr << "loc point not found" << endl;
+      if (!lpi) std::cerr << "loc point not found" <<std::endl;
 
       badness += elements.Get(eli).
 	CalcJacobianBadnessDirDeriv (points, lpi, vdir, hderiv);
@@ -1194,10 +1191,10 @@ void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
 
   int uselocalh = mparam.uselocalh;
 
-  (*testout) << setprecision(8);
-  (*testout) << "Improve Mesh" << "\n";
+  std::cerr << std::setprecision(8);
+  std::cerr << "Improve Mesh" << "\n";
   PrintMessage (3, "ImproveMesh");
-  //  (*mycout) << "Vol = " << CalcVolume (points, volelements) << endl;
+  //  (*mystd::cout) << "Vol = " << CalcVolume (points, volelements) <<std::endl;
 
 
   for (i = 1; i <= surfelements.Size(); i++)
@@ -1256,8 +1253,8 @@ void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
       */
       if (i % printmod == 0) PrintDot (printdot);
 
-      //    (*testout) << "Now point " << i << "\n";
-      //    (*testout) << "Old: " << points.Get(i) << "\n";
+      //    std::cerr << "Now point " << i << "\n";
+      //    std::cerr << "Old: " << points.Get(i) << "\n";
 
       pf->SetPointIndex (i);
 
@@ -1266,7 +1263,7 @@ void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
 	double lh = GetH (points.Get(i));
 	pf->SetLocalH (GetH (points.Get(i)));
 	par.typx = lh / 10;
-	//	  (*testout) << "lh(" << points.Get(i) << ") = " << lh << "\n";
+	//	  std::cerr << "lh(" << points.Get(i) << ") = " << lh << "\n";
       }
 
       surf1 = surf2 = surf3 = 0;
@@ -1299,7 +1296,7 @@ void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
 
       if (surf2 && !surf3)
 	{
-	  //      (*testout) << "On Edge" << "\n";
+	  //      std::cerr << "On Edge" << "\n";
 	  /*
 	    xedge = 0;
 	    edgeminf.SetPoint (geometry.GetSurface(surf1),
@@ -1313,7 +1310,7 @@ void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
 
       if (surf1 && !surf2)
 	{
-	  //      (*testout) << "In Surface" << "\n";
+	  //      std::cerr << "In Surface" << "\n";
 	  /*
 	    xsurf = 0;
 	    surfminf.SetPoint (geometry.GetSurface(surf1),
@@ -1326,7 +1323,7 @@ void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
  
       if (!surf1)
 	{
-	  //      (*testout) << "In Volume" << "\n";
+	  //      std::cerr << "In Volume" << "\n";
 	  x = 0;
 	  freeminf.SetPoint (points.Elem(i));
 	  //	  par.typx = 
@@ -1337,11 +1334,11 @@ void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
 	  points.Elem(i).Z() += x.Get(3);
 	}
       
-      //    (*testout) << "New Point: " << points.Elem(i) << "\n" << "\n";
+      //    std::cerr << "New Point: " << points.Elem(i) << "\n" << "\n";
     
     }
   PrintDot ('\n');
-  //  (*mycout) << "Vol = " << CalcVolume (points, volelements) << endl;
+  //  (*mystd::cout) << "Vol = " << CalcVolume (points, volelements) <<std::endl;
 
   multithread.task = savetask;
 
@@ -1355,7 +1352,7 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
 {
   int typ = 1;
   
-  (*testout) << "Improve Mesh" << "\n";
+  std::cerr << "Improve Mesh" << "\n";
   PrintMessage (3, "ImproveMesh");
 
   int np = GetNP();
@@ -1392,13 +1389,13 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
   if (goal == OPT_QUALITY)
     {
       bad1 = CalcTotalBad (points, volelements, mp);
-      (*testout) << "Total badness = " << bad1 << endl;
+      std::cerr << "Total badness = " << bad1 <<std::endl;
       PrintMessage (5, "Total badness = ", bad1);
     }
   
   Vector x(3);
   
-  (*testout) << setprecision(8);
+  std::cerr << std::setprecision(8);
   
   //int uselocalh = mparam.uselocalh;
 
@@ -1493,9 +1490,9 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
 
 	if (pok)
 	  {
-            //*testout << "start BFGS, pok" << endl;
+            //std::cerr << "start BFGS, pok" <<std::endl;
 	    BFGS (x, freeminf, par);
-            //*testout << "BFGS complete, pok" << endl;
+            //std::cerr << "BFGS complete, pok" <<std::endl;
 	    points[pi](0) += x(0);
 	    points[pi](1) += x(1);
 	    points[pi](2) += x(2);
@@ -1511,7 +1508,7 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
   if (goal == OPT_QUALITY)
     {
       bad1 = CalcTotalBad (points, volelements, mp);
-      (*testout) << "Total badness = " << bad1 << endl;
+      std::cerr << "Total badness = " << bad1 <<std::endl;
       PrintMessage (5, "Total badness = ", bad1);
     }
 }
@@ -1525,7 +1522,7 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
 {
   int i, j;
   
-  (*testout) << "Improve Mesh Jacobian" << "\n";
+  std::cerr << "Improve Mesh Jacobian" << "\n";
   PrintMessage (3, "ImproveMesh Jacobian");
 
   int np = GetNP();
@@ -1534,7 +1531,7 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
   
   Vector x(3);
   
-  (*testout) << setprecision(8);
+  std::cerr << std::setprecision(8);
   
   JacobianPointFunction pf(points, volelements);
   
@@ -1588,11 +1585,11 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
       if(usepoint && !usepoint->Test(i))
 	continue;
 
-      //(*testout) << "improvejac, p = " << i << endl;
+      //std::cerr << "improvejac, p = " << i <<std::endl;
 
       if (goal == OPT_WORSTCASE && !badnodes.Test(i))
 	continue;
-      //	(*testout) << "smoot p " << i << endl;
+      //	std::cerr << "smoot p " << i <<std::endl;
 
       /*
 	if (multithread.terminate)
@@ -1619,16 +1616,16 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
 
       if (pok)
 	{
-          //*testout << "start BFGS, Jacobian" << endl;
+          //std::cerr << "start BFGS, Jacobian" <<std::endl;
 	  BFGS (x, pf, par);
-          //*testout << "end BFGS, Jacobian" << endl;
+          //std::cerr << "end BFGS, Jacobian" <<std::endl;
 	  points.Elem(i)(0) += x(0);
 	  points.Elem(i)(1) += x(1);
 	  points.Elem(i)(2) += x(2);
 	}
       else
 	{
-	  cout << "el not ok" << endl;
+	  std::cout << "el not ok" <<std::endl;
 	}
     }
   PrintDot ('\n');
@@ -1649,7 +1646,7 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 {
   int i, j;
   
-  (*testout) << "Improve Mesh Jacobian" << "\n";
+  std::cerr << "Improve Mesh Jacobian" << "\n";
   PrintMessage (3, "ImproveMesh Jacobian");
 
   int np = GetNP();
@@ -1658,7 +1655,7 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
   
   Vector x(3);
   
-  (*testout).precision(8);
+  std::cerr.precision(8);
   
   JacobianPointFunction pf(points, volelements);
 
@@ -1737,11 +1734,11 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
   for (PointIndex pi = points.Begin(); pi <= points.End(); pi++)
     if ( usepoint.Test(i) )
       {
-	//(*testout) << "improvejac, p = " << i << endl;
+	//std::cerr << "improvejac, p = " << i <<std::endl;
 
 	if (goal == OPT_WORSTCASE && !badnodes.Test(i))
 	  continue;
-	//	(*testout) << "smoot p " << i << endl;
+	//	std::cerr << "smoot p " << i <<std::endl;
 
 	/*
 	if (multithread.terminate)
@@ -1786,7 +1783,7 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 	  continue;
 
 	//pf.UnSetNV(); x = 0;
-	//(*testout) << "before " << pf.Func(x);
+	//std::cerr << "before " << pf.Func(x);
 
 	pf.SetNV(*nv[i-1]);
 
@@ -1813,12 +1810,12 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 	  }
 	else
 	  {
-	    cout << "el not ok" << endl;
-	    (*testout) << "el not ok" << endl
-		       << "   func " << ((brother == -1) ? pf.Func(x) : pf_sum.Func (x)) << endl;
+	    std::cout << "el not ok" <<std::endl;
+	    std::cerr << "el not ok" <<std::endl
+		       << "   func " << ((brother == -1) ? pf.Func(x) : pf_sum.Func (x)) <<std::endl;
 	    if(brother != -1)
-	      (*testout) << "   func1 " << pf.Func(x) << endl
-			 << "   func2 " << pf2ptr->Func(x) << endl;
+	      std::cerr << "   func1 " << pf.Func(x) <<std::endl
+			 << "   func2 " << pf2ptr->Func(x) <<std::endl;
 	  }
       }
   

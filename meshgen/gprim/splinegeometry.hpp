@@ -1,3 +1,6 @@
+#ifndef _FILE_SPLINEGEOMETRY
+#define _FILE_SPLINEGEOMETRY
+
 /*
 
 
@@ -11,11 +14,8 @@ in geom2d only 2D - Geometry classes (with material properties etc.)
 
 */
 
+#include <string>
 #include "spline.hpp"
-
-
-#ifndef _FILE_SPLINEGEOMETRY
-#define _FILE_SPLINEGEOMETRY
 
 namespace netgen
 {
@@ -40,7 +40,7 @@ namespace netgen
     { return splines; }
 
     int GetNSplines (void) const { return splines.Size(); }
-    string GetSplineType (const int i) const { return splines[i]->GetType(); }
+    std::string GetSplineType (const int i) const { return splines[i]->GetType(); }
     SplineSeg<D> & GetSpline (const int i) {return *splines[i];}
     const SplineSeg<D> & GetSpline (const int i) const {return *splines[i];}
 

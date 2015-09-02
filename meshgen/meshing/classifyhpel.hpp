@@ -41,9 +41,9 @@ HPREF_ELEMENT_TYPE ClassifyTet(HPRefElement & el, INDEX_2_HASHTABLE<int> & edges
 	    if (sort[kk] > sort[kk+1])
 	      {
 		cnt++;
-		Swap (sort[kk], sort[kk+1]); 
+		std::swap (sort[kk], sort[kk+1]); 
 	      }
-	if (cnt % 2 == 1) Swap (pi3, pi4);
+	if (cnt % 2 == 1) std::swap (pi3, pi4);
 	
 	ep1 = edgepoint.Test (el.pnums[j]);
 	ep2 = edgepoint.Test (el.pnums[k]);
@@ -64,11 +64,10 @@ HPREF_ELEMENT_TYPE ClassifyTet(HPRefElement & el, INDEX_2_HASHTABLE<int> & edges
 	
 	if (debug)
 	  {
-	    cout << "debug" << endl;
-	    *testout  << "debug" << endl;
-	    *testout << "ep = " << ep1 << ep2 << ep3 << ep4 << endl;
-	    *testout << "cp = " << cp1 << cp2 << cp3 << cp4 << endl;
-	    *testout << "edge = " << isedge1 << isedge2 << isedge3 << isedge4 << isedge5 << isedge6 << endl;
+	    std::cerr << "debug" << std::endl;
+	    std::cerr << "ep = " << ep1 << ep2 << ep3 << ep4 << std::endl;
+	    std::cerr << "cp = " << cp1 << cp2 << cp3 << cp4 << std::endl;
+	    std::cerr << "edge = " << isedge1 << isedge2 << isedge3 << isedge4 << isedge5 << isedge6 << std::endl;
 	  }
 
 
@@ -402,18 +401,18 @@ HPREF_ELEMENT_TYPE ClassifyTet(HPRefElement & el, INDEX_2_HASHTABLE<int> & edges
       }
   
   
-  if (debug) cout << "type = " << type << endl;
+  if (debug) std::cout << "type = " << type << std::endl;
 
   if (type == HP_NONE)
     {
       //     cnt_undef++;
-      (*testout) << "undefined element" << endl
-		 << "cp = " << cp1 << cp2 << cp3 << cp4 << endl
-		 << "ep = " << ep1 << ep2 << ep3 << ep4 << endl
+      std::cerr << "undefined element" << std::endl
+		 << "cp = " << cp1 << cp2 << cp3 << cp4 << std::endl
+		 << "ep = " << ep1 << ep2 << ep3 << ep4 << std::endl
 		 << "isedge = " << isedge1 << isedge2 << isedge3 
-		 << isedge4 << isedge5 << isedge6 << endl
-		 << "isface = " << isface1 << isface2 << isface3 << isface4 << endl;
-      cout << "undefined element !!! " << endl;
+		 << isedge4 << isedge5 << isedge6 << std::endl
+		 << "isface = " << isface1 << isface2 << isface3 << isface4 << std::endl;
+      std::cout << "undefined element !!! " << std::endl;
 
       
     }
@@ -432,7 +431,7 @@ HPREF_ELEMENT_TYPE ClassifyPrism(HPRefElement & el, INDEX_2_HASHTABLE<int> & edg
   int p[6];
   for(int m=1;m<=6;m++)
     {
-      int point_sing[6]={0,0,0,0,0,0}; 
+//      int point_sing[6]={0,0,0,0,0,0}; 
       int face_sing[5]={0,0,0,0,0};
       int edge_sing[9]={0,0,0,0,0,0,0,0,0}; 
       
@@ -447,13 +446,13 @@ HPREF_ELEMENT_TYPE ClassifyPrism(HPRefElement & el, INDEX_2_HASHTABLE<int> & edg
 	  for(int l=3;l<6;l++) p[l]=p[l-3]-3; 
 	}
       
-      for(int j=0;j<6;j++) 
-	{ 
-	  if(cornerpoint.Test(el.PNum(p[j])))  { point_sing[p[j]-1]=3;}
-	  else if(edgepoint.Test(el.PNum(p[j]))) point_sing[p[j]-1]=2;
-	  else if (facepoint[el.PNum(p[j])] == -1 || facepoint[el.PNum(p[j])] == el.GetIndex())
-	    point_sing[p[j]-1] = 1;  
-	}
+//      for(int j=0;j<6;j++) 
+//	{ 
+//	  if(cornerpoint.Test(el.PNum(p[j])))  { point_sing[p[j]-1]=3;}
+//	  else if(edgepoint.Test(el.PNum(p[j]))) point_sing[p[j]-1]=2;
+//	  else if (facepoint[el.PNum(p[j])] == -1 || facepoint[el.PNum(p[j])] == el.GetIndex())
+//	    point_sing[p[j]-1] = 1;  
+//	}
       
       const ELEMENT_EDGE * eledges = MeshTopology::GetEdges1 (PRISM);
       for(int k=0;k<9;k++)
@@ -597,7 +596,7 @@ HPREF_ELEMENT_TYPE ClassifyPrism(HPRefElement & el, INDEX_2_HASHTABLE<int> & edg
 	  
 	case 2:
 	  if(sve[0] <= 1) 
-	    cout << " **** WARNING: Edge between to different singular faces should be marked singular " << endl; 
+	    std::cout << " **** WARNING: Edge between to different singular faces should be marked singular " << std::endl; 
 		      
 	  if(sve[1] <= 1)   
 	    if(sve[2] <=1) 
@@ -638,9 +637,9 @@ HPREF_ELEMENT_TYPE ClassifyPrism(HPRefElement & el, INDEX_2_HASHTABLE<int> & edg
     }
 	 
   /*
-   *testout << " Prism with pnums " << endl; 
-   for(int j=0;j<6;j++) *testout << el.pnums[j] << "\t"; 
-   *testout << endl; 
+   std::cerr << " Prism with pnums " <<std::endl; 
+   for(int j=0;j<6;j++) std::cerr << el.pnums[j] << "\t"; 
+   std::cerr <<std::endl; 
    */
   
   if(type != HP_NONE) 
@@ -650,9 +649,9 @@ HPREF_ELEMENT_TYPE ClassifyPrism(HPRefElement & el, INDEX_2_HASHTABLE<int> & edg
       for(int k=0;k<6;k++) el.pnums[k] = pnums[k]; 
     }
 
-  /* *testout << " Classified Prism with pnums " << endl; 
-     for(int j=0;j<6;j++) *testout << el.pnums[j] << "\t"; 
-     *testout << endl; 
+  /* std::cerr << " Classified Prism with pnums " <<std::endl; 
+     for(int j=0;j<6;j++) std::cerr << el.pnums[j] << "\t"; 
+     std::cerr <<std::endl; 
      */ 
   return(type); 
 }
@@ -673,7 +672,7 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
   i3.Sort();
   bool sing_face = faces.Used (i3);
   
-  // *testout << " facepoint " << facepoint << endl;  
+  // std::cerr << " facepoint " << facepoint <<std::endl;  
       
 
   // Try all rotations of the trig 
@@ -681,14 +680,14 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
     {
       int point_sing[3] = {0,0,0}; 
       int edge_sing[3] = {0,0,0}; 
-      // *testout << " actual rotation of trig points " ;  
+      // std::cerr << " actual rotation of trig points " ;  
       for(int m=0;m<3;m++) 
 	{ 
 	  p[m] = (j+m)%3 +1; // local vertex number
 	  pnums[m] = el.PNum(p[m]); // global vertex number 
-	  // *testout << pnums[m] << " \t "; 
+	  // std::cerr << pnums[m] << " \t "; 
 	}
-      // *testout << endl ; 
+      // std::cerr <<std::endl ; 
       
       if(dim == 3) 
 	{
@@ -696,18 +695,18 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
 	  for(int k=0;k<3;k++)
 	    if(!sing_face)
 	      { 
-		//	*testout << " fp [" << k << "] = " << facepoint[pnums[k]] << endl;   
-		//	*testout << " fd.DomainIn()" <<  fd.DomainIn() << endl; 
-		//	*testout  << " fd.DomainOut()" <<  fd.DomainOut() << endl; 
+		//	std::cerr << " fp [" << k << "] = " << facepoint[pnums[k]] <<std::endl;   
+		//	std::cerr << " fd.DomainIn()" <<  fd.DomainIn() <<std::endl; 
+		//	std::cerr  << " fd.DomainOut()" <<  fd.DomainOut() <<std::endl; 
 		if( facepoint[pnums[k]]  && (facepoint[pnums[k]] ==-1 || 
 					     facepoint[pnums[k]] == fd.DomainIn() ||   facepoint[pnums[k]] == fd.DomainOut()))
 		  point_sing[p[k]-1] = 1; 
 	      } 
 	  // if point is on face_edge in next step sing = 2 
 
-	  /*	  *testout << " pointsing NACH FACEPOints ... FALLS EDGEPOINT UMSETZEN" ; 
-            for (int k=0;k<3;k++) *testout << "\t" << point_sing[p[k]-1] ;
-            *testout << endl; */
+	  /*	  std::cerr << " pointsing NACH FACEPOints ... FALLS EDGEPOINT UMSETZEN" ; 
+            for (int k=0;k<3;k++) std::cerr << "\t" << point_sing[p[k]-1] ;
+            std::cerr <<std::endl; */
 	}
       
       const ELEMENT_EDGE * eledges = MeshTopology::GetEdges1(TRIG); 
@@ -744,15 +743,15 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
 		    }
 		}
 	      
-	      /*  *testout << " pointsing NACH edges UND FACEEDGES UMSETZEN ... " ; 
-                  for (int k=0;k<3;k++) *testout << "\t" << point_sing[p[k]-1] ; 
-                  *testout << endl;          
+	      /*  std::cerr << " pointsing NACH edges UND FACEEDGES UMSETZEN ... " ; 
+                  for (int k=0;k<3;k++) std::cerr << "\t" << point_sing[p[k]-1] ; 
+                  std::cerr <<std::endl;          
                   */
 	    }
 	}
       /*
-       *testout << " dim " << dim << endl; 
-       *testout << " edgepoint_dom " << edgepoint_dom << endl; 
+       std::cerr << " dim " << dim <<std::endl; 
+       std::cerr << " edgepoint_dom " << edgepoint_dom <<std::endl; 
        */
       if(dim==2)
 	{
@@ -796,7 +795,7 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
 	if(cornerpoint.Test(el.PNum(p[k]))) 
 	  point_sing[p[k]-1] = 3; 
       
-      *testout << "point_sing = " << point_sing[0] << point_sing[1] << point_sing[2] << endl;
+      std::cerr << "point_sing = " << point_sing[0] << point_sing[1] << point_sing[2] << std::endl;
 
       if(edge_sing[0] + edge_sing[1] + edge_sing[2] == 0) 
         { 
@@ -854,21 +853,21 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
           else if (edge_sing[2] && edge_sing[1] && edge_sing[0])
             type = HP_TRIG_3SINGEDGES; 
      
-      //  cout << " run for " <<  j << " gives type " << type << endl; 
-      //*testout << " run for " <<  j << " gives type " << type << endl; 
+      //  std::cout << " run for " <<  j << " gives type " << type <<std::endl; 
+      //std::cerr << " run for " <<  j << " gives type " << type <<std::endl; 
 
       if(type!=HP_NONE) break;
     }
 
-  *testout << "type = " << type << endl;
+  std::cerr << "type = " << type << std::endl;
     
   for(int k=0;k<3;k++) el[k] = pnums[k]; 
   /*if(type != HP_NONE) 
     {
      
-    cout << " TRIG with pnums " << pnums[0] << "\t"  << 
-    pnums[1] << "\t"  << pnums[2] << endl; 
-    cout << " type "  << type << endl; 
+    std::cout << " TRIG with pnums " << pnums[0] << "\t"  << 
+    pnums[1] << "\t"  << pnums[2] <<std::endl; 
+    std::cout << " type "  << type <<std::endl; 
     }
   */
       return(type);
@@ -921,7 +920,7 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
       ep3 |= cp3;
       
       
-      // (*testout) << "cp = " << cp1 << cp2 << cp3 << ", ep = " << ep1 << ep2 << ep3 << endl;
+      // std::cerr << "cp = " << cp1 << cp2 << cp3 << ", ep = " << ep1 << ep2 << ep3 <<std::endl;
 
       int p[3] = { el.PNumMod (j), el.PNumMod (j+1), el.PNumMod (j+2)};
       if(ep1)
@@ -980,7 +979,7 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
 	      ep1 = 1; ep3=1;
 	    }
 	  
-	  // cout << " isedge " << isedge1 << " \t " << isedge2 << " \t " << isedge3 << endl;  
+	  // std::cout << " isedge " << isedge1 << " \t " << isedge2 << " \t " << isedge3 <<std::endl;  
 	
 	  if (!sing_face)
             {
@@ -1031,11 +1030,11 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
       
 		  
       /*
-        cout << " used " << face_edges.Used (INDEX_2::Sort (el.PNumMod(j), el.PNumMod(j+1))) << endl; 
+        std::cout << " used " << face_edges.Used (INDEX_2::Sort (el.PNumMod(j), el.PNumMod(j+1))) <<std::endl; 
 
-        cout << " isedge " << isedge1 << " \t " << isedge2 << " \t " << isedge3 << endl; 
-        cout << " ep " << ep1 << "\t" << ep2 << " \t " << ep3 << endl; 
-        cout << " cp " << cp1 << "\t" << cp2 << " \t " << cp3 << endl; 
+        std::cout << " isedge " << isedge1 << " \t " << isedge2 << " \t " << isedge3 <<std::endl; 
+        std::cout << " ep " << ep1 << "\t" << ep2 << " \t " << ep3 <<std::endl; 
+        std::cout << " cp " << cp1 << "\t" << cp2 << " \t " << cp3 <<std::endl; 
       */
 		  
 
@@ -1127,9 +1126,9 @@ HPREF_ELEMENT_TYPE ClassifyTrig(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
   /*if(type != HP_NONE) 
     {
      
-    cout << " TRIG with pnums " << pnums[0] << "\t"  << 
-    pnums[1] << "\t"  << pnums[2] << endl; 
-    cout << " type "  << type << endl; 
+    std::cout << " TRIG with pnums " << pnums[0] << "\t"  << 
+    pnums[1] << "\t"  << pnums[2] <<std::endl; 
+    std::cout << " type "  << type <<std::endl; 
     }
   */
   return(type);
@@ -1144,7 +1143,7 @@ HPREF_ELEMENT_TYPE ClassifyQuad(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
   int ep1(-1), ep2(-1), ep3(-1), ep4(-1), cp1(-1), cp2(-1), cp3(-1), cp4(-1);
   int isedge1, isedge2, isedge3, isedge4;
 
-  *testout << "edges = " << edges << endl;
+  std::cerr << "edges = " << edges << std::endl;
   
   for (int j = 1; j <= 4; j++)
     {
@@ -1301,9 +1300,9 @@ HPREF_ELEMENT_TYPE ClassifyQuad(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
       int sumep = ep1 + ep2 + ep3 + ep4;
       int sumedge = isedge1 + isedge2 + isedge3 + isedge4;
 
-      *testout << "isedge = " << isedge1 << isedge2 << isedge3 << isedge4 << endl;
-      *testout << "iscp = " << cp1 << cp2 << cp3 << cp4 << endl;
-      *testout << "isep = " << ep1 << ep2 << ep3 << ep4 << endl;
+      std::cerr << "isedge = " << isedge1 << isedge2 << isedge3 << isedge4 << std::endl;
+      std::cerr << "iscp = " << cp1 << cp2 << cp3 << cp4 << std::endl;
+      std::cerr << "isep = " << ep1 << ep2 << ep3 << ep4 << std::endl;
 
       switch (sumedge)
         {
@@ -1463,23 +1462,23 @@ HPREF_ELEMENT_TYPE ClassifyQuad(HPRefElement & el, INDEX_2_HASHTABLE<int> & edge
           pnums[3] = el.PNumMod (j+3);
           for (int k=0;k<4;k++) el[k] = pnums[k]; 
 	
-          /*  cout << " QUAD with pnums " << pnums[0] << "\t"  << 
+          /*  std::cout << " QUAD with pnums " << pnums[0] << "\t"  << 
               pnums[1] << "\t"  << pnums[2] << "\t"  << pnums[3] 
-              << endl << " of type " << type << endl; */
+              <<std::endl << " of type " << type <<std::endl; */
 		   		      
           break;
         }
     }
   if (type == HP_NONE)
     {
-      (*testout) << "undefined element" << endl
-                 << "cp = " << cp1 << cp2 << cp3 << cp4 << endl
-                 << "ep = " << ep1 << ep2 << ep3 << ep4 << endl
+      std::cerr << "undefined element" << std::endl
+                 << "cp = " << cp1 << cp2 << cp3 << cp4 << std::endl
+                 << "ep = " << ep1 << ep2 << ep3 << ep4 << std::endl
                  << "isedge = " << isedge1 << isedge2 << isedge3 
-                 << isedge4 << endl;
+                 << isedge4 << std::endl;
     }
 	    
-  *testout << "quad type = " << type << endl;
+  std::cerr << "quad type = " << type << std::endl;
 
   return type;  
 }	    
@@ -1505,9 +1504,9 @@ HPREF_ELEMENT_TYPE ClassifyHex(HPRefElement & el, INDEX_2_HASHTABLE<int> & edges
   for(int m=0;m<6 && type == HP_NONE;m++) 
     for(int j=0;j<4 && type == HP_NONE;j++) 
       { 
-	int point_sing[8]={0,0,0,0,0,0,0,0}; 
+//	int point_sing[8]={0,0,0,0,0,0,0,0}; 
 	int face_sing[6] = {0,0,0,0,0,0};
-	int edge_sing[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+//	int edge_sing[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 	int spoint=0, sface=0, sedge=0; 
 	for(int l=0;l<4;l++) 
 	  {
@@ -1518,22 +1517,22 @@ HPREF_ELEMENT_TYPE ClassifyHex(HPRefElement & el, INDEX_2_HASHTABLE<int> & edges
 	for(int l=0;l<8;l++) 
 	  if(cornerpoint.Test(el.PNum(p[l])))  
 	    { 
-	      point_sing[p[l]-1]=3;
+//	      point_sing[p[l]-1]=3;
 	      spoint++; 
 	    }
-	  else if(edgepoint.Test(el.PNum(p[l]))) point_sing[p[l]-1]=2;
-	  else if (facepoint[el.PNum(p[l])] == -1 || facepoint[el.PNum(p[l])] == el.GetIndex())
-	    point_sing[p[l]-1] = 1;   
+//	  else if(edgepoint.Test(el.PNum(p[l]))) point_sing[p[l]-1]=2;
+//	  else if (facepoint[el.PNum(p[l])] == -1 || facepoint[el.PNum(p[l])] == el.GetIndex())
+//	    point_sing[p[l]-1] = 1;   
 	
 	for(int k=0;k<12;k++)
           {
             INDEX_2 i2 = INDEX_2 :: Sort(el.PNum(p[eledges[k][0]-1]),el.PNum(p[eledges[k][1]-1])); 
             if (edges.Used(i2)) 
               { 
-                edge_sing[k] = 2;
+//                edge_sing[k] = 2;
                 sedge++; 
               }
-            else edge_sing[k] = face_edges.Used(i2);
+//            else edge_sing[k] = face_edges.Used(i2);
           }
 	
 	for (int k=0;k<6;k++)
@@ -1574,9 +1573,9 @@ HPREF_ELEMENT_TYPE ClassifyHex(HPRefElement & el, INDEX_2_HASHTABLE<int> & edges
 	    int pnums[8]; 
 	    for(int l=0;l<8;l++) pnums[l] = el[p[l]-1];
 	    for(int l=0;l<8;l++) el[l] = pnums[l];
-	    /* cout << " HEX with pnums " << pnums[0] << "\t"  << 
+	    /* std::cout << " HEX with pnums " << pnums[0] << "\t"  << 
                pnums[1] << "\t"  << pnums[2] << "\t"  << pnums[3] << "\t"  << 
-               pnums[4] << "\t"  <<  pnums[5] << endl << " of type " << type << endl; */
+               pnums[4] << "\t"  <<  pnums[5] <<std::endl << " of type " << type <<std::endl; */
 	    break; 
 	  }
       }
@@ -1623,7 +1622,7 @@ HPREF_ELEMENT_TYPE ClassifySegm(HPRefElement & hpel, INDEX_2_HASHTABLE<int> & ed
   else
     hpel.type = HP_SEGM_SINGCORNERS;
   
-  // cout << " SEGM found with " << hpel[0] << " \t" << hpel[1] << endl << " of type " << hpel.type << endl; 
+  // std::cout << " SEGM found with " << hpel[0] << " \t" << hpel[1] <<std::endl << " of type " << hpel.type <<std::endl; 
   return(hpel.type) ; 
 } 
 

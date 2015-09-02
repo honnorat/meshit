@@ -12,9 +12,9 @@
    Abstract data type Array
 */
 
-#include <mystdlib.h>
-#include <myadt.hpp>
+#include <meshgen.hpp>
 #include <assert.h>
+#include "array.hpp"
 
 
 namespace netgen
@@ -24,7 +24,7 @@ namespace netgen
 #ifdef NONE  
   void BASE_Array :: ReSize (int minsize, int elementsize)
   {
-    cout << "resize, minsize = " << minsize << endl;
+    std::cout << "resize, minsize = " << minsize <<std::endl;
 
     if (inc == -1)
       throw Exception ("Try to resize fixed size array");
@@ -50,7 +50,7 @@ namespace netgen
       }
     
     allocsize = nsize;
-    cout << "resize done" << endl;
+    std::cout << "resize done" <<std::endl;
   }
   
   
@@ -66,7 +66,7 @@ namespace netgen
     if (!actsize)
       {
 	throw Exception ("Array should not be empty");
-	//      cerr << "Array souldn't be empty";
+	//      std::cerr << "Array souldn't be empty";
       }
   }
 #endif

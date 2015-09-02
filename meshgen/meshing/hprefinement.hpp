@@ -11,8 +11,9 @@
   HP Refinement
 */
 
+#include "meshtype.hpp"
 
-
+namespace netgen {
 
 enum HPREF_ELEMENT_TYPE {
   HP_NONE=0,
@@ -309,11 +310,11 @@ public:
   
 };
 
+class Refinement;
 
-
-extern void HPRefinement (Mesh & mesh, Refinement * ref, int levels, 
+void HPRefinement (Mesh & mesh, Refinement * ref, int levels, 
 			  double fac1=0.125, bool setorders=true, bool ref_level = false);
 
-
+}
 #endif
 

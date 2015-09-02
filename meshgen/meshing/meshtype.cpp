@@ -1,6 +1,9 @@
-#include <mystdlib.h>
-
-#include "meshing.hpp"  
+#include <meshgen.hpp>
+#include "meshtype.hpp" 
+#include "meshclass.hpp"
+#include "../general/autoptr.hpp"
+#include "../general/ngexception.hpp"
+#include "../gprim/geom3d.hpp"
 
 namespace netgen
 {
@@ -21,41 +24,6 @@ namespace netgen
     throw NgException ("Please report error: MPGI Size too small\n");
   }
   
-
-
-#ifdef PARALLEL
-  MPI_Datatype MeshPoint :: MyGetMPIType ( )
-  { 
-    static MPI_Datatype type = NULL;
-    static MPI_Datatype htype = NULL;
-    if (!type)
-      {
-	MeshPoint hp;
-	int blocklen[] = { 3, 1, 1 };
-	MPI_Aint displ[] = { (char*)&hp.x[0] - (char*)&hp,
-			     (char*)&hp.layer - (char*)&hp,
-			     (char*)&hp.singular - (char*)&hp };
-	MPI_Datatype types[] = { MPI_DOUBLE, MPI_INT, MPI_DOUBLE };
-	*testout << "displ = " << displ[0] << ", " << displ[1] << ", " << displ[2] << endl;
-	*testout << "sizeof = " << sizeof (MeshPoint) << endl;
-	MPI_Type_create_struct (3, blocklen, displ, types, &htype);
-	MPI_Type_commit ( &htype );
-	MPI_Aint lb, ext;
-	MPI_Type_get_extent (htype, &lb, &ext);
-	*testout << "lb = " << lb << endl;
-	*testout << "ext = " << ext << endl;
-	ext = sizeof (MeshPoint);
-	MPI_Type_create_resized (htype, lb, ext, &type);
-	MPI_Type_commit ( &type );
-	
-      }
-    return type;
-  }
-#endif
-
-
-
-
   Segment :: Segment() 
   {
     pnums[0] = -1;
@@ -146,7 +114,7 @@ namespace netgen
   }
 
 
-  ostream & operator<<(ostream  & s, const Segment & seg)
+  std::ostream & operator<<(std::ostream  & s, const Segment & seg)
   {
     s << seg[0] << "(gi=" << seg.geominfo[0].trignum << ") - "
       << seg[1] << "(gi=" << seg.geominfo[1].trignum << ")"
@@ -265,24 +233,6 @@ namespace netgen
     orderx = ordery = 1;
   }
 
-
-  /*
-    void Element2d :: SetType (ELEMENT_TYPE atyp)
-    {
-    typ = atyp;
-    switch (typ)
-    {
-    case TRIG: np = 3; break;
-    case QUAD: np = 4; break;
-    case TRIG6: np = 6; break;
-    case QUAD6: np = 6; break;
-    default:
-    PrintSysError ("Element2d::SetType, illegal type ", typ);
-    }
-    }
-  */
-
-
   void Element2d :: GetBox (const T_POINTS & points, Box3d & box) const
   {
     box.SetPoint (points.Get(pnum[0]));
@@ -306,24 +256,24 @@ namespace netgen
       {
       case TRIG:
         {
-          Swap (pnum[1], pnum[2]);
+          std::swap (pnum[1], pnum[2]);
           break;
         }
       case TRIG6:
         {
-          Swap (pnum[1], pnum[2]);
-          Swap (pnum[4], pnum[5]);
+          std::swap (pnum[1], pnum[2]);
+          std::swap (pnum[4], pnum[5]);
           break;
         }
       case QUAD:
         {
-          Swap (pnum[0], pnum[3]);
-          Swap (pnum[1], pnum[2]);
+          std::swap (pnum[0], pnum[3]);
+          std::swap (pnum[1], pnum[2]);
           break;
         }
       default:
         {
-          cerr << "Element2d::Invert2, illegal element type " << int(typ) << endl;
+          std::cerr << "Element2d::Invert2, illegal element type " << int(typ) << std::endl;
         }
       }
   }
@@ -447,10 +397,10 @@ namespace netgen
     CalcABt (pmat, dshape, trans);
 
     /*
-      (*testout) << "p = " << p  << endl
-      << "pmat = " << pmat << endl
-      << "dshape = " << dshape << endl
-      << "tans = " << trans << endl;
+      std::cerr << "p = " << p  <<std::endl
+      << "pmat = " << pmat <<std::endl
+      << "dshape = " << dshape <<std::endl
+      << "tans = " << trans <<std::endl;
     */
   }
 
@@ -463,7 +413,7 @@ namespace netgen
 #ifdef DEBUG
     if (pmat.Width() != np || pmat.Height() != 2)
       {
-        (*testout) << "GetTransofrmation: pmat doesn't fit" << endl;
+        std::cerr << "GetTransofrmation: pmat doesn't fit" << std::endl;
         return;
       }
 #endif
@@ -486,7 +436,7 @@ namespace netgen
   {
     if (shape.Size() != GetNP())
       {
-        cerr << "Element::GetShape: Length not fitting" << endl;
+        std::cerr << "Element::GetShape: Length not fitting" << std::endl;
         return;
       }
 
@@ -625,7 +575,7 @@ namespace netgen
 #ifdef DEBUG
     if (pmat.Width() != np || pmat.Height() != 2)
       {
-        cerr << "Element::GetPointMatrix: sizes don't fit" << endl;
+        std::cerr << "Element::GetPointMatrix: sizes don't fit" << std::endl;
         return;
       }
 #endif
@@ -908,7 +858,7 @@ namespace netgen
 
 
 
-  ostream & operator<<(ostream  & s, const Element2d & el)
+  std::ostream & operator<<(std::ostream  & s, const Element2d & el)
   {
     s << "np = " << el.GetNP();
     for (int j = 1; j <= el.GetNP(); j++)
@@ -917,7 +867,7 @@ namespace netgen
   }
 
 
-  ostream & operator<<(ostream  & s, const Element & el)
+  std::ostream & operator<<(std::ostream  & s, const Element & el)
   {
     s << "np = " << el.GetNP();
     for (int j = 0; j < el.GetNP(); j++)
@@ -977,7 +927,7 @@ namespace netgen
       case 6: typ = PRISM; break;
       case 8: typ = HEX; break;
       case 10: typ = TET10; break;
-      default: cerr << "Element::Element: unknown element with " << np << " points" << endl;
+      default: std::cerr << "Element::Element: unknown element with " << np << " points" << std::endl;
       }
     orderx = ordery = orderz = 1;
   }
@@ -1053,7 +1003,7 @@ namespace netgen
       case 10: typ = TET10; break;
         // 
       default: break;
-        cerr << "Element::SetNP unknown element with " << np << " points" << endl;
+        std::cerr << "Element::SetNP unknown element with " << np << " points" << std::endl;
       }
   }
 
@@ -1072,7 +1022,7 @@ namespace netgen
       case PRISM12: np = 12; break;
 
       default: break;
-        cerr << "Element::SetType unknown type  " << int(typ) << endl;
+        std::cerr << "Element::SetType unknown type  " << int(typ) << std::endl;
       }
   }
 
@@ -1084,31 +1034,31 @@ namespace netgen
       {
       case 4:
         {
-          Swap (PNum(3), PNum(4));
+          std::swap (PNum(3), PNum(4));
           break;
         }
       case 5:
         {
-          Swap (PNum(1), PNum(4));
-          Swap (PNum(2), PNum(3));
+          std::swap (PNum(1), PNum(4));
+          std::swap (PNum(2), PNum(3));
           break;
         }
       case 6:
         {
-          Swap (PNum(1), PNum(4));
-          Swap (PNum(2), PNum(5));
-          Swap (PNum(3), PNum(6));
+          std::swap (PNum(1), PNum(4));
+          std::swap (PNum(2), PNum(5));
+          std::swap (PNum(3), PNum(6));
           break;
         }
       }
   }
 
 
-  void Element :: Print (ostream & ost) const
+  void Element :: Print (std::ostream & ost) const
   {
     ost << np << " Points: ";
     for (int i = 1; i <= np; i++)
-      ost << pnum[i-1] << " " << endl;
+      ost << pnum[i-1] << " " << std::endl;
   }
 
   void Element :: GetBox (const T_POINTS & points, Box3d & box) const
@@ -1299,7 +1249,7 @@ namespace netgen
         }
       default:
         {
-          cerr << "GetTetsLocal not implemented for el with " << GetNP() << " nodes" << endl;
+          std::cerr << "GetTetsLocal not implemented for el with " << GetNP() << " nodes" << std::endl;
         }
       }
   }
@@ -1399,7 +1349,7 @@ namespace netgen
         }
       default:
         {
-          cout << "GetNodesLocal not impelemented for element " << GetType() << endl;
+          std::cout << "GetNodesLocal not impelemented for element " << GetType() << std::endl;
           np = 0;
         }
       }
@@ -1505,7 +1455,7 @@ namespace netgen
         }
       default:
         {
-          cout << "GetNodesLocal not impelemented for element " << GetType() << endl;
+          std::cout << "GetNodesLocal not impelemented for element " << GetType() << std::endl;
           np = 0;
 	  pp = NULL;
         }
@@ -1714,10 +1664,10 @@ namespace netgen
     CalcABt (pmat, dshape, trans);
 
     /*
-      (*testout) << "p = " << p  << endl
-      << "pmat = " << pmat << endl
-      << "dshape = " << dshape << endl
-      << "tans = " << trans << endl;
+      std::cerr << "p = " << p  <<std::endl
+      << "pmat = " << pmat <<std::endl
+      << "dshape = " << dshape <<std::endl
+      << "tans = " << trans <<std::endl;
     */
   }
 
@@ -1729,7 +1679,7 @@ namespace netgen
 
     if (pmat.Width() != np || pmat.Height() != 3)
       {
-        (*testout) << "GetTransofrmation: pmat doesn't fit" << endl;
+        std::cerr << "GetTransofrmation: pmat doesn't fit" << std::endl;
         return;
       }
 
@@ -1753,7 +1703,7 @@ namespace netgen
 
     if (shape.Size() != GetNP())
       {
-        cerr << "Element::GetShape: Length not fitting" << endl;
+        std::cerr << "Element::GetShape: Length not fitting" << std::endl;
         return;
       }
 
@@ -1822,7 +1772,7 @@ namespace netgen
     /*
       if (shape.Size() < GetNP())
       {
-      cerr << "Element::GetShape: Length not fitting" << endl;
+      std::cerr << "Element::GetShape: Length not fitting" <<std::endl;
       return;
       }
     */
@@ -1911,7 +1861,7 @@ namespace netgen
     int np = GetNP();
     if (dshape.Height() != 3 || dshape.Width() != np)
       {
-        cerr << "Element::DShape: Sizes don't fit" << endl;
+        std::cerr << "Element::DShape: Sizes don't fit" << std::endl;
         return;
       }
 
@@ -2311,9 +2261,9 @@ namespace netgen
   }
 
 
-  const string & FaceDescriptor :: GetBCName () const
+  const std::string & FaceDescriptor :: GetBCName () const
   {
-    static string defaultstring = "default";
+    static std::string defaultstring = "default";
     if (bcname) return *bcname;
     return defaultstring;
   }
@@ -2326,7 +2276,7 @@ namespace netgen
   */
 
 
-  ostream & operator<<(ostream  & s, const FaceDescriptor & fd)
+  std::ostream & operator<<(std::ostream  & s, const FaceDescriptor & fd)
   {
     s << "surfnr = " << fd.SurfNr() 
       << ", domin = " << fd.DomainIn()
@@ -2369,7 +2319,7 @@ namespace netgen
 
   void Identifications :: Add (PointIndex pi1, PointIndex pi2, int identnr)
   {
-    //  (*testout) << "Identification::Add, pi1 = " << pi1 << ", pi2 = " << pi2 << ", identnr = " << identnr << endl;
+    //  std::cerr << "Identification::Add, pi1 = " << pi1 << ", pi2 = " << pi2 << ", identnr = " << identnr <<std::endl;
     INDEX_2 pair (pi1, pi2);
     identifiedpoints->Set (pair, identnr);
 
@@ -2435,7 +2385,7 @@ namespace netgen
 
     else
       {
-        cout << "getmap, identnr = " << identnr << endl;
+        std::cout << "getmap, identnr = " << identnr << std::endl;
 
         for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++)
           for (int j = 1; j <= identifiedpoints_nr->GetBagSize(i); j++)
@@ -2502,12 +2452,12 @@ namespace netgen
   }
 
 
-  void Identifications :: Print (ostream & ost) const
+  void Identifications :: Print (std::ostream & ost) const
   {
-    ost << "Identifications:" << endl;
-    ost << "pairs: " << endl << *identifiedpoints << endl;
-    ost << "pairs and nr: " << endl << *identifiedpoints_nr << endl;
-    ost << "table: " << endl << idpoints_table << endl;
+    ost << "Identifications:" << std::endl;
+    ost << "pairs: " << std::endl << *identifiedpoints << std::endl;
+    ost << "pairs and nr: " << std::endl << *identifiedpoints_nr << std::endl;
+    ost << "table: " << std::endl << idpoints_table << std::endl;
   }
 
 
@@ -2550,45 +2500,45 @@ namespace netgen
     secondorder = 0;
   }
 
-  void MeshingParameters :: Print (ostream & ost) const
+  void MeshingParameters :: Print (std::ostream & ost) const
   {
-    ost << "Meshing parameters: " << endl
-        << "optimize3d = " << optimize3d << endl
-        << "optsteps3d = " << optsteps3d << endl
-        << " optimize2d = " <<  optimize2d << endl
-        << " optsteps2d = " <<  optsteps2d << endl
-        << " opterrpow = " <<  opterrpow << endl
-        << " blockfill = " <<  blockfill << endl
-        << " filldist = " <<  filldist << endl
-        << " safety = " <<  safety << endl
-        << " relinnersafety = " <<  relinnersafety << endl
-        << " uselocalh = " <<  uselocalh << endl
-        << " grading = " <<  grading << endl
-        << " delaunay = " <<  delaunay << endl
-        << " maxh = " <<  maxh << endl;
+    ost << "Meshing parameters: " << std::endl
+        << "optimize3d = " << optimize3d << std::endl
+        << "optsteps3d = " << optsteps3d << std::endl
+        << " optimize2d = " <<  optimize2d << std::endl
+        << " optsteps2d = " <<  optsteps2d << std::endl
+        << " opterrpow = " <<  opterrpow << std::endl
+        << " blockfill = " <<  blockfill << std::endl
+        << " filldist = " <<  filldist << std::endl
+        << " safety = " <<  safety << std::endl
+        << " relinnersafety = " <<  relinnersafety << std::endl
+        << " uselocalh = " <<  uselocalh << std::endl
+        << " grading = " <<  grading << std::endl
+        << " delaunay = " <<  delaunay << std::endl
+        << " maxh = " <<  maxh << std::endl;
     if(meshsizefilename)
-      ost << " meshsizefilename = " <<  meshsizefilename << endl;
+      ost << " meshsizefilename = " <<  meshsizefilename << std::endl;
     else
-      ost << " meshsizefilename = NULL" << endl;
-    ost << " startinsurface = " <<  startinsurface << endl
-        << " checkoverlap = " <<  checkoverlap << endl
-        << " checkchartboundary = " <<  checkchartboundary << endl
-        << " curvaturesafety = " <<  curvaturesafety << endl
-        << " segmentsperedge = " <<  segmentsperedge << endl
-        << " parthread = " <<  parthread << endl
-        << " elsizeweight = " <<  elsizeweight << endl
-        << " giveuptol2d = " <<  giveuptol2d << endl
-        << " giveuptol = " <<  giveuptol << endl
-        << " maxoutersteps = " <<  maxoutersteps << endl
-        << " starshapeclass = " <<  starshapeclass << endl
-        << " baseelnp        = " <<  baseelnp        << endl
-        << " sloppy = " <<  sloppy << endl
-        << " badellimit = " <<  badellimit << endl
-        << " secondorder = " <<  secondorder << endl
-        << " elementorder = " <<  elementorder << endl
-        << " quad = " <<  quad << endl
-        << " inverttets = " <<  inverttets << endl
-        << " inverttrigs = " <<  inverttrigs << endl;
+      ost << " meshsizefilename = NULL" << std::endl;
+    ost << " startinsurface = " <<  startinsurface << std::endl
+        << " checkoverlap = " <<  checkoverlap << std::endl
+        << " checkchartboundary = " <<  checkchartboundary << std::endl
+        << " curvaturesafety = " <<  curvaturesafety << std::endl
+        << " segmentsperedge = " <<  segmentsperedge << std::endl
+        << " parthread = " <<  parthread << std::endl
+        << " elsizeweight = " <<  elsizeweight << std::endl
+        << " giveuptol2d = " <<  giveuptol2d << std::endl
+        << " giveuptol = " <<  giveuptol << std::endl
+        << " maxoutersteps = " <<  maxoutersteps << std::endl
+        << " starshapeclass = " <<  starshapeclass << std::endl
+        << " baseelnp        = " <<  baseelnp        << std::endl
+        << " sloppy = " <<  sloppy << std::endl
+        << " badellimit = " <<  badellimit << std::endl
+        << " secondorder = " <<  secondorder << std::endl
+        << " elementorder = " <<  elementorder << std::endl
+        << " quad = " <<  quad << std::endl
+        << " inverttets = " <<  inverttets << std::endl
+        << " inverttrigs = " <<  inverttrigs << std::endl;
   }
 
   void MeshingParameters :: CopyFrom(const MeshingParameters & other)

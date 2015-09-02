@@ -417,7 +417,7 @@ inline ostream & operator<< (ostream & ost, const Mat<H,W> & m)
     {
       for (int j = 0; j < W; j++)
 	ost << m(i,j) << "   ";
-      ost << endl;
+      ost <<std::endl;
     }
   return ost;
 }

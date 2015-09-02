@@ -22,7 +22,7 @@ namespace netgen
 void WriteElmerFormat (const Mesh &mesh,
 			 const string &filename)
 {
-  cout << "write elmer mesh files" << endl;
+  std::cout << "write elmer mesh files" <<std::endl;
   int np = mesh.GetNP();
   int ne = mesh.GetNE();
   int nse = mesh.GetNSE();

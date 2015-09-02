@@ -1,4 +1,4 @@
-#include <mystdlib.h>
+#include <meshgen.hpp>
 #include <myadt.hpp>
 #include <linalg.hpp>
 #include <csg.hpp>
@@ -119,8 +119,8 @@ namespace netgen
     tcl_const char * classname = argv[1];
     tcl_const char * name = argv[2];
 
-    cout << "Create primitive, class = " << classname
-	 << ", name = " << name << endl;
+    std::cout << "Create primitive, class = " << classname
+	 << ", name = " << name <<std::endl;
 
     Primitive * nprim = Primitive::CreatePrimitive (classname);
     Solid * nsol = new Solid (nprim);
@@ -157,8 +157,8 @@ namespace netgen
     Array<double> coeffs;
 
 
-    cout << "Set primitive data, name = " << name
-	 << ", value = " << value  << endl;
+    std::cout << "Set primitive data, name = " << name
+	 << ", value = " << value  <<std::endl;
 
 
     istringstream vst (value);
@@ -192,8 +192,8 @@ namespace netgen
     tcl_const char * name = argv[1];
     tcl_const char * val = argv[2];
 
-    cout << "Set Solid Data, name = " << name
-	 << ", value = " << val << endl;
+    std::cout << "Set Solid Data, name = " << name
+	 << ", value = " << val <<std::endl;
 
     istringstream vst (val);
 
@@ -230,11 +230,11 @@ namespace netgen
     for (int i = 1; i <= coeffs.Size(); i++)
       vst << coeffs.Get(i) << " ";
 
-    cout << "GetPrimitiveData, name = " << name
+    std::cout << "GetPrimitiveData, name = " << name
 	 << ", classnamevar = " << classnamevar
-	 << ", classname = " << classname << endl
+	 << ", classname = " << classname <<std::endl
 	 << " valuevar = " << valuevar
-	 << ", values = " << vst.str() << endl;
+	 << ", values = " << vst.str() <<std::endl;
 
     Tcl_SetVar  (interp, classnamevar, (char*)classname, 0);
     Tcl_SetVar  (interp, valuevar, (char*)vst.str().c_str(), 0);
@@ -261,7 +261,7 @@ namespace netgen
     const Solid * sol = geometry->GetSolid (name);
     sol->GetSolidData (vst);
 
-    cout << "GetSolidData, name = " << name << ", data = " << vst.str() << endl;
+    std::cout << "GetSolidData, name = " << name << ", data = " << vst.str() <<std::endl;
 
     Tcl_SetVar  (interp, valuevar, (char*)vst.str().c_str(), 0);
 
@@ -293,7 +293,7 @@ namespace netgen
 	  vst << sol->Name() << " ";
       }
 
-    cout << "primnames = " << vst.str() << endl;
+    std::cout << "primnames = " << vst.str() <<std::endl;
 
     Tcl_SetVar  (interp, valuevar, (char*)vst.str().c_str(), 0);
 
@@ -325,7 +325,7 @@ namespace netgen
 	vst << surf->Name() << " ";
       }
 
-    cout << "surfnames = " << vst.str() << endl;
+    std::cout << "surfnames = " << vst.str() <<std::endl;
 
     Tcl_SetVar  (interp, valuevar, (char*)vst.str().c_str(), 0);
 
@@ -356,7 +356,7 @@ namespace netgen
 	  vst << sol->Name() << " ";
       }
 
-    cout << "solnames = " << vst.str() << endl;
+    std::cout << "solnames = " << vst.str() <<std::endl;
 
     Tcl_SetVar  (interp, valuevar, (char*)vst.str().c_str(), 0);
 
@@ -379,8 +379,8 @@ namespace netgen
     int i;
     /*
       for (i = 0; i < argc; i++)
-      cout << argv[i] << ", ";
-      cout << endl;
+      std::cout << argv[i] << ", ";
+      std::cout <<std::endl;
     */
 
     if (strcmp (argv[1], "getlist") == 0)

@@ -1,6 +1,10 @@
 #ifndef BISECT
 #define BISECT
 
+#include "improve2.hpp"
+
+namespace netgen {
+
 class BisectionOptions
 {
 public:
@@ -15,12 +19,12 @@ public:
   BisectionOptions ();
 };
 
-class ZRefinementOptions
-{
-public:
-  int minref;
-  ZRefinementOptions();
-};
+//class ZRefinementOptions
+//{
+//public:
+//  int minref;
+//  ZRefinementOptions();
+//};
 
 
 /*
@@ -31,10 +35,10 @@ extern void BisectTets (Mesh &, const CSGeometry *,
 extern void BisectTetsCopyMesh (Mesh &, const class CSGeometry *,
 				BisectionOptions & opt);
 
-extern void ZRefinement (Mesh &, const class NetgenGeometry *,
-			 ZRefinementOptions & opt);
-
-
+//extern void ZRefinement (Mesh &, const class NetgenGeometry *,
+//			 ZRefinementOptions & opt);
+//
+//
 
 
 
@@ -42,6 +46,7 @@ class DLL_HEADER Refinement
 {
   MeshOptimize2d * optimizer2d;
 
+ 
 public:
   Refinement ();
   virtual ~Refinement ();
@@ -98,5 +103,5 @@ public:
   
   virtual void LocalizeEdgePoints(Mesh & /* mesh */) const {;}
 };
-
+}
 #endif

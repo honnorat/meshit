@@ -1,4 +1,8 @@
-#include <myadt.hpp>
+#include <cstring>
+#include <iostream>
+#include <iomanip>
+#include <meshgen.hpp>
+#include "dynamicmem.hpp"
 
 using namespace std;
 
@@ -54,7 +58,7 @@ namespace netgen
 
     if (!ptr)
       {
-	cerr << "BaseynamicMem, cannot allocate " << s << " bytes" << endl;
+	std::cerr << "BaseynamicMem, cannot allocate " << s << " bytes" << std::endl;
 	Print ();
 	throw ("BaseDynamicMem::Alloc: out of memory");
       }
@@ -71,7 +75,7 @@ namespace netgen
 
     if (!ptr)
       {
-	cerr << "BaseynamicMem, cannot Reallocate " << s << " bytes" << endl;
+	std::cerr << "BaseynamicMem, cannot Reallocate " << s << " bytes" << std::endl;
 	Print ();
 	throw ("BaseDynamicMem::Alloc: out of memory");
       }
@@ -106,7 +110,7 @@ namespace netgen
 
   void BaseDynamicMem :: Print ()
   {
-    cout << "****************** Dynamic Mem Report ****************" << endl;
+    std::cout << "****************** Dynamic Mem Report ****************" << std::endl;
     BaseDynamicMem * p = first;
     size_t mem = 0;
     int cnt = 0;
@@ -115,23 +119,23 @@ namespace netgen
 	mem += p->size;
 	cnt++;
 
-	cout << setw(10) << p->size << " Bytes";
-	cout << ", addr = " << (void*)p->ptr;
+	std::cout << std::setw(10) << p->size << " Bytes";
+	std::cout << ", addr = " << (void*)p->ptr;
 	if (p->name)
-	  cout << " in block " << p->name;
-	cout << endl;
+	  std::cout << " in block " << p->name;
+	std::cout << std::endl;
 
 	p = p->next;
       }
 
     if (mem > 100000000)
-      cout << "memory in dynamic memory: " << mem/1048576 << " MB" << endl;
+      std::cout << "memory in dynamic memory: " << mem/1048576 << " MB" << std::endl;
     else if (mem > 100000)
-      cout << "memory in dynamic memory: " << mem/1024 << " kB" << endl;
+      std::cout << "memory in dynamic memory: " << mem/1024 << " kB" << std::endl;
     else
-      cout << "memory in dynamic memory: " << mem << " Bytes" << endl;
-    cout << "number of blocks:         " << cnt << endl;
-    //  cout << "******************************************************" << endl;
+      std::cout << "memory in dynamic memory: " << mem << " Bytes" << std::endl;
+    std::cout << "number of blocks:         " << cnt << std::endl;
+    //  std::cout << "******************************************************" <<std::endl;
   }
 
 
@@ -158,7 +162,7 @@ namespace netgen
 	size_t blocks = p->size / (1024*1024);
 	blocks /= (4096/nr);
 	
-	// cout << "ptr = " << (void*)(p->ptr) << ", size = " << p->size << ", hptr = " << hptr << " blocks = " << blocks << endl;
+	// std::cout << "ptr = " << (void*)(p->ptr) << ", size = " << p->size << ", hptr = " << hptr << " blocks = " << blocks <<std::endl;
 
 	for (size_t i = 0; i <= blocks; i++)
 	  ch[hptr+i] = '1';
@@ -181,7 +185,7 @@ namespace netgen
 	size_t blocks = pm->size / (1024*1024);
 	blocks /= (4096/nr);
 	
-	// cout << "moveable, ptr = " << (void*)(pm->ptr) << ", size = " << pm->size << ", hptr = " << hptr << " blocks = " << blocks << endl;
+	// std::cout << "moveable, ptr = " << (void*)(pm->ptr) << ", size = " << pm->size << ", hptr = " << hptr << " blocks = " << blocks <<std::endl;
 
 	for (size_t i = 0; i <= blocks; i++)
 	  ch[hptr+i] = '1';

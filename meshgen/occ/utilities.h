@@ -38,8 +38,8 @@
 
 /* ---  INFOS is always defined (without _DEBUG_): to be used for warnings, with release version --- */
 
-#define INFOS(msg)    {SLog->putMessage(*SLog<<__FILE__<<" ["<<__LINE__<<"] : "<<msg<<endl);}
-#define PYSCRIPT(msg) {SLog->putMessage(*SLog<<"---PYSCRIPT--- "<<msg<<endl);}
+#define INFOS(msg)    {SLog->putMessage(*SLog<<__FILE__<<" ["<<__LINE__<<"] : "<<msg<std::endl);}
+#define PYSCRIPT(msg) {SLog->putMessage(*SLog<<"---PYSCRIPT--- "<<msg<std::endl);}
 
 /* --- To print date and time of compilation of current source --- */
 
@@ -66,7 +66,7 @@
 					   *SLog<<__FILE__<<" ["<< __LINE__<<"] : "\
 					   << "COMPILED with " << COMPILER \
 					   << ", " << __DATE__ \
-					   << " at " << __TIME__ <<endl); }
+					   << " at " << __TIME__ <std::endl); }
 
 #ifdef _DEBUG_
 
@@ -74,20 +74,20 @@
 
 #define MYTRACE *SLog << "- Trace " << __FILE__ << " [" << __LINE__ << "] : " 
 
-#define MESSAGE(msg) {SLog->putMessage( MYTRACE <<msg<<endl<<ends); }
-#define SCRUTE(var)  {SLog->putMessage( MYTRACE << #var << "=" << var <<endl<<ends); }
+#define MESSAGE(msg) {SLog->putMessage( MYTRACE <<msg<std::endl<<ends); }
+#define SCRUTE(var)  {SLog->putMessage( MYTRACE << #var << "=" << var <std::endl<<ends); }
 
-#define REPERE *SLog << "   --------------" << endl 
-#define BEGIN_OF(msg) {REPERE;MYTRACE<<"Begin of: "     <<msg<<endl;REPERE;} 
-#define END_OF(msg)   {REPERE;MYTRACE<<"Normal end of: "<<msg<<endl;REPERE;} 
+#define REPERE *SLog << "   --------------" <<std::endl 
+#define BEGIN_OF(msg) {REPERE;MYTRACE<<"Begin of: "     <<msg<std::endl;REPERE;} 
+#define END_OF(msg)   {REPERE;MYTRACE<<"Normal end of: "<<msg<std::endl;REPERE;} 
 
-#define HERE {cout<<flush ;cerr<<"- Trace "<<__FILE__<<" ["<<__LINE__<<"] : "<<flush ;}
+#define HERE {std::cout<<flush ;std::cerr<<"- Trace "<<__FILE__<<" ["<<__LINE__<<"] : "<<flush ;}
 
-#define INTERRUPTION(code) {HERE;cerr<<"INTERRUPTION return code= "<<code<< endl;std::exit(code);}
+#define INTERRUPTION(code) {HERE;std::cerr<<"INTERRUPTION return code= "<<code<<std::endl;std::exit(code);}
 
 #ifndef ASSERT
 #define ASSERT(condition) \
-        if (!(condition)){HERE;cerr<<"CONDITION "<<#condition<<" NOT VERIFIED"<<endl;INTERRUPTION(1);}
+        if (!(condition)){HERE;std::cerr<<"CONDITION "<<#condition<<" NOT VERIFIED"<std::endl;INTERRUPTION(1);}
 #endif /* ASSERT */
 
 

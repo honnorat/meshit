@@ -1,5 +1,8 @@
 //File for handling warnings, errors, messages
-#include <meshing.hpp>
+#include <meshgen.hpp>
+#include "msghandler.hpp"
+#include "../general/array.hpp"
+#include "global.hpp"
 
 namespace netgen
 {
@@ -215,11 +218,11 @@ void GetStatus(MyStr & s, double & percentage)
 #endif
 
 #ifdef SMALLLIBORNOTCL
-void Ng_PrintDest(const char * s){cout << s <<flush;}
+void Ng_PrintDest(const char * s){std::cout << s <<flush;}
 double GetTime(){return 0;}
 void MyError(const char * ch)
 {
-  cerr << ch << endl;
+  std::cerr << ch <<std::endl;
 }
 #endif
 */

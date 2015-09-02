@@ -130,7 +130,7 @@ namespace netgen
 
   template <> DLL_HEADER Ng_Element Ngx_Mesh :: GetElement<0> (int nr) const
   {
-    cout << "Netgen does not support 0-D elements" << endl;
+    std::cout << "Netgen does not support 0-D elements" <<std::endl;
 	Ng_Element ret;
 	return ret;
   }
@@ -294,7 +294,7 @@ namespace netgen
 
   template <> DLL_HEADER Ng_Element Ng_GetElement<0> (int nr)
   {
-    cout << "Netgen does not support 0-D elements" << endl;
+    std::cout << "Netgen does not support 0-D elements" <<std::endl;
 	Ng_Element ret;
 	return ret;
   }
@@ -488,7 +488,7 @@ namespace netgen
                               double * x,
                               double * dxdxi) const
   {
-    cout << "1D not supported" << endl;
+    std::cout << "1D not supported" <<std::endl;
   }
 
 
@@ -554,7 +554,7 @@ namespace netgen
                                    double * x, size_t sx,
                                    double * dxdxi, size_t sdxdxi) const
   {
-    cout << "1D not supported" << endl;
+    std::cout << "1D not supported" <<std::endl;
   }
 
 

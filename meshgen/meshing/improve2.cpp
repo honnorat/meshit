@@ -1,13 +1,8 @@
-#include <mystdlib.h>
-
-#include "meshing.hpp"
-#include <opti.hpp>
-
-#ifndef SMALLLIB
-//#ifndef NOTCL
-//#include <visual.hpp>
-//#endif
-#endif
+#include <meshgen.hpp>
+#include "improve2.hpp"
+#include "global.hpp"
+#include "../general/ngexception.hpp"
+#include "../gprim/geomfuncs.hpp"
 
 namespace netgen
 {
@@ -75,14 +70,6 @@ namespace netgen
 	mesh.CalcSurfacesOfNode();
 	return;
       }
-
-
-    static int timer = NgProfiler::CreateTimer ("EdgeSwapping 2D");
-    NgProfiler::RegionTimer reg1 (timer);
-
-    static int timerstart = NgProfiler::CreateTimer ("EdgeSwapping 2D start");
-    NgProfiler::StartTimer (timerstart);
-
 
     Array<SurfaceElementIndex> seia;
     mesh.GetSurfaceElementsOfFace (faceindex, seia);
@@ -232,10 +219,6 @@ namespace netgen
 
     for (int i = 0; i < seia.Size(); i++)
       swapped[seia[i]] = 0;
-
-    NgProfiler::StopTimer (timerstart);
-  
-
 
     int t = 4;
     int done = 0;
@@ -445,23 +428,6 @@ namespace netgen
       }
 
 
-    static int timer = NgProfiler::CreateTimer ("Combineimprove 2D");
-    NgProfiler::RegionTimer reg (timer);
-
-    static int timerstart = NgProfiler::CreateTimer ("Combineimprove 2D start");
-    NgProfiler::StartTimer  (timerstart);
-
-
-    static int timerstart1 = NgProfiler::CreateTimer ("Combineimprove 2D start1");
-    NgProfiler::StartTimer  (timerstart1);
-
-
-
-    // int i, j, k, l;
-    // PointIndex pi;
-    // SurfaceElementIndex sei;
-
-
     Array<SurfaceElementIndex> seia;
     mesh.GetSurfaceElementsOfFace (faceindex, seia);
 
@@ -497,17 +463,6 @@ namespace netgen
 
     Array<bool,PointIndex::BASE> fixed(np);
     fixed = false;
-
-    NgProfiler::StopTimer  (timerstart1);
-
-    /*
-    for (SegmentIndex si = 0; si < mesh.GetNSeg(); si++)
-      {
-	INDEX_2 i2(mesh[si][0], mesh[si][1]);
-	fixed[i2.I1()] = true;
-	fixed[i2.I2()] = true;
-      }
-    */
 
     for (int i = 0; i < seia.Size(); i++)
       {
@@ -548,8 +503,6 @@ namespace netgen
 	  }
       }
 
-    NgProfiler::StopTimer  (timerstart);
-
     for (int i = 0; i < seia.Size(); i++)
       {
 	SurfaceElementIndex sei = seia[i];
@@ -576,20 +529,20 @@ namespace netgen
 
 	    if (debugflag)
 	      {
-		(*testout) << "Combineimprove, face = " << faceindex 
-			   << "pi1 = " << pi1 << " pi2 = " << pi2 << endl;
+		std::cerr << "Combineimprove, face = " << faceindex 
+			   << "pi1 = " << pi1 << " pi2 = " << pi2 << std::endl;
 	      }
 
 	    /*
 	    // save version:
 	    if (fixed.Get(pi1) || fixed.Get(pi2)) 
 	    continue;
-	    if (pi2 < pi1) swap (pi1, pi2);
+	    if (pi2 < pi1) std::swap (pi1, pi2);
 	    */
 
 	    // more general 
 	    if (fixed[pi2]) 
-	      Swap (pi1, pi2);
+	      std::swap (pi1, pi2);
 
 	    if (fixed[pi2])  
 	      continue;
@@ -708,7 +661,7 @@ namespace netgen
        
 	    if (debugflag)
 	      {
-		(*testout) << "bad1 = " << bad1 << ", bad2 = " << bad2 << endl;
+		std::cerr << "bad1 = " << bad1 << ", bad2 = " << bad2 << std::endl;
 	      }
 
 
@@ -722,8 +675,8 @@ namespace netgen
 
 	    if (should)
 	      {
-		// (*testout) << "combine !" << endl;
-		// (*testout) << "bad1 = " << bad1 << ", bad2 = " << bad2 << endl;
+		// std::cerr << "combine !" <<std::endl;
+		// std::cerr << "bad1 = " << bad1 << ", bad2 = " << bad2 <<std::endl;
 
 
 		mesh[pi1] = pnew;
@@ -737,7 +690,7 @@ namespace netgen
 		if(l<elementsonnode.EntrySize(pi1))
 		  el1p = &mesh[elementsonnode[pi1][l]];
 		else
-		  cerr << "OOPS!" << endl;
+		  std::cerr << "OOPS!" << std::endl;
 
 		for (l = 0; l < el1p->GetNP(); l++)
 		  if ((*el1p)[l] == pi1)
@@ -746,7 +699,7 @@ namespace netgen
 		      // gi_set = true;
 		    }
 
-		// (*testout) << "Connect point " << pi2 << " to " << pi1 << "\n";
+		// std::cerr << "Connect point " << pi2 << " to " << pi1 << "\n";
 		for (int k = 0; k < elementsonnode[pi2].Size(); k++)
 		  {
 		    Element2d & el = mesh[elementsonnode[pi2][k]];
@@ -774,10 +727,10 @@ namespace netgen
 		/*
 		  for (k = 0; k < hasbothpi.Size(); k++)
 		  {
-		  cout << mesh[hasbothpi[k]] << endl;
+		  std::cout << mesh[hasbothpi[k]] <<std::endl;
 		  for (l = 0; l < 3; l++)
-		  cout << mesh[mesh[hasbothpi[k]][l]] << " ";
-		  cout << endl;
+		  std::cout << mesh[mesh[hasbothpi[k]][l]] << " ";
+		  std::cout <<std::endl;
 		  }
 		*/
 
@@ -811,8 +764,8 @@ namespace netgen
     Vec3d n, ng;
     Array<Vec3d> ngs(3);
 
-    (*mycout) << "Check Surface Approxiamtion" << endl;
-    (*testout) << "Check Surface Approxiamtion" << endl;
+    (*mystd::cout) << "Check Surface Approxiamtion" <<std::endl;
+    std::cerr << "Check Surface Approxiamtion" <<std::endl;
 
     for (i = 1; i <= ne; i++)
     {
@@ -832,8 +785,8 @@ namespace netgen
     double angle =  (180.0 / M_PI) * Angle (n, ng);
     if (angle > 60)
     {
-    (*testout) << "el " << i << " node " << el.PNum(j)
-    << "has angle = " << angle << endl;
+    std::cerr << "el " << i << " node " << el.PNum(j)
+    << "has angle = " << angle <<std::endl;
     }
     }	
 
@@ -842,9 +795,9 @@ namespace netgen
     double angle =  (180.0 / M_PI) * Angle (ngs.Get(j), ngs.Get(j%3+1));
     if (angle > 60)
     {
-    (*testout) << "el " << i << " node-node " 
+    std::cerr << "el " << i << " node-node " 
     << ngs.Get(j) << " - " << ngs.Get(j%3+1)
-    << " has angle = " << angle << endl;
+    << " has angle = " << angle <<std::endl;
     }
     }
     }

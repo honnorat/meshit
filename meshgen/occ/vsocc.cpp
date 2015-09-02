@@ -155,7 +155,7 @@ namespace netgen
     BRepGProp::LinearProperties(occgeometry->fmap(i), system);
     gp_Pnt pnt = system.CentreOfMass();
     center = Point<3> (pnt.X(), pnt.Y(), pnt.Z());
-    cout << "Setting center to mid of face " << i << " = " << center << endl;
+    std::cout << "Setting center to mid of face " << i << " = " << center <<std::endl;
     }
     }
 
@@ -188,7 +188,7 @@ namespace netgen
 
     if(aEdgePoly.IsNull())
     {
-    cout << "cannot visualize edge " << i << endl;
+    std::cout << "cannot visualize edge " << i <<std::endl;
     continue;
     }
 
@@ -206,7 +206,7 @@ namespace netgen
 
     }
 
-    glEndList ();
+    gstd::endlist ();
 
     for (i = 1; i <= trilists.Size(); i++)
     glDeleteLists (trilists.Elem(i), 1);
@@ -296,7 +296,7 @@ namespace netgen
 
     if (triangulation.IsNull())
     {
-    cout << "cannot visualize face " << i << endl;
+    std::cout << "cannot visualize face " << i <<std::endl;
     continue;
     }
 
@@ -354,7 +354,7 @@ namespace netgen
     }
 
 
-    glEndList ();
+    gstd::endlist ();
 
     }
     */
@@ -442,8 +442,8 @@ namespace netgen
 
          if(aEdgePoly.IsNull())
          {
-            (*testout) << "visualizing edge " << occgeometry->emap.FindIndex (edge)
-            << " without using the occ visualization triangulation" << endl;
+            std::cerr << "visualizing edge " << occgeometry->emap.FindIndex (edge)
+            << " without using the occ visualization triangulation" <<std::endl;
 
             double s0, s1;
             Handle(Geom_Curve) c = BRep_Tool::Curve(edge, s0, s1);
@@ -469,7 +469,7 @@ namespace netgen
          glEnd ();
       }
 
-      glEndList ();
+      gstd::endlist ();
 
       // Highlighted edge list
 
@@ -489,8 +489,8 @@ namespace netgen
 
          if(aEdgePoly.IsNull())
          {
-            (*testout) << "visualizing edge " << occgeometry->emap.FindIndex (edge)
-            << " without using the occ visualization triangulation" << endl;
+            std::cerr << "visualizing edge " << occgeometry->emap.FindIndex (edge)
+            << " without using the occ visualization triangulation" <<std::endl;
 
             double s0, s1;
             Handle(Geom_Curve) c = BRep_Tool::Curve(edge, s0, s1);
@@ -516,7 +516,7 @@ namespace netgen
          glEnd ();
       }
 
-      glEndList ();
+      gstd::endlist ();
 
       // display faces
 
@@ -572,7 +572,7 @@ namespace netgen
 
          if (triangulation.IsNull())
          {
-            cout << "cannot visualize face " << i << endl;
+            std::cout << "cannot visualize face " << i <<std::endl;
             occgeometry->fvispar[i-1].SetNotDrawable();
             continue;
          }
@@ -602,8 +602,8 @@ namespace netgen
                n = prop.Normal();
                else
                {
-                  (*testout) << "Visualization of face " << i
-                  << ": Normal vector not defined" << endl;
+                  std::cerr << "Visualization of face " << i
+                  << ": Normal vector not defined" <<std::endl;
                   //		  n = gp_Vec (0,0,0);
                   gp_Vec a(p[0],p[1]);
                   gp_Vec b(p[0],p[2]);
@@ -618,7 +618,7 @@ namespace netgen
          glEnd ();
 
       }
-      glEndList ();
+      gstd::endlist ();
 
    }
 
@@ -738,7 +738,7 @@ namespace netgen
          occgeometry->changed = OCCGEOMETRYVISUALIZATIONFULLCHANGE;
          else
          occgeometry->changed = OCCGEOMETRYVISUALIZATIONHALFCHANGE;
-         cout << "Selected face: " << minname << endl;
+         std::cout << "Selected face: " << minname <<std::endl;
       }
       else
       {

@@ -1,5 +1,8 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "specials.hpp"
+
+#include "msghandler.hpp"
+#include "../gprim/geom3d.hpp"
 
 
 namespace netgen
@@ -48,7 +51,7 @@ void CutOffAndCombine (Mesh & mesh, const Mesh & othermesh)
       el.GetBox(mesh.Points(), box);
 
       if (i % 10000 == 0)
-	cout << "+" << flush;
+	std::cout << "+" << std::flush;
 
       if (box.Intersect(otherbox))
 	{
@@ -60,7 +63,7 @@ void CutOffAndCombine (Mesh & mesh, const Mesh & othermesh)
       if (remove)
 	mesh.VolumeElement(i).Delete();
     }
-  cout << endl;
+  std::cout <<std::endl;
 
   BitArray connected(mesh.GetNP());
   connected.Clear();
@@ -96,10 +99,10 @@ void CutOffAndCombine (Mesh & mesh, const Mesh & othermesh)
 		}
 	    }
 	}
-      cout << "." << flush;
+      std::cout << "." << std::flush;
     }
   while (changed);
-  cout << endl;
+  std::cout <<std::endl;
 
   for (i = 1; i <= mesh.GetNE(); i++)
     {
@@ -167,12 +170,12 @@ void HelmholtzMesh (Mesh & mesh)
   int i;
   double ri, ra, rinf;
 
-  cout << "ri = ";
-  cin >> ri;
-  cout << "ra = ";
-  cin >> ra;
-  cout << "rinf = ";
-  cin >> rinf;
+  std::cout << "ri = ";
+  std::cin >> ri;
+  std::cout << "ra = ";
+  std::cin >> ra;
+  std::cout << "rinf = ";
+  std::cin >> rinf;
 
   double det = ri * ra * rinf - ri * ri * rinf;
   double a = (ri - rinf) / det;

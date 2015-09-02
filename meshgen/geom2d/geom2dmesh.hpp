@@ -7,10 +7,14 @@
 /* Date:   22. Jan. 01                                                    */
 /**************************************************************************/
 
+#include "../gprim/geomobjects.hpp"
+#include "../meshing/bisect.hpp"
 
 namespace netgen
 {
-
+//    class Refinement;
+    
+    
   class Refinement2d : public Refinement
   {
     const class SplineGeometry2d & geometry;

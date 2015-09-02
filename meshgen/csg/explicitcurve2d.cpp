@@ -30,8 +30,8 @@ double ExplicitCurve2d :: NumericalProjectParam (const Point<2> & p, double lb, 
   fl = tan * (cp - p);
   if (fl > 0)			// changed by wmf, originally fl >= 0
     {
-      //      cerr << "tan = " << tan << " cp - p = " << (cp - p) << endl;
-      //      cerr << "ExplicitCurve2d::NumericalProject: lb wrong" << endl;
+      //      std::cerr << "tan = " << tan << " cp - p = " << (cp - p) <<std::endl;
+      //      std::cerr << "ExplicitCurve2d::NumericalProject: lb wrong" <<std::endl;
       return 0;
     }
   
@@ -40,8 +40,8 @@ double ExplicitCurve2d :: NumericalProjectParam (const Point<2> & p, double lb, 
   fu = tan * (cp - p);
   if (fu < 0)			// changed by wmf, originally fu <= 0
     {
-      //    cerr << "tan = " << tan << " cp - p = " << (cp - p) << endl;
-      //    cerr << "ExplicitCurve2d::NumericalProject: ub wrong" << endl;
+      //    std::cerr << "tan = " << tan << " cp - p = " << (cp - p) <<std::endl;
+      //    std::cerr << "ExplicitCurve2d::NumericalProject: ub wrong" <<std::endl;
     return 0;
     }
     
@@ -51,7 +51,7 @@ double ExplicitCurve2d :: NumericalProjectParam (const Point<2> & p, double lb, 
     cnt++;
     if (cnt > 50)
       {
-      (*testout) << "Num Proj, cnt = " << cnt << endl;
+      std::cerr << "Num Proj, cnt = " << cnt <<std::endl;
       }
      
     t = (lb * fu - ub * fl) / (fu - fl);

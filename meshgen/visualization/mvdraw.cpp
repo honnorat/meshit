@@ -304,8 +304,8 @@ namespace netgen
 	  */
 
 	  /*	
-	    cout << "pv1 = " << pvx1 << ", " << pvy1 << ", " << pvz1 << endl;
-	    cout << "p1 = " << px1 << ", " << py1 << ", " << pz1 << endl;
+	    std::cout << "pv1 = " << pvx1 << ", " << pvy1 << ", " << pvz1 <<std::endl;
+	    std::cout << "p1 = " << px1 << ", " << py1 << ", " << pz1 <<std::endl;
 	  */
 
 	  glTranslated (px2-px1, py2-py1, pz2-pz1);
@@ -318,8 +318,8 @@ namespace netgen
 	{
 	  // glTranslatef(0.0f, 0.0f, -dist);
 
-	  // cout << "deltay = " << deltay << endl;
-	  // cout << "float_bug = " << (float(deltay)/100) << endl;   gives wrong result with icc 9.0.021
+	  // std::cout << "deltay = " << deltay <<std::endl;
+	  // std::cout << "float_bug = " << (float(deltay)/100) <<std::endl;   gives wrong result with icc 9.0.021
 	  glScaled (exp (double (-deltay)/100), 
 		    exp (double (-deltay)/100), 
 		    exp (double (-deltay)/100));
@@ -764,15 +764,15 @@ namespace netgen
 	    displname = XDisplayName (0);
 
 	    /*
-	    cout << "Init Parallel GL" << endl;
-	    cout << "DisplayName = " << displname << endl;
-	    cout << "current display = " << dpy << endl;
-	    cout << "current drawable = " << drawable << endl;                  
-	    cout << "current context = " << ctx << endl;                  
+	    std::cout << "Init Parallel GL" <<std::endl;
+	    std::cout << "DisplayName = " << displname <<std::endl;
+	    std::cout << "current display = " << dpy <<std::endl;
+	    std::cout << "current drawable = " << drawable <<std::endl;                  
+	    std::cout << "current context = " << ctx <<std::endl;                  
 	    
-	    cout << "contextid = " << xid << endl;
-	    cout << "isdirect = " << glXIsDirect ( dpy, ctx ) << endl;                  
-	    cout << "extensionstring = " << glXQueryExtensionsString( dpy, 0 ) << endl;
+	    std::cout << "contextid = " << xid <<std::endl;
+	    std::cout << "isdirect = " << glXIsDirect ( dpy, ctx ) <<std::endl;                  
+	    std::cout << "extensionstring = " << glXQueryExtensionsString( dpy, 0 ) <<std::endl;
 	    */
 
 	    MyMPI_SendCmd ("redraw");

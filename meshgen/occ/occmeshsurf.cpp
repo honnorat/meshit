@@ -105,15 +105,15 @@ namespace netgen
 
     if(glob_testout)
       {
-	(*testout) << "u " << geominfo.u << " v " << geominfo.v 
+	std::cerr << "u " << geominfo.u << " v " << geominfo.v 
 		   << " du " << lprop.D1U().X() << " "<< lprop.D1U().Y() << " "<< lprop.D1U().Z()
-		   << " dv " << lprop.D1V().X() << " "<< lprop.D1V().Y() << " "<< lprop.D1V().Z() << endl;
+		   << " dv " << lprop.D1V().X() << " "<< lprop.D1V().Y() << " "<< lprop.D1V().Z() <<std::endl;
       }
 
 
 
     if (orient == TopAbs_REVERSED) n = -1*n;
-    //  (*testout) << "GetNormalVector" << endl;
+    //  std::cerr << "GetNormalVector" <<std::endl;
   }
 
 
@@ -126,8 +126,8 @@ namespace netgen
       {
 	p1 = ap1; p2 = ap2;
 
-	//cout << "p1 = " << p1 << endl;
-	//cout << "p2 = " << p2 << endl;
+	//std::cout << "p1 = " << p1 <<std::endl;
+	//std::cout << "p2 = " << p2 <<std::endl;
       
 	GetNormalVector (p1, geominfo1, ez);
       
@@ -148,7 +148,7 @@ namespace netgen
 	ez.Normalize();
 	ey = Cross (ez, ex);
 	nmid = ez;
-	//cout << "ex " << ex << " ey " << ey << " ez " << ez << endl;
+	//std::cout << "ex " << ex << " ey " << ey << " ez " << ez <<std::endl;
       }
     else
       {
@@ -178,9 +178,9 @@ namespace netgen
 	D1(0,1) = dv.X(); D1(1,1) = dv.Y(); D1(2,1) = dv.Z();
 
 	/*
-	  (*testout) << "DefineTangentialPlane" << endl
-	  << "---------------------" << endl;
-	  (*testout) << "D1 = " << endl << D1 << endl;
+	  std::cerr << "DefineTangentialPlane" <<std::endl
+	  << "---------------------" <<std::endl;
+	  std::cerr << "D1 = " <<std::endl << D1 <<std::endl;
 	*/
 
 	Transpose (D1, D1T);
@@ -270,7 +270,7 @@ namespace netgen
 	/*
 	  if(zone == -1)
 	  {
-	  (*testout) << "zone = -1 for " << p3d << " 2D: " << pplane << " n " << n << " nmid " << nmid << endl;
+	  std::cerr << "zone = -1 for " << p3d << " 2D: " << pplane << " n " << n << " nmid " << nmid <<std::endl;
 	  glob_testout = true;
 	  GetNormalVector (p3d, geominfo, n);
 	  glob_testout = false;
@@ -280,7 +280,7 @@ namespace netgen
     else
       {
 	pplane = Point<2>(geominfo.u, geominfo.v);
-	//      (*testout) << "(u,v) = " << geominfo.u << ", " << geominfo.v << endl;
+	//      std::cerr << "(u,v) = " << geominfo.u << ", " << geominfo.v <<std::endl;
 	pplane = Point<2> (1/h * (Amatinv * (pplane-psp1)));
 	//      pplane = Point<2> (h * (Amatinv * (pplane-psp1)));
 	//      pplane = Point<2> (1/h * ((pplane-psp1)));
@@ -297,11 +297,11 @@ namespace netgen
   { 
     if (projecttype == PLANESPACE)
       {
-	//      cout << "2d   : " << pplane << endl;
+	//      std::cout << "2d   : " << pplane <<std::endl;
 	p3d = p1 + (h * pplane(0)) * ex + (h * pplane(1)) * ey;
-	//      cout << "3d   : " << p3d << endl;
+	//      std::cout << "3d   : " << p3d <<std::endl;
 	Project (p3d, gi);  
-	//      cout << "proj : " << p3d << endl;
+	//      std::cout << "proj : " << p3d <<std::endl;
       }
     else
       {
@@ -321,11 +321,11 @@ namespace netgen
   void OCCSurface :: Project (Point<3> & p, PointGeomInfo & gi)
   {
     //   static int cnt = 0;
-    //  if (cnt++ % 1000 == 0) cout << "********************************************** OCCSurfce :: Project, cnt = " << cnt << endl;
+    //  if (cnt++ % 1000 == 0) std::cout << "********************************************** OCCSurfce :: Project, cnt = " << cnt <<std::endl;
   
     gp_Pnt pnt(p(0), p(1), p(2));
 
-    //(*testout) << "pnt = " << pnt.X() << ", " << pnt.Y() << ", " << pnt.Z() << endl;
+    //std::cerr << "pnt = " << pnt.X() << ", " << pnt.Y() << ", " << pnt.Z() <<std::endl;
 
 
     /*
@@ -333,7 +333,7 @@ namespace netgen
 
     if (!proj.NbPoints())
       {
-	cout << "Project Point on Surface FAIL" << endl;
+	std::cout << "Project Point on Surface FAIL" <<std::endl;
 	throw UVBoundsException();
       }
     */
@@ -343,13 +343,13 @@ namespace netgen
 
 
     /*
-      cout << "NP = " << proj.NbPoints() << endl;
+      std::cout << "NP = " << proj.NbPoints() <<std::endl;
 
       for (int i = 1; i <= proj.NbPoints(); i++)
       {
       gp_Pnt pnt2 = proj.Point(i);
       Point<3> p2 = Point<3> (pnt2.X(), pnt2.Y(), pnt2.Z());
-      cout << i << ". p = " << p2 << ", dist = " << (p2-p).Length() << endl;
+      std::cout << i << ". p = " << p2 << ", dist = " << (p2-p).Length() <<std::endl;
       }
     */
 
@@ -364,7 +364,7 @@ namespace netgen
     suval.Coord( u, v);
     pnt = occface->Value( u, v );
     
-    //(*testout) << "pnt(proj) = " << pnt.X() << ", " << pnt.Y() << ", " << pnt.Z() << endl;
+    //std::cerr << "pnt(proj) = " << pnt.X() << ", " << pnt.Y() << ", " << pnt.Z() <<std::endl;
     gi.u = u;
     gi.v = v;
     
@@ -506,7 +506,7 @@ namespace netgen
   GetNormalVector(INDEX surfind, const Point<3> & p, Vec<3> & n) const
   {
     //  static int cnt = 0;
-    //  if (cnt++ % 1000 == 0) cout << "GetNV cnt = " << cnt << endl;
+    //  if (cnt++ % 1000 == 0) std::cout << "GetNV cnt = " << cnt <<std::endl;
     Standard_Real u,v;
 
     gp_Pnt pnt(p(0), p(1), p(2));
@@ -519,9 +519,9 @@ namespace netgen
 
     if (proj.NbPoints() < 1)
       {
-	cout << "ERROR: OCCSurface :: GetNormalVector: GeomAPI_ProjectPointOnSurf failed!"
-	     << endl;
-	cout << p << endl;
+	std::cout << "ERROR: OCCSurface :: GetNormalVector: GeomAPI_ProjectPointOnSurf failed!"
+	     <<std::endl;
+	std::cout << p <<std::endl;
 	return;
       }
  
@@ -540,7 +540,7 @@ namespace netgen
 
     /*
       if (!occface->IsCNu (1) || !occface->IsCNv (1))
-      (*testout) << "SurfOpt: Differentiation FAIL" << endl;
+      std::cerr << "SurfOpt: Differentiation FAIL" <<std::endl;
     */
 
     n = Cross (Vec3d(du.X(), du.Y(), du.Z()),
@@ -566,9 +566,9 @@ namespace netgen
 
     if (proj.NbPoints() < 1)
       {
-	cout << "ERROR: OCCSurface :: GetNormalVector: GeomAPI_ProjectPointOnSurf failed!"
-	     << endl;
-	cout << p << endl;
+	std::cout << "ERROR: OCCSurface :: GetNormalVector: GeomAPI_ProjectPointOnSurf failed!"
+	     <<std::endl;
+	std::cout << p <<std::endl;
 	return 0;
       }
  
@@ -679,7 +679,7 @@ namespace netgen
  
 	if (!geometry.FastProject (surfi, hnewp, u, v))
 	  {
-	  //  cout << "Fast projection to surface fails! Using OCC projection" << endl;
+	  //  std::cout << "Fast projection to surface fails! Using OCC projection" <<std::endl;
 	    geometry.Project (surfi, hnewp);
 	  }
 
@@ -722,7 +722,7 @@ namespace netgen
     if (surfi > 0)
       if (!geometry.FastProject (surfi, p, gi.u, gi.v))
 	{
-	  cout << "Fast projection to surface fails! Using OCC projection" << endl;
+	  std::cout << "Fast projection to surface fails! Using OCC projection" <<std::endl;
 	  geometry.Project (surfi, p);
 	}
   };

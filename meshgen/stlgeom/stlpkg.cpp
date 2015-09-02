@@ -1,19 +1,10 @@
-#include <mystdlib.h>
-#include <myadt.hpp>
-#include <linalg.hpp>
-#include <csg.hpp>
-
-#include <meshing.hpp>
-
-
-#include <incvis.hpp>
-#include <visual.hpp>
-
+#include <meshgen.hpp>
 #include <stlgeom.hpp>
 
 #include "vsstl.hpp"
+#include "../general/autoptr.hpp"
 
-extern "C" int Ng_STL_Init (Tcl_Interp * interp);
+//extern "C" int Ng_STL_Init (Tcl_Interp * interp);
 
 
 
@@ -93,7 +84,7 @@ namespace netgen
 
       stlparam.recalc_h_opt =
 	atoi (Tcl_GetVar (interp, "::stloptions.recalchopt", 0));
-      //  stlparam.Print (cout);      
+      //  stlparam.Print (std::cout);      
     }
   };
 
@@ -120,7 +111,7 @@ namespace netgen
 		    Tcl_Interp * interp,
 		    int argc, tcl_const char *argv[])
   {
-    //cout << "STL doctor" << endl;
+    //std::cout << "STL doctor" <<std::endl;
     STLGeometry * stlgeometry = 
           dynamic_cast<STLGeometry*> (ng_geometry.Ptr());
       
@@ -156,7 +147,7 @@ namespace netgen
     stldoctor.showtouchedtrigchart =
       atoi (Tcl_GetVar (interp, "::stldoctor.showtouchedtrigchart", 0));
 
-    //cout << "smt=" << stldoctor.showmarkedtrigs << endl;
+    //std::cout << "smt=" << stldoctor.showmarkedtrigs <<std::endl;
 
     stldoctor.dirtytrigfact =
       atof (Tcl_GetVar (interp, "::stldoctor.dirtytrigfact", 0));
@@ -431,7 +422,7 @@ namespace netgen
     if (stlgeometry)
       {
 	stlgeometry->STLInfo(data);
-	//      cout << "NT=" << data[0] << endl;
+	//      std::cout << "NT=" << data[0] <<std::endl;
 
 	if (argc == 2)
 	  {

@@ -1,7 +1,14 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
-
-
+#include <meshgen.hpp>
+#include "meshclass.hpp"
+#include "../general/seti.hpp"
+#include "../gprim/adtree.hpp"
+#include "../gprim/geomtest3d.hpp"
+#include "../gprim/geomfuncs.hpp"
+#include "adfront3.hpp"
+#include "meshing3.hpp"
+#include "improve3.hpp"
+#include "meshtool.hpp"
+#include "global.hpp"
 
 namespace netgen
 {
@@ -223,13 +230,13 @@ namespace netgen
       {
 	if (pi <= 0 || pi > links.Size())
 	  {
-	    cerr << "link, error " << endl;
-	    cerr << "pi = " << pi << " linked.s = " << linked.Size() << endl;
+	    std::cerr << "link, error " << std::endl;
+	    std::cerr << "pi = " << pi << " linked.s = " << linked.Size() << std::endl;
 	    exit(1);
 	  }
 	if (linked.Size() > links.Size())
 	  {
-	    cerr << "links have loop" << endl;
+	    std::cerr << "links have loop" << std::endl;
 	    exit(1);
 	  }
 
@@ -288,7 +295,7 @@ namespace netgen
       int i, j, k, l;
       if (!felind)
       {
-      cerr << "not in any sphere, 1" << endl;
+      std::cerr << "not in any sphere, 1" <<std::endl;
       // old, non tree search
 
       double mindist = 1e10;
@@ -301,19 +308,19 @@ namespace netgen
       if (toofar < mindist || toofar < 1e-7) 
       {
       mindist = toofar;
-      cout << " dist2 = " << Dist2 (centers.Get(j), newp)
-      << " radi2 = " << radi2.Get(j) << endl;
+      std::cout << " dist2 = " << Dist2 (centers.Get(j), newp)
+      << " radi2 = " << radi2.Get(j) <<std::endl;
       }
       if (toofar < 0)
       {
       el = tempels.Get(j);
       felind = j;
-      cout << "sphere found !" << endl;
+      std::cout << "sphere found !" <<std::endl;
       break; 
       }
       }
       }
-      cout << "point is too far from sheres: " << mindist << endl;
+      std::cout << "point is too far from sheres: " << mindist <<std::endl;
       }
     */      
 
@@ -386,10 +393,10 @@ namespace netgen
 		  //changed
 		  //int prec = testout->precision();
 		  //testout->precision(12);
-		  //(*testout) << "val1 " << Dist2 (centers.Get(nbind), newp)
+		  //std::cerr << "val1 " << Dist2 (centers.Get(nbind), newp)
 		  //	     << " val2 " << radi2.Get(nbind) * (1+1e-8)
 		  //	     << " val3 " << radi2.Get(nbind)
-		  //	     << " val1 / val3 " << Dist2 (centers.Get(nbind), newp)/radi2.Get(nbind) << endl;
+		  //	     << " val1 / val3 " << Dist2 (centers.Get(nbind), newp)/radi2.Get(nbind) <<std::endl;
 		  //testout->precision(prec);
 		  if (Dist2 (centers.Get(nbind), newp) 
 		      < radi2.Get(nbind) * (1+1e-8) )
@@ -442,7 +449,7 @@ namespace netgen
 		}
 	    }
       } // while (changed)
-    //      (*testout) << "newels: " << endl;
+    //      std::cerr << "newels: " <<std::endl;
     Array<Element> newels;
 
     Element2d face(TRIG);
@@ -479,13 +486,13 @@ namespace netgen
 		
 	      if (hval > -1e-12)
 		{
-		  cerr << "vec to outer" << endl;
-		  (*testout) << "vec to outer, hval = " << hval << endl;
-		  (*testout) << "v1 x v2 = " << Cross (v1, v2) << endl;
-		  (*testout) << "facep: "
+		  std::cerr << "vec to outer" << std::endl;
+		  std::cerr << "vec to outer, hval = " << hval << std::endl;
+		  std::cerr << "v1 x v2 = " << Cross (v1, v2) << std::endl;
+		  std::cerr << "facep: "
 			     << mesh.Point (face[0]) << " "
 			     << mesh.Point (face[1]) << " "
-			     << mesh.Point (face[2]) << endl;
+			     << mesh.Point (face[2]) << std::endl;
 		}
 	    }
 	}
@@ -543,13 +550,13 @@ namespace netgen
 	  {
 	    PrintSysError ("Delaunay: New tet is flat");
 
-	    (*testout) << "new tet is flat" << endl;
+	    std::cerr << "new tet is flat" << std::endl;
 	    for (int k = 1; k <= 4; k++)
-	      (*testout) << newels.Get(j).PNum(k) << " ";
-	    (*testout) << endl;
+	      std::cerr << newels.Get(j).PNum(k) << " ";
+	    std::cerr << std::endl;
 	    for (int k = 1; k <= 4; k++)
-	      (*testout) << *pp[k-1] << " ";
-	    (*testout) << endl;
+	      std::cerr << *pp[k-1] << " ";
+	    std::cerr << std::endl;
 	  }
 
 	r2 = Dist2 (*pp[0], pc);
@@ -763,15 +770,15 @@ namespace netgen
 
     PrintMessage (3, "Points: ", cntp);
     PrintMessage (3, "Elements: ", tempels.Size());
-    //   (*mycout) << cntp << " / " << tempels.Size() << " points/elements" << endl;
+    //   (*mystd::cout) << cntp << " / " << tempels.Size() << " points/elements" <<std::endl;
 
     /*
-      cout << "tempels: ";
-      tempels.PrintMemInfo(cout);
-      cout << "Searchtree: ";
-      tettree.Tree().PrintMemInfo(cout);
-      cout << "MeshNB: ";
-      meshnb.PrintMemInfo(cout);
+      std::cout << "tempels: ";
+      tempels.PrintMemInfo(std::cout);
+      std::cout << "Searchtree: ";
+      tettree.Tree().PrintMemInfo(std::cout);
+      std::cout << "MeshNB: ";
+      meshnb.PrintMemInfo(std::cout);
     */
   }
 
@@ -806,7 +813,7 @@ namespace netgen
     Delaunay1 (mesh, mp, adfront, tempels, oldnp, startel, pmin, pmax);
 
     {
-      // improve delaunay - mesh by swapping !!!!
+      // improve delaunay - mesh by std::swapping !!!!
 
       Mesh tempmesh;
       for (PointIndex pi = mesh.Points().Begin(); pi < mesh.Points().End(); pi++)
@@ -830,7 +837,7 @@ namespace netgen
 
 	  Vec3d n = Cross (v1, v2);
 	  double vol = n * v3;
-	  if (vol > 0) swap (el[2], el[3]);
+	  if (vol > 0) std::swap (el[2], el[3]);
 
 	  tempmesh.AddVolumeElement (el);
 	}
@@ -848,7 +855,7 @@ namespace netgen
 	  Element2d sel = mesh.OpenElement(i);
 	  sel.SetIndex(1);
 	  tempmesh.AddSurfaceElement (sel);
-	  swap (sel[1], sel[2]);
+	  std::swap (sel[1], sel[2]);
 	  tempmesh.AddSurfaceElement (sel);
 	}
 
@@ -868,7 +875,7 @@ namespace netgen
 	   pi < tempmesh.Points().End(); pi++)
 	tempmesh.AddLockedPoint (pi);
       
-      //    tempmesh.PrintMemInfo(cout);
+      //    tempmesh.PrintMemInfo(std::cout);
       // tempmesh.Save ("tempmesh.vol");
 
       for (int i = 1; i <= 2; i++)
@@ -925,11 +932,11 @@ namespace netgen
 	    badnode.Set(el[2]);
 	    badnode.Set(el[3]);
 	    ndeg++;
-	    (*testout) << "vol = " << vol << " h = " << h << endl;
+	    std::cerr << "vol = " << vol << " h = " << h << std::endl;
 	  }
 
 	if (vol > 0)
-	  Swap (el[2], el[3]);
+	  std::swap (el[2], el[3]);
       }
 
     ne = tempels.Size();
@@ -1032,8 +1039,8 @@ namespace netgen
 	    tetedges.Set (i2, 1);
 	  }
       }
-    //  cout << "tetedges:";
-    //  tetedges.PrintMemInfo (cout);
+    //  std::cout << "tetedges:";
+    //  tetedges.PrintMemInfo (std::cout);
 
 
     for (INDEX_2_HASHTABLE<INDEX_2>::Iterator it = twotrias.Begin();
@@ -1113,8 +1120,8 @@ namespace netgen
 	Box3dTree setree(pmin, pmax);
 
 	/*      
-		cout << "open elements in search tree: " << openels.Size() << endl;
-		cout << "pmin, pmax = " << pmin << " - " << pmax << endl;
+		std::cout << "open elements in search tree: " << openels.Size() <<std::endl;
+		std::cout << "pmin, pmax = " << pmin << " - " << pmax <<std::endl;
 	*/
 
 	for (int i = 1; i <= openels.Size(); i++)
@@ -1185,24 +1192,24 @@ namespace netgen
 		  {
 		    /*
 		    int il1, il2;
-		    (*testout) << "intersect !" << endl;
-		    (*testout) << "triind: ";
+		    std::cerr << "intersect !" <<std::endl;
+		    std::cerr << "triind: ";
 		    for (il1 = 0; il1 < 3; il1++)
-		      (*testout) << " " << tripi[il1];
-		    (*testout) << endl;
-		    (*testout) << "tetind: ";
+		      std::cerr << " " << tripi[il1];
+		    std::cerr <<std::endl;
+		    std::cerr << "tetind: ";
 		    for (il2 = 0; il2 < 4; il2++)
-		      (*testout) << " " << tetpi[il2];
-		    (*testout) << endl;
+		      std::cerr << " " << tetpi[il2];
+		    std::cerr <<std::endl;
 		  
-		    (*testout) << "trip: ";
+		    std::cerr << "trip: ";
 		    for (il1 = 0; il1 < 3; il1++)
-		      (*testout) << " " << *tripp[il1];
-		    (*testout) << endl;
-		    (*testout) << "tetp: ";
+		      std::cerr << " " << *tripp[il1];
+		    std::cerr <<std::endl;
+		    std::cerr << "tetp: ";
 		    for (il2 = 0; il2 < 4; il2++)
-		      (*testout) << " " << *pp[il2];
-		    (*testout) << endl;
+		      std::cerr << " " << *pp[il2];
+		    std::cerr <<std::endl;
 		    */
 		  
 		  
@@ -1272,8 +1279,8 @@ namespace netgen
 	elsonpoint.Add (i4.I2(), i+1);
       }
 
-    //  cout << "elsonpoint mem: ";
-    //  elsonpoint.PrintMemInfo(cout);
+    //  std::cout << "elsonpoint mem: ";
+    //  elsonpoint.PrintMemInfo(std::cout);
 
     INDEX_3_CLOSED_HASHTABLE<INDEX_2> faceht(100);   
   
@@ -1354,23 +1361,23 @@ namespace netgen
     */
 
     /*
-      (*testout) << "nb elements:" << endl;
+      std::cerr << "nb elements:" <<std::endl;
       for (i = 1; i <= tempels.Size(); i++)
       {
-      (*testout) << i << " ";
+      std::cerr << i << " ";
       for (j = 1; j <= 4; j++)
-      (*testout) << tempels.Get(i).NB1(j) << " ";
-      (*testout) << endl;
+      std::cerr << tempels.Get(i).NB1(j) << " ";
+      std::cerr <<std::endl;
       }
   
-      (*testout) << "pairs:" << endl;
+      std::cerr << "pairs:" <<std::endl;
       for (i = 1; i <= innerfaces.GetNBags(); i++)
       for (j = 1; j <= innerfaces.GetBagSize(i); j++)
       {
       INDEX_3 i3;
       INDEX_2 i2;
       innerfaces.GetData (i, j, i3, i2);
-      (*testout) << i2 << endl;
+      std::cerr << i2 <<std::endl;
       }
     */
 
@@ -1381,12 +1388,12 @@ namespace netgen
 
 
     /*
-      cout << "innerfaces: ";
-      innerfaces.PrintMemInfo (cout);
+      std::cout << "innerfaces: ";
+      innerfaces.PrintMemInfo (std::cout);
     */
 
-    //  cout << "boundaryfaces: ";
-    //  boundaryfaces.PrintMemInfo (cout);
+    //  std::cout << "boundaryfaces: ";
+    //  boundaryfaces.PrintMemInfo (std::cout);
 
 
     PrintMessage (5, "tables filled");
@@ -1439,10 +1446,10 @@ namespace netgen
 	inside = adfront->Inside (ci);
 
 	/*
-	  cout << "startel: " << i << endl;
-	  cout << "inside = " << inside << endl;
-	  cout << "ins2 = " << adfront->Inside (Center (ci, p1)) << endl;
-	  cout << "ins3 = " << adfront->Inside (Center (ci, p2)) << endl;
+	  std::cout << "startel: " << i <<std::endl;
+	  std::cout << "inside = " << inside <<std::endl;
+	  std::cout << "ins2 = " << adfront->Inside (Center (ci, p1)) <<std::endl;
+	  std::cout << "ins3 = " << adfront->Inside (Center (ci, p2)) <<std::endl;
 	*/
       
 	elstack.SetSize(0);
@@ -1483,7 +1490,7 @@ namespace netgen
 		      int other = i2.I1() + i2.I2() - ei;
 
 		      if (other != tempels.Get(ei).NB1(j))
-		      cerr << "different1 !!" << endl;
+		      std::cerr << "different1 !!" <<std::endl;
 
 		      if (other)
 		      {
@@ -1492,7 +1499,7 @@ namespace netgen
 		      }
 		      else
 		      if (tempels.Get(ei).NB1(j))
-		      cerr << "different2 !!" << endl;
+		      std::cerr << "different2 !!" <<std::endl;
 		    */
 
 		  }
@@ -1516,19 +1523,19 @@ namespace netgen
 	    Point3d ci = Center (p1, p2, p3, p4);
 	  
 	    //       if (adfront->Inside (ci) != adfront->Inside (Center (ci, p1)))
-	    // 	cout << "ERROR: outer test unclear !!!" << endl;	
+	    // 	std::cout << "ERROR: outer test unclear !!!" <<std::endl;	
 	  
 	    if (inner.Test(i) != adfront->Inside (ci))
 	      {
 		/*
-		  cout << "ERROR: outer test wrong !!!" 
+		  std::cout << "ERROR: outer test wrong !!!" 
 		  << "inner = " << int(inner.Test(i))
 		  << "outer = " << int(outer.Test(i))
-		  << endl;
+		  <<std::endl;
 	      
-		  cout << "Vol = " << Determinant(Vec3d(p1, p2),
+		  std::cout << "Vol = " << Determinant(Vec3d(p1, p2),
 		  Vec3d(p1, p3),
-		  Vec3d(p1, p4)) << endl;
+		  Vec3d(p1, p4)) <<std::endl;
 	      
 		*/	      
 		for (int j = 1; j <= 4; j++)
@@ -1541,7 +1548,7 @@ namespace netgen
 		      case 3: hp = Center (ci, p3); break;
 		      case 4: hp = Center (ci, p4); break;
 		      }
-		    //		  cout << "inside(" << hp << ") = " << adfront->Inside(hp) << endl;
+		    //		  std::cout << "inside(" << hp << ") = " << adfront->Inside(hp) <<std::endl;
 		  }
 	      
 	      }
@@ -1572,13 +1579,13 @@ namespace netgen
     {
     tempmesh.AddVolumeElement (tempels.Get(i2.I1()));
     tempmesh.AddVolumeElement (tempels.Get(i2.I2()));
-    cerr << "outer flag different for connected els" << endl;
+    std::cerr << "outer flag different for connected els" <<std::endl;
     }
     }
     }
 
 
-    cout << "Check intersectiong once more" << endl;
+    std::cout << "Check intersectiong once more" <<std::endl;
 
     for (i = 1; i <= openels.Size(); i++)
     {
@@ -1611,23 +1618,23 @@ namespace netgen
     tripi[k-1] = sel.PNum(k);
     }
 
-    (*testout) << "Check Triangle " << j << ":";
+    std::cerr << "Check Triangle " << j << ":";
     for (k = 1; k <= 3; k++)
-    (*testout) << " " << sel.PNum(k);
+    std::cerr << " " << sel.PNum(k);
     for (k = 1; k <= 3; k++)
-    (*testout) << " " << tempmesh.Point(sel.PNum(k));
-    (*testout) << endl;
+    std::cerr << " " << tempmesh.Point(sel.PNum(k));
+    std::cerr <<std::endl;
 
-    (*testout) << "Check Tet " << i << ":";
+    std::cerr << "Check Tet " << i << ":";
     for (k = 1; k <= 4; k++)
-    (*testout) << " " << el.PNum(k);
+    std::cerr << " " << el.PNum(k);
     for (k = 1; k <= 4; k++)
-    (*testout) << " " << tempmesh.Point(el.PNum(k));
-    (*testout) << endl;
+    std::cerr << " " << tempmesh.Point(el.PNum(k));
+    std::cerr <<std::endl;
 
     if (IntersectTetTriangle (&pp[0], &tripp[0], tetpi, tripi))
     {
-    cout << "Intesection detected !!" << endl;
+    std::cout << "Intesection detected !!" <<std::endl;
     }
     }
 

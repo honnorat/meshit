@@ -1,8 +1,8 @@
-#include <mystdlib.h>
-#include <myadt.hpp>
-
-#include <linalg.hpp>
-#include <gprim.hpp>
+#include <meshgen.hpp>
+#include "geomtest3d.hpp"
+#include "geomfuncs.hpp"
+#include "../linalg/densemat.hpp"
+#include "../linalg/polynomial.hpp"
 
 namespace netgen
 {
@@ -22,9 +22,9 @@ IntersectTriangleLine (const Point<3> ** tri, const Point<3> ** line)
   int i;
 
   /*
-  (*testout) << "Tri-Line inters: " << endl
-	     << "tri = " << *tri[0] << ", " << *tri[1] << ", " << *tri[2] << endl
-	     << "line = " << *line[0] << ", " << *line[1] << endl;
+  std::cerr << "Tri-Line inters: " <<std::endl
+	     << "tri = " << *tri[0] << ", " << *tri[1] << ", " << *tri[2] <<std::endl
+	     << "line = " << *line[0] << ", " << *line[1] <<std::endl;
   */
   for (i = 0; i < 3; i++)
     {
@@ -49,19 +49,19 @@ IntersectTriangleLine (const Point<3> ** tri, const Point<3> ** line)
     {
 #ifdef DEVELOP      
       // line parallel to triangle !
-      // cout << "ERROR: IntersectTriangleLine degenerated" << endl;
-      //      (*testout) << "WARNING: IntersectTriangleLine degenerated\n";
+      // std::cout << "ERROR: IntersectTriangleLine degenerated" <<std::endl;
+      //      std::cerr << "WARNING: IntersectTriangleLine degenerated\n";
       /*
-      (*testout) << "lin-tri intersection: " << endl
-		 << "line = " << *line[0] << " - " << *line[1] << endl
-		 << "tri = " << *tri[0] << " - " << *tri[1] << " - " << *tri[2] << endl
-		 << "lami = " << lami << endl
-		 << "pc = " << ( *line[0] + lami.Get(1) * vl ) << endl
-		 << "   = " << ( *tri[0] + lami.Get(2) * vt1 + lami.Get(3) * vt2) << endl
-		 << " a = " << a << endl
-		 << " ainv = " << ainv << endl
-		 << " det(a) = " << det << endl
-		 << " rs = " << rs << endl;
+      std::cerr << "lin-tri intersection: " <<std::endl
+		 << "line = " << *line[0] << " - " << *line[1] <<std::endl
+		 << "tri = " << *tri[0] << " - " << *tri[1] << " - " << *tri[2] <<std::endl
+		 << "lami = " << lami <<std::endl
+		 << "pc = " << ( *line[0] + lami.Get(1) * vl ) <<std::endl
+		 << "   = " << ( *tri[0] + lami.Get(2) * vt1 + lami.Get(3) * vt2) <<std::endl
+		 << " a = " << a <<std::endl
+		 << " ainv = " << ainv <<std::endl
+		 << " det(a) = " << det <<std::endl
+		 << " rs = " << rs <<std::endl;
       */
 #endif
       return 0;
@@ -71,7 +71,7 @@ IntersectTriangleLine (const Point<3> ** tri, const Point<3> ** line)
   // ainv.Mult (rs, lami);
   lami = ainv * rs;
 
-  //  (*testout) << "lami = " << lami << endl;
+  //  std::cerr << "lami = " << lami <<std::endl;
 
   double eps = 1e-6;
   if (
@@ -85,19 +85,19 @@ IntersectTriangleLine (const Point<3> ** tri, const Point<3> ** line)
 
      {
 #ifdef DEVELOP
-       //      cout << "WARNING: IntersectTriangleLine degenerated" << endl;
-      (*testout) << "WARNING: IntersectTriangleLine numerical inexact" << endl;
+       //      std::cout << "WARNING: IntersectTriangleLine degenerated" <<std::endl;
+      std::cerr << "WARNING: IntersectTriangleLine numerical inexact" << std::endl;
 
-      (*testout) << "lin-tri intersection: " << endl
-		 << "line = " << *line[0] << " - " << *line[1] << endl
-		 << "tri = " << *tri[0] << " - " << *tri[1] << " - " << *tri[2] << endl
-		 << "lami = " << lami << endl
-		 << "pc = " << ( *line[0] + lami.Get(1) * vl ) << endl
-		 << "   = " << ( *tri[0] + lami.Get(2) * vt1 + lami.Get(3) * vt2) << endl
-		 << " a = " << a << endl
-		 << " ainv = " << ainv << endl
-		 << " det(a) = " << det << endl
-		 << " rs = " << rs << endl;
+      std::cerr << "lin-tri intersection: " << std::endl
+		 << "line = " << *line[0] << " - " << *line[1] << std::endl
+		 << "tri = " << *tri[0] << " - " << *tri[1] << " - " << *tri[2] << std::endl
+		 << "lami = " << lami << std::endl
+		 << "pc = " << ( *line[0] + lami.Get(1) * vl ) << std::endl
+		 << "   = " << ( *tri[0] + lami.Get(2) * vt1 + lami.Get(3) * vt2) << std::endl
+		 << " a = " << a << std::endl
+		 << " ainv = " << ainv << std::endl
+		 << " det(a) = " << det << std::endl
+		 << " rs = " << rs << std::endl;
 #endif
     }
       
@@ -180,10 +180,10 @@ int IntersectTetTriangle (const Point<3> ** tet, const Point<3> ** tri,
 	}
     }  
   
-  //  (*testout) << "cnt = " << cnt << endl;
+  //  std::cerr << "cnt = " << cnt <<std::endl;
 
 
-  //  (*testout) << "tet-trig inters, cnt = " << cnt << endl;
+  //  std::cerr << "tet-trig inters, cnt = " << cnt <<std::endl;
   
   // cnt .. number of common points
   switch (cnt)
@@ -342,10 +342,10 @@ int IntersectTetTriangle (const Point<3> ** tet, const Point<3> ** tri,
 	      {
 		
 		/*
-		(*testout) << "lcrline = " << lcrline 
-			   << " eps = " << eps << " diam = " << diam << endl;
+		std::cerr << "lcrline = " << lcrline 
+			   << " eps = " << eps << " diam = " << diam <<std::endl;
 		 
-		(*testout) << "hit, cnt == 1 " 
+		std::cerr << "hit, cnt == 1 " 
 			   << "lam1,2,3,4 = " << lam1 << ", " 
 			   << lam2 << ", " << lam3 << ", " << lam4
 			   << "\n";
@@ -365,9 +365,9 @@ int IntersectTetTriangle (const Point<3> ** tet, const Point<3> ** tri,
 	tetp4 = 6 - tetp1 - tetp2 - tetp3;
 	trip3 = 3 - trip1 - trip2;
 
-	//	(*testout) << "trip1,2,3 = " << trip1 << ", " << trip2 << ", " << trip3 << endl;
-	//	(*testout) << "tetp1,2,3,4 = " << tetp1 << ", " << tetp2 
-	//		   << ", " << tetp3 << ", " << tetp4 << endl;
+	//	std::cerr << "trip1,2,3 = " << trip1 << ", " << trip2 << ", " << trip3 <<std::endl;
+	//	std::cerr << "tetp1,2,3,4 = " << tetp1 << ", " << tetp2 
+	//		   << ", " << tetp3 << ", " << tetp4 <<std::endl;
 
 	Vec3d vtri = *tri[trip3] - *tri[trip1];
 	Vec3d vtet1 = *tet[tetp3] - *tri[trip1];
@@ -389,25 +389,25 @@ int IntersectTetTriangle (const Point<3> ** tet, const Point<3> ** tri,
 	  {
 	    /*
 
-	    (*testout) << "vtet1 = " << vtet1 << endl;
-	    (*testout) << "vtet2 = " << vtet2 << endl;
-	    (*testout) << "vtri = " << vtri << endl;
-	    (*testout) << "lam1 = " << lam1 << " lam2 = " << lam2 << endl;
-	    (*testout) << (lam1 * (vtet1 * vtet1) + lam2 * (vtet1 * vtet2))
-		       << " = " << (vtet1 * vtri) << endl;
-	    (*testout) << (lam1 * (vtet1 * vtet2) + lam2 * (vtet2 * vtet2))
-		       << " = " << (vtet2 * vtri) << endl;
+	    std::cerr << "vtet1 = " << vtet1 <<std::endl;
+	    std::cerr << "vtet2 = " << vtet2 <<std::endl;
+	    std::cerr << "vtri = " << vtri <<std::endl;
+	    std::cerr << "lam1 = " << lam1 << " lam2 = " << lam2 <<std::endl;
+	    std::cerr << (lam1 * (vtet1 * vtet1) + lam2 * (vtet1 * vtet2))
+		       << " = " << (vtet1 * vtri) <<std::endl;
+	    std::cerr << (lam1 * (vtet1 * vtet2) + lam2 * (vtet2 * vtet2))
+		       << " = " << (vtet2 * vtri) <<std::endl;
 	    
-	    (*testout) << "tet = ";
+	    std::cerr << "tet = ";
 	    for (j = 0; j < 4; j++)
-	      (*testout) << (*tet[j]) << " ";
-	    (*testout) << endl;
-	    (*testout) << "tri = ";
+	      std::cerr << (*tet[j]) << " ";
+	    std::cerr <<std::endl;
+	    std::cerr << "tri = ";
 	    for (j = 0; j < 3; j++)
-	      (*testout) << (*tri[j]) << " ";
-	    (*testout) << endl;
+	      std::cerr << (*tri[j]) << " ";
+	    std::cerr <<std::endl;
 
-	    (*testout) << "hit, cnt == 2" << endl;
+	    std::cerr << "hit, cnt == 2" <<std::endl;
 	    */
 	    
 	    return 1;
@@ -422,7 +422,9 @@ int IntersectTetTriangle (const Point<3> ** tet, const Point<3> ** tri,
       }
     }
 
-  (*testout) << "hit, cnt = " << cnt << endl;
+  std::cerr << "hit, cnt = " << cnt << std::endl;
+  std::cerr << "hit, cnt = " << cnt << std::endl;
+  std::cerr << "hit, cnt = " << cnt << std::endl;
   return 1;
 }
 
@@ -493,7 +495,7 @@ int IntersectTetTriangleRef (const Point<3> ** tri, const int * tripi)
 	}
     }  
   
-  //  (*testout) << "cnt = " << cnt << endl;
+  //  std::cerr << "cnt = " << cnt <<std::endl;
 
 
   switch (cnt)
@@ -639,7 +641,7 @@ int IntersectTetTriangleRef (const Point<3> ** tri, const int * tripi)
 	    if (lam1 > -eps && lam2 > -eps &&
 		lam3 > -eps && lam4 > -eps)
 	      {
-		//		(*testout) << "hit, cnt == 1" << "\n";
+		//		std::cerr << "hit, cnt == 1" << "\n";
 		return 1;
 	      }
 	  }
@@ -656,9 +658,9 @@ int IntersectTetTriangleRef (const Point<3> ** tri, const int * tripi)
 	tetp4 = 6 - tetp1 - tetp2 - tetp3;
 	trip3 = 3 - trip1 - trip2;
 
-	//	(*testout) << "trip1,2,3 = " << trip1 << ", " << trip2 << ", " << trip3 << endl;
-	//	(*testout) << "tetp1,2,3,4 = " << tetp1 << ", " << tetp2 
-	//		   << ", " << tetp3 << ", " << tetp4 << endl;
+	//	std::cerr << "trip1,2,3 = " << trip1 << ", " << trip2 << ", " << trip3 <<std::endl;
+	//	std::cerr << "tetp1,2,3,4 = " << tetp1 << ", " << tetp2 
+	//		   << ", " << tetp3 << ", " << tetp4 <<std::endl;
 
 	Vec3d vtri = *tri[trip3] - *tri[trip1];
 	Vec3d vtet1 = *tet[tetp3] - *tri[trip1];
@@ -679,26 +681,26 @@ int IntersectTetTriangleRef (const Point<3> ** tri, const int * tripi)
 	else
 	  {
 
-// 	    (*testout) << "vtet1 = " << vtet1 << endl;
-// 	    (*testout) << "vtet2 = " << vtet2 << endl;
-// 	    (*testout) << "vtri = " << vtri << endl;
-// 	    (*testout) << "lam1 = " << lam1 << " lam2 = " << lam2 << endl;
+// 	    std::cerr << "vtet1 = " << vtet1 <<std::endl;
+// 	    std::cerr << "vtet2 = " << vtet2 <<std::endl;
+// 	    std::cerr << "vtri = " << vtri <<std::endl;
+// 	    std::cerr << "lam1 = " << lam1 << " lam2 = " << lam2 <<std::endl;
 
-// 	    (*testout) << (lam1 * (vtet1 * vtet1) + lam2 * (vtet1 * vtet2))
-// 		       << " = " << (vtet1 * vtri) << endl;
-// 	    (*testout) << (lam1 * (vtet1 * vtet2) + lam2 * (vtet2 * vtet2))
-// 		       << " = " << (vtet2 * vtri) << endl;
+// 	    std::cerr << (lam1 * (vtet1 * vtet1) + lam2 * (vtet1 * vtet2))
+// 		       << " = " << (vtet1 * vtri) <<std::endl;
+// 	    std::cerr << (lam1 * (vtet1 * vtet2) + lam2 * (vtet2 * vtet2))
+// 		       << " = " << (vtet2 * vtri) <<std::endl;
 	    
-// 	    (*testout) << "tet = ";
+// 	    std::cerr << "tet = ";
 // 	    for (j = 0; j < 4; j++)
-// 	      (*testout) << (*tet[j]) << " ";
-// 	    (*testout) << endl;
-// 	    (*testout) << "tri = ";
+// 	      std::cerr << (*tet[j]) << " ";
+// 	    std::cerr <<std::endl;
+// 	    std::cerr << "tri = ";
 // 	    for (j = 0; j < 3; j++)
-// 	      (*testout) << (*tri[j]) << " ";
-// 	    (*testout) << endl;
+// 	      std::cerr << (*tri[j]) << " ";
+// 	    std::cerr <<std::endl;
 
-// 	    (*testout) << "hit, cnt == 2" << endl;
+// 	    std::cerr << "hit, cnt == 2" <<std::endl;
 
 	    return 1;
 	  }
@@ -712,7 +714,7 @@ int IntersectTetTriangleRef (const Point<3> ** tri, const int * tripi)
       }
     }
 
-  (*testout) << "hit, cnt = " << cnt << endl;
+  std::cerr << "hit, cnt = " << cnt << std::endl;
   return 1;
 }
 
@@ -784,7 +786,7 @@ int IntersectTriangleTriangle (const Point<3> ** tri1, const Point<3> ** tri2)
 
 	    if (IntersectTriangleLine (tri1, &line[0]))
 	      {
-		(*testout) << "int1, line = " << *line[0] << " - " << *line[1] << endl;
+		std::cerr << "int1, line = " << *line[0] << " - " << *line[1] << std::endl;
 		return 1;
 	      }
 	  }	
@@ -796,7 +798,7 @@ int IntersectTriangleTriangle (const Point<3> ** tri1, const Point<3> ** tri2)
 
 	    if (IntersectTriangleLine (tri2, &line[0]))
 	      {
-		(*testout) << "int2, line = " << *line[0] << " - " << *line[1] << endl;
+		std::cerr << "int2, line = " << *line[0] << " - " << *line[1] << std::endl;
 		return 1;
 	      }
 	  }	
@@ -844,7 +846,7 @@ int CalcSphereCenter (const Point<3> ** pts, Point<3> & c)
   Vec3d sol;
   if (SolveLinearSystem (row1, row2, row3, rhs, sol))
     {
-      (*testout) << "CalcSphereCenter: degenerated" << endl;
+      std::cerr << "CalcSphereCenter: degenerated" << std::endl;
       return 1;
     }
 
@@ -874,7 +876,7 @@ int CalcTriangleCenter (const Point3d ** pts, Point3d & c)
 
   if (fabs (a.Det()) <= 1e-12 * h * h)
     {
-      (*testout) << "CalcTriangleCenter: degenerated" << endl;
+      std::cerr << "CalcTriangleCenter: degenerated" << std::endl;
       return 1;
     }
 
@@ -915,8 +917,8 @@ double ComputeCylinderRadius (const Point3d & p1,
   double h2 = n2l / v12len;
   
   /*
-  (*testout) << "n1 = " << n1 << " n2 = " << n2 
-	     << "h1 = " << h1 << " h2 = " << h2 << endl;
+  std::cerr << "n1 = " << n1 << " n2 = " << n2 
+	     << "h1 = " << h1 << " h2 = " << h2 <<std::endl;
   */
   return ComputeCylinderRadius (n1, n2, h1, h2);
 }
@@ -961,11 +963,11 @@ double ComputeCylinderRadius (const Vec3d & n1, const Vec3d & n2,
   
   double rad = (lam1 * n1 + lam2 * n2).Length();
   /*
-  (*testout) << "n1 = " << n1
+  std::cerr << "n1 = " << n1
 	     << " n2 = " << n2
 	     << " t1 = " << t1
 	     << " t2 = " << t2
-	     << " rad = " << rad << endl;
+	     << " rad = " << rad <<std::endl;
   */
   return rad;
 }
@@ -1095,7 +1097,7 @@ double MinDistTP2 (const Point3d & tp1, const Point3d & tp2,
   double res2 =  - pol.MaxUnitTriangle ();
 
   if (fabs (res - res2) > 1e-8)
-    cout << "res and res2 differ: " << res << " != " << res2 << endl;
+    std::cout << "res and res2 differ: " << res << " != " << res2 << std::endl;
   return res2;
 }
 

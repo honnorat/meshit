@@ -11,6 +11,8 @@
   Parallel thread, Mutex,
 */
 
+#include <pthread.h>
+
 namespace netgen
 {
 

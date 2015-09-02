@@ -7,6 +7,11 @@
 /* Date:   19. Nov. 97                                                    */
 /**************************************************************************/
 
+#include "../gprim/geom3d.hpp"
+#include "meshtype.hpp"
+
+namespace netgen {
+
 class FrontPoint3;
 class FrontFace;
 class MiniElement2d;
@@ -60,58 +65,5 @@ private:
   int reset;
   int hashcount;
 };
-
+}
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

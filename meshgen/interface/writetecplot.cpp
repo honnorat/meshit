@@ -30,7 +30,7 @@ void WriteTecPlotFormat (const Mesh & mesh,
   Array<int> sn(np);
   ofstream outfile(filename.c_str());
   
-  outfile << "TITLE=\" " << filename << "\"" << endl;
+  outfile << "TITLE=\" " << filename << "\"" <<std::endl;
 
   // fill hashtable
 
@@ -80,7 +80,7 @@ void WriteTecPlotFormat (const Mesh & mesh,
 	  sn.Elem(i) = ++z;
 
       outfile << "ZONE T=\" Surface " << j << " \", N=" << z
-	      << ", E=" << e << ", ET=TRIANGLE, F=FEPOINT" << endl;
+	      << ", E=" << e << ", ET=TRIANGLE, F=FEPOINT" <<std::endl;
 
       for (i = 1; i <= np; i++)
 	if (sn.Elem(i) != 0)
@@ -93,7 +93,7 @@ void WriteTecPlotFormat (const Mesh & mesh,
 		    << n(0) << " "
 		    << n(1) << " "
 		    << n(2) << " "
-		    << i     << endl;
+		    << i     <<std::endl;
 	  }
 	  
 
@@ -104,7 +104,7 @@ void WriteTecPlotFormat (const Mesh & mesh,
 	    /* FlaechenKnoten (3) */
 	    outfile << sn.Get(el.PNum(1)) << " " 
 		    << sn.Get(el.PNum(2)) << " "
-		    << sn.Get(el.PNum(3)) << endl;
+		    << sn.Get(el.PNum(3)) <<std::endl;
 	      
 	  /// Hier soll noch die Ausgabe der Nummer des angrenzenden
 	      /// Vol.elements erfolgen !

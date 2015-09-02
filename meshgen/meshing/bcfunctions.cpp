@@ -1,7 +1,8 @@
 
-#include <mystdlib.h>
-#include <meshing.hpp>
-
+#include <meshgen.hpp>
+#include "bcfunctions.hpp"
+#include "../general/netgenout.hpp"
+#include "../general/ngexception.hpp"
 
 namespace netgen
 {
@@ -31,7 +32,7 @@ namespace netgen
        colours match is defined as "eps" and is currently 
        2.5e-5 (for square of distance)
    */
-   bool ColourMatch(Vec3d col1, Vec3d col2, double eps = DEFAULT_EPS)
+   bool ColourMatch(Vec3d col1, Vec3d col2, double eps)
    {
       if(eps <= 0.0) eps = DEFAULT_EPS;
       
@@ -74,12 +75,12 @@ namespace netgen
 
       if(printmessage_importance >= 3)
       {
-         cout << endl << "-------- Face Colours --------" << endl;
+         std::cout << std::endl << "-------- Face Colours --------" << std::endl;
          for( int i = 1; i <= face_colours.Size(); i++)
          {
-            cout << face_colours.Elem(i) << endl;
+            std::cout << face_colours.Elem(i) << std::endl;
          }
-         cout << "------------------------------" << endl;
+         std::cout << "------------------------------" << std::endl;
       }
    }
 
@@ -99,7 +100,7 @@ namespace netgen
        new boundary condition number starting from the highest 
        boundary condition number specified in the profile file.
    */
-   void AutoColourAlg_UserProfile(Mesh & mesh, ifstream & ocf)
+   void AutoColourAlg_UserProfile(Mesh & mesh, std::ifstream & ocf)
    {
       char ocf_inp[100];
       bool header_found = false;
@@ -438,7 +439,7 @@ namespace netgen
       }
       else
       {
-         ifstream ocf(bccolourfile);
+         std::ifstream ocf(bccolourfile);
 
          // If there was an error opening the Colour profile file, jump to the alternate 
          // algorithm after printing a message

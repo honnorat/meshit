@@ -4,10 +4,10 @@ Spline curve for Mesh generator
 
 */
 
-#include <mystdlib.h>
-#include <linalg.hpp>
-#include <gprim.hpp>
+#include <meshgen.hpp>
 #include "spline.hpp"
+#include "../linalg/densemat.hpp"
+#include "../gprim/geomfuncs.hpp"
 
 namespace netgen
 {
@@ -37,7 +37,7 @@ namespace netgen
   void CircleSeg<3> :: LineIntersections (const double a, const double b, const double c,
 					  Array < Point<3> > & points, const double eps) const
   {
-    cerr << "CircleSeg<3>::LineIntersections not implemented" << endl;
+    std::cerr << "CircleSeg<3>::LineIntersections not implemented" << std::endl;
   }
   
   template <> 
@@ -94,7 +94,7 @@ namespace netgen
   {
     weight = Dist (p1, p3) / sqrt (0.5 * (Dist2 (p1, p2) + Dist2 (p2, p3)));
     // weight = sqrt(2);
-    // cout << "weight = " << weight << endl;
+    // std::cout << "weight = " << weight <<std::endl;
     proj_latest_t = 0.5;
   }
 
@@ -263,7 +263,7 @@ namespace netgen
         double d0,d1,d2;
 
 	
-        //(*testout) << "newtonersatz" << endl;
+        //std::cerr << "newtonersatz" <<std::endl;
         while(t2-t0 > 1e-8)
           {
 	    
@@ -331,7 +331,7 @@ namespace netgen
 
         point_on_curve =  SplineSeg3<D> ::GetPoint(t);
       }
-    //(*testout) << " latest_t " << proj_latest_t << " t " << t << endl;
+    //std::cerr << " latest_t " << proj_latest_t << " t " << t <<std::endl;
 
     proj_latest_t = t;
 
@@ -343,10 +343,10 @@ namespace netgen
     if (fabs (t-ht) > 1e-3)
     {
     // if (Dist2 (point, hp) < Dist2 (point, point_on_curve))
-    cout << "project is wrong" << endl;
-    cout << "t = " << t << ", ht = " << ht << endl;
-    cout << "dist org = " << Dist(point, point_on_curve) << endl;
-    cout << "dist trivial = " << Dist(point, hp) << endl;
+    std::cout << "project is wrong" <<std::endl;
+    std::cout << "t = " << t << ", ht = " << ht <<std::endl;
+    std::cout << "dist org = " << Dist(point, point_on_curve) <<std::endl;
+    std::cout << "dist trivial = " << Dist(point, hp) <<std::endl;
     }
     */
   }

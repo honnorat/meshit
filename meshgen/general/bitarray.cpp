@@ -8,9 +8,8 @@
    data type BitArray
 */
 
-#include <mystdlib.h>
-#include <myadt.hpp>
-
+#include <meshgen.hpp>
+#include "bitarray.hpp"
 
 namespace netgen
 {

@@ -52,9 +52,9 @@ void ImportSolution (const char * filename)
 	    }
 	  inf.putback (buf[0]);
 
-	  (*testout) << "Flags: " << endl;
-	  flags.PrintFlags (*testout);
-	  (*testout) << "done" << endl;
+	  std::cerr << "Flags: " <<std::endl;
+	  flags.PrintFlags std::cerr;
+	  std::cerr << "done" <<std::endl;
 
 	  size = int(flags.GetNumFlag ("size", Ng_GetNP()));
 	  comps = int(flags.GetNumFlag ("components", 1));
@@ -64,12 +64,12 @@ void ImportSolution (const char * filename)
 
 	  double * sol = new double[size*comps];
 	  
-	  (*testout) << "import solution " << name << " size = " << size << " comps = " << comps << " order = " << order << endl;
+	  std::cerr << "import solution " << name << " size = " << size << " comps = " << comps << " order = " << order <<std::endl;
 
 	  for (i = 0; i < size*comps; i++)
 	    {
 	      inf >> sol[i];
-	      //	      (*testout) << "sol: " << sol[i] << endl;
+	      //	      std::cerr << "sol: " << sol[i] <<std::endl;
 	    }
 	  
 	  Ng_SolutionData soldata;
@@ -102,8 +102,8 @@ void ImportSolution (const char * filename)
 	  }
       else
 	{
-	  //	  cout << "kw = (" << buf << ")" << endl;
-	  (*testout) << "kw = (" << buf << ")" << endl;
+	  //	  std::cout << "kw = (" << buf << ")" <<std::endl;
+	  std::cerr << "kw = (" << buf << ")" <<std::endl;
 	  break;
 	}
     }

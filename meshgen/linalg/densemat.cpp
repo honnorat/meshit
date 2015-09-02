@@ -1,6 +1,7 @@
-#include <mystdlib.h>
+#include <meshgen.hpp>
 
-#include <linalg.hpp>
+#include "../general/array.hpp"
+#include "densemat.hpp"
 
 
 namespace netgen
@@ -87,7 +88,7 @@ namespace netgen
     for (j = 1; j <= Width(); j++)
     Set (i, j, m2(i, j));
     else
-    (*myerr) << "DenseMatrix::Operator=: Matrix not allocated" << endl;
+    std::cerr << "DenseMatrix::Operator=: Matrix not allocated" <<std::endl;
 
     return *this;
     }
@@ -110,7 +111,7 @@ namespace netgen
     
     if (Height() != m2.Height() || Width() != m2.Width())
       {
-        (*myerr) << "DenseMatrix::Operator+=: Sizes don't fit" << endl;
+        std::cerr << "DenseMatrix::Operator+=: Sizes don't fit" << std::endl;
         return *this;
       }
     
@@ -126,7 +127,7 @@ namespace netgen
           }
       }
     else
-      (*myerr) << "DenseMatrix::Operator+=: Matrix not allocated" << endl;
+      std::cerr << "DenseMatrix::Operator+=: Matrix not allocated" << std::endl;
 
     return *this;
   }
@@ -139,7 +140,7 @@ namespace netgen
 
     if (Height() != m2.Height() || Width() != m2.Width())
       {
-        (*myerr) << "DenseMatrix::Operator-=: Sizes don't fit" << endl;
+        std::cerr << "DenseMatrix::Operator-=: Sizes don't fit" << std::endl;
         return *this;
       }
 
@@ -155,7 +156,7 @@ namespace netgen
           }
       }
     else
-      (*myerr) << "DenseMatrix::Operator-=: Matrix not allocated" << endl;
+      std::cerr << "DenseMatrix::Operator-=: Matrix not allocated" << std::endl;
 
     return *this;
   }
@@ -189,7 +190,7 @@ namespace netgen
   {
     if (width != height)
       {
-        (*myerr) << "DenseMatrix :: Det: width != height" << endl;
+        std::cerr << "DenseMatrix :: Det: width != height" << std::endl;
         return 0;
       }
 
@@ -205,7 +206,7 @@ namespace netgen
           - data[2] * data[4] * data[6];
       default:
         {
-          (*myerr) << "Matrix :: Det:  general size not implemented (size=" << width << ")" << endl;
+          std::cerr << "Matrix :: Det:  general size not implemented (size=" << width << ")" << std::endl;
           return 0;
         }
       }
@@ -218,12 +219,12 @@ namespace netgen
 
     if (m1.Width() != m1.Height())
       {
-        (*myerr) << "CalcInverse: matrix not symmetric" << endl;
+        std::cerr << "CalcInverse: matrix not symmetric" << std::endl;
         return;
       }
     if (m1.Width() != m2.Width() || m1.Height() != m2.Height())
       {
-        (*myerr) << "CalcInverse: dim(m2) != dim(m1)" << endl;
+        std::cerr << "CalcInverse: dim(m2) != dim(m1)" << std::endl;
         return;
       }
 
@@ -233,8 +234,7 @@ namespace netgen
         det = m1.Det();
         if (det == 0)
           {
-            (*myerr) << "CalcInverse: Matrix singular" << endl;
-            (*testout) << "CalcInverse: Matrix singular" << endl;
+            std::cerr << "CalcInverse: Matrix singular" << std::endl;
             return;
           }
 
@@ -290,7 +290,7 @@ namespace netgen
         /*
           m2.SetSymmetric();
           if (!m2.Symmetric())
-          cerr << "m should be symmetric for Cholesky" << endl;
+          std::cerr << "m should be symmetric for Cholesky" <<std::endl;
         */
 
         for (i = 1; i <= n; i++)
@@ -300,7 +300,7 @@ namespace netgen
         for (i = 1; i <= n; i++)
           {
             if (dots && i % 10 == 0)
-              (*mycout) << "." << flush;
+              (*mystd::cout) << "." << flush;
 
             for (j = i; j <= n; j++)
               {
@@ -319,7 +319,7 @@ namespace netgen
                   {
                     if (x <= 0)
                       {
-                        cerr << "Matrix indefinite 1" << endl;
+                        std::cerr << "Matrix indefinite 1" << std::endl;
                         return;
                       }
 		  
@@ -343,7 +343,7 @@ namespace netgen
         // 	    x = 0;
         // 	    for (k = 1; k <= i && k <= j; k++)
         // 	      x += m2.Get(i, k) * m2.Get(j, k);
-        // 	    (*testout) << "err " << i << "," << j << " = " << (m1.Get(i, j) - x) << endl;
+        // 	    std::cerr << "err " << i << "," << j << " = " << (m1.Get(i, j) - x) <<std::endl;
         // 	  }
 
 
@@ -356,7 +356,7 @@ namespace netgen
         for (i = 1; i <= n; i++)
           {
             if (dots && i % 10 == 0)
-              (*mycout) << "+" << flush;
+              (*mystd::cout) << "+" << flush;
 
             for (j = i; j <= n; j++)
               {
@@ -375,14 +375,14 @@ namespace netgen
               }
           }
       
-        //      (*testout) << "check L^-1" << endl;
+        //      std::cerr << "check L^-1" <<std::endl;
         //      for (i = 1; i <= n; i++)
         // 	for (j = 1; j <= n; j++)
         // 	  {
         // 	    x = 0;
         // 	    for (k = j; k <= i; k++)
         // 	      x += hm.Get(i, k) * m2.Get(j, k);
-        // 	    (*testout) << "i, j = " << i << "," << j << " x = " << x << endl;
+        // 	    std::cerr << "i, j = " << i << "," << j << " x = " << x <<std::endl;
         // 	  }
 
 
@@ -391,7 +391,7 @@ namespace netgen
         for (i = 1; i <= n; i++)
           {
             if (dots && i % 10 == 0)
-              (*mycout) << "-" << flush;
+              (*mystd::cout) << "-" << flush;
 
             for (j = 1; j <= i; j++)
               {
@@ -415,7 +415,7 @@ namespace netgen
           for (j = 1; j < i; j++)
             m2.Elem(j, i) = m2.Get(i, j);
       
-        if (dots) (*mycout) << endl;
+        if (dots) (*mystd::cout) << std::endl;
 #endif
 
 
@@ -460,8 +460,7 @@ namespace netgen
 	  
             if (max < 1e-20)
               {
-                cerr << "Inverse matrix: matrix singular" << endl;
-                *testout << "Inverse matrix: matrix singular" << endl;
+                std::cerr << "Inverse matrix: matrix singular" << std::endl;
                 return;
               }
 	  
@@ -524,7 +523,7 @@ namespace netgen
       
           for (i = 1; i <= n; i++)
           {
-          //	(*mycout) << '.' << flush;
+          //	(*mystd::cout) << '.' << flush;
           q = m1.Get(i, i);
           for (k = 1; k <= n; k++)
           {
@@ -559,7 +558,7 @@ namespace netgen
             
           for (i = n; i >= 1; i--)
           {
-          //	(*mycout) << "+" << flush;
+          //	(*mystd::cout) << "+" << flush;
           for (j = 1; j < i; j++)
 	  {
           q = m1.Elem(j, i);
@@ -600,7 +599,7 @@ namespace netgen
 
     if (m2.Height() != n1 || m2.Width() != n1)
       {
-        (*myerr) << "CalcAAt: sizes don't fit" << endl;
+        std::cerr << "CalcAAt: sizes don't fit" << std::endl;
         return;
       }
 
@@ -645,7 +644,7 @@ namespace netgen
 
     if (m2.Height() != n2 || m2.Width() != n2)
       {
-        (*myerr) << "CalcAtA: sizes don't fit" << endl;
+        std::cerr << "CalcAtA: sizes don't fit" << std::endl;
         return;
       }
 
@@ -671,7 +670,7 @@ namespace netgen
 
     if (m2.Height() != n1 || m2.Width() != n3 || b.Width() != n2)
       {
-        (*myerr) << "CalcABt: sizes don't fit" << endl;
+        std::cerr << "CalcABt: sizes don't fit" << std::endl;
         return;
       }
 
@@ -709,7 +708,7 @@ namespace netgen
 
     if (m2.Height() != n2 || m2.Width() != n3 || b.Height() != n1)
       {
-        (*myerr) << "CalcAtB: sizes don't fit" << endl;
+        std::cerr << "CalcAtB: sizes don't fit" << std::endl;
         return;
       }
 
@@ -752,11 +751,11 @@ namespace netgen
 
     if (m1.Width() != m2.Height())
       {
-        (*myerr) << "DenseMatrix :: operator*: Matrix Size does not fit" << endl;
+        std::cerr << "DenseMatrix :: operator*: Matrix Size does not fit" << std::endl;
       }
     else if (temp.Height() != m1.Height())
       {
-        (*myerr) << "DenseMatrix :: operator*: temp not allocated" << endl;
+        std::cerr << "DenseMatrix :: operator*: temp not allocated" << std::endl;
       }
     else
       {
@@ -774,16 +773,16 @@ namespace netgen
     if (m1.Width() != m2.Height() || m1.Height() != m3.Height() ||
         m2.Width() != m3.Width() )
       {
-        (*myerr) << "DenseMatrix :: Mult: Matrix Size does not fit" << endl;
-        (*myerr) << "m1: " << m1.Height() << " x " << m1.Width() << endl;
-        (*myerr) << "m2: " << m2.Height() << " x " << m2.Width() << endl;
-        (*myerr) << "m3: " << m3.Height() << " x " << m3.Width() << endl;
+        std::cerr << "DenseMatrix :: Mult: Matrix Size does not fit" << std::endl;
+        std::cerr << "m1: " << m1.Height() << " x " << m1.Width() << std::endl;
+        std::cerr << "m2: " << m2.Height() << " x " << m2.Width() << std::endl;
+        std::cerr << "m3: " << m3.Height() << " x " << m3.Width() << std::endl;
         return;
       }
     /*
       else if (m1.Symmetric() || m2.Symmetric() || m3.Symmetric())
       {
-      (*myerr) << "DenseMatrix :: Mult: not implemented for symmetric matrices" << endl;
+      std::cerr << "DenseMatrix :: Mult: not implemented for symmetric matrices" <<std::endl;
       return;
       }
     */
@@ -902,11 +901,11 @@ namespace netgen
 
     if (m1.Width() != m2.Width() || m1.Height() != m2.Height())
       {
-        (*myerr) << "BaseMatrix :: operator+: Matrix Size does not fit" << endl;
+        std::cerr << "BaseMatrix :: operator+: Matrix Size does not fit" << std::endl;
       }
     else if (temp.Height() != m1.Height())
       {
-        (*myerr) << "BaseMatrix :: operator+: temp not allocated" << endl;
+        std::cerr << "BaseMatrix :: operator+: temp not allocated" << std::endl;
       }
     else
       {
@@ -963,20 +962,20 @@ namespace netgen
     #ifdef DEVELOP
     if (!n) 
     {
-    cout << "DenseMatrix::Mult  mheight = 0" << endl;
+    std::cout << "DenseMatrix::Mult  mheight = 0" <<std::endl;
     }
     if (!m) 
     {
-    cout << "DenseMatrix::Mult mwidth = 0" << endl;
+    std::cout << "DenseMatrix::Mult mwidth = 0" <<std::endl;
     }
 
     if (m != v.Size())
     {
-    (*myerr) << "\nMatrix and Vector don't fit" << endl;
+    std::cerr << "\nMatrix and Vector don't fit" <<std::endl;
     }
     else if (Height() != prod.Size())
     {
-    (*myerr) << "Base_Matrix::operator*(Vector): prod vector not ok" << endl;
+    std::cerr << "Base_Matrix::operator*(Vector): prod vector not ok" <<std::endl;
     }
     else
     #endif
@@ -1038,11 +1037,11 @@ namespace netgen
     /*
       if (Height() != v.Size())
       {
-      (*myerr) << "\nMatrix and Vector don't fit" << endl;
+      std::cerr << "\nMatrix and Vector don't fit" <<std::endl;
       }
       else if (Width() != prod.Size())
       {
-      (*myerr) << "Base_Matrix::operator*(Vector): prod vector not ok" << endl;
+      std::cerr << "Base_Matrix::operator*(Vector): prod vector not ok" <<std::endl;
       }
       else
     */
@@ -1099,11 +1098,11 @@ namespace netgen
 
     if (Width() != x.Size() || Height() != b.Size())
       {
-        (*myerr) << "\nMatrix and Vector don't fit" << endl;
+        std::cerr << "\nMatrix and Vector don't fit" << std::endl;
       }
     else if (Height() != res.Size())
       {
-        (*myerr) << "Base_Matrix::operator*(Vector): prod vector not ok" << endl;
+        std::cerr << "Base_Matrix::operator*(Vector): prod vector not ok" << std::endl;
       }
     else
       {
@@ -1133,7 +1132,7 @@ namespace netgen
 
     if (Width() != hx.Size() || Height() != hx.Size())
       {
-        (*myerr) << "Matrix::EvaluateBilinearForm: sizes don't fit" << endl;
+        std::cerr << "Matrix::EvaluateBilinearForm: sizes don't fit" << std::endl;
       }
     else
       {
@@ -1148,7 +1147,7 @@ namespace netgen
           }
       }
 
-    //  testout << "sum = " << sum << endl;
+    //  testout << "sum = " << sum <<std::endl;
     return sum;
   }
 
@@ -1209,19 +1208,19 @@ namespace netgen
 
     if (Width() != Height())
       {
-        (*myerr) << "SolveDestroy: Matrix not square";
+        std::cerr << "SolveDestroy: Matrix not square";
         return;
       }
     if (Width() != v.Size())
       {
-        (*myerr) << "SolveDestroy: Matrix and Vector don't fit";
+        std::cerr << "SolveDestroy: Matrix and Vector don't fit";
         return;
       }
 
     sol = v;
     if (Height() != sol.Size())
       {
-        (*myerr) << "SolveDestroy: Solution Vector not ok";
+        std::cerr << "SolveDestroy: Solution Vector not ok";
         return;
       }
 
@@ -1245,7 +1244,7 @@ namespace netgen
       
         for (i = 1; i <= n; i++)
           {
-            // (*mycout) << "." << flush;
+            // (*mystd::cout) << "." << flush;
             for (j = i; j <= n; j++)
               {
                 x = Get(i, j);
@@ -1263,7 +1262,7 @@ namespace netgen
                   {
                     if (x <= 0)
                       {
-                        cerr << "Matrix indefinite" << endl;
+                        std::cerr << "Matrix indefinite" << std::endl;
                         return;
                       }
 		  
@@ -1322,7 +1321,7 @@ namespace netgen
       }
     else
       {
-        //      (*mycout) << "gauss" << endl;
+        //      (*mystd::cout) << "gauss" <<std::endl;
         int n = Height();
         for (int i = 1; i <= n; i++)
           {
@@ -1368,13 +1367,13 @@ namespace netgen
 
 
 
-  ostream & operator<< (ostream & ost, const DenseMatrix & m)
+  std::ostream & operator<< (std::ostream & ost, const DenseMatrix & m)
   {
     for (int i = 0; i < m.Height(); i++)
       {
         for (int j = 0; j < m.Width(); j++)
           ost << m.Get(i+1,j+1) << " ";
-        ost << endl;
+        ost << std::endl;
       }
     return ost;
   }

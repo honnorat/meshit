@@ -583,7 +583,7 @@ namespace netgen
 	SetDistantPNum (dist_pnums[hi+1], dist_pnums[hi]); // , dist_pnums[hi+2]);
     
     NgProfiler::StopTimer (timer_pts);
-    *testout << "got " << numvert << " vertices" << endl;
+    std::cerr << "got " << numvert << " vertices" <<std::endl;
 
     {
       Element el;
@@ -708,7 +708,7 @@ namespace netgen
     stringstream str;
     str << "p" << id << ": got " << GetNE() << " elements and " 
 	 << GetNSE() << " surface elements";
-    cout << str.str() << endl;
+    std::cout << str.str() <<std::endl;
     // PrintMessage (2, "Got ", GetNE(), " elements and ", GetNSE(), " surface elements");
     // PrintMessage (2, "Got ", GetNSE(), " surface elements");
 
@@ -748,9 +748,9 @@ namespace netgen
 
     /*
     for (ElementIndex ei = 0; ei < GetNE(); ei++)
-      *testout << "el(" << ei << ") is in part " << (*this)[ei].GetPartition() << endl;
+      std::cerr << "el(" << ei << ") is in part " << (*this)[ei].GetPartition() <<std::endl;
     for (SurfaceElementIndex ei = 0; ei < GetNSE(); ei++)
-      *testout << "sel(" << int(ei) << ") is in part " << (*this)[ei].GetPartition() << endl;
+      std::cerr << "sel(" << int(ei) << ") is in part " << (*this)[ei].GetPartition() <<std::endl;
       */
     
     // MyMPI_SendCmd ("mesh");
@@ -808,7 +808,7 @@ namespace netgen
 			 &edgecut, &epart[0], &npart[0]);
     */
     PrintMessage (3, "metis complete");
-    // cout << "done" << endl;
+    // std::cout << "done" <<std::endl;
 
     for (int i = 0; i < GetNE(); i++)
       VolumeElement(i+1).SetPartition(epart[i] + 1);
@@ -883,7 +883,7 @@ namespace netgen
 		  }
 	      }
 	    if (sel.GetPartition() == -1)
-	      cerr << "no volume element found" << endl;
+	      std::cerr << "no volume element found" <<std::endl;
 	  }
 
 
@@ -917,7 +917,7 @@ namespace netgen
 		  }
 	      }
 	    if (sel.GetPartition() == -1)
-	      cerr << "no volume element found" << endl;
+	      std::cerr << "no volume element found" <<std::endl;
 	  }
 	
 	
@@ -952,9 +952,9 @@ namespace netgen
 
     /*
     for (ElementIndex ei = 0; ei < GetNE(); ei++)
-      *testout << "el(" << ei << ") is in part " << (*this)[ei].GetPartition() << endl;
+      std::cerr << "el(" << ei << ") is in part " << (*this)[ei].GetPartition() <<std::endl;
     for (SurfaceElementIndex ei = 0; ei < GetNSE(); ei++)
-      *testout << "sel(" << int(ei) << ") is in part " << (*this)[ei].GetPartition() << endl;
+      std::cerr << "sel(" << int(ei) << ") is in part " << (*this)[ei].GetPartition() <<std::endl;
       */
     
     // MyMPI_SendCmd ("mesh");
@@ -967,9 +967,9 @@ namespace netgen
   {
     PrintMessage (3, "call metis 5 with weights ...");
     
-    // cout << "segment_weights " << segment_weights << endl;
-    // cout << "surface_weights " << surface_weights << endl;
-    // cout << "volume_weights " << volume_weights << endl;
+    // std::cout << "segment_weights " << segment_weights <<std::endl;
+    // std::cout << "surface_weights " << surface_weights <<std::endl;
+    // std::cout << "volume_weights " << volume_weights <<std::endl;
 
     int timer = NgProfiler::CreateTimer ("Mesh::Partition");
     NgProfiler::RegionTimer reg(timer);
@@ -1043,7 +1043,7 @@ namespace netgen
 			 &edgecut, &epart[0], &npart[0]);
     */
     PrintMessage (3, "metis complete");
-    // cout << "done" << endl;
+    // std::cout << "done" <<std::endl;
 
     for (int i = 0; i < GetNE(); i++)
       VolumeElement(i+1).SetPartition(epart[i] + 1);
@@ -1143,9 +1143,9 @@ namespace netgen
 	// 	nparts = 4;	   
 	// 	metis :: METIS_PartMeshDual (&ne, &nn, elmnts, &etype, &numflag, &nparts,
 	// 				     &edgecut, epart, npart);
-	// 	cout << "done" << endl;
+	// 	std::cout << "done" <<std::endl;
 	
-	// 	cout << "edge-cut: " << edgecut << ", balance: " << metis :: ComputeElementBalance(ne, nparts, epart) << endl;
+	// 	std::cout << "edge-cut: " << edgecut << ", balance: " << metis :: ComputeElementBalance(ne, nparts, epart) <<std::endl;
 	
 	// 	for (int i=1; i<=ne; i++)
 	// 	  {
@@ -1160,11 +1160,11 @@ namespace netgen
 	NgProfiler::StartTimer (timermetis);
 	
 #ifdef METIS4
-	cout << "call metis(4)_PartMeshDual ... " << flush;
+	std::cout << "call metis(4)_PartMeshDual ... " << flush;
 	METIS_PartMeshDual (&ne, &nn, &elmnts[0], &etype, &numflag, &nparts,
 			    &edgecut, &epart[0], &npart[0]);
 #else
-	cout << "call metis(5)_PartMeshDual ... " << endl;
+	std::cout << "call metis(5)_PartMeshDual ... " <<std::endl;
 	// idx_t options[METIS_NOPTIONS];
 	
 	Array<idx_t> eptr(ne+1);
@@ -1178,10 +1178,10 @@ namespace netgen
 	
 	NgProfiler::StopTimer (timermetis);
 	
-	cout << "complete" << endl;
+	std::cout << "complete" <<std::endl;
 #ifdef METIS4
-	cout << "edge-cut: " << edgecut << ", balance: " 
-	     << ComputeElementBalance(ne, nparts, &epart[0]) << endl;
+	std::cout << "edge-cut: " << edgecut << ", balance: " 
+	     << ComputeElementBalance(ne, nparts, &epart[0]) <<std::endl;
 #endif
 	
 	// partition numbering by metis : 0 ...  ntasks - 1
@@ -1274,7 +1274,7 @@ namespace netgen
     METIS_PartGraphKway ( &nn, xadj, adjacency, v_weights, e_weights, &weightflag, 
 			  &numflag, &nparts, options, &edgecut, part );
 #else
-    cout << "currently not supported (metis5), A" << endl;
+    std::cout << "currently not supported (metis5), A" <<std::endl;
 #endif
 
     Array<int> nodesinpart(ntasks);
@@ -1301,7 +1301,7 @@ namespace netgen
     delete [] part;
     delete [] adjacency;
 #else
-    cout << "parthybridmesh not available" << endl;
+    std::cout << "parthybridmesh not available" <<std::endl;
 #endif
   }
 
@@ -1388,7 +1388,7 @@ namespace netgen
     METIS_PartGraphKway ( &ne, xadj, adjacency, v_weights, e_weights, &weightflag, 
 			  &numflag, &nparts, options, &edgecut, part );
 #else
-    cout << "currently not supported (metis5), B" << endl;
+    std::cout << "currently not supported (metis5), B" <<std::endl;
 #endif
 
 
@@ -1416,7 +1416,7 @@ namespace netgen
     delete [] part;
     delete [] adjacency;
 #else
-    cout << "partdualmesh not available" << endl;
+    std::cout << "partdualmesh not available" <<std::endl;
 #endif
 
   }
@@ -1512,7 +1512,7 @@ namespace netgen
     for (SurfaceElementIndex sei = 0; sei < ne; sei++)
       (*this) [sei].SetPartition (part[sei]+1);
 #else
-    cout << "partdualmesh not available" << endl;
+    std::cout << "partdualmesh not available" <<std::endl;
 #endif
 
   }

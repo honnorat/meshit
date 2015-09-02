@@ -182,8 +182,8 @@ namespace netgen
                   if((neighbour_celllist.Elem(peek_loc) != 0) 
                      && (neighbour_celllist.Elem(new_loc) < neighbour_celllist.Elem(peek_loc)))
                   {
-                     Swap(neighbour_celllist.Elem(new_loc),neighbour_celllist.Elem(peek_loc));
-                     Swap(owner_facelist.Elem(new_loc),owner_facelist.Elem(peek_loc));
+                     std::swap(neighbour_celllist.Elem(new_loc),neighbour_celllist.Elem(peek_loc));
+                     std::swap(owner_facelist.Elem(new_loc),owner_facelist.Elem(peek_loc));
                      new_loc = peek_loc;
                   }
 
@@ -198,8 +198,8 @@ namespace netgen
                   if((neighbour_celllist.Elem(peek_loc) != 0) 
                      && (neighbour_celllist.Elem(new_loc) > neighbour_celllist.Elem(peek_loc)))
                   {
-                     Swap(neighbour_celllist.Elem(new_loc),neighbour_celllist.Elem(peek_loc));
-                     Swap(owner_facelist.Elem(new_loc),owner_facelist.Elem(peek_loc));
+                     std::swap(neighbour_celllist.Elem(new_loc),neighbour_celllist.Elem(peek_loc));
+                     std::swap(owner_facelist.Elem(new_loc),owner_facelist.Elem(peek_loc));
                      new_loc = peek_loc;
                   }
 
@@ -610,19 +610,19 @@ namespace netgen
       int nse = mesh.GetNSE();
       int ne = mesh.GetNE();
 
-      cout << "Write OpenFOAM 1.5+ Mesh Files....\n";
+      std::cout << "Write OpenFOAM 1.5+ Mesh Files....\n";
 
       // Abort if there are no points, surface elements or volume elements
       if((np <= 0) || (ne <= 0) || (nse <= 0))
       {
-         cout << "Export Error: Invalid mesh.... Aborting!\n";
+         std::cout << "Export Error: Invalid mesh.... Aborting!\n";
          return;
       }
 
       // OpenFOAM only supports linear meshes!
       if(mparam.secondorder || mesh.GetCurvedElements().IsHighOrder())
       {
-         cout << "Export Error: OpenFOAM 1.5+ does not support non-linear elements.... Aborting!\n";
+         std::cout << "Export Error: OpenFOAM 1.5+ does not support non-linear elements.... Aborting!\n";
          return;
       }
 
@@ -631,12 +631,12 @@ namespace netgen
          || (mesh.VolumeElement(ne/2).GetType() == TET10)
          || (mesh.VolumeElement(ne/2).GetType() == PRISM12))
       {
-         cout << "Export Error: OpenFOAM 1.5+ does not support non-linear elements.... Aborting!\n";
+         std::cout << "Export Error: OpenFOAM 1.5+ does not support non-linear elements.... Aborting!\n";
          return;
       }
 
 
-      cout << "Writing OpenFOAM 1.5+ Mesh files to case: " << casename << "\n";
+      std::cout << "Writing OpenFOAM 1.5+ Mesh files to case: " << casename << "\n";
 
       // Create the case directory if it does not already exist
       // NOTE: This needs to be improved for the Linux variant....!!!
@@ -717,24 +717,24 @@ namespace netgen
 
       // Build the owner, neighbour, faces and boundary lists 
       // from the Netgen mesh
-      cout << "\nBuilding Owner, Neighbour and Face Lists: ";
+      std::cout << "\nBuilding Owner, Neighbour and Face Lists: ";
 
       error = BuildOwnerNeighbourLists(mesh);
 
-      cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+      std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
 
 
       // Write the "owner" file
       if(outfile_own->good() && !error)
       {
-         cout << "Writing the owner file: ";
+         std::cout << "Writing the owner file: ";
          WriteOwnerFile(outfile_own);
          delete outfile_own;
-         cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
-         cout << "Export Error: Error creating file: owner.... Aborting\n";
+         std::cout << "Export Error: Error creating file: owner.... Aborting\n";
          error = true;
       }
 
@@ -742,14 +742,14 @@ namespace netgen
       // Write the "neighbour" file
       if(outfile_nei->good() && !error)
       {
-         cout << "Writing the neighbour file: ";
+         std::cout << "Writing the neighbour file: ";
          WriteNeighbourFile(outfile_nei);
          delete outfile_nei;
-         cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
-         cout << "Export Error: Error creating file: neighbour.... Aborting\n";
+         std::cout << "Export Error: Error creating file: neighbour.... Aborting\n";
          error = true;
       }
 
@@ -757,14 +757,14 @@ namespace netgen
       // Write the "faces" file
       if(outfile_faces->good() && !error)
       {
-         cout << "Writing the faces file: ";
+         std::cout << "Writing the faces file: ";
          WriteFacesFile(outfile_faces, mesh);
          delete outfile_faces;
-         cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
-         cout << "Export Error: Error creating file: faces.... Aborting\n";
+         std::cout << "Export Error: Error creating file: faces.... Aborting\n";
          error = true;
       }
 
@@ -772,14 +772,14 @@ namespace netgen
       // Write the "points" file
       if(outfile_pnts->good() && !error)
       {
-         cout << "Writing the points file: ";
+         std::cout << "Writing the points file: ";
          WritePointsFile(outfile_pnts,mesh);
          delete outfile_pnts;
-         cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
-         cout << "Export Error: Error creating file: points.... Aborting\n";
+         std::cout << "Export Error: Error creating file: points.... Aborting\n";
          error = true;
       }
 
@@ -787,24 +787,24 @@ namespace netgen
       // Write the "boundary" file
       if(outfile_bnd->good() && !error)
       {
-         cout << "Writing the boundary file: ";
+         std::cout << "Writing the boundary file: ";
          WriteBoundaryFile(outfile_bnd);
          delete outfile_bnd;
-         cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
-         cout << "Export Error: Error creating file: boundary.... Aborting\n";
+         std::cout << "Export Error: Error creating file: boundary.... Aborting\n";
          error = true;
       }
 
       if(!error)
       {
-         cout << "OpenFOAM 1.5+ Export successfully completed (Time elapsed = " << GetTime() << " sec) !\n";
+         std::cout << "OpenFOAM 1.5+ Export successfully completed (Time elapsed = " << GetTime() << " sec) !\n";
       }
       else
       {
-         cout << "Error in OpenFOAM 1.5+ Export.... Aborted!\n";
+         std::cout << "Error in OpenFOAM 1.5+ Export.... Aborted!\n";
       }
    }
 }

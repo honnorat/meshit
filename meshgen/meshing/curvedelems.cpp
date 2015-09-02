@@ -1,9 +1,12 @@
-#include <mystdlib.h>
+#include <meshgen.hpp>
 
-#include "meshing.hpp"
-
+#include "curvedelems.hpp"
 #include "../general/autodiff.hpp"
-
+#include "../general/netgenout.hpp"
+#include "../general/ngexception.hpp"
+#include "../gprim/geomfuncs.hpp"
+#include "topology.hpp"
+#include "bisect.hpp"
 
 namespace netgen
 {
@@ -351,15 +354,15 @@ namespace netgen
     Tx hx[50], hy[50*50];
     // ScaledJacobiPolynomial (n-3, x, 1-y, 2, 2, hx);
     /*
-    cout << "scaled jacobi, old: " << endl;
+    std::cout << "scaled jacobi, old: " <<std::endl;
     for (int i = 0; i <= n-3; i++)
-      cout << i << ": " << hx[i] << endl;
+      std::cout << i << ": " << hx[i] <<std::endl;
     */
     jacpols2[2] -> EvaluateScaled (n-3, x, 1-y, hx);
     /*
-    cout << "scaled jacobi, new: " << endl;
+    std::cout << "scaled jacobi, new: " <<std::endl;
     for (int i = 0; i <= n-3; i++)
-      cout << i << ": " << hx[i] << endl;
+      std::cout << i << ": " << hx[i] <<std::endl;
     */
     // for (int ix = 0; ix <= n-3; ix++)
     // JacobiPolynomial (n-3, 2*y-1, 2*ix+5, 2, hy+50*ix);
@@ -460,8 +463,11 @@ namespace netgen
   void CurvedElements :: BuildCurvedElements(const Refinement * ref, int aorder,
                                              bool arational)
   {
+#ifdef PARALLEL
     bool working = (ntasks == 1) || (id > 0);
-
+#else
+    bool working = true;
+#endif
     ishighorder = 0;
     order = 1;
 
@@ -576,13 +582,13 @@ namespace netgen
 	  {
 	    partop.GetDistantEdgeNums (e+1, procs);
 	    for (int j = 0; j < procs.Size(); j++)
-	      edgeorder[e] = max(edgeorder[e], recv_orders[procs[j]][cnt[procs[j]]++]);
+	      edgeorder[e] = std::max(edgeorder[e], recv_orders[procs[j]][cnt[procs[j]]++]);
 	  }
 	for (int f = 0; f < faceorder.Size(); f++)
 	  {
 	    partop.GetDistantFaceNums (f+1, procs);
 	    for (int j = 0; j < procs.Size(); j++)
-	      faceorder[f] = max(faceorder[f], recv_orders[procs[j]][cnt[procs[j]]++]);
+	      faceorder[f] = std::max(faceorder[f], recv_orders[procs[j]][cnt[procs[j]]++]);
 	  }
       }
 #endif
@@ -593,7 +599,7 @@ namespace netgen
     for (int i = 0; i < nedges; i++)
       {
 	edgecoeffsindex[i] = nd;
-	nd += max (0, edgeorder[i]-1);
+	nd += std::max (0, edgeorder[i]-1);
       }
     edgecoeffsindex[nedges] = nd;
 
@@ -607,9 +613,9 @@ namespace netgen
       {
 	facecoeffsindex[i] = nd;
 	if (top.GetFaceType(i+1) == TRIG)
-	  nd += max (0, (faceorder[i]-1)*(faceorder[i]-2)/2);
+	  nd += std::max (0, (faceorder[i]-1)*(faceorder[i]-2)/2);
 	else
-	  nd += max (0, sqr(faceorder[i]-1));
+	  nd += std::max (0, sqr(faceorder[i]-1));
       }
     facecoeffsindex[nfaces] = nd;
 
@@ -655,7 +661,7 @@ namespace netgen
 		  // PointIndex pi1 = el[edges[i2][0]];
 		  // PointIndex pi2 = el[edges[i2][1]];
 
-		  // bool swap = pi1 > pi2;
+		  // bool std::swap = pi1 > pi2;
 		
 		  // Point<3> p1 = mesh[pi1];
 		  // Point<3> p2 = mesh[pi2];
@@ -737,7 +743,7 @@ namespace netgen
 	      Point<3> p2 = mesh[pi2];
 
 	      int order1 = edgeorder[e];
-	      int ndof = max (0, order1-1);
+	      int ndof = std::max(0, order1-1);
 
 	      if (rational && order1 >= 2)
 		{
@@ -948,13 +954,13 @@ namespace netgen
 	  top.GetEdgeVertices (edgenr+1, pi1, pi2);
 
 	  bool swap = swap_edge[edgenr]; // (pi1 > pi2);
-	  if (swap) Swap (pi1, pi2);
+	  if (swap) std::swap (pi1, pi2);
 
 	  Point<3> p1 = mesh[pi1];
 	  Point<3> p2 = mesh[pi2];
 
 	  int order1 = edgeorder[segnr];
-	  int ndof = max (0, order1-1);
+	  int ndof = std::max(0, order1-1);
 
 	  if (rational)
 	    {
@@ -1002,16 +1008,16 @@ namespace netgen
 		      dw *= -0.7;
 		      w = wold + dw;
 		    }
-		  // *testout << "w = " << w << ", dw = " << dw << endl;
+		  // std::cerr << "w = " << w << ", dw = " << dw <<std::endl;
 		}
 
-	      // cout << "wopt = " << w << ", dopt = " << dold << endl;
+	      // std::cout << "wopt = " << w << ", dopt = " << dold <<std::endl;
 	      edgeweight[segnr] = w;
             
-	      //             cout << "p1 = " << p1 << ", tau1 = " << tau1 << ", alpha1 = " << sol(0) << endl;
-	      //             cout << "p2 = " << p2 << ", tau2 = " << tau2 << ", alpha2 = " << -sol(1) << endl;
-	      //             cout << "p+alpha tau = " << p1 + sol(0) * tau1 
-	      //                  << " =?= " << p2 +sol(1) * tau2 << endl;
+	      //             std::cout << "p1 = " << p1 << ", tau1 = " << tau1 << ", alpha1 = " << sol(0) <<std::endl;
+	      //             std::cout << "p2 = " << p2 << ", tau2 = " << tau2 << ", alpha2 = " << -sol(1) <<std::endl;
+	      //             std::cout << "p+alpha tau = " << p1 + sol(0) * tau1 
+	      //                  << " =?= " << p2 +sol(1) * tau2 <<std::endl;
             
 	    }
 
@@ -1105,7 +1111,7 @@ namespace netgen
 	  {
 	    partop.GetDistantFaceNums (f+1, procs);
 	    for (int j = 0; j < procs.Size(); j++)
-	      surfnr[f] = max(surfnr[f], recv_surfnr[procs[j]][cnt[procs[j]]++]);
+	      surfnr[f] = std::max(surfnr[f], recv_surfnr[procs[j]][cnt[procs[j]]++]);
 	  }
       }
 #endif
@@ -1124,16 +1130,16 @@ namespace netgen
 
 		int fnums[] = { 0, 1, 2 };
 		/*
-		if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
-		if (el[fnums[1]] > el[fnums[2]]) swap (fnums[1], fnums[2]);
-		if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
+		if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
+		if (el[fnums[1]] > el[fnums[2]]) std::swap (fnums[1], fnums[2]);
+		if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
 		*/
-		if (verts[fnums[0]] > verts[fnums[1]]) swap (fnums[0], fnums[1]);
-		if (verts[fnums[1]] > verts[fnums[2]]) swap (fnums[1], fnums[2]);
-		if (verts[fnums[0]] > verts[fnums[1]]) swap (fnums[0], fnums[1]);
+		if (verts[fnums[0]] > verts[fnums[1]]) std::swap (fnums[0], fnums[1]);
+		if (verts[fnums[1]] > verts[fnums[2]]) std::swap (fnums[1], fnums[2]);
+		if (verts[fnums[0]] > verts[fnums[1]]) std::swap (fnums[0], fnums[1]);
 
 		int order1 = faceorder[facenr];
-		int ndof = max (0, (order1-1)*(order1-2)/2);
+		int ndof = std::max (0, (order1-1)*(order1-2)/2);
 	    
 		Vector shape(ndof), dmat(ndof);
 		MatrixFixWidth<3> rhs(ndof), sol(ndof);
@@ -1173,7 +1179,7 @@ namespace netgen
 			Vector eshape(eorder-1);
 			int vi1, vi2;
 			top.GetEdgeVertices (edgenrs[k]+1, vi1, vi2);
-			if (vi1 > vi2) swap (vi1, vi2);
+			if (vi1 > vi2) std::swap (vi1, vi2);
 			int v1 = -1, v2 = -1;
 			for (int j = 0; j < 3; j++)
 			  {
@@ -1273,8 +1279,8 @@ namespace netgen
     
     if (working)
       ishighorder = (order > 1);
-    // (*testout) << "edgecoeffs = " << endl << edgecoeffs << endl;
-    // (*testout) << "facecoeffs = " << endl << facecoeffs << endl;
+    // std::cerr << "edgecoeffs = " <<std::endl << edgecoeffs <<std::endl;
+    // std::cerr << "facecoeffs = " <<std::endl << facecoeffs <<std::endl;
 
 
 #ifdef PARALLEL
@@ -1387,7 +1393,7 @@ namespace netgen
     if (curved)
       *curved = (info.order > 1);
 
-    // cout << "Segment, |x| = " << Abs2(Vec<3> (*x) ) << endl;
+    // std::cout << "Segment, |x| = " << Abs2(Vec<3> (*x) ) <<std::endl;
   }
 
 
@@ -1531,7 +1537,7 @@ namespace netgen
       case QUAD : info.nv = 4; break;
       case TRIG6: return true;
       default:
-	cerr << "undef element in CalcSurfaceTrafo" << endl;
+	std::cerr << "undef element in CalcSurfaceTrafo" << std::endl;
       }
     info.ndof = info.nv;
 
@@ -1612,7 +1618,7 @@ namespace netgen
       case QUAD : info.nv = 4; break;
       case TRIG6: info.nv = 6; break;
       default:
-	cerr << "undef element in CalcSurfaceTrafo" << endl;
+	std::cerr << "undef element in CalcSurfaceTrafo" << std::endl;
       }
     info.ndof = info.nv;
 
@@ -1732,7 +1738,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0], vi2 = edges[i][1];
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcScaledEdgeShape (eorder, shapes(vi1)-shapes(vi2), shapes(vi1)+shapes(vi2), &shapes(ii));
 		  ii += eorder-1;
@@ -1743,9 +1749,9 @@ namespace netgen
 	  if (forder >= 3)
 	    {
 	      int fnums[] = { 0, 1, 2 };
-	      if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
-	      if (el[fnums[1]] > el[fnums[2]]) swap (fnums[1], fnums[2]);
-	      if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
+	      if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
+	      if (el[fnums[1]] > el[fnums[2]]) std::swap (fnums[1], fnums[2]);
+	      if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
 	      
 	      CalcTrigShape (forder, 
 			     shapes(fnums[1])-shapes(fnums[0]),
@@ -1803,7 +1809,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0]-1, vi2 = edges[i][1]-1;
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcEdgeShape (eorder, mu[vi1]-mu[vi2], &shapes(ii));
 		  double lame = shapes(vi1)+shapes(vi2);
@@ -1836,7 +1842,7 @@ namespace netgen
     dshapes.SetSize(info.ndof);
     // dshapes = 0;	  
 
-    // *testout << "calcelementdshapes, info.ndof = " << info.ndof << endl;
+    // std::cerr << "calcelementdshapes, info.ndof = " << info.ndof <<std::endl;
 
     if (rational && info.order >= 2)
       {
@@ -1895,7 +1901,7 @@ namespace netgen
 	  
 	  if (info.order == 1) return;
 
-	  // *testout << "info.order = " << info.order << endl;
+	  // std::cerr << "info.order = " << info.order <<std::endl;
 
 
 	  lami[0] = xi(0);
@@ -1911,7 +1917,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0]-1, vi2 = edges[i][1]-1;
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcScaledEdgeShapeDxDt<2> (eorder, lami[vi1]-lami[vi2], lami[vi1]+lami[vi2], &dshapes(ii,0));
 
@@ -1935,13 +1941,13 @@ namespace netgen
 	    }
 
 	  int forder = faceorder[info.facenr];
-	  // *testout << "forder = " << forder << endl;
+	  // std::cerr << "forder = " << forder <<std::endl;
 	  if (forder >= 3)
 	    {
 	      int fnums[] = { 0, 1, 2 };
-	      if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
-	      if (el[fnums[1]] > el[fnums[2]]) swap (fnums[1], fnums[2]);
-	      if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
+	      if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
+	      if (el[fnums[1]] > el[fnums[2]]) std::swap (fnums[1], fnums[2]);
+	      if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
 	      
 	      CalcTrigShapeDxDy (forder, 
 				 lami[fnums[1]]-lami[fnums[0]],
@@ -2045,7 +2051,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0]-1, vi2 = edges[i][1]-1;
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcEdgeShapeDx (eorder, mu[vi1]-mu[vi2], &hshapes[0], &hdshapes[0]);
 
@@ -2065,7 +2071,7 @@ namespace netgen
 	    }
 
 	  /*	  
-	   *testout << "quad, dshape = " << endl << dshapes << endl;
+	   std::cerr << "quad, dshape = " <<std::endl << dshapes <<std::endl;
 	   for (int i = 0; i < 2; i++)
 	   {
 	   Point<2> xil = xi, xir = xi;
@@ -2079,7 +2085,7 @@ namespace netgen
 	   dshapes(j,i) = 1.0 / 2e-6 * (shapesr(j)-shapesl(j));
 	   }
 	  
-	   *testout << "quad, num dshape = " << endl << dshapes << endl;
+	   std::cerr << "quad, num dshape = " <<std::endl << dshapes <<std::endl;
 	   */
 	  break;
 	}
@@ -2352,7 +2358,7 @@ namespace netgen
 	  }
       }
 
-    // *testout << "curved_elements, dshapes = " << endl << dshapes << endl;
+    // std::cerr << "curved_elements, dshapes = " <<std::endl << dshapes <<std::endl;
 
     //    if (curved) *curved = (info.ndof > info.nv);
 
@@ -2407,7 +2413,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0]-1, vi2 = edges[i][1]-1;
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcScaledEdgeShape (eorder, shapes(vi1)-shapes(vi2), shapes(vi1)+shapes(vi2), &shapes(ii));
 		  ii += eorder-1;
@@ -2420,9 +2426,9 @@ namespace netgen
 	      if (forder >= 3)
 		{
 		  int fnums[] = { faces[i][0]-1, faces[i][1]-1, faces[i][2]-1 }; 
-		  if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
-		  if (el[fnums[1]] > el[fnums[2]]) swap (fnums[1], fnums[2]);
-		  if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
+		  if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
+		  if (el[fnums[1]] > el[fnums[2]]) std::swap (fnums[1], fnums[2]);
+		  if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
 
 		  CalcScaledTrigShape (forder, 
 				       shapes(fnums[1])-shapes(fnums[0]), shapes(fnums[2]), 
@@ -2482,7 +2488,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0]-1, vi2 = edges[i][1]-1;
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcScaledEdgeShape (eorder, lami[vi1]-lami[vi2], lami[vi1]+lami[vi2], &shapes(ii));
 		  double facz = (i < 3) ? (1-xi(2)) : xi(2);
@@ -2499,7 +2505,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0]-1, vi2 = edges[i][1]-1;
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  double bubz = lamiz[vi1]*lamiz[vi2];
 		  double polyz = lamiz[vi1] - lamiz[vi2];
@@ -2521,9 +2527,9 @@ namespace netgen
 	      int forder = faceorder[info.facenrs[i]];
 	      if ( forder < 3 ) continue;
 	      int fav[3] = { faces[i][0]-1, faces[i][1]-1, faces[i][2]-1 };
-	      if(el[fav[0]] > el[fav[1]]) swap(fav[0],fav[1]); 
-	      if(el[fav[1]] > el[fav[2]]) swap(fav[1],fav[2]);
-	      if(el[fav[0]] > el[fav[1]]) swap(fav[0],fav[1]); 	
+	      if(el[fav[0]] > el[fav[1]]) std::swap(fav[0],fav[1]); 
+	      if(el[fav[1]] > el[fav[2]]) std::swap(fav[1],fav[2]);
+	      if(el[fav[0]] > el[fav[1]]) std::swap(fav[0],fav[1]); 	
 
 	      CalcTrigShape (forder, 
 			     lami[fav[2]]-lami[fav[1]], lami[fav[0]],
@@ -2561,7 +2567,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = (edges[i][0]-1), vi2 = (edges[i][1]-1);
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcScaledEdgeShape (eorder, shapes[vi1]-shapes[vi2], shapes[vi1]+shapes[vi2], &shapes(ii));
 		  double fac = (shapes[vi1]+shapes[vi2]) / (1-z);
@@ -2674,7 +2680,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = edges[i][0]-1, vi2 = edges[i][1]-1;
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  CalcScaledEdgeShapeDxDt<3> (eorder, lami[vi1]-lami[vi2], lami[vi1]+lami[vi2], &dshapes(ii,0));
 
@@ -2705,9 +2711,9 @@ namespace netgen
 	      if (forder >= 3)
 		{
 		  int fnums[] = { faces[i][0]-1, faces[i][1]-1, faces[i][2]-1 }; 
-		  if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
-		  if (el[fnums[1]] > el[fnums[2]]) swap (fnums[1], fnums[2]);
-		  if (el[fnums[0]] > el[fnums[1]]) swap (fnums[0], fnums[1]);
+		  if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
+		  if (el[fnums[1]] > el[fnums[2]]) std::swap (fnums[1], fnums[2]);
+		  if (el[fnums[0]] > el[fnums[1]]) std::swap (fnums[0], fnums[1]);
 
 		  CalcScaledTrigShapeDxDyDt (forder, 
 					     lami[fnums[1]]-lami[fnums[0]], 
@@ -2819,7 +2825,7 @@ namespace netgen
 	      if (order >= 2)
 		{
 		  int vi1 = (edges[i][0]-1), vi2 = (edges[i][1]-1);
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 		  vi1 = vi1 % 3;
 		  vi2 = vi2 % 3;
 
@@ -2863,7 +2869,7 @@ namespace netgen
 	      if (eorder >= 2)
 		{
 		  int vi1 = (edges[i][0]-1), vi2 = (edges[i][1]-1);
-		  if (el[vi1] > el[vi2]) swap (vi1, vi2);
+		  if (el[vi1] > el[vi2]) std::swap (vi1, vi2);
 
 		  double bubz = lamiz[vi1] * lamiz[vi2];
 		  double dbubz = dlamiz[vi1]*lamiz[vi2] + lamiz[vi1]*dlamiz[vi2];
@@ -2898,9 +2904,9 @@ namespace netgen
 	      int ndf = (forder+1)*(forder+2)/2 - 3 - 3*(forder-1);
 
 	      int fav[3] = { faces[i][0]-1, faces[i][1]-1, faces[i][2]-1 };
-	      if(el[fav[0]] > el[fav[1]]) swap(fav[0],fav[1]); 
-	      if(el[fav[1]] > el[fav[2]]) swap(fav[1],fav[2]);
-	      if(el[fav[0]] > el[fav[1]]) swap(fav[0],fav[1]); 	
+	      if(el[fav[0]] > el[fav[1]]) std::swap(fav[0],fav[1]); 
+	      if(el[fav[1]] > el[fav[2]]) std::swap(fav[1],fav[2]);
+	      if(el[fav[0]] > el[fav[1]]) std::swap(fav[0],fav[1]); 	
 
 	      MatrixFixWidth<2> dshapei(ndf);
 	      Vector shapei(ndf);
@@ -3055,10 +3061,10 @@ namespace netgen
       for (int j = 0; j < info.ndof; j++)
       dshapes2(j,i) = (shapesr(j)-shapesl(j)) / (2*eps);
       }
-      (*testout) << "dshapes = " << endl << dshapes << endl;
-      (*testout) << "dshapes2 = " << endl << dshapes2 << endl;
+      std::cerr << "dshapes = " <<std::endl << dshapes <<std::endl;
+      std::cerr << "dshapes2 = " <<std::endl << dshapes2 <<std::endl;
       dshapes2 -= dshapes;
-      (*testout) << "diff = " << endl << dshapes2 << endl;
+      std::cerr << "diff = " <<std::endl << dshapes2 <<std::endl;
     */
   }
 
@@ -3272,7 +3278,7 @@ namespace netgen
       case QUAD : info.nv = 4; break;
       case TRIG6: info.nv = 6; break;
       default:
-	cerr << "undef element in CalcMultPointSurfaceTrao" << endl;
+	std::cerr << "undef element in CalcMultPointSurfaceTrao" << std::endl;
       }
     info.ndof = info.nv;
 

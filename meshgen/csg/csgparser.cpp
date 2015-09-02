@@ -173,7 +173,7 @@ namespace netgen
   void CSGScanner :: Error (const string & err)
   {
     stringstream errstr;
-    errstr << "Parsing error in line " << linenum << ": " << endl << err << endl;
+    errstr << "Parsing error in line " << linenum << ": " <<std::endl << err <<std::endl;
     throw string(errstr.str());
   }
 
@@ -1036,7 +1036,7 @@ namespace netgen
 		      Flags flags;
 		      ParseFlags (scan, flags);
 		      int factor = int(flags.GetNumFlag("factor",1)); 
-		      // cout << "Singular Face with factor " << factor << endl; 
+		      // std::cout << "Singular Face with factor " << factor <<std::endl; 
 		      PrintMessageCR (3, "Singular Face  with factor ", factor);
 
 		      ParseChar (scan, ';');
@@ -1083,7 +1083,7 @@ namespace netgen
 			    if (geom->GetTopLevelObject(i)->GetSolid() == sol)
 			      domnr = i;
 			  
-			  // cout << "domnr = " << domnr;
+			  // std::cout << "domnr = " << domnr;
 			}
 
 		      if(!s1 || !s2)
@@ -1114,7 +1114,7 @@ namespace netgen
 		      const Solid * s1 = geom->GetSolid(name1);
 		      const Solid * s2 = geom->GetSolid(name2);
 		      const Solid * s3 = geom->GetSolid(name3);
-		      // cout << "Singular Point with factor " << factor << endl; 
+		      // std::cout << "Singular Point with factor " << factor <<std::endl; 
 		      PrintMessageCR (3, "Singular Point  with factor ", factor);
 		      geom->singpoints.Append (new SingularPoint (1, s1, s2, s3, factor));
 		      break;
@@ -1344,32 +1344,32 @@ namespace netgen
 
 	    else
 	      {
-		cout << "read unidentified token " << scan.GetToken() 
+		std::cout << "read unidentified token " << scan.GetToken() 
 		     << " (as char: \"" << char(scan.GetToken()) << "\")"
-		     << " string = " << scan.GetStringValue() << endl;
+		     << " string = " << scan.GetStringValue() <<std::endl;
 		scan.ReadNext();
 	      }
 	  }
       }
     catch (string errstr)
       {
-	cout << "caught error " << errstr << endl;
+	std::cout << "caught error " << errstr <<std::endl;
 	throw NgException (errstr);
       }
 
 
 
-    (*testout) << geom->GetNTopLevelObjects() << " TLOs:" << endl;
+    std::cerr << geom->GetNTopLevelObjects() << " TLOs:" <<std::endl;
     for (int i = 0; i < geom->GetNTopLevelObjects(); i++)
       {
 	const TopLevelObject * tlo = geom->GetTopLevelObject(i);
 	if (tlo->GetSolid())
-	  (*testout) << i << ": " << *tlo->GetSolid() << endl;
+	  std::cerr << i << ": " << *tlo->GetSolid() <<std::endl;
       }
 
-    (*testout) << geom->GetNSurf() << " Surfaces" << endl;
+    std::cerr << geom->GetNSurf() << " Surfaces" <<std::endl;
     for (int i = 0; i < geom->GetNSurf(); i++)
-      (*testout) << i << ": " << *geom->GetSurface(i) << endl;
+      std::cerr << i << ": " << *geom->GetSurface(i) <<std::endl;
 
     return geom;
     /*
@@ -1377,9 +1377,9 @@ namespace netgen
       {
       scan.ReadNext();
       if (scan.GetToken() == TOK_STRING)
-      cout << "found string " << scan.GetStringValue() << endl;
+      std::cout << "found string " << scan.GetStringValue() <<std::endl;
       else
-      cout << "token = " << int(scan.GetToken()) << endl;
+      std::cout << "token = " << int(scan.GetToken()) <<std::endl;
       }
       while (scan.GetToken() != TOK_END);
     */

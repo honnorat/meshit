@@ -94,7 +94,7 @@ namespace netgen
                         char ch;
                         string name;
                         sbuf >> ch >> name;
-                        cout << "Title: " << name << endl;
+                        std::cout << "Title: " << name <<std::endl;
                       }
                     else if (token == "%STATISTICS")
                       {
@@ -106,7 +106,7 @@ namespace netgen
                       }
                     else
                       {
-                        cout << "SECTION HEADER, unknown field: " << buf << endl;
+                        std::cout << "SECTION HEADER, unknown field: " << buf <<std::endl;
                       }
                   }                
               }
@@ -133,7 +133,7 @@ namespace netgen
 			    string classname, type;
 			    sbuf >> classname >> type;
 			    if (classname != "SOLID" || type != "TETRA")
-			      cerr << "Element not supported: " << buf << endl;
+			      std::cerr << "Element not supported: " << buf <<std::endl;
 			  }
                       }
                     else if (token == "%END_SECT")
@@ -142,7 +142,7 @@ namespace netgen
                       }
                     else
                       {
-                        cout << "SECTION ELEM_TYPE, unknown field: " << buf << endl;
+                        std::cout << "SECTION ELEM_TYPE, unknown field: " << buf <<std::endl;
                       }
                   }                
               }
@@ -164,7 +164,7 @@ namespace netgen
                       }
                     else
                       {
-                        // cout << "COORD_SYSTEMS, unknown field: " << buf << endl;
+                        // std::cout << "COORD_SYSTEMS, unknown field: " << buf <<std::endl;
                       }
                   }                
               }
@@ -173,7 +173,7 @@ namespace netgen
  
             else if (token == "MATERIALS")
               {
-		*testout << "parse materials" << endl;
+		std::cerr << "parse materials" <<std::endl;
                 Array<double> young_modulus, poisson_ratio, mass_density;
 
                 while (1)
@@ -199,7 +199,7 @@ namespace netgen
                         else
                           {
                             sbuf >> val;
-			    *testout << "prop = " << prop << ", val = " << val << endl;
+			    std::cerr << "prop = " << prop << ", val = " << val <<std::endl;
                             if (prop == "YOUNG_MODULUS")
                               young_modulus.Append (val);
                             else if  (prop == "POISSON_RATIO")
@@ -213,13 +213,13 @@ namespace netgen
                         mesh.SetUserData ("YOUNG_MODULUS", young_modulus);
                         mesh.SetUserData ("POISSON_RATIO", poisson_ratio);
                         mesh.SetUserData ("MASS_DENSITY", mass_density);
-			*testout << "young = " << young_modulus << endl;
-			*testout << "poisson = " << poisson_ratio << endl;
+			std::cerr << "young = " << young_modulus <<std::endl;
+			std::cerr << "poisson = " << poisson_ratio <<std::endl;
                         break;
                       }
                     else
                       {
-                        cout << "SECTION MATERIALS, unknown field: " << buf << endl;
+                        std::cout << "SECTION MATERIALS, unknown field: " << buf <<std::endl;
                       }
                   }
               }
@@ -271,7 +271,7 @@ namespace netgen
                       }
                     else
                       {
-                        cout << "SECTION MESH, unknown: " << buf << endl;
+                        std::cout << "SECTION MESH, unknown: " << buf <<std::endl;
                       }
                   }
               }
@@ -326,7 +326,7 @@ namespace netgen
 
                             FaceDescriptor fd(-1, -1, -1, -1);
                             fd.SetBCProperty (nr);
-			    *testout << "add fd " << mesh.GetNFD() << ", nr = " << nr << endl;
+			    std::cerr << "add fd " << mesh.GetNFD() << ", nr = " << nr <<std::endl;
                             mesh.AddFaceDescriptor (fd);
                               
                             for (int j = 0; j < fnums.Size(); j += 2)
@@ -349,7 +349,7 @@ namespace netgen
                       }
                     else
                       {
-                        cout << "SECTION MESH, unknown: " << buf << endl;
+                        std::cout << "SECTION MESH, unknown: " << buf <<std::endl;
                       }
                   }
               }
@@ -378,10 +378,10 @@ namespace netgen
                         sbuf >> lt->id >> def >> ch >> lt->name >> lt->placement >> lt->valuetype;
                         
                         if (lt->name == "DISPLACEMENT")
-                          cout << "loadtype DISPLACEMENT found" << endl;
+                          std::cout << "loadtype DISPLACEMENT found" <<std::endl;
 
                         if (lt->placement != "FACE" && lt->placement != "EDGE" && lt->placement != "NODE")
-                          cout << "unsupported placement " << lt->placement << endl;
+                          std::cout << "unsupported placement " << lt->placement <<std::endl;
 
                         loadtypes.Append (lt);
                       }
@@ -415,24 +415,24 @@ namespace netgen
                             if (loadtypes[i]->placement == "FACE" && loadtypes[i]->name == "DISPLACEMENT")
                               {
                                 mesh.SetUserData ("CONSTRAINT_DISP_FACE", loadtypes[i]->places);
-                                cout << "constrained faces: " << loadtypes[i]->places << endl;
+                                std::cout << "constrained faces: " << loadtypes[i]->places <<std::endl;
                               }
                             if (loadtypes[i]->placement == "EDGE" && loadtypes[i]->name == "DISPLACEMENT")
                               {
                                 mesh.SetUserData ("CONSTRAINT_DISP_EDGE", loadtypes[i]->places);
-                                cout << "constrained edges: " << loadtypes[i]->places << endl;
+                                std::cout << "constrained edges: " << loadtypes[i]->places <<std::endl;
                               }
                             if (loadtypes[i]->placement == "NODE" && loadtypes[i]->name == "DISPLACEMENT")
                               {
                                 mesh.SetUserData ("CONSTRAINT_DISP_NODE", loadtypes[i]->places);
-                                cout << "constrained nodes: " << loadtypes[i]->places << endl;
+                                std::cout << "constrained nodes: " << loadtypes[i]->places <<std::endl;
                               }
                           }
                         break;
                       }
                     else
                       {
-                        cout << "SECTION LOADS, unknown field: " << buf << endl;
+                        std::cout << "SECTION LOADS, unknown field: " << buf <<std::endl;
                       }
                   }
               }
@@ -441,11 +441,11 @@ namespace netgen
 
             else
               {
-                cout << "unknown section " << token << endl;
+                std::cout << "unknown section " << token <<std::endl;
               }
           }
         else
-          cout << "parse line: (" << buf << ")" << endl;
+          std::cout << "parse line: (" << buf << ")" <<std::endl;
       }
   }
 }

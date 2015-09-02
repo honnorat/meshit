@@ -21,12 +21,12 @@ namespace netgen
   if (beta > 1) 
     {
       beta = 1;
-      cout << "Warning: beta set to 1" << endl;
+      std::cout << "Warning: beta set to 1" <<std::endl;
     }
   if (beta <= 1e-3)
     {
       beta = 1e-3;
-      cout << "Warning: beta set to minimal value 0.001" << endl;
+      std::cout << "Warning: beta set to minimal value 0.001" <<std::endl;
     }
 
   sol1 = asol1;
@@ -36,7 +36,7 @@ namespace netgen
 
 void SingularEdge :: FindPointsOnEdge (class Mesh & mesh)
 {
-  (*testout) << "find points on edge" << endl;
+  std::cerr << "find points on edge" <<std::endl;
   points.SetSize(0);
   segms.SetSize(0);
 
@@ -101,9 +101,9 @@ void SingularEdge :: FindPointsOnEdge (class Mesh & mesh)
     }
   
   /*
-  (*testout) << "Singular edge points:" << endl;
+  std::cerr << "Singular edge points:" <<std::endl;
   for (int i = 0; i < points.Size(); i++)
-    (*testout) << points[i] << endl;
+    std::cerr << points[i] <<std::endl;
   */
  
 }
@@ -159,7 +159,7 @@ void SingularPoint :: FindPoints (class Mesh & mesh)
       if (mesh[pi].Type() != FIXEDPOINT) continue;
       const Point<3> p = mesh[pi];
 
-      (*testout) << "check singular point" << p << endl;
+      std::cerr << "check singular point" << p <<std::endl;
 
       if (sol1->IsIn (p) && sol2->IsIn(p) && sol3->IsIn(p) &&
 	  !sol1->IsStrictIn (p) && !sol2->IsStrictIn(p) && !sol3->IsStrictIn(p))
@@ -177,7 +177,7 @@ void SingularPoint :: FindPoints (class Mesh & mesh)
 		}
 
 	      solk -> TangentialSolid (p, tansol, surfk, 1e-3);
-	      (*testout) << "Tansol = " << *tansol << endl;
+	      std::cerr << "Tansol = " << *tansol <<std::endl;
 
 	      if (!tansol) continue;
 
@@ -189,7 +189,7 @@ void SingularPoint :: FindPoints (class Mesh & mesh)
 	      tansol->GetSurfaceIndices (surfk);
 	      tansol -> IterateSolid (urpi);
 
-	      (*testout) << "surfinds = " << surfk << endl;
+	      std::cerr << "surfinds = " << surfk <<std::endl;
 
 	      for (int i = 0; i < surfk.Size(); i++)
 		if (!surf.Contains (surfk[i]))

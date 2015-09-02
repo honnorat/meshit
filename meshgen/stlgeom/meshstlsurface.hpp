@@ -12,9 +12,13 @@
 The interface between mesh generation and stl geometry
 
 */
+#include "../meshing/meshing2.hpp"
 
 
+namespace netgen {
 /// 
+    class STLGeometry;
+    
 class MeshingSTLSurface : public Meshing2
 {
   ///
@@ -115,7 +119,7 @@ public:
   virtual void ProjectToSurface (Point<3> & p, int surfi, PointGeomInfo & gi) const;
 };
 
-
+}
 
 #endif
 

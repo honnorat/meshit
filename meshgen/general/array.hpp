@@ -7,6 +7,9 @@
 /* Date:   01. Jun. 95                                                    */
 /**************************************************************************/
 
+//#include <stddef.h>
+#include <iostream>
+#include <cstring>
 
 namespace netgen
 {
@@ -50,7 +53,7 @@ namespace netgen
     {
 #ifdef DEBUG
       if (i-BASE < 0 || i-BASE >= size)
-	cout << "array<" << typeid(T).name() << "> out of range, i = " << i << ", s = " << size << endl;
+	std::cout << "array<" << typeid(T).name() << "> out of range, i = " << i << ", s = " << size << std::endl;
 #endif
 
       return data[i-BASE]; 
@@ -69,9 +72,9 @@ namespace netgen
     {
 #ifdef DEBUG
       if (i < 1 || i > size)
-	cout << "Array<" << typeid(T).name() 
+	std::cout << "Array<" << typeid(T).name() 
 	     << ">::Elem out of range, i = " << i
-	     << ", s = " << size << endl;
+	     << ", s = " << size << std::endl;
 #endif
 
       return ((T*)data)[i-1]; 
@@ -82,8 +85,8 @@ namespace netgen
     {
 #ifdef DEBUG
       if (i < 1 || i > size)
-	cout << "Array<" << typeid(T).name() << ">::Get out of range, i = " << i
-	     << ", s = " << size << endl;
+	std::cout << "Array<" << typeid(T).name() << ">::Get out of range, i = " << i
+	     << ", s = " << size << std::endl;
 #endif
 
       return ((const T*)data)[i-1]; 
@@ -94,8 +97,8 @@ namespace netgen
     { 
 #ifdef DEBUG
       if (i < 1 || i > size)
-	cout << "Array<" << typeid(T).name() << ">::Set out of range, i = " << i
-	     << ", s = " << size << endl;
+	std::cout << "Array<" << typeid(T).name() << ">::Set out of range, i = " << i
+	     << ", s = " << size << std::endl;
 #endif
 
       ((T*)data)[i-1] = el; 
@@ -148,10 +151,10 @@ namespace netgen
 
   // print array
   template <typename T, int BASE, typename TIND>
-  inline ostream & operator<< (ostream & s, const FlatArray<T,BASE,TIND> & a)
+  inline std::ostream & operator<< (std::ostream & s, const FlatArray<T,BASE,TIND> & a)
   {
     for (TIND i = a.Begin(); i < a.End(); i++)
-      s << i << ": " << a[i] << endl;
+      s << i << ": " << a[i] << std::endl;
     return s;
   }
 
@@ -432,10 +435,10 @@ namespace netgen
 
 
   template <typename T1, typename T2>
-  inline ostream & operator<< (ostream & s, const IndirectArray<T1,T2> & ia)
+  inline std::ostream & operator<< (std::ostream & s, const IndirectArray<T1,T2> & ia)
   {
     for (int i = ia.Begin(); i < ia.End(); i++)
-      s << i << ": " << ia[i] << endl;
+      s << i << ": " << ia[i] << std::endl;
     return s;
   }
   
@@ -551,7 +554,7 @@ namespace netgen
     void PrintMemInfo (ostream & ost) const
     {
       ost << Size() << " elements of size " << sizeof(T) << " = " 
-	  << Size() * sizeof(T) << endl;
+	  << Size() * sizeof(T) <<std::endl;
     }
 
     MoveableArray & operator= (const T & el)
@@ -593,7 +596,7 @@ namespace netgen
   inline ostream & operator<< (ostream & ost, MoveableArray<T> & a)
   {
     for (int i = 0; i < a.Size(); i++)
-      ost << i << ": " << a[i] << endl;
+      ost << i << ": " << a[i] <<std::endl;
     return ost;
   }
   */
@@ -648,8 +651,8 @@ namespace netgen
       
 	if (i <= j)
 	  {
-	    Swap (data[i], data[j]);
-	    Swap (slave[i], slave[j]);
+	    std::swap (data[i], data[j]);
+	    std::swap (slave[i], slave[j]);
 	    i++; j--;
 	  }
       }

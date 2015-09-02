@@ -1,14 +1,15 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "meshing3.hpp"
+#include "meshclass.hpp"
+#include "../general/ngexception.hpp"
+#include "global.hpp"
+#include "findip.hpp"
 
 namespace netgen
 {
 
 double minother;
 double minwithoutother;
-
-
-
 
 
 MeshingStat3d :: MeshingStat3d ()
@@ -19,7 +20,7 @@ MeshingStat3d :: MeshingStat3d ()
 }  
   
 
-Meshing3 :: Meshing3 (const string & rulefilename) 
+Meshing3 :: Meshing3 (const std::string & rulefilename) 
 {
   tolfak = 1;
 
@@ -168,14 +169,6 @@ int Meshing3 :: AddConnectedPair (const INDEX_2 & apair)
 MESHING3_RESULT Meshing3 :: 
 GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 {
-  static int meshing3_timer = NgProfiler::CreateTimer ("Meshing3::GenerateMesh");
-  static int meshing3_timer_a = NgProfiler::CreateTimer ("Meshing3::GenerateMesh a");
-  static int meshing3_timer_b = NgProfiler::CreateTimer ("Meshing3::GenerateMesh b");
-  static int meshing3_timer_c = NgProfiler::CreateTimer ("Meshing3::GenerateMesh c");
-  static int meshing3_timer_d = NgProfiler::CreateTimer ("Meshing3::GenerateMesh d");
-  NgProfiler::RegionTimer reg (meshing3_timer);
-
-
   Array<Point3d > locpoints;      // local points
   Array<MiniElement2d> locfaces;     // local faces
   Array<PointIndex> pindex;      // mapping from local to front point numbering
@@ -273,7 +266,7 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
       const Point3d & p2 = adfront->GetPoint (bel.PNum(2));
       const Point3d & p3 = adfront->GetPoint (bel.PNum(3));
 
-      // (*testout) << endl << "base = " << bel << endl;
+      // std::cerr <<std::endl << "base = " << bel <<std::endl;
 
 
       Point3d pmid = Center (p1, p2, p3);
@@ -292,15 +285,13 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
       double hinner = hmax * (1 + stat.qualclass);
       double houter = hmax * (1 + 2 * stat.qualclass);
 
-      NgProfiler::StartTimer (meshing3_timer_a);
       stat.qualclass =
         adfront -> GetLocals (baseelem, locpoints, locfaces, 
 			      pindex, findex, connectedpairs,
 			      houter, hinner,
 			      locfacesplit);
-      NgProfiler::StopTimer (meshing3_timer_a);
 
-      // (*testout) << "locfaces = " << endl << locfaces << endl;
+      // std::cerr << "locfaces = " <<std::endl << locfaces <<std::endl;
 
       int pi1 = pindex.Get(locfaces[0].PNum(1));
       int pi2 = pindex.Get(locfaces[0].PNum(2));
@@ -315,8 +306,8 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 
       if (loktestmode)
 	{
-	  (*testout) << "baseel = " << baseelem << ", ind = " << findex.Get(1) << endl;
-	  (*testout) << "pi = " << pi1 << ", " << pi2 << ", " << pi3 << endl;
+	  std::cerr << "baseel = " << baseelem << ", ind = " << findex.Get(1) << std::endl;
+	  std::cerr << "pi = " << pi1 << ", " << pi2 << ", " << pi3 << std::endl;
 	}
 
 
@@ -325,9 +316,9 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 
       if (testmode)
 	{
-	  (*testout) << "baseelem = " << baseelem << " qualclass = " << stat.qualclass << endl;
-	  (*testout) << "locpoints = " << endl << locpoints << endl;
-	  (*testout) << "connected = " << endl << connectedpairs << endl;
+	  std::cerr << "baseelem = " << baseelem << " qualclass = " << stat.qualclass << std::endl;
+	  std::cerr << "locpoints = " << std::endl << locpoints << std::endl;
+	  std::cerr << "connected = " << std::endl << connectedpairs << std::endl;
 	}
 
 
@@ -357,9 +348,7 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
       if (stat.qualclass >= mp.starshapeclass &&
 	  mp.baseelnp != 4)   
 	{
-	  NgProfiler::RegionTimer reg1 (meshing3_timer_b);
 	  // star-shaped domain removing
-
 	  grouppoints.SetSize (0);
 	  groupfaces.SetSize (0);
 	  grouppindex.SetSize (0);
@@ -376,7 +365,7 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	  if (onlytri && groupfaces.Size() <= 20 + 2*stat.qualclass &&
 	      FindInnerPoint (grouppoints, groupfaces, inp))
 	    {
-	      (*testout) << "inner point found" << endl;
+	      std::cerr << "inner point found" << std::endl;
 
 	      for (i = 1; i <= groupfaces.Size(); i++)
 		adfront -> DeleteFace (groupfindex.Get(i));
@@ -419,16 +408,16 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
       /*
       for (i = 1; i <= locfaces.Size(); i++)
 	{
-	  (*testout) << "Face " << i << ": ";
+	  std::cerr << "Face " << i << ": ";
 	  for (j = 1; j <= locfaces.Get(i).GetNP(); j++)
-	    (*testout) << pindex.Get(locfaces.Get(i).PNum(j)) << " ";
-	  (*testout) << endl;
+	    std::cerr << pindex.Get(locfaces.Get(i).PNum(j)) << " ";
+	  std::cerr <<std::endl;
 	}
       for (i = 1; i <= locpoints.Size(); i++)
 	{
-	  (*testout) << "p" << i 
+	  std::cerr << "p" << i 
 		     << ", gi = " << pindex.Get(i) 
-		     << " = " << locpoints.Get(i) << endl;
+		     << " = " << locpoints.Get(i) <<std::endl;
 	}
 	*/
 
@@ -462,7 +451,7 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	      if (plainpoints.Get(i).Z() > 0)
 		{
 		  //if(loktestmode)
-		  //  (*testout) << "plainpoints.Get(i).Z() = " << plainpoints.Get(i).Z() << " > 0" << endl;
+		  //  std::cerr << "plainpoints.Get(i).Z() = " << plainpoints.Get(i).Z() << " > 0" <<std::endl;
 		  allowpoint.Elem(i) = 0;
 		}
 	    }
@@ -472,17 +461,15 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 
 	  if (stat.cnttrials % 100 == 0)
 	    {
-	      (*testout) << "\n";
+	      std::cerr << "\n";
 	      for (i = 1; i <= canuse.Size(); i++)
 	      {
-		(*testout) << foundmap.Get(i) << "/" 
+		std::cerr << foundmap.Get(i) << "/" 
 			   << canuse.Get(i) << "/"
 			   << ruleused.Get(i) << " map/can/use rule " << rules.Get(i)->Name() << "\n";
 	      }
-	      (*testout) << endl;
+	      std::cerr << std::endl;
 	    }
-
-	  NgProfiler::StartTimer (meshing3_timer_c);	  
 
 	  found = ApplyRules (plainpoints, allowpoint, 
 			      locfaces, locfacesplit, connectedpairs,
@@ -492,17 +479,12 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	  if (found >= 0) impossible = 0;
 	  if (found < 0) found = 0;
 
-
-	  NgProfiler::StopTimer (meshing3_timer_c);	  
-
 	  if (!found) loktestmode = 0;
 
-	  NgProfiler::RegionTimer reg2 (meshing3_timer_d);	  
-	  
 	  if (loktestmode)
 	    {
-	      (*testout) << "plainpoints = " << endl << plainpoints << endl;
-	      (*testout) << "Applyrules found " << found << endl;
+	      std::cerr << "plainpoints = " << std::endl << plainpoints << std::endl;
+	      std::cerr << "Applyrules found " << found << std::endl;
 	    }
 
 	  if (found) stat.cntsucc++;
@@ -567,15 +549,15 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	      
 	      if (testmode)
 		{
-		  (*testout) << "found is active, 3" << endl;
+		  std::cerr << "found is active, 3" << std::endl;
 		  for (i = 1; i <= plainpoints.Size(); i++)
 		    {
-		      (*testout) << "p";
+		      std::cerr << "p";
 		      if (i <= pindex.Size())
-			(*testout) << pindex.Get(i) << ": ";
+			std::cerr << pindex.Get(i) << ": ";
 		      else
-			(*testout) << "new: ";
-		      (*testout) << plainpoints.Get(i) << endl;
+			std::cerr << "new: ";
+		      std::cerr << plainpoints.Get(i) << std::endl;
 		    }
 		}
 	      
@@ -619,11 +601,11 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 
 	  /*
 	  if (optother)
-	    (*testout) << "Other is optimal" << endl;
+	    std::cerr << "Other is optimal" <<std::endl;
 
 	  if (minother < minwithoutother)
 	    {
-	      (*testout) << "Other is better, " << minother << " less " << minwithoutother << endl;
+	      std::cerr << "Other is better, " << minother << " less " << minwithoutother <<std::endl;
 	    }
 	    */
 
@@ -639,15 +621,15 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 
 	  if (loktestmode)
 	    {
-	      (*testout) << "apply rule" << endl;
+	      std::cerr << "apply rule" << std::endl;
 	      for (i = 1; i <= locpoints.Size(); i++)
 		{
-		  (*testout) << "p";
+		  std::cerr << "p";
 		  if (i <= pindex.Size())
-		    (*testout) << pindex.Get(i) << ": ";
+		    std::cerr << pindex.Get(i) << ": ";
 		  else
-		    (*testout) << "new: ";
-		  (*testout) << locpoints.Get(i) << endl;
+		    std::cerr << "new: ";
+		  std::cerr << locpoints.Get(i) << std::endl;
 		}
 	    }
 
@@ -684,7 +666,7 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	      for (j = 1; j <= locfaces.Get(i).GetNP(); j++)
 		locfaces.Elem(i).PNum(j) = 
 		  pindex.Get(locfaces.Get(i).PNum(j));
-	      // (*testout) << "add face " << locfaces.Get(i) << endl;
+	      // std::cerr << "add face " << locfaces.Get(i) <<std::endl;
 	      adfront->AddFace (locfaces.Get(i));
 	    }
 	  
@@ -696,7 +678,7 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	  adfront->IncrementClass (findex.Get(1));
 	  if (impossible && mp.check_impossible)
 	    {
-	      (*testout) << "skip face since it is impossible" << endl;
+	      std::cerr << "skip face since it is impossible" << std::endl;
 	      for (j = 0; j < 100; j++)
 		adfront->IncrementClass (findex.Get(1));
 	    }
@@ -713,8 +695,8 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
   PrintMessage (5, "");  // line feed after statistics
 
   for (i = 1; i <= ruleused.Size(); i++)
-    (*testout) << setw(4) << ruleused.Get(i)
-	       << " times used rule " << rules.Get(i) -> Name() << endl;
+    std::cerr << std::setw(4) << ruleused.Get(i)
+	       << " times used rule " << rules.Get(i) -> Name() << std::endl;
 
 
   if (!mp.baseelnp && adfront->Empty())
@@ -860,12 +842,12 @@ void Meshing3 :: BlockFill (Mesh & mesh, double gh)
       
       if (adfront -> Inside (undefp))
 	{
-	  //	  (*mycout) << "inner" << endl;
+	  //	  (*mystd::cout) << "inner" <<std::endl;
 	  inner.Elem(undefi) = BLOCKINNER;
 	}
       else
 	{
-	  //	  (*mycout) << "outer" << endl;
+	  //	  (*mystd::cout) << "outer" <<std::endl;
 	  inner.Elem(undefi) = BLOCKOUTER;
 	}
 
@@ -1102,8 +1084,8 @@ void Meshing3 :: BlockFillLocalH (Mesh & mesh,
 {
   double filldist = mp.filldist;
 
-  (*testout) << "blockfill local h" << endl;
-  (*testout) << "rel filldist = " << filldist << endl;
+  std::cerr << "blockfill local h" << std::endl;
+  std::cerr << "rel filldist = " << filldist << std::endl;
   PrintMessage (3, "blockfill local h");
 
 
@@ -1183,7 +1165,7 @@ void Meshing3 :: BlockFillLocalH (Mesh & mesh,
   while (changed);
 
   if (debugparam.slowchecks)
-    (*testout) << "Blockfill with points: " << endl;
+    std::cerr << "Blockfill with points: " << std::endl;
   for (int i = 1; i <= npoints.Size(); i++)
     {
       if (meshbox.IsIn (npoints.Get(i)))
@@ -1193,11 +1175,11 @@ void Meshing3 :: BlockFillLocalH (Mesh & mesh,
 
 	  if (debugparam.slowchecks)
 	    {
-	      (*testout) << npoints.Get(i) << endl;
+	      std::cerr << npoints.Get(i) << std::endl;
 	      if (!adfront->Inside(npoints.Get(i)))
 		{
-		  cout << "add outside point" << endl;
-		  (*testout) << "outside" << endl;
+		  std::cout << "add outside point" << std::endl;
+		  std::cerr << "outside" << std::endl;
 		}
 	    }
 

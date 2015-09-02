@@ -182,34 +182,34 @@ namespace netgen
 	      }
 	    if (strcmp (argv[1], "sewfaces") == 0)
 	      {
-		cout << "Before operation:" << endl;
+		std::cout << "Before operation:" <<std::endl;
 		occgeometry->PrintNrShapes();
 		occgeometry->SewFaces();
 		occgeometry->BuildFMap();
-		cout << endl << "After operation:" << endl;
+		std::cout <<std::endl << "After operation:" <<std::endl;
 		occgeometry->PrintNrShapes();
 		occgeometry->BuildVisualizationMesh(vispar.occdeflection);
 		occgeometry->changed = OCCGEOMETRYVISUALIZATIONHALFCHANGE;
 	      }
 	    if (strcmp (argv[1], "makesolid") == 0)
 	      {
-		cout << "Before operation:" << endl;
+		std::cout << "Before operation:" <<std::endl;
 		occgeometry->PrintNrShapes();
 		occgeometry->MakeSolid();
 		occgeometry->BuildFMap();
-		cout << endl << "After operation:" << endl;
+		std::cout <<std::endl << "After operation:" <<std::endl;
 		occgeometry->PrintNrShapes();
 		occgeometry->BuildVisualizationMesh(vispar.occdeflection);
 		occgeometry->changed = OCCGEOMETRYVISUALIZATIONHALFCHANGE;
 	      }
 	    if (strcmp (argv[1], "upgradetopology") == 0)
 	      {
-		cout << "Before operation:" << endl;
+		std::cout << "Before operation:" <<std::endl;
 		occgeometry->PrintNrShapes();
 		occgeometry->SewFaces();
 		occgeometry->MakeSolid();
 		occgeometry->BuildFMap();
-		cout << endl << "After operation:" << endl;
+		std::cout <<std::endl << "After operation:" <<std::endl;
 		occgeometry->PrintNrShapes();
 		occgeometry->BuildVisualizationMesh(vispar.occdeflection);
 		occgeometry->changed = OCCGEOMETRYVISUALIZATIONHALFCHANGE;
@@ -229,11 +229,11 @@ namespace netgen
 		occgeometry->splitpartitions =
 		  atoi (Tcl_GetVar (interp, "::occoptions.splitpartitions", 0));
 
-		//	      cout << "Before operation:" << endl;
+		//	      std::cout << "Before operation:" <<std::endl;
 		//	      occgeometry->PrintNrShapes();
 		occgeometry->HealGeometry();
 		occgeometry->BuildFMap();
-		//	      cout << endl << "After operation:" << endl;
+		//	      std::cout <<std::endl << "After operation:" <<std::endl;
 		//	      occgeometry->PrintNrShapes();
 		occgeometry->BuildVisualizationMesh(vispar.occdeflection);
 		occgeometry->changed = OCCGEOMETRYVISUALIZATIONHALFCHANGE;
@@ -463,7 +463,7 @@ namespace netgen
 		int i = atoi (argv[2]);
 		occgeometry->changed = i;
 	      }
-	    if (strcmp (argv[1], "swaporientation") == 0)
+	    if (strcmp (argv[1], "std::swaporientation") == 0)
 	      {
 		IGESControl_Writer writer("millimeters", 1);
 		writer.AddShape (occgeometry->shape);
@@ -498,7 +498,7 @@ namespace netgen
 	    if (strcmp (argv[1], "marksingular") == 0)
 	      {
 		int nr = atoi (argv[3]);
-		cout << "marking " << argv[2] << " " << nr << endl;
+		std::cout << "marking " << argv[2] << " " << nr <<std::endl;
 		char buf[2]; buf[0] = '0'; buf[1] = 0;
 		bool sing = false;
 		if (strcmp (argv[2], "Face") == 0)
@@ -517,14 +517,14 @@ namespace netgen
 
 		char* cstr = (char*)str.str().c_str();
 
-		(*testout) << cstr << endl;
+		std::cerr << cstr <<std::endl;
 
 		char helpstr[1000];
 
 		while (strchr (cstr, '}'))
 		  {
 		    strncpy (helpstr, cstr+2, strlen(strchr(cstr+2, '}')));
-		    (*testout) << "***" << cstr << "***" << endl;
+		    std::cerr << "***" << cstr << "***" <<std::endl;
 		    cstr = strchr (cstr, '}');
 		  } 
 	      }

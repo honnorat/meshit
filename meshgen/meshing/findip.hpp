@@ -1,6 +1,11 @@
+#ifndef __FIND_INNER_H
+#define __FIND_INNER_H
 // find inner point
 
+#include "../gprim/geomobjects.hpp"
+#include "../gprim/geomfuncs.hpp"
 
+namespace netgen {
 
 inline void Minimize (const Array<Vec3d> & a,
 		      const Array<double> & c,
@@ -32,12 +37,12 @@ inline void Minimize (const Array<Vec3d> & a,
 	}
 
       /*
-      (*testout) << "act1 = "
+      std::cerr << "act1 = "
 		 << act1[0] << " "
 		 << act1[1] << " "
 		 << act1[2] << " "
-		 << act1[3] << endl;
-      (*testout) << "Det = " << Det(m) << endl;
+		 << act1[3] <<std::endl;
+      std::cerr << "Det = " << Det(m) <<std::endl;
       */
 
       if (fabs (Det (m)) > 1e-10)
@@ -72,9 +77,6 @@ inline int FindInnerPoint (POINTArray & points,
 			   FACEArray & faces,
 			   Point3d & p)
 {
-  static int timer = NgProfiler::CreateTimer ("FindInnerPoint");
-  NgProfiler::RegionTimer reg (timer);
-
   Array<Vec3d> a;
   Array<double> c;
   Mat<3> m, inv;
@@ -111,13 +113,13 @@ inline int FindInnerPoint (POINTArray & points,
   center /= (3*faces.Size());
 
 
-  // (*testout) << "center = " << center << endl;
+  // std::cerr << "center = " << center <<std::endl;
 
   double hmax = 0;
   for (int i = 0; i < nf; i++)
     {
       // const Element2d & el = faces[i];
-      // (*testout) << "el[" << i << "] = " << el << endl;
+      // std::cerr << "el[" << i << "] = " << el <<std::endl;
       for (int j = 1; j <= 3; j++)
 	{
 	  double hi = Dist (points.Get(faces[i].PNumMod(j)),
@@ -126,7 +128,7 @@ inline int FindInnerPoint (POINTArray & points,
 	}
     }
   
-  // (*testout) << "hmax = " << hmax << endl;
+  // std::cerr << "hmax = " << hmax <<std::endl;
   
   a[nf] = Vec<3> (1, 0, 0);
   c[nf] = -center(0) - hmax;
@@ -138,8 +140,8 @@ inline int FindInnerPoint (POINTArray & points,
   c[nf+3] = center(0)+center(1)+center(2)-3*hmax;
 
   /*
-  (*testout) << "findip, a now = " << endl << a << endl;
-  (*testout) << "findip, c now = " << endl << c << endl;
+  std::cerr << "findip, a now = " <<std::endl << a <<std::endl;
+  std::cerr << "findip, c now = " <<std::endl << c <<std::endl;
   */
 
   int act[5] = { 0, nf, nf+1, nf+2, nf+3 };
@@ -148,19 +150,19 @@ inline int FindInnerPoint (POINTArray & points,
   while (1)
     {
       /*
-      (*testout) << "try ";
+      std::cerr << "try ";
       for (int j = 0; j < 5; j++)
-	(*testout)  << act[j] << " ";
+	std::cerr  << act[j] << " ";
       */
 
       Minimize (a, c, act, x, f, sol);
 
       /*
-      (*testout) << endl << "sol = ";
+      std::cerr <<std::endl << "sol = ";
       for (int j = 0; j < 4; j++)
-	(*testout)  << sol[j] << " ";
+	std::cerr  << sol[j] << " ";
 
-      (*testout) << " fmin = " << f << endl;
+      std::cerr << " fmin = " << f <<std::endl;
       */
       for (int j = 0; j < 4; j++) act[j] = sol[j];
       
@@ -177,16 +179,18 @@ inline int FindInnerPoint (POINTArray & points,
 	    }
 	}
       
-      // (*testout) << "maxval = " << maxval << endl;
+      // std::cerr << "maxval = " << maxval <<std::endl;
       if (!found) break;
     }
   
-  // cout << "converged, f = " << f << endl;
+  // std::cout << "converged, f = " << f <<std::endl;
   
   p = Point3d (x(0), x(1), x(2));
-  // (*testout) << "findip, f = " << f << ", hmax = " << hmax << endl;
+  // std::cerr << "findip, f = " << f << ", hmax = " << hmax <<std::endl;
   return (f < -1e-5 * hmax);
 }
 
 
+}
 
+#endif

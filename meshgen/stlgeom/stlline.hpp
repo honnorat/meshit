@@ -9,6 +9,8 @@
 /* Date:   20. Nov. 99                                                    */
 /**************************************************************************/
 
+namespace netgen {
+
 class STLGeometry;
 class STLTopology;
 
@@ -184,5 +186,7 @@ public:
   void DoSplit() {split = 1;}
   int ShouldSplit() const {return split;}
 };
+
+}
 
 #endif

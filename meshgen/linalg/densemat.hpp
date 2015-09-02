@@ -11,6 +11,9 @@
     Data type dense matrix
 */
 
+#include "vector.hpp"
+
+namespace netgen {
 
 class DenseMatrix
 {
@@ -62,24 +65,24 @@ public:
 #ifdef DEBUG
     if (prod.Size() != height)
       {
-	(*myerr) << "Mult: wrong vector size " << endl;
+	(*myerr) << "Mult: wrong vector size " << std::endl;
       }
     if (!height) 
       {
-	cout << "DenseMatrix::Mult height = 0" << endl;
+	std::cout << "DenseMatrix::Mult height = 0" << std::endl;
       }
     if (!width) 
       {
-	cout << "DenseMatrix::Mult width = 0" << endl;
+	std::cout << "DenseMatrix::Mult width = 0" << std::endl;
       }
     
     if (width != v.Size())
       {
-	(*myerr) << "\nMatrix and Vector don't fit" << endl;
+	(*myerr) << "\nMatrix and Vector don't fit" << std::endl;
       }
     else if (Height() != prod.Size())
       {
-	(*myerr) << "Base_Matrix::operator*(Vector): prod vector not ok" << endl;
+	(*myerr) << "Base_Matrix::operator*(Vector): prod vector not ok" << std::endl;
       }
     else
 #endif
@@ -148,7 +151,7 @@ public:
 };
 
 
-extern ostream & operator<< (ostream & ost, const DenseMatrix & m);
+extern std::ostream & operator<< (std::ostream & ost, const DenseMatrix & m);
 
 
 
@@ -208,7 +211,7 @@ public:
     /*    
     if (prod.Size() != height)
       {
-	cerr << "MatrixFixWidth::Mult: wrong vector size " << endl;
+	std::cerr << "MatrixFixWidth::Mult: wrong vector size " <<std::endl;
 	assert (1);
       }
     */    
@@ -262,13 +265,13 @@ public:
 
 
 template <int WIDTH>
-extern ostream & operator<< (ostream & ost, const MatrixFixWidth<WIDTH> & m)
+extern std::ostream & operator<< (std::ostream & ost, const MatrixFixWidth<WIDTH> & m)
 {
   for (int i = 0; i < m.Height(); i++)
     {
       for (int j = 0; j < m.Width(); j++)
 	ost << m.Get(i+1,j+1) << " ";
-      ost << endl;
+      ost << std::endl;
     }
   return ost;
 };
@@ -276,6 +279,6 @@ extern ostream & operator<< (ostream & ost, const MatrixFixWidth<WIDTH> & m)
 
 extern DLL_HEADER void CalcAtA (const DenseMatrix & a, DenseMatrix & m2);
 extern DLL_HEADER void CalcInverse (const DenseMatrix & m1, DenseMatrix & m2);
-
+}
 
 #endif

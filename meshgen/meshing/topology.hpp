@@ -7,12 +7,15 @@
 /* Date:   27. Apr. 01                                                    */
 /**************************************************************************/
 
+#include "../general/array.hpp"
+#include "meshclass.hpp"
+
 /*
     Mesh topology
     (Elements, Faces, Edges, Vertices
 */
 
-
+namespace netgen {
 struct T_EDGE
 {
   int orient:1;
@@ -192,7 +195,7 @@ inline int MeshTopology :: GetNVertices (ELEMENT_TYPE et)
       return 8;
 
       // default:
-      // cerr << "Ng_ME_GetNVertices, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetNVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -233,7 +236,7 @@ inline int MeshTopology :: GetNPoints (ELEMENT_TYPE et)
       return 8;
 
       // default:
-      // cerr << "Ng_ME_GetNVertices, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetNVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -272,7 +275,7 @@ inline int MeshTopology :: GetNEdges (ELEMENT_TYPE et)
       return 12;
 
       // default:
-      // cerr << "Ng_ME_GetNEdges, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetNEdges, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -310,7 +313,7 @@ inline int MeshTopology :: GetNFaces (ELEMENT_TYPE et)
       return 6;
 
       // default:
-      // cerr << "Ng_ME_GetNVertices, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetNVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -411,7 +414,7 @@ const ELEMENT_EDGE * MeshTopology :: GetEdges1 (ELEMENT_TYPE et)
     case HEX:
       return hex_edges;
       // default:
-      // cerr << "Ng_ME_GetEdges, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetEdges, illegal element type " << et <<std::endl;
     }
    return 0;  
 }
@@ -509,7 +512,7 @@ const ELEMENT_EDGE * MeshTopology :: GetEdges0 (ELEMENT_TYPE et)
     case HEX:
       return hex_edges;
       // default:
-      // cerr << "Ng_ME_GetEdges, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetEdges, illegal element type " << et <<std::endl;
     }
    return 0;  
 }
@@ -596,7 +599,7 @@ inline const ELEMENT_FACE * MeshTopology :: GetFaces1 (ELEMENT_TYPE et)
       return hex_faces;
 
       // default:
-      // cerr << "Ng_ME_GetVertices, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
@@ -678,29 +681,11 @@ inline const ELEMENT_FACE * MeshTopology :: GetFaces0 (ELEMENT_TYPE et)
       return hex_faces;
 
       // default:
-      // cerr << "Ng_ME_GetVertices, illegal element type " << et << endl;
+      // std::cerr << "Ng_ME_GetVertices, illegal element type " << et <<std::endl;
     }
   return 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 #endif

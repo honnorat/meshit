@@ -8,12 +8,9 @@
 /*                                                                         */
 /***************************************************************************/
 
-#include <mystdlib.h>
-#include <myadt.hpp> 
+#include <meshgen.hpp>
 
-#include <linalg.hpp>
 #include "opti.hpp"
-
 
 namespace netgen
 {
@@ -27,7 +24,7 @@ void Cholesky (const DenseMatrix & a,
 
   int n = a.Height();
   
-  //  (*testout) << "a = " << a << endl;
+  //  std::cerr << "a = " << a <<std::endl;
 
   l = a;
 
@@ -60,16 +57,16 @@ void Cholesky (const DenseMatrix & a,
 
   /*
   // Multiply:
-  (*testout) << "multiplied factors: " << endl;
+  std::cerr << "multiplied factors: " <<std::endl;
   for (i = 1; i <= n; i++)
     for (j = 1; j <= n; j++)
       {
 	x = 0;
 	for (k = 1; k <= n; k++)
 	  x += l.Get(i, k) * l.Get(j, k) * d.Get(k);
-	(*testout) << x << " ";
+	std::cerr << x << " ";
       }
-  (*testout) << endl;
+  std::cerr <<std::endl;
   */
 }
 
@@ -171,11 +168,11 @@ int LDLtUpdate (DenseMatrix & l, Vector & d, double a, const Vector & u)
 
   for (int j = 1; j <= n; j++)
     {
-      t = told + a * sqr (v(j-1)) / d(j-1);
+      t = told + a * (v(j-1)*v(j-1)) / d(j-1);
 
       if (t <= 0) 
 	{
-	  (*testout) << "update err, t = " << t << endl;
+	  std::cout << "update err, t = " << t << std::endl;
 	  return 1;
 	}
 
@@ -248,12 +245,12 @@ double BFGS (
   do
     {
       // Restart
-      // cout << "it " << it << "f = " << f << endl;
+      // std::cout << "it " << it << "f = " << f <<std::endl;
       if (it % (5 * n) == 0)
 	{
 
 	  for (int i = 1; i <= n; i++)
-	    d(i-1) = typf/ sqr (typx(i-1));   // 1;
+	    d(i-1) = typf/ (typx(i-1)*typx(i-1));   // 1;
 	  for (int i = 2; i <= n; i++)
 	    for (int j = 1; j < i; j++)
 	      l.Elem(i, j) = 0;
@@ -281,10 +278,10 @@ double BFGS (
 
       SolveLDLt (l, d, g, p);
 
- //      (*testout) << "l " << l << endl
-// 		 << "d " << d << endl
-// 		 << "g " << g << endl
-// 		 << "p " << p << endl;
+ //      std::cerr << "l " << l <<std::endl
+// 		 << "d " << d <<std::endl
+// 		 << "g " << g <<std::endl
+// 		 << "p " << p <<std::endl;
 
 
       p *= -1;
@@ -299,19 +296,19 @@ double BFGS (
 	     mu1, sigma, xi1, xi2, tau, tau1, tau2, ifail);
 
       if(ifail == 1)
-	(*testout) << "no success with linesearch" << endl;
+	std::cerr << "no success with linesearch" << std::endl;
 
        /*
       // if (it > par.maxit_bfgs/2)
 	{
-	  (*testout) << "x = " << x << endl;
-	  (*testout) << "xneu = " << xneu << endl;
-	  (*testout) << "f = " << f << endl;
-	  (*testout) << "g = " << g << endl;
+	  std::cerr << "x = " << x <<std::endl;
+	  std::cerr << "xneu = " << xneu <<std::endl;
+	  std::cerr << "f = " << f <<std::endl;
+	  std::cerr << "g = " << g <<std::endl;
 	}
       */
 
-      //      (*testout) << "it = " << it << " f = " << f << endl;
+      //      std::cerr << "it = " << it << " f = " << f <<std::endl;
       //      if (ifail != 0) break;
 
       s.Set2 (1, xneu, -1, x);
@@ -331,20 +328,19 @@ double BFGS (
 	{
 	  if (LDLtUpdate (l, d, 1 / a1, y) != 0)
 	    {
-              cerr << "BFGS update error1" << endl;
-	      (*testout) << "BFGS update error1" << endl;
-	      (*testout) << "l " << endl << l << endl
-			 << "d " << d << endl;
+              std::cerr << "BFGS update error1" << std::endl;
+	      std::cerr << "BFGS update error1" << std::endl;
+	      std::cerr << "l " << std::endl << l << std::endl
+			 << "d " << d << std::endl;
 	      ifail = 1;
 	      break;
 	    }
 
 	  if (LDLtUpdate (l, d, -1 / a2, bs) != 0)
 	    {
-              cerr << "BFGS update error2" << endl;
-	      (*testout) << "BFGS update error2" << endl;
-	      (*testout) << "l " << endl << l << endl
-			 << "d " << d << endl;
+              std::cerr << "BFGS update error2" << std::endl;
+	      std::cerr << "l " << std::endl << l << std::endl
+			<< "d " << d << std::endl;
 	      ifail = 1;
 	      break;
 	    }
@@ -352,17 +348,17 @@ double BFGS (
 
       // Calculate stop conditions
 
-      hd = eps * max2 (typf, fabs (f));
+      hd = eps * std::max (typf, fabs (f));
       a1crit = 1;
       for (int i = 1; i <= n; i++)
-	if ( fabs (g(i-1)) * max2 (typx(i-1), fabs (x(i-1))) > hd)
+	if ( fabs (g(i-1)) * std::max (typx(i-1), fabs (x(i-1))) > hd)
 	  a1crit = 0;
 
 
-      a3acrit = (fold - f <= tauf * max2 (typf, fabs (f)));
+      a3acrit = (fold - f <= tauf * std::max (typf, fabs (f)));
 
-      //    testout << "g = " << g << endl;
-      //    testout << "a1crit, a3crit = " << int(a1crit) << ", " << int(a3acrit) << endl;
+      //    testout << "g = " << g <<std::endl;
+      //    testout << "a1crit, a3crit = " << int(a1crit) << ", " << int(a3acrit) <<std::endl;
 
       /*
 	// Output for tests
@@ -376,13 +372,13 @@ double BFGS (
 	testout << " x = (" << setw (12) << setprecision (5) << x.Elem(1);
 	for (i = 2; i <= n; i++)
 	testout << "," << setw (12) << setprecision (5) << x.Elem(i);
-	testout << ")" << endl;
+	testout << ")" <<std::endl;
 	*/
 
-      //(*testout) << "it = " << it << " f = " << f << " x = " << x << endl
-      //	 << " g = " << g << " p = " << p << endl << endl;
+      //std::cerr << "it = " << it << " f = " << f << " x = " << x <<std::endl
+      //	 << " g = " << g << " p = " << p <<std::endl <<std::endl;
 
-      //      (*testout) << "|g| = " << g.L2Norm() << endl;
+      //      std::cerr << "|g| = " << g.L2Norm() <<std::endl;
 
       if (g.L2Norm() < fun.GradStopping (x)) break;
 
@@ -390,19 +386,19 @@ double BFGS (
   while (!a1crit || !a3acrit);
 
   /*
-  (*testout) << "it = " << it << " g = " << g << " f = " << f 
-	     << " fail = " << ifail << endl;
+  std::cerr << "it = " << it << " g = " << g << " f = " << f 
+	     << " fail = " << ifail <<std::endl;
   */
   if (f0 < f || (ifail == 1))
     {
-      (*testout) << "fail, f = " << f << " f0 = " << f0 << endl;
+      std::cerr << "fail, f = " << f << " f0 = " << f0 << std::endl;
       f = f0;
       x = x0;
     }
 
-  // cout << endl;
+  // std::cout <<std::endl;
 
-  //  (*testout) << "x = " << x << ", x0 = " << x0 << endl;
+  //  std::cerr << "x = " << x << ", x0 = " << x0 <<std::endl;
   return f;
 }
 

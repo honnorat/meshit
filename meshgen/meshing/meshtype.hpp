@@ -8,6 +8,14 @@
 /* Date:   01. Okt. 95                                                    */
 /**************************************************************************/
 
+#include <meshgen.hpp>
+#include <iostream>
+
+#include "msghandler.hpp"
+#include "../linalg/densemat.hpp"
+#include "../gprim/geom3d.hpp"
+#include "../general/hashtabl.hpp"
+
 namespace netgen
 {
 
@@ -52,12 +60,12 @@ namespace netgen
       : trignum(-1), u(0), v(0) { ; }
   };
 
-  inline ostream & operator<< (ostream & ost, const PointGeomInfo & gi)
+  inline std::ostream & operator<< (std::ostream & ost, const PointGeomInfo & gi)
   {
     return (ost << gi.trignum << " " << gi.u << " " << gi.v);
   }
 
-  inline istream & operator>> (istream & ist, PointGeomInfo & gi)
+  inline std::istream & operator>> (std::istream & ist, PointGeomInfo & gi)
   {
     return (ist >> gi.trignum >> gi.u >> gi.v);
   }
@@ -103,7 +111,7 @@ namespace netgen
     }
   };
 
-  inline ostream & operator<< (ostream & ost, const EdgePointGeomInfo & gi)
+  inline std::ostream & operator<< (std::ostream & ost, const EdgePointGeomInfo & gi)
   {
     ost << "epgi: edgnr=" << gi.edgenr << ", dist=" << gi.dist;
     return ost;
@@ -138,12 +146,12 @@ namespace netgen
 #endif  
   };
 
-  inline istream & operator>> (istream & ist, PointIndex & pi)
+  inline std::istream & operator>> (std::istream & ist, PointIndex & pi)
   {
     int i; ist >> i; pi = i; return ist;
   }
 
-  inline ostream & operator<< (ostream & ost, const PointIndex & pi)
+  inline std::ostream & operator<< (std::ostream & ost, const PointIndex & pi)
   {
     return (ost << int(pi));
   }
@@ -164,12 +172,12 @@ namespace netgen
     ElementIndex & operator-- (int) { i--; return *this; }
   };
 
-  inline istream & operator>> (istream & ist, ElementIndex & pi)
+  inline std::istream & operator>> (std::istream & ist, ElementIndex & pi)
   {
     int i; ist >> i; pi = i; return ist;
   }
 
-  inline ostream & operator<< (ostream & ost, const ElementIndex & pi)
+  inline std::ostream & operator<< (std::ostream & ost, const ElementIndex & pi)
   {
     return (ost << int(pi));
   }
@@ -190,12 +198,12 @@ namespace netgen
     SurfaceElementIndex & operator-- (int) { i--; return *this; }
   };
 
-  inline istream & operator>> (istream & ist, SurfaceElementIndex & pi)
+  inline std::istream & operator>> (std::istream & ist, SurfaceElementIndex & pi)
   {
     int i; ist >> i; pi = i; return ist;
   }
 
-  inline ostream & operator<< (ostream & ost, const SurfaceElementIndex & pi)
+  inline std::ostream & operator<< (std::ostream & ost, const SurfaceElementIndex & pi)
   {
     return (ost << int(pi));
   }
@@ -214,12 +222,12 @@ namespace netgen
     SegmentIndex & operator-- (int) { i--; return *this; }
   };
 
-  inline istream & operator>> (istream & ist, SegmentIndex & pi)
+  inline std::istream & operator>> (std::istream & ist, SegmentIndex & pi)
   {
     int i; ist >> i; pi = i; return ist;
   }
 
-  inline ostream & operator<< (ostream & ost, const SegmentIndex & pi)
+  inline std::ostream & operator<< (std::ostream & ost, const SegmentIndex & pi)
   {
     return (ost << int(pi));
   }
@@ -271,12 +279,12 @@ namespace netgen
 #endif
 
   };
-
-  inline ostream & operator<<(ostream  & s, const MeshPoint & pt)
-  { 
-    return (s << Point<3> (pt)); 
-  }
-
+//
+//  inline std::ostream & operator<<(std::ostream  & s, const MeshPoint & pt)
+//  { 
+//    return (s << Point<3> (pt)); 
+//  }
+//
 
 
 
@@ -476,7 +484,7 @@ namespace netgen
     {
 #ifdef DEBUG
       if (pnum[0] < PointIndex::BASE && !deleted)
-	cerr << "Surfelement has illegal pnum, but not marked as deleted" << endl;
+	std::cerr << "Surfelement has illegal pnum, but not marked as deleted" << std::endl;
 #endif    
       return deleted; 
     }
@@ -516,7 +524,7 @@ namespace netgen
   };
 
 
-  ostream & operator<<(ostream  & s, const Element2d & el);
+  std::ostream & operator<<(std::ostream  & s, const Element2d & el);
 
 
 
@@ -669,7 +677,7 @@ namespace netgen
     /// Calculates Volume of elemenet
     double Volume (const T_POINTS & points) const;
     ///
-    void Print (ostream & ost) const;
+    void Print (std::ostream & ost) const;
     ///
     int GetNFaces () const
     {
@@ -767,7 +775,7 @@ namespace netgen
     { 
 #ifdef DEBUG
       if (pnum[0] < PointIndex::BASE && !flags.deleted)
-	cerr << "Volelement has illegal pnum, but not marked as deleted" << endl;
+	std::cerr << "Volelement has illegal pnum, but not marked as deleted" << std::endl;
 #endif    
 
       return flags.deleted; 
@@ -785,7 +793,7 @@ namespace netgen
     int hp_elnr;
   };
 
-  ostream & operator<<(ostream  & s, const Element & el);
+  std::ostream & operator<<(std::ostream  & s, const Element & el);
 
 
 
@@ -843,7 +851,7 @@ namespace netgen
 #endif
 
   private:
-    string* bcname;
+    std::string* bcname;
 
   public:
     /*
@@ -859,20 +867,20 @@ namespace netgen
   
     int hp_elnr;
 
-    void SetBCName ( string * abcname )
+    void SetBCName ( std::string * abcname )
     {
       bcname = abcname;
     }
 
-    string * BCNamePtr () 
+    std::string * BCNamePtr () 
     { return bcname; }
 
-    const string * BCNamePtr () const 
+    const std::string * BCNamePtr () const 
     { return bcname; }
 
-    const string & GetBCName () const
+    const std::string & GetBCName () const
     {
-      static string defaultstring = "default";
+      static std::string defaultstring = "default";
       if (! bcname ) return defaultstring;
       return *bcname;
     }
@@ -898,7 +906,7 @@ namespace netgen
 #endif
   };
 
-  ostream & operator<<(ostream  & s, const Segment & seg);
+  std::ostream & operator<<(std::ostream  & s, const Segment & seg);
 
 
 
@@ -926,7 +934,7 @@ namespace netgen
     Vec3d surfcolour;
 
     ///
-    string * bcname;
+    std::string * bcname;
     /// root of linked list 
     SurfaceElementIndex firstelement;
   
@@ -955,14 +963,14 @@ namespace netgen
     // Philippose - 06/07/2009
     // Get Surface colour
     Vec3d SurfColour () const { return surfcolour; }
-    const string & GetBCName () const; 
+    const std::string & GetBCName () const; 
     // string * BCNamePtr () { return bcname; }
     // const string * BCNamePtr () const  { return bcname; }
     void SetSurfNr (int sn) { surfnr = sn; }
     void SetDomainIn (int di) { domin = di; }
     void SetDomainOut (int dom) { domout = dom; }
     void SetBCProperty (int bc) { bcprop = bc; }
-    void SetBCName (string * bcn) { bcname = bcn; }
+    void SetBCName (std::string * bcn) { bcname = bcn; }
     // Philippose - 06/07/2009
     // Set the surface colour
     void SetSurfColour (Vec3d colour) { surfcolour = colour; }
@@ -975,7 +983,7 @@ namespace netgen
     friend class Mesh;
   };
 
-  ostream & operator<< (ostream  & s, const FaceDescriptor & fd);
+  std::ostream & operator<< (std::ostream  & s, const FaceDescriptor & fd);
 
  
   class EdgeDescriptor
@@ -1003,7 +1011,7 @@ namespace netgen
        3d optimization strategy:
        // m .. move nodes
        // M .. move nodes, cheap functional
-       // s .. swap faces
+       // s .. std::swap faces
        // c .. combine elements
        // d .. divide elements
        // p .. plot, no pause
@@ -1016,8 +1024,8 @@ namespace netgen
     int optsteps3d;
     /**
        2d optimization strategy:
-       // s .. swap, opt 6 lines/node
-       // S .. swap, optimal elements
+       // s .. std::swap, opt 6 lines/node
+       // S .. std::swap, optimal elements
        // m .. move nodes
        // p .. plot, no pause
        // P .. plot, pause
@@ -1101,7 +1109,7 @@ namespace netgen
     ///
     MeshingParameters ();
     ///
-    void Print (ostream & ost) const;
+    void Print (std::ostream & ost) const;
 
     void CopyFrom(const MeshingParameters & other);
   };
@@ -1147,7 +1155,7 @@ namespace netgen
   inline void Element2d :: Invert()
   {
     if (typ == TRIG)
-      Swap (PNum(2), PNum(3));
+      std::swap (PNum(2), PNum(3));
     else
       Invert2();
   }
@@ -1300,7 +1308,7 @@ namespace netgen
     /// remove secondorder
     void SetMaxPointNr (int maxpnum);
 
-    void Print (ostream & ost) const;
+    void Print (std::ostream & ost) const;
   };
 
 

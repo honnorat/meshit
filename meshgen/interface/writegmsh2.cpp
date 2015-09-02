@@ -68,8 +68,8 @@ namespace netgen
          && (mesh.VolumeElement(1).GetNP() <= 10)
          && (mesh.SurfaceElement(1).GetNP() <= 6))
       {
-         cout << "Write GMSH v2.xx Format \n";
-         cout << "The GMSH v2.xx export is currently available for elements upto 2nd Order\n" << endl;
+         std::cout << "Write GMSH v2.xx Format \n";
+         std::cout << "The GMSH v2.xx export is currently available for elements upto 2nd Order\n" <<std::endl;
 
          int inverttets = mparam.inverttets;
          int invertsurf = mparam.inverttrigs;
@@ -111,7 +111,7 @@ namespace netgen
             if(el.GetNP() == 6) elType = GMSH_TRIG6;  //// GMSH Type for a 6 node triangle
             if(elType == 0)
             {
-               cout << " Invalid surface element type for Gmsh 2.0 3D-Mesh Export Format !\n";
+               std::cout << " Invalid surface element type for Gmsh 2.0 3D-Mesh Export Format !\n";
                return;
             }
 
@@ -144,7 +144,7 @@ namespace netgen
             if(el.GetNP() == 10) elType = GMSH_TET10; //// GMSH Element type for 10 node tetrahedron
             if(elType == 0)
             {
-               cout << " Invalid volume element type for Gmsh 2.0 3D-Mesh Export Format !\n";
+               std::cout << " Invalid volume element type for Gmsh 2.0 3D-Mesh Export Format !\n";
                return;
             }
 
@@ -179,7 +179,7 @@ namespace netgen
       */
       else if(ne == 0)   /// means that there's no 3D element
       {
-         cout << "\n Write Gmsh v2.xx Surface Mesh (triangle and/or quadrangles upto 2nd Order)" << endl;
+         std::cout << "\n Write Gmsh v2.xx Surface Mesh (triangle and/or quadrangles upto 2nd Order)" <<std::endl;
 
          /// Prepare GMSH 2.0 file (See GMSH 2.0 Documentation)
          outfile << "$MeshFormat\n";
@@ -218,7 +218,7 @@ namespace netgen
             if(el.GetNP() == 8) elType = GMSH_QUAD8;  //// GMSH Type for an 8 node quadrangle
             if(elType == 0)
             {
-               cout << " Invalid surface element type for Gmsh 2.0 2D-Mesh Export Format !\n";
+               std::cout << " Invalid surface element type for Gmsh 2.0 2D-Mesh Export Format !\n";
                return;
             }
 
@@ -253,7 +253,7 @@ namespace netgen
 
       else
       {
-         cout << " Invalid element type for Gmsh v2.xx Export Format !\n";
+         std::cout << " Invalid element type for Gmsh v2.xx Export Format !\n";
       }
    } // End: WriteGmsh2Format
 } // End: namespace netgen

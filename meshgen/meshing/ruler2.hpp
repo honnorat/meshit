@@ -1,6 +1,14 @@
 #ifndef FILE_NETRULE
 #define FILE_NETRULE
 
+#include <iostream>
+#include "../general/array.hpp"
+#include "../linalg/densemat.hpp"
+#include "../gprim/geom2d.hpp"
+#include "meshtype.hpp"
+
+namespace netgen {
+
 ///
 class netrule
 {
@@ -157,7 +165,7 @@ public:
   const char * Name () const { return name; }
 
   ///
-  void LoadRule (istream & ist);
+  void LoadRule (std::istream & ist);
 };
 
 
@@ -165,5 +173,8 @@ public:
 /** Draws 2D rules.
     Visual testing of 2D meshing rules */
 extern void DrawRules ();
+
+}
+
 #endif
 

@@ -1,5 +1,11 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <string>
+#include <meshgen.hpp>
+#include "basegeom.hpp"
+#include "meshfunc.hpp"
+#include "global.hpp"
+#include "meshtool.hpp"
+
+#include "../general/ngexception.hpp"
 
 namespace netgen
 {
@@ -59,7 +65,7 @@ namespace netgen
   }
 
 
-  void NetgenGeometry :: Save (string filename) const
+  void NetgenGeometry :: Save (std::string filename) const
   {
     throw NgException("Cannot save geometry - no geometry available");
   }

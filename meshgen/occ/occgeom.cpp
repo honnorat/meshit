@@ -24,13 +24,13 @@ namespace netgen
       TopExp_Explorer e;
       int count = 0;
       for (e.Init(shape, TopAbs_COMPSOLID); e.More(); e.Next()) count++;
-      cout << "CompSolids: " << count << endl;
+      std::cout << "CompSolids: " << count <<std::endl;
 
-      cout << "Solids    : " << somap.Extent() << endl;
-      cout << "Shells    : " << shmap.Extent() << endl;
-      cout << "Faces     : " << fmap.Extent() << endl;
-      cout << "Edges     : " << emap.Extent() << endl;
-      cout << "Vertices  : " << vmap.Extent() << endl;
+      std::cout << "Solids    : " << somap.Extent() <<std::endl;
+      std::cout << "Shells    : " << shmap.Extent() <<std::endl;
+      std::cout << "Faces     : " << fmap.Extent() <<std::endl;
+      std::cout << "Edges     : " << emap.Extent() <<std::endl;
+      std::cout << "Vertices  : " << vmap.Extent() <<std::endl;
    }
 
 
@@ -42,51 +42,51 @@ namespace netgen
       cont.Clear();
       cont.Perform(geom->shape);
 
-      (*testout) << "OCC CONTENTS" << endl;
-      (*testout) << "============" << endl;
-      (*testout) << "SOLIDS   : " << cont.NbSolids() << endl;
-      (*testout) << "SHELLS   : " << cont.NbShells() << endl;
-      (*testout) << "FACES    : " << cont.NbFaces() << endl;
-      (*testout) << "WIRES    : " << cont.NbWires() << endl;
-      (*testout) << "EDGES    : " << cont.NbEdges() << endl;
-      (*testout) << "VERTICES : " << cont.NbVertices() << endl;
+      std::cerr << "OCC CONTENTS" <<std::endl;
+      std::cerr << "============" <<std::endl;
+      std::cerr << "SOLIDS   : " << cont.NbSolids() <<std::endl;
+      std::cerr << "SHELLS   : " << cont.NbShells() <<std::endl;
+      std::cerr << "FACES    : " << cont.NbFaces() <<std::endl;
+      std::cerr << "WIRES    : " << cont.NbWires() <<std::endl;
+      std::cerr << "EDGES    : " << cont.NbEdges() <<std::endl;
+      std::cerr << "VERTICES : " << cont.NbVertices() <<std::endl;
 
       TopExp_Explorer e;
       int count = 0;
       for (e.Init(geom->shape, TopAbs_COMPOUND); e.More(); e.Next())
          count++;
-      (*testout) << "Compounds: " << count << endl;
+      std::cerr << "Compounds: " << count <<std::endl;
 
       count = 0;
       for (e.Init(geom->shape, TopAbs_COMPSOLID); e.More(); e.Next())
          count++;
-      (*testout) << "CompSolids: " << count << endl;
+      std::cerr << "CompSolids: " << count <<std::endl;
 
-      (*testout) << endl;
+      std::cerr <<std::endl;
 
-      cout << "Highest entry in topology hierarchy: " << endl;
+      std::cout << "Highest entry in topology hierarchy: " <<std::endl;
       if (count)
-         cout << count << " composite solid(s)" << endl;
+         std::cout << count << " composite solid(s)" <<std::endl;
       else
          if (geom->somap.Extent())
-            cout << geom->somap.Extent() << " solid(s)" << endl;
+            std::cout << geom->somap.Extent() << " solid(s)" <<std::endl;
          else
             if (geom->shmap.Extent())
-               cout << geom->shmap.Extent() << " shells(s)" << endl;
+               std::cout << geom->shmap.Extent() << " shells(s)" <<std::endl;
             else
                if (geom->fmap.Extent())
-                  cout << geom->fmap.Extent() << " face(s)" << endl;
+                  std::cout << geom->fmap.Extent() << " face(s)" <<std::endl;
                else
                   if (geom->wmap.Extent())
-                     cout << geom->wmap.Extent() << " wire(s)" << endl;
+                     std::cout << geom->wmap.Extent() << " wire(s)" <<std::endl;
                   else
                      if (geom->emap.Extent())
-                        cout << geom->emap.Extent() << " edge(s)" << endl;
+                        std::cout << geom->emap.Extent() << " edge(s)" <<std::endl;
                      else
                         if (geom->vmap.Extent())
-                           cout << geom->vmap.Extent() << " vertices(s)" << endl;
+                           std::cout << geom->vmap.Extent() << " vertices(s)" <<std::endl;
                         else
-                           cout << "no entities" << endl;
+                           std::cout << "no entities" <<std::endl;
 
    }
 
@@ -136,11 +136,11 @@ namespace netgen
       }
 
 
-      cout << "Starting geometry healing procedure (tolerance: " << tolerance << ")" << endl
-         << "-----------------------------------" << endl;
+      std::cout << "Starting geometry healing procedure (tolerance: " << tolerance << ")" <<std::endl
+         << "-----------------------------------" <<std::endl;
 
       {
-         cout << endl << "- repairing faces" << endl;
+         std::cout <<std::endl << "- repairing faces" <<std::endl;
 
          Handle(ShapeFix_Face) sff;
          Handle_ShapeBuild_ReShape rebuild = new ShapeBuild_ReShape;
@@ -174,17 +174,17 @@ namespace netgen
                sff->Status(ShapeExtend_DONE4) ||
                sff->Status(ShapeExtend_DONE5))
             {
-               cout << "repaired face " << fmap.FindIndex(face) << " ";
+               std::cout << "repaired face " << fmap.FindIndex(face) << " ";
                if(sff->Status(ShapeExtend_DONE1))
-                  cout << "(some wires are fixed)" <<endl;
+                  std::cout << "(some wires are fixed)" <std::endl;
                else if(sff->Status(ShapeExtend_DONE2))
-                  cout << "(orientation of wires fixed)" <<endl;
+                  std::cout << "(orientation of wires fixed)" <std::endl;
                else if(sff->Status(ShapeExtend_DONE3))
-                  cout << "(missing seam added)" <<endl;
+                  std::cout << "(missing seam added)" <std::endl;
                else if(sff->Status(ShapeExtend_DONE4))
-                  cout << "(small area wire removed)" <<endl;
+                  std::cout << "(small area wire removed)" <std::endl;
                else if(sff->Status(ShapeExtend_DONE5))
-                  cout << "(natural bounds added)" <<endl;
+                  std::cout << "(natural bounds added)" <std::endl;
                TopoDS_Face newface = sff->Face();
 
                rebuild->Replace(face, newface, Standard_False);
@@ -214,7 +214,7 @@ namespace netgen
 
       if (fixsmalledges)
       {
-         cout << endl << "- fixing small edges" << endl;
+         std::cout <<std::endl << "- fixing small edges" <<std::endl;
 
          Handle(ShapeFix_Wire) sfw;
          Handle_ShapeBuild_ReShape rebuild = new ShapeBuild_ReShape;
@@ -245,19 +245,19 @@ namespace netgen
                   sfw->StatusSmall(ShapeExtend_FAIL2) ||
                   sfw->StatusSmall(ShapeExtend_FAIL3)))
                {
-                  cout << "Fixed small edge in wire " << wmap.FindIndex (oldwire) << endl;
+                  std::cout << "Fixed small edge in wire " << wmap.FindIndex (oldwire) <<std::endl;
                   replace = true;
 
                }
                else if (sfw->StatusSmall(ShapeExtend_FAIL1))
-                  cerr << "Failed to fix small edge in wire " << wmap.FindIndex (oldwire)
-                  << ", edge cannot be checked (no 3d curve and no pcurve)" << endl;
+                  std::cerr << "Failed to fix small edge in wire " << wmap.FindIndex (oldwire)
+                  << ", edge cannot be checked (no 3d curve and no pcurve)" <<std::endl;
                else if (sfw->StatusSmall(ShapeExtend_FAIL2))
-                  cerr << "Failed to fix small edge in wire " << wmap.FindIndex (oldwire)
-                  << ", edge is null-length and has different vertives at begin and end, and lockvtx is True or ModifiyTopologyMode is False" << endl;
+                  std::cerr << "Failed to fix small edge in wire " << wmap.FindIndex (oldwire)
+                  << ", edge is null-length and has different vertives at begin and end, and lockvtx is True or ModifiyTopologyMode is False" <<std::endl;
                else if (sfw->StatusSmall(ShapeExtend_FAIL3))
-                  cerr << "Failed to fix small edge in wire " << wmap.FindIndex (oldwire)
-                  << ", CheckConnected has failed" << endl;
+                  std::cerr << "Failed to fix small edge in wire " << wmap.FindIndex (oldwire)
+                  << ", CheckConnected has failed" <<std::endl;
 
                replace = sfw->FixEdgeCurves() || replace;
 
@@ -297,9 +297,9 @@ namespace netgen
                   BRepGProp::LinearProperties(edge, system);
                   if (system.Mass() < tolerance)
                   {
-                     cout << "removing degenerated edge " << emap.FindIndex(edge)
+                     std::cout << "removing degenerated edge " << emap.FindIndex(edge)
                         << " from vertex " << vmap.FindIndex(TopExp::FirstVertex (edge))
-                        << " to vertex " << vmap.FindIndex(TopExp::LastVertex (edge)) << endl;
+                        << " to vertex " << vmap.FindIndex(TopExp::LastVertex (edge)) <<std::endl;
                      rebuild->Remove(edge, false);
                   }
                }
@@ -335,12 +335,12 @@ namespace netgen
 
          if (sfwf->FixWireGaps())
          {
-            cout << endl << "- fixing wire gaps" << endl;
-            if (sfwf->StatusWireGaps(ShapeExtend_OK)) cout << "no gaps found" << endl;
-            if (sfwf->StatusWireGaps(ShapeExtend_DONE1)) cout << "some 2D gaps fixed" << endl;
-            if (sfwf->StatusWireGaps(ShapeExtend_DONE2)) cout << "some 3D gaps fixed" << endl;
-            if (sfwf->StatusWireGaps(ShapeExtend_FAIL1)) cout << "failed to fix some 2D gaps" << endl;
-            if (sfwf->StatusWireGaps(ShapeExtend_FAIL2)) cout << "failed to fix some 3D gaps" << endl;
+            std::cout <<std::endl << "- fixing wire gaps" <<std::endl;
+            if (sfwf->StatusWireGaps(ShapeExtend_OK)) std::cout << "no gaps found" <<std::endl;
+            if (sfwf->StatusWireGaps(ShapeExtend_DONE1)) std::cout << "some 2D gaps fixed" <<std::endl;
+            if (sfwf->StatusWireGaps(ShapeExtend_DONE2)) std::cout << "some 3D gaps fixed" <<std::endl;
+            if (sfwf->StatusWireGaps(ShapeExtend_FAIL1)) std::cout << "failed to fix some 2D gaps" <<std::endl;
+            if (sfwf->StatusWireGaps(ShapeExtend_FAIL2)) std::cout << "failed to fix some 3D gaps" <<std::endl;
          }
 
          sfwf->SetPrecision(tolerance);
@@ -351,7 +351,7 @@ namespace netgen
             {
                TopoDS_Edge edge = TopoDS::Edge(exp1.Current());
                if ( BRep_Tool::Degenerated(edge) )
-                  cout << "degenerated edge at position 4" << endl;
+                  std::cout << "degenerated edge at position 4" <<std::endl;
             }
          }
 
@@ -359,10 +359,10 @@ namespace netgen
 
          if (sfwf->FixSmallEdges())
          {
-            cout << endl << "- fixing wire frames" << endl;
-            if (sfwf->StatusSmallEdges(ShapeExtend_OK)) cout << "no small edges found" << endl;
-            if (sfwf->StatusSmallEdges(ShapeExtend_DONE1)) cout << "some small edges fixed" << endl;
-            if (sfwf->StatusSmallEdges(ShapeExtend_FAIL1)) cout << "failed to fix some small edges" << endl;
+            std::cout <<std::endl << "- fixing wire frames" <<std::endl;
+            if (sfwf->StatusSmallEdges(ShapeExtend_OK)) std::cout << "no small edges found" <<std::endl;
+            if (sfwf->StatusSmallEdges(ShapeExtend_DONE1)) std::cout << "some small edges fixed" <<std::endl;
+            if (sfwf->StatusSmallEdges(ShapeExtend_FAIL1)) std::cout << "failed to fix some small edges" <<std::endl;
          }
 
 
@@ -383,7 +383,7 @@ namespace netgen
          {
             TopoDS_Edge edge = TopoDS::Edge(exp1.Current());
             if ( BRep_Tool::Degenerated(edge) )
-               cout << "degenerated edge at position 5" << endl;
+               std::cout << "degenerated edge at position 5" <<std::endl;
          }
       }
 
@@ -393,7 +393,7 @@ namespace netgen
       if (fixspotstripfaces)
       {
 
-         cout << endl << "- fixing spot and strip faces" << endl;
+         std::cout <<std::endl << "- fixing spot and strip faces" <<std::endl;
          Handle(ShapeFix_FixSmallFace) sffsm = new ShapeFix_FixSmallFace();
          sffsm -> Init (shape);
          sffsm -> SetPrecision (tolerance);
@@ -409,7 +409,7 @@ namespace netgen
          {
             TopoDS_Edge edge = TopoDS::Edge(exp1.Current());
             if ( BRep_Tool::Degenerated(edge) )
-               cout << "degenerated edge at position 6" << endl;
+               std::cout << "degenerated edge at position 6" <<std::endl;
          }
       }
 
@@ -417,7 +417,7 @@ namespace netgen
 
       if (sewfaces)
       {
-         cout << endl << "- sewing faces" << endl;
+         std::cout <<std::endl << "- sewing faces" <<std::endl;
 
          BRepOffsetAPI_Sewing sewedObj(tolerance);
 
@@ -432,7 +432,7 @@ namespace netgen
          if (!sewedObj.SewedShape().IsNull())
             shape = sewedObj.SewedShape();
          else
-            cout << " not possible";
+            std::cout << " not possible";
       }
 
 
@@ -452,7 +452,7 @@ namespace netgen
 
       if (makesolids)
       {
-         cout << endl << "- making solids" << endl;
+         std::cout <<std::endl << "- making solids" <<std::endl;
 
          BRepBuilderAPI_MakeSolid ms;
          int count = 0;
@@ -464,7 +464,7 @@ namespace netgen
 
          if (!count)
          {
-            cout << " not possible (no shells)" << endl;
+            std::cout << " not possible (no shells)" <<std::endl;
          }
          else
          {
@@ -494,7 +494,7 @@ namespace netgen
                //delete sfs; sfs = NULL;
             }
             else
-               cout << " not possible" << endl;
+               std::cout << " not possible" <<std::endl;
          }
       }
 
@@ -502,7 +502,7 @@ namespace netgen
 
       if (splitpartitions)
       {
-         cout << "- running SALOME partition splitter" << endl;
+         std::cout << "- running SALOME partition splitter" <<std::endl;
 
          TopExp_Explorer e2;
          Partition_Spliter ps;
@@ -518,13 +518,13 @@ namespace netgen
          ps.Compute();
          shape = ps.Shape();
 
-         cout << " before: " << count << " solids" << endl;
+         std::cout << " before: " << count << " solids" <<std::endl;
 
          count = 0;
          for (e2.Init (shape, TopAbs_SOLID);
             e2.More(); e2.Next()) count++;
 
-            cout << " after : " << count << " solids" << endl;
+            std::cout << " after : " << count << " solids" <<std::endl;
       }
 
       BuildFMap();
@@ -536,7 +536,7 @@ namespace netgen
          {
             TopoDS_Edge edge = TopoDS::Edge(exp1.Current());
             if ( BRep_Tool::Degenerated(edge) )
-               cout << "degenerated edge at position 8" << endl;
+               std::cout << "degenerated edge at position 8" <<std::endl;
          }
       }
 
@@ -564,18 +564,18 @@ namespace netgen
       for (exp0.Init(shape, TopAbs_COMPOUND); exp0.More(); exp0.Next()) nnrc++;
       for (exp0.Init(shape, TopAbs_COMPSOLID); exp0.More(); exp0.Next()) nnrcs++;
 
-      cout << "-----------------------------------" << endl;
-      cout << "Compounds       : " << nnrc << " (" << nrc << ")" << endl;
-      cout << "Composite solids: " << nnrcs << " (" << nrcs << ")" << endl;
-      cout << "Solids          : " << nnrso << " (" << nrso << ")" << endl;
-      cout << "Shells          : " << nnrsh << " (" << nrsh << ")" << endl;
-      cout << "Wires           : " << nnrw << " (" << nrw << ")" << endl;
-      cout << "Faces           : " << nnrf << " (" << nrf << ")" << endl;
-      cout << "Edges           : " << nnre << " (" << nre << ")" << endl;
-      cout << "Vertices        : " << nnrv << " (" << nrv << ")" << endl;
-      cout << endl;
-      cout << "Totol surface area : " << newsurfacecont << " (" << surfacecont << ")" << endl;
-      cout << endl;
+      std::cout << "-----------------------------------" <<std::endl;
+      std::cout << "Compounds       : " << nnrc << " (" << nrc << ")" <<std::endl;
+      std::cout << "Composite solids: " << nnrcs << " (" << nrcs << ")" <<std::endl;
+      std::cout << "Solids          : " << nnrso << " (" << nrso << ")" <<std::endl;
+      std::cout << "Shells          : " << nnrsh << " (" << nrsh << ")" <<std::endl;
+      std::cout << "Wires           : " << nnrw << " (" << nrw << ")" <<std::endl;
+      std::cout << "Faces           : " << nnrf << " (" << nrf << ")" <<std::endl;
+      std::cout << "Edges           : " << nnre << " (" << nre << ")" <<std::endl;
+      std::cout << "Vertices        : " << nnrv << " (" << nrv << ")" <<std::endl;
+      std::cout <<std::endl;
+      std::cout << "Totol surface area : " << newsurfacecont << " (" << surfacecont << ")" <<std::endl;
+      std::cout <<std::endl;
    }
 
 
@@ -596,12 +596,12 @@ namespace netgen
          exp0.More(); exp0.Next())
       {
          TopoDS_Compound compound = TopoDS::Compound (exp0.Current());
-         (*testout) << "compound" << endl;
+         std::cerr << "compound" <<std::endl;
          int i = 0;
          for (exp1.Init(compound, TopAbs_SHELL);
             exp1.More(); exp1.Next())
          {
-            (*testout) << "shell " << ++i << endl;
+            std::cerr << "shell " << ++i <<std::endl;
          }
       }
 
@@ -629,9 +629,9 @@ namespace netgen
                      if (fmap.FindIndex(face) < 1)
                      {
                         fmap.Add (face);
-                        (*testout) << "face " << fmap.FindIndex(face) << " ";
-                        (*testout) << ((face.Orientation() == TopAbs_REVERSED) ? "-" : "+") << ", ";
-                        (*testout) << ((exp2.Current().Orientation() == TopAbs_REVERSED) ? "-" : "+") << endl;
+                        std::cerr << "face " << fmap.FindIndex(face) << " ";
+                        std::cerr << ((face.Orientation() == TopAbs_REVERSED) ? "-" : "+") << ", ";
+                        std::cerr << ((exp2.Current().Orientation() == TopAbs_REVERSED) ? "-" : "+") <<std::endl;
                         for (exp3.Init(exp2.Current(), TopAbs_WIRE);
                            exp3.More(); exp3.Next())
                         {
@@ -673,9 +673,9 @@ namespace netgen
          {
             shmap.Add (shell);
 
-            (*testout) << "shell " << shmap.FindIndex(shell) << " ";
-            (*testout) << ((shell.Orientation() == TopAbs_REVERSED) ? "-" : "+") << ", ";
-            (*testout) << ((exp1.Current().Orientation() == TopAbs_REVERSED) ? "-" : "+") << endl;
+            std::cerr << "shell " << shmap.FindIndex(shell) << " ";
+            std::cerr << ((shell.Orientation() == TopAbs_REVERSED) ? "-" : "+") << ", ";
+            std::cerr << ((exp1.Current().Orientation() == TopAbs_REVERSED) ? "-" : "+") <<std::endl;
 
             for (exp2.Init(shell, TopAbs_FACE); exp2.More(); exp2.Next())
             {
@@ -841,8 +841,8 @@ namespace netgen
 
    void OCCGeometry :: SewFaces ()
    {
-      (*testout) << "Trying to sew faces ..." << endl;
-      cout << "Trying to sew faces ..." << flush;
+      std::cerr << "Trying to sew faces ..." <<std::endl;
+      std::cout << "Trying to sew faces ..." << flush;
 
       BRepOffsetAPI_Sewing sewedObj(1);
  
@@ -857,10 +857,10 @@ namespace netgen
       if (!sewedObj.SewedShape().IsNull())
       {
          shape = sewedObj.SewedShape();
-         cout << " done" << endl;
+         std::cout << " done" <<std::endl;
       }
       else
-         cout << " not possible";
+         std::cout << " not possible";
    }
 
 
@@ -871,8 +871,8 @@ namespace netgen
    {
       TopExp_Explorer exp0;
 
-      (*testout) << "Trying to build solids ..." << endl;
-      cout << "Trying to build solids ..." << flush;
+      std::cerr << "Trying to build solids ..." <<std::endl;
+      std::cout << "Trying to build solids ..." << flush;
 
       BRepBuilderAPI_MakeSolid ms;
       int count = 0;
@@ -884,7 +884,7 @@ namespace netgen
 
       if (!count)
       {
-         cout << " not possible (no shells)" << endl;
+         std::cout << " not possible (no shells)" <<std::endl;
          return;
       }
 
@@ -913,10 +913,10 @@ namespace netgen
             shape = newshape;
          }
 
-         cout << " done" << endl;
+         std::cout << " done" <<std::endl;
       }
       else
-         cout << " not possible" << endl;
+         std::cout << " not possible" <<std::endl;
    }
 
 
@@ -924,12 +924,12 @@ namespace netgen
 
    void OCCGeometry :: BuildVisualizationMesh (double deflection)
    {
-      cout << "Preparing visualization (deflection = " << deflection << ") ... " << flush;
+      std::cout << "Preparing visualization (deflection = " << deflection << ") ... " << flush;
 
       BRepTools::Clean (shape);
       // BRepMesh_IncrementalMesh::
       BRepMesh_IncrementalMesh (shape, deflection, true);
-      cout << "done" << endl;
+      std::cout << "done" <<std::endl;
    }
 
 
@@ -945,7 +945,7 @@ namespace netgen
       Point<3> p1 = Point<3> (x1,y1,z1);
       Point<3> p2 = Point<3> (x2,y2,z2);
 
-      (*testout) << "Bounding Box = [" << p1 << " - " << p2 << "]" << endl;
+      std::cerr << "Bounding Box = [" << p1 << " - " << p2 << "]" <<std::endl;
       boundingbox = Box<3> (p1,p2);
       SetCenter();
    }
@@ -956,7 +956,7 @@ namespace netgen
    void OCCGeometry :: Project (int surfi, Point<3> & p) const
    {
       static int cnt = 0;
-      if (++cnt % 1000 == 0) cout << "Project cnt = " << cnt << endl;
+      if (++cnt % 1000 == 0) std::cout << "Project cnt = " << cnt <<std::endl;
 
       gp_Pnt pnt(p(0), p(1), p(2));
 
@@ -1022,7 +1022,7 @@ namespace netgen
 
       } while (xold.SquareDistance(x) > sqr(PROJECTION_TOLERANCE) && count < 50);
 
-      //    (*testout) << "FastProject count: " << count << endl;
+      //    std::cerr << "FastProject count: " << count <<std::endl;
 
       if (count == 50) return false;
 
@@ -1036,14 +1036,14 @@ namespace netgen
 
    void OCCGeometry :: WriteOCC_STL(char * filename)
    {
-      cout << "writing stl..."; cout.flush();
+      std::cout << "writing stl..."; std::cout.flush();
       StlAPI_Writer writer;
       writer.RelativeMode() = Standard_False;
 
       writer.SetDeflection(0.02);
       writer.Write(shape,filename);
 
-      cout << "done" << endl;
+      std::cout << "done" <<std::endl;
    }
 
 
@@ -1322,7 +1322,7 @@ namespace netgen
 	   case TopAbs_VERTEX:
 	     count2 = vmap.FindIndex(TopoDS::Vertex(e.Current())); break;
 	   default:
-	     cout << "RecursiveTopologyTree: Case " << e.Current().ShapeType() << " not handeled" << endl;
+	     std::cout << "RecursiveTopologyTree: Case " << e.Current().ShapeType() << " not handeled" <<std::endl;
          }
 
          int nrsubshapes = 0;
@@ -1357,7 +1357,7 @@ namespace netgen
 
    void OCCGeometry :: GetTopologyTree (stringstream & str)
    {
-      cout << "Building topology tree ... " << flush;
+      std::cout << "Building topology tree ... " << flush;
       RecursiveTopologyTree (shape, str, TopAbs_COMPSOLID, false, "CompSolids");
       RecursiveTopologyTree (shape, str, TopAbs_SOLID, true, "FreeSolids");
       RecursiveTopologyTree (shape, str, TopAbs_SHELL, true, "FreeShells");
@@ -1366,7 +1366,7 @@ namespace netgen
       RecursiveTopologyTree (shape, str, TopAbs_EDGE, true, "FreeEdges");
       RecursiveTopologyTree (shape, str, TopAbs_VERTEX, true, "FreeVertices");
       str << flush;
-      //  cout << "done" << endl;
+      //  std::cout << "done" <<std::endl;
    }
 
 
@@ -1392,7 +1392,7 @@ namespace netgen
       int twistedfaces = 0;
       // int edgessamebutnotidentified = 0;
 
-      cout << "checking faces ... " << flush;
+      std::cout << "checking faces ... " << flush;
 
       int i;
       for (i = 1; i <= fmap.Extent(); i++)
@@ -1405,7 +1405,7 @@ namespace netgen
             if (!spotfaces++)
                str << "SpotFace {Spot face} ";
 
-            (*testout) << "Face " << i << " is a spot face" << endl;
+            std::cerr << "Face " << i << " is a spot face" <<std::endl;
             str << "SpotFace/Face" << i << " ";
             str << "{Face " << i << " } ";
          }
@@ -1415,7 +1415,7 @@ namespace netgen
             if (!stripsupportfaces++)
                str << "StripSupportFace {Strip support face} ";
 
-            (*testout) << "Face " << i << " has strip support" << endl;
+            std::cerr << "Face " << i << " has strip support" <<std::endl;
             str << "StripSupportFace/Face" << i << " ";
             str << "{Face " << i << " } ";
          }
@@ -1425,8 +1425,8 @@ namespace netgen
             if (!singlestripfaces++)
                str << "SingleStripFace {Single strip face} ";
 
-            (*testout) << "Face " << i << " is a single strip (edge " << emap.FindIndex(e1)
-               << " and edge " << emap.FindIndex(e2) << " are identical)" << endl;
+            std::cerr << "Face " << i << " is a single strip (edge " << emap.FindIndex(e1)
+               << " and edge " << emap.FindIndex(e2) << " are identical)" <<std::endl;
             str << "SingleStripFace/Face" << i << " ";
             str << "{Face " << i << " (edge " << emap.FindIndex(e1)
                << " and edge " << emap.FindIndex(e2) << " are identical)} ";
@@ -1437,9 +1437,9 @@ namespace netgen
             if (!stripfaces++)
                str << "StripFace {Strip face} ";
 
-            (*testout) << "Face " << i << " is a strip (edge " << emap.FindIndex(e1)
+            std::cerr << "Face " << i << " is a strip (edge " << emap.FindIndex(e1)
                << " and edge " << emap.FindIndex(e2)
-               << " are identical)" << endl;
+               << " are identical)" <<std::endl;
             str << "StripFace/Face" << i << " ";
             str << "{Face " << i << " (edge " << emap.FindIndex(e1)
                << " and edge " << emap.FindIndex(e2) << " are identical)} ";
@@ -1450,8 +1450,8 @@ namespace netgen
             if (!facessplitbyvertices++)
                str << "FaceSplitByVertices {Face split by vertices} ";
 
-            (*testout) << "Face " << i << " is split by " << count
-               << " vertex/vertices " << endl;
+            std::cerr << "Face " << i << " is split by " << count
+               << " vertex/vertices " <<std::endl;
             str << "FaceSplitByVertices/Face" << i << " ";
             str << "{Face " << i << " (split by " << count << "vertex/vertices)} ";
          }
@@ -1464,7 +1464,7 @@ namespace netgen
                if (!smoothpinfaces++)
                   str << "SmoothPinFace {Smooth pin face} ";
 
-               (*testout) << "Face " << i << " is a smooth pin" << endl;
+               std::cerr << "Face " << i << " is a smooth pin" <<std::endl;
                str << "SmoothPinFace/Face" << i << " ";
                str << "{Face " << i << " } ";
             }
@@ -1473,7 +1473,7 @@ namespace netgen
                if (!stretchedpinfaces++)
                   str << "StretchedPinFace {Stretched pin face} ";
 
-               (*testout) << "Face " << i << " is a streched pin" << endl;
+               std::cerr << "Face " << i << " is a streched pin" <<std::endl;
                str << "StretchedPinFace/Face" << i << " ";
                str << "{Face " << i << " } ";
             }
@@ -1485,14 +1485,14 @@ namespace netgen
             if (!twistedfaces++)
                str << "TwistedFace {Twisted face} ";
 
-            (*testout) << "Face " << i << " is twisted" << endl;
+            std::cerr << "Face " << i << " is twisted" <<std::endl;
             str << "TwistedFace/Face" << i << " ";
             str << "{Face " << i << " } ";
          }
       }
 
-      cout << "done" << endl;
-      cout << "checking edges ... " << flush;
+      std::cout << "done" <<std::endl;
+      std::cout << "checking edges ... " << flush;
 
       // double dmax;
       // int cnt = 0;
@@ -1520,7 +1520,7 @@ namespace netgen
 
       str << flush;
 
-      cout << "done" << endl;
+      std::cout << "done" <<std::endl;
    }
 
 
@@ -1594,11 +1594,11 @@ namespace netgen
 
    void OCCParameters :: Print(ostream & ost) const
    {
-      ost << "OCC Parameters:" << endl
+      ost << "OCC Parameters:" <<std::endl
          << "close edges: " << resthcloseedgeenable
-         << ", fac = " << resthcloseedgefac << endl
+         << ", fac = " << resthcloseedgefac <<std::endl
 		 << "minimum edge length: " << resthminedgelenenable
-		 << ", min len = " << resthminedgelen << endl;
+		 << ", min len = " << resthminedgelen <<std::endl;
    }
 
 

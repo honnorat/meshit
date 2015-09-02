@@ -1,5 +1,10 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+
+#include "meshclass.hpp"
+#include "meshing2.hpp"
+#include "localh.hpp"
+#include "../gprim/geomfuncs.hpp"
+#include "global.hpp"
 
 // not yet working ....
 
@@ -10,8 +15,8 @@ namespace netgen
   {
     double filldist = mp.filldist;
     
-    cout << "blockfill local h" << endl;
-    cout << "rel filldist = " << filldist << endl;
+    std::cout << "blockfill local h" << std::endl;
+    std::cout << "rel filldist = " << filldist << std::endl;
     PrintMessage (3, "blockfill local h");
 
     Array<Point<3> > npoints;
@@ -36,7 +41,7 @@ namespace netgen
       }
 
     
-    cout << "bbox = " << bbox << endl;
+    std::cout << "bbox = " << bbox << std::endl;
 
 
     // Point<3> mpc = bbox.Center();
@@ -85,10 +90,10 @@ namespace netgen
     while (changed);
 
     if (debugparam.slowchecks)
-      (*testout) << "Blockfill with points: " << endl;
-    *testout << "loch = " << mesh.LocalHFunction() << endl;
+      std::cerr << "Blockfill with points: " << std::endl;
+    std::cerr << "loch = " << mesh.LocalHFunction() << std::endl;
     
-    *testout << "npoints = " << endl << npoints << endl;
+    std::cerr << "npoints = " << std::endl << npoints << std::endl;
 
     for (int i = 1; i <= npoints.Size(); i++)
       {
@@ -99,13 +104,13 @@ namespace netgen
 	    
 	    if (debugparam.slowchecks)
 	      {
-		(*testout) << npoints.Get(i) << endl;
+		std::cerr << npoints.Get(i) << std::endl;
 
 		Point<2> p2d (npoints.Get(i)(0), npoints.Get(i)(1));
 		if (!adfront->Inside(p2d))
 		  {
-		    cout << "add outside point" << endl;
-		    (*testout) << "outside" << endl;
+		    std::cout << "add outside point" << std::endl;
+		    std::cerr << "outside" << std::endl;
 		  }
 	      }
 	    
@@ -158,16 +163,16 @@ namespace netgen
   
   void Meshing2 :: Delaunay (Mesh & mesh, int domainnr, const MeshingParameters & mp)
   {
-    cout << "2D Delaunay meshing (in progress)" << endl;
+    std::cout << "2D Delaunay meshing (in progress)" << std::endl;
 
     // int oldnp = mesh.GetNP();
 
-    cout << "np, old = " << mesh.GetNP() << endl;
+    std::cout << "np, old = " << mesh.GetNP() << std::endl;
 
     BlockFillLocalH (mesh, mp);
 
 
-    cout << "np, now = " << mesh.GetNP() << endl;
+    std::cout << "np, now = " << mesh.GetNP() << std::endl;
     
   }
 

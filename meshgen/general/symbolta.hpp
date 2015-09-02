@@ -1,6 +1,8 @@
 #ifndef FILE_SYMBOLTA
 #define FILE_SYMBOLTA
 
+#include "array.hpp"
+#include "template.hpp"
 
 /**************************************************************************/
 /* File:   symbolta.hh                                                    */

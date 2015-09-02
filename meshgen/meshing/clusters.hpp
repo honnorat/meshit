@@ -12,7 +12,9 @@
 
   nodes, edges, faces, elements
 */
+#include "meshclass.hpp"
 
+namespace netgen {
 
 class AnisotropicClusters
 {
@@ -38,5 +40,5 @@ public:
   int GetElementRepresentant (int enr) const
   { return cluster_reps.Get(nv+ned+nfa+enr); }
 };
-
+}
 #endif

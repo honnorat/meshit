@@ -90,7 +90,7 @@ void Surface :: DefineTangentialPlane (const Point<3> & ap1,
   ey = Cross (ez, ex);  
 }
 
-void Surface :: ToPlane (const Point<3> & p3d, Point<2> & pplane, 
+void Surface :: ToPlane (const Point3d & p3d, Point<2> & pplane, 
 			 double h, int & zone) const
 {
   Vec<3> p1p, n;
@@ -255,7 +255,7 @@ Primitive * Primitive :: CreatePrimitive (const char * classname)
 
 
   stringstream ost;
-  ost << "Primitve::CreatePrimitive not implemented for " << classname << endl;
+  ost << "Primitve::CreatePrimitive not implemented for " << classname <<std::endl;
   throw NgException (ost.str());
 }
 
@@ -263,7 +263,7 @@ Primitive * Primitive :: CreatePrimitive (const char * classname)
 Primitive * Primitive :: Copy () const
 {
   stringstream ost;
-  ost << "Primitve::Copy not implemented for " << typeid(*this).name() << endl;
+  ost << "Primitve::Copy not implemented for " << typeid(*this).name() <<std::endl;
   throw NgException (ost.str());
 }
 
@@ -271,7 +271,7 @@ Primitive * Primitive :: Copy () const
 void Primitive :: Transform (Transformation<3> & trans)
 {
   stringstream ost;
-  ost << "Primitve::Transform not implemented for " << typeid(*this).name() << endl;
+  ost << "Primitve::Transform not implemented for " << typeid(*this).name() <<std::endl;
   throw NgException (ost.str());
 }
 
@@ -289,7 +289,7 @@ void Primitive ::
 GetTangentialVecSurfaceIndices (const Point<3> & p, const Vec<3> & v,
 				Array<int> & surfind, double eps) const
 {
-  cout << "get tangvecsurfind not implemented" << endl;
+  std::cout << "get tangvecsurfind not implemented" <<std::endl;
   surfind.SetSize (0);
 }
 
@@ -322,11 +322,11 @@ VecInSolid2 (const Point<3> & p,
 	     const Vec<3> & v2,
 	     double eps) const
 {
-  //(*testout) << "Primitive::VecInSolid2" << endl;
+  //std::cerr << "Primitive::VecInSolid2" <<std::endl;
   Point<3> hp = p + 1e-3 * v1 + 1e-5 * v2;
 
   INSOLID_TYPE res = PointInSolid (hp, eps);
-  //  (*testout) << "vectorin2, type = " << typeid(*this).name() << ", res = " << res << endl;
+  //  std::cerr << "vectorin2, type = " << typeid(*this).name() << ", res = " << res <<std::endl;
 
   return res;
 }
@@ -337,7 +337,7 @@ VecInSolid3 (const Point<3> & p,
 	     const Vec<3> & v2,
 	     double eps) const
 {
-  //(*testout) << "Primitive::VecInSolid3" << endl;
+  //std::cerr << "Primitive::VecInSolid3" <<std::endl;
   return VecInSolid (p, v1, eps);
 }
 
@@ -439,7 +439,7 @@ INSOLID_TYPE OneSurfacePrimitive ::
 VecInSolid3 (const Point<3> & p, const Vec<3> & v, const Vec<3> & v2,
 	     double eps) const
 {
-  //(*testout) << "OneSurfacePrimitive::VecInSolid3" << endl;
+  //std::cerr << "OneSurfacePrimitive::VecInSolid3" <<std::endl;
   double hv1 = (GetSurface(0).CalcFunctionValue(p));
   if (hv1 <= -eps)
     return IS_INSIDE;

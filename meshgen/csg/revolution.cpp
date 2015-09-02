@@ -72,16 +72,16 @@ namespace netgen
       {
 	spline = new LineSeg<2>(GeomPoint<2>(p[0],1),
 				GeomPoint<2>(p[1],1));
-	//(*testout) << "appending LineSeg<2> " << p[0] 
-	//	   << " to " << p[1] << endl;
+	//std::cerr << "appending LineSeg<2> " << p[0] 
+	//	   << " to " << p[1] <<std::endl;
       }
     else if(stype == 3)
       {
 	spline = new SplineSeg3<2>(GeomPoint<2>(p[0],1),
 				   GeomPoint<2>(p[1],1),
 				   GeomPoint<2>(p[2],1));
-	//(*testout) << "appending SplineSeg<3> "
-	//	   << p[0] << " -- " << p[1] << " -- " << p[2] << endl;
+	//std::cerr << "appending SplineSeg<3> "
+	//	   << p[0] << " -- " << p[1] << " -- " << p[2] <<std::endl;
       }
 
     for(int i=0; i<3; i++)
@@ -184,14 +184,14 @@ namespace netgen
 	grad(0) = dFdxbar*v_axis(0) + dFdybar * ( point_minus_p0(0)-v_axis(0)*p(0) )/p(1);
 	grad(1) = dFdxbar*v_axis(1) + dFdybar * ( point_minus_p0(1)-v_axis(1)*p(0) )/p(1);
 	grad(2) = dFdxbar*v_axis(2) + dFdybar * ( point_minus_p0(2)-v_axis(2)*p(0) )/p(1);
-	//(*testout) << "grad1("<<point<<") = " << grad << endl;
+	//std::cerr << "grad1("<<point<<") = " << grad <<std::endl;
       }
     else
       {
 	grad(0) = dFdxbar*v_axis(0);
 	grad(1) = dFdxbar*v_axis(1);
 	grad(2) = dFdxbar*v_axis(2);
-	//(*testout) << "grad2("<<point<<") = " << grad << endl;
+	//std::cerr << "grad2("<<point<<") = " << grad <<std::endl;
       }
   }
 
@@ -242,7 +242,7 @@ namespace netgen
 	hesse(1,2) = hesse(2,1) = 2.*spline_coefficient(0)*v_axis(1)*v_axis(2) + spline_coefficient(2)*v_axis(1)*dybardz + spline_coefficient(2)*dybardy*v_axis(2)
 	  + 2.*spline_coefficient(2)*dybardy*dybardz + dFdybar*dybardyz;
 
-	//(*testout) << "hesse1: " << hesse <<endl;
+	//std::cerr << "hesse1: " << hesse <std::endl;
       }
     else if (fabs(spline_coefficient(2)) + fabs(spline_coefficient(4)) < 1.e-9 &&
 	     fabs(spline_coefficient(0)) > 1e-10)
@@ -256,17 +256,17 @@ namespace netgen
 	hesse(0,1) = hesse(1,0) = aux*v_axis(0)*v_axis(1);
 	hesse(0,2) = hesse(2,0) = aux*v_axis(0)*v_axis(2);
 	hesse(1,2) = hesse(2,1) = aux*v_axis(1)*v_axis(2);
-	//(*testout) << "hesse2: " << hesse <<endl;
+	//std::cerr << "hesse2: " << hesse <std::endl;
 	
       }
     else if (fabs(spline_coefficient(1)) + fabs(spline_coefficient(3)) + fabs(spline_coefficient(4)) + fabs(spline_coefficient(5)) < 1.e-9) // line
       {
 	hesse = 0;
-	//(*testout) << "hesse3: " << hesse <<endl;
+	//std::cerr << "hesse3: " << hesse <std::endl;
       }
     else
       {
-	(*testout) << "hesse4: " << hesse <<endl;
+	std::cerr << "hesse4: " << hesse <std::endl;
       }
   }
 
@@ -317,7 +317,7 @@ namespace netgen
 	Vec<2> n(v(1),-v(0)); n.Normalize();
 
 	//if(ss3)
-	//  (*testout) << "n " << n << endl;
+	//  std::cerr << "n " << n <<std::endl;
 
 	if(fabs(n(1)) < 1e-15)
 	  continue;
@@ -329,7 +329,7 @@ namespace netgen
 	double c2 = (t2 > 0) ? (1./t2) : -1;
 	
 	//if(ss3)
-	//  (*testout) << "t1 " << t1 << " t2 " << t2 << " c1 " << c1 << " c2 " << c2 << endl;
+	//  std::cerr << "t1 " << t1 << " t2 " << t2 << " c1 " << c1 << " c2 " << c2 <<std::endl;
 
 	if(c1 > retval)
 	  retval = c1;
@@ -338,7 +338,7 @@ namespace netgen
       }
 	
     //if(ss3)
-    //  (*testout) << "curvature " << retval << endl;
+    //  std::cerr << "curvature " << retval <<std::endl;
 
     return retval;
 
@@ -426,7 +426,7 @@ namespace netgen
     str << p0(0) << " " << p0(1) << " " << p0(2) << " "
 	<< v_axis(0) << " " << v_axis(1) << " " << v_axis(2) << " ";
     for(int i=0; i<6; i++) str << spline_coefficient(i) << " ";
-    str << endl;
+    str <<std::endl;
   }
 
 
@@ -604,7 +604,7 @@ namespace netgen
 		  splinecurve.GetSpline(nsplines-1).EndPI()) < 1e-7)
       type = 1;
     else
-      cerr << "Surface of revolution cannot be constructed" << endl;
+      std::cerr << "Surface of revolution cannot be constructed" <<std::endl;
 
     for(int i=0; i<splinecurve.GetNSplines(); i++)
       {
@@ -720,7 +720,7 @@ namespace netgen
 
     Array < Point<2> > points;
 
-    //(*testout) << "face intersections at: " << endl;
+    //std::cerr << "face intersections at: " <<std::endl;
     for(int i=0; i<faces.Size(); i++)
       {
 	faces[i]->GetSpline().LineIntersections(a,b,c,points,eps);
@@ -729,7 +729,7 @@ namespace netgen
 	  {
 	    double t = (points[j](0)-p2d(0))/randomx;
 
-	    //(*testout) << t << endl;
+	    //std::cerr << t <<std::endl;
 	    if ( t < -eps )
 	      intersections_before++;
 	    else if ( t > eps )
@@ -756,7 +756,7 @@ namespace netgen
 
     if(pInSolid != DOES_INTERSECT)
       {
-	//(*testout) << "pInSolid" << endl;
+	//std::cerr << "pInSolid" <<std::endl;
 	return pInSolid;
       }
 
@@ -850,7 +850,7 @@ namespace netgen
       }
     else
       {
-	cerr << "Jo gibt's denn des?" << endl;
+	std::cerr << "Jo gibt's denn des?" <<std::endl;
       }
 
     return DOES_INTERSECT;    

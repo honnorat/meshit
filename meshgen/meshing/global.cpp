@@ -1,31 +1,15 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
+#include <meshgen.hpp>
+#include "global.hpp"
 
 
 namespace netgen
 {
-  // stringstream emptystr;
-  // ostream * testout = &emptystr;
-  // testout -> clear(ios::failbit);
-
-  // ostream * testout = &cout;
-  ostream * testout = new ostream(0);
-
-  // NetgenOutStream * testout = new NetgenOutStream;
-
-  ostream * mycout = &cout;
-  ostream * myerr = &cerr;
-
-
   //  Flags parameters;
-
 
   int silentflag = 0;
   int testmode = 0;
 
   volatile multithreadt multithread;
-
-  string ngdir = ".";
 
   Array<int> tets_in_qualclass;
 

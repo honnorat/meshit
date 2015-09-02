@@ -1,14 +1,6 @@
-#include <mystdlib.h>
-#include "incvis.hpp"
-
-#include <myadt.hpp>
-#include <meshing.hpp>
-#include <csg.hpp>
-#include <stlgeom.hpp>
-
-#include <visual.hpp>
-
+#include <meshgen.hpp>
 #include "vscsg.hpp"
+#include "incvis.hpp"
 
 namespace netgen
 {
@@ -202,7 +194,7 @@ namespace netgen
 	      }
 	    */
 	  }
-	glEndList ();
+	gstd::endlist ();
       }
   }
 
@@ -365,7 +357,7 @@ namespace netgen
 
 	float range[2];
 	glGetFloatv(GL_POINT_SIZE_RANGE, &range[0]);
-	cout << "max ptsize = " << range[0] << "-" << range[1] << endl;
+	std::cout << "max ptsize = " << range[0] << "-" << range[1] <<std::endl;
       
 
 	glBegin( GL_POINTS );

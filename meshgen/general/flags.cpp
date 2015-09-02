@@ -8,8 +8,10 @@
    Datatype Flags
 */
 
-#include <mystdlib.h>
-#include <myadt.hpp>
+#include <meshgen.hpp>
+#include <sstream>
+#include <fstream>
+#include "flags.hpp"
 
 namespace netgen
 {
@@ -167,28 +169,28 @@ namespace netgen
   void Flags :: SaveFlags (const char * filename) const 
   {
     int i;
-    ofstream outfile (filename);
+    std::ofstream outfile (filename);
   
     for (i = 1; i <= strflags.Size(); i++)
-      outfile << strflags.GetName(i) << " = " << strflags.Get(i) << endl;
+      outfile << strflags.GetName(i) << " = " << strflags.Get(i) << std::endl;
     for (i = 1; i <= numflags.Size(); i++)
-      outfile << numflags.GetName(i) << " = " << numflags.Get(i) << endl;
+      outfile << numflags.GetName(i) << " = " << numflags.Get(i) << std::endl;
     for (i = 1; i <= defflags.Size(); i++)
-      outfile << defflags.GetName(i) << endl;
+      outfile << defflags.GetName(i) << std::endl;
   }
  
 
 
-  void Flags :: PrintFlags (ostream & ost) const 
+  void Flags :: PrintFlags (std::ostream & ost) const 
   {
     int i;
   
     for (i = 1; i <= strflags.Size(); i++)
-      ost << strflags.GetName(i) << " = " << strflags.Get(i) << endl;
+      ost << strflags.GetName(i) << " = " << strflags.Get(i) << std::endl;
     for (i = 1; i <= numflags.Size(); i++)
-      ost << numflags.GetName(i) << " = " << numflags.Get(i) << endl;
+      ost << numflags.GetName(i) << " = " << numflags.Get(i) << std::endl;
     for (i = 1; i <= defflags.Size(); i++)
-      ost << defflags.GetName(i) << endl;
+      ost << defflags.GetName(i) << std::endl;
   }
  
 
@@ -197,9 +199,9 @@ namespace netgen
     char name[100], str[100];
     char ch;
     double val;
-    ifstream infile(filename);
+    std::ifstream infile(filename);
 
-    //  (*logout) << "Load flags from " << filename << endl << endl;
+    //  (*logout) << "Load flags from " << filename <<std::endl <<std::endl;
     while (infile.good())
       {
 	infile >> name;
@@ -222,7 +224,7 @@ namespace netgen
 	infile >> ch;
 	if (ch != '=')
 	  {
-	    //	  (*logout) << endl;
+	    //	  (*logout) <<std::endl;
 	    infile.putback (ch);
 	    SetFlag (name);
 	  }
@@ -234,23 +236,23 @@ namespace netgen
 		infile.clear();
 		infile >> str;
 		SetFlag (name, str);
-		//	      (*logout) << " = " << str << endl;
+		//	      (*logout) << " = " << str <<std::endl;
 	      }
 	    else
 	      {
 		SetFlag (name, val);
-		//	      (*logout) << " = " << val << endl;
+		//	      (*logout) << " = " << val <<std::endl;
 	      }
 	  }
       }
-    //  (*logout) << endl;
+    //  (*logout) <<std::endl;
   }
 
 
   void Flags :: SetCommandLineFlag (const char * st)
   {
-    //  cout << "clflag = " << st << endl;
-    istringstream inst( (char *)st);
+    //  std::cout << "clflag = " << st <<std::endl;
+    std::istringstream inst( (char *)st);
     // istrstream defined with char *  (not const char *  ?????)
 
     char name[100];
@@ -259,7 +261,7 @@ namespace netgen
 
     if (st[0] != '-')
       {
-	cerr << "flag must start with '-'" << endl;
+	std::cerr << "flag must start with '-'" << std::endl;
 	return;
       }
   
@@ -267,33 +269,33 @@ namespace netgen
   
     if (!pos)
       {
-	//      (cout) << "Add def flag: " << st+1 << endl;
+	//      (std::cout) << "Add def flag: " << st+1 <<std::endl;
 	SetFlag (st+1);
       }
     else
       {
-	//      cout << "pos = " << pos << endl;
+	//      std::cout << "pos = " << pos <<std::endl;
 
 	strncpy (name, st+1, (pos-st)-1);
 	name[pos-st-1] = 0;
 
-	//      cout << "name = " << name << endl;
+	//      std::cout << "name = " << name <<std::endl;
 
 	pos++;
 	char * endptr = NULL;
 
 	val = strtod (pos, &endptr);
 
-	//      cout << "val = " << val << endl;
+	//      std::cout << "val = " << val <<std::endl;
 
 	if (endptr == pos)
 	  {
-	    //	  (cout) << "Add String Flag: " << name << " = " << pos << endl;
+	    //	  (std::cout) << "Add String Flag: " << name << " = " << pos <<std::endl;
 	    SetFlag (name, pos);
 	  }
 	else
 	  {
-	    //	  (cout) << "Add Num Flag: " << name << " = " << val << endl;
+	    //	  (std::cout) << "Add Num Flag: " << name << " = " << val <<std::endl;
 	    SetFlag (name, val);
 	  }
       }
@@ -301,7 +303,7 @@ namespace netgen
 
     /*
       inst >> name;
-      (*mycout) << "name = " << name << endl;
+      (*mystd::cout) << "name = " << name <<std::endl;
 
       ch = 0;
       inst >> ch;
@@ -317,12 +319,12 @@ namespace netgen
       inst.clear();
       inst >> str;
       SetFlag (name, str);
-      (*mycout) << "str = " << str << endl;
+      (*mystd::cout) << "str = " << str <<std::endl;
       }
       else
       {
       SetFlag (name, val);
-      (*mycout) << "val = " << val << endl;
+      (*mystd::cout) << "val = " << val <<std::endl;
       }
       }
     */

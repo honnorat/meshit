@@ -1,6 +1,8 @@
-#include <mystdlib.h>
-#include "meshing.hpp"
-
+#include <meshgen.hpp>
+#include "localh.hpp"
+#include "adfront2.hpp"
+#include "adfront3.hpp"
+#include "../gprim/geomfuncs.hpp"
 
 namespace netgen
 {
@@ -129,10 +131,10 @@ namespace netgen
   void LocalH :: SetH (const Point3d & p, double h)
   {
     /*
-      (*testout) << "Set h at " << p << " to " << h << endl;
+      std::cerr << "Set h at " << p << " to " << h <<std::endl;
       if (h < 1e-8)
       {
-      cout << "do not set h to " << h << endl;
+      std::cout << "do not set h to " << h <<std::endl;
       return;
       }
     */
@@ -329,8 +331,8 @@ namespace netgen
     root->flags.pinner = !adfront->SameSide (rpmid, rx2);
   
     if (testinner)
-      (*testout) << "inner = " << root->flags.pinner << " =?= " 
-		 << testinner(Point3d(root->xmid[0], root->xmid[1], root->xmid[2])) << endl;
+      std::cerr << "inner = " << root->flags.pinner << " =?= " 
+		 << testinner(Point3d(root->xmid[0], root->xmid[1], root->xmid[2])) << std::endl;
   
     Array<int> faceinds(nf);
     Array<Box3d> faceboxes(nf);
@@ -421,7 +423,7 @@ namespace netgen
 	  box->flags.isinner = box->flags.pinner;
       }
 
-    // cout << "faceused: " << faceused.Size() << ", " << faceused2.Size() << ", " << facenotused.Size() << endl;
+    // std::cout << "faceused: " << faceused.Size() << ", " << faceused2.Size() << ", " << facenotused.Size() <<std::endl;
 
     int nf = faceused.Size();
     for (int i = 0; i < 8; i++)
@@ -483,8 +485,8 @@ namespace netgen
     root->flags.pinner = !adfront->SameSide (rpmid, rx2);
   
     if (testinner)
-      (*testout) << "inner = " << root->flags.pinner << " =?= "
-		 << testinner(rpmid) << endl;
+      std::cerr << "inner = " << root->flags.pinner << " =?= "
+		 << testinner(rpmid) << std::endl;
   
     Array<int> faceinds(nf);
     Array<Box<3> > faceboxes(nf);
@@ -577,7 +579,7 @@ namespace netgen
 	  box->flags.isinner = box->flags.pinner;
       }
 
-    // cout << "faceused: " << faceused.Size() << ", " << faceused2.Size() << ", " << facenotused.Size() << endl;
+    // std::cout << "faceused: " << faceused.Size() << ", " << faceused2.Size() << ", " << facenotused.Size() <<std::endl;
 
     int nf = faceused.Size();
     for (int i = 0; i < 8; i++)
@@ -700,9 +702,9 @@ namespace netgen
 	ConvexifyRec (box->childs[i]);  
   }
 
-  void LocalH :: PrintMemInfo (ostream & ost) const
+  void LocalH :: PrintMemInfo (std::ostream & ost) const
   {
     ost << "LocalH: " << boxes.Size() << " boxes of " << sizeof(GradingBox)
-	<< " bytes = " << boxes.Size()*sizeof(GradingBox) << " bytes" << endl;
+	<< " bytes = " << boxes.Size()*sizeof(GradingBox) << " bytes" << std::endl;
   }
 }

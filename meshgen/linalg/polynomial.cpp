@@ -1,5 +1,5 @@
-#include <mystdlib.h>
-#include <linalg.hpp>
+#include <meshgen.hpp>
+#include "polynomial.hpp"
 
 namespace netgen
 {

@@ -1,6 +1,6 @@
-#include <mystdlib.h>
+#include <meshgen.hpp>
 
-#include "meshing.hpp"
+#include "clusters.hpp"
 
 namespace netgen
 {
@@ -24,9 +24,6 @@ namespace netgen
     bool hasfaces = top.HasFaces();
 
     if (!hasedges || !hasfaces) return;
-
-    if (id == 0)
-      PrintMessage (3, "Update clusters");
 
     nv = mesh.GetNV();
     ned = top.GetNEdges();
@@ -215,7 +212,7 @@ namespace netgen
 		      int kk = nnums[k];
 
 		      if (cluster_reps.Get(kk) < cluster_reps.Get(jj))
-			swap (jj,kk);
+			std::swap (jj,kk);
 
 		      if (cluster_reps.Get(jj) < cluster_reps.Get(kk))
 			{
@@ -244,18 +241,18 @@ namespace netgen
 	      if (clustertab)
 	      {
 	      if (typ == PYRAMID)
-	      (*testout) << "pyramid";
+	      std::cerr << "pyramid";
 	      else if (typ == PRISM || typ == PRISM12)
-	      (*testout) << "prism";
+	      std::cerr << "prism";
 	      else if (typ == TET || typ == TET10)
-	      (*testout) << "tet";
+	      std::cerr << "tet";
 	      else
-	      (*testout) << "unknown type" << endl;
+	      std::cerr << "unknown type" <<std::endl;
 		
-	      (*testout) << ", nnums  = ";
+	      std::cerr << ", nnums  = ";
 	      for (j = 0; j < nnums.Size(); j++)
-	      (*testout) << "node " << j << " = " << nnums[j] << ", rep = "
-	      << cluster_reps.Get(nnums[j]) << endl;
+	      std::cerr << "node " << j << " = " << nnums[j] << ", rep = "
+	      << cluster_reps.Get(nnums[j]) <<std::endl;
 	      }
 	    */
 	  }
@@ -263,19 +260,19 @@ namespace netgen
     while (changed);
 
     /*
-      (*testout) << "cluster reps:" << endl;
+      std::cerr << "cluster reps:" <<std::endl;
       for (i = 1; i <= cluster_reps.Size(); i++)
       {
-      (*testout) << i << ": ";
+      std::cerr << i << ": ";
       if (i <= nv)
-      (*testout) << "v" << i << " ";
+      std::cerr << "v" << i << " ";
       else if (i <= nv+ned)
-      (*testout) << "e" << i-nv << " ";
+      std::cerr << "e" << i-nv << " ";
       else if (i <= nv+ned+nfa)
-      (*testout) << "f" << i-nv-ned << " ";
+      std::cerr << "f" << i-nv-ned << " ";
       else
-      (*testout) << "c" << i-nv-ned-nfa << " ";
-      (*testout) << cluster_reps.Get(i) << endl;
+      std::cerr << "c" << i-nv-ned-nfa << " ";
+      std::cerr << cluster_reps.Get(i) <<std::endl;
       }
     */
   }

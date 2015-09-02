@@ -1,9 +1,10 @@
 #ifndef FILE_MESHING3
 #define FILE_MESHING3
 
+#include "adfront3.hpp"
+#include "ruler3.hpp"
 
-
-
+namespace netgen {
 enum MESHING3_RESULT
 {
   MESHING3_OK = 0,
@@ -30,7 +31,7 @@ class Meshing3
   double tolfak;
 public:
   /// 
-  Meshing3 (const string & rulefilename); 
+  Meshing3 (const std::string & rulefilename); 
   /// 
   Meshing3 (const char ** rulep);
   ///
@@ -116,7 +117,7 @@ extern int FindInnerPoint (POINTArray & grouppoints,
 
 
 
-
+}
 #endif
 
 

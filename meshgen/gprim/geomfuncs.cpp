@@ -1,7 +1,5 @@
-#include <mystdlib.h>
-
-#include <myadt.hpp>
-#include <gprim.hpp>
+#include <meshgen.hpp>
+#include "geomfuncs.hpp"
 
 namespace netgen
 {
@@ -90,10 +88,10 @@ void EigenValues (const Mat<3,3> & m, Vec<3> & ev)
 
   a = -1.;
   b = m(0,0) + m(1,1) + m(2,2);
-  c = -( m(0,0)*m(2,2) + m(1,1)*m(2,2) + m(0,0)*m(1,1) - sqr(m(0,1)) - sqr(m(0,2)) - sqr(m(1,2)) );
+  c = -( m(0,0)*m(2,2) + m(1,1)*m(2,2) + m(0,0)*m(1,1) - m(0,1)*m(0,1) - m(0,2)*m(0,2) - m(1,2)*m(1,2) );
   d = Det (m);
-  p = 3.*a*c - sqr(b);
-  q = 27.*sqr(a)*d - 9.*a*b*c + 2.*sqr(b)*b;
+  p = 3.*a*c - b*b;
+  q = 27.*a*a*d - 9.*a*b*c + 2.*b*b*b;
 
 
   arg = acos((-q/2)/sqrt(-(p*p*p)));

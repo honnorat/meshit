@@ -14,11 +14,7 @@
 
 
 
-#include <mystdlib.h>
-
-#include <myadt.hpp>  // min, max, sqr
-
-#include <linalg.hpp>
+#include <meshgen.hpp>
 #include "opti.hpp"
 
 
@@ -31,18 +27,18 @@ const double eps0 = 1E-15;
 
 double MinFunction :: Func (const Vector & /* x */) const
 {
-  cerr << "Func of MinFunction called" << endl;
+  std::cerr << "Func of MinFunction called" << std::endl;
   return 0;
 }
 
 void MinFunction :: Grad (const Vector & /* x */, Vector & /* g */) const
 {
-  cerr << "Grad of MinFunction called" << endl;
+  std::cerr << "Grad of MinFunction called" << std::endl;
 }
   
 double MinFunction :: FuncGrad (const Vector & x, Vector & g) const
 {
-  cerr << "Grad of MinFunction called" << endl;
+  std::cerr << "Grad of MinFunction called" << std::endl;
   return 0;
   /*
   int n = x.Size();
@@ -68,7 +64,7 @@ double MinFunction :: FuncGrad (const Vector & x, Vector & g) const
     }
 
   double f = Func(x);
-  //  (*testout) << "f = " << f << " grad = " << g << endl;
+  //  std::cerr << "f = " << f << " grad = " << g <<std::endl;
   return f;
   */
 }
@@ -80,7 +76,7 @@ double MinFunction :: FuncDeriv (const Vector & x, const Vector & dir, double & 
   double f = FuncGrad (x, g);
   deriv = (g * dir);
 
-  //  (*testout) << "g = " << g << ", dir = " << dir << ", deriv = " << deriv << endl;
+  //  std::cerr << "g = " << g << ", dir = " << dir << ", deriv = " << deriv <<std::endl;
   return f;
 }
 
@@ -127,7 +123,7 @@ void MinFunction :: ApproximateHesse (const Vector & x,
 
       hesse(i, i) = (f11 + f22 - 2 * f) / (eps * eps);
     }
-  //  (*testout) << "hesse = " << hesse << endl;
+  //  std::cerr << "hesse = " << hesse <<std::endl;
 }
 
 
@@ -182,15 +178,15 @@ void lines (Vector & x,         // i: initial point of line-search
 
   phi1prime = phi0prime;
 
-  //  (*testout) << "phi0prime = " << phi0prime << endl;
+  //  std::cerr << "phi0prime = " << phi0prime <<std::endl;
 
   //  it = 100000l;
   it = 0;
 
-  // cout << "lin: ";
+  // std::cout << "lin: ";
   while (it++ <= par.maxit_linsearch)
     {
-      // cout << "i = " << it << " f = " << f << " ";
+      // std::cout << "i = " << it << " f = " << f << " ";
       xneu.Set2 (1, x, alphahat, p);
 
 
@@ -198,7 +194,7 @@ void lines (Vector & x,         // i: initial point of line-search
       //      f = fun.Func (xneu);
       f = fun.FuncDeriv (xneu, p, phihatprime);
 
-      // (*testout) << "lines, f = " << f << " phip = " << phihatprime << endl;
+      // std::cerr << "lines, f = " << f << " phip = " << phihatprime <<std::endl;
 
       if (f < fmin)
 	{
@@ -213,7 +209,7 @@ void lines (Vector & x,         // i: initial point of line-search
 	  break;
 	}
 
-      // (*testout) << "i = " << it << " al = " << alphahat << " f = " << f << " fprime " << phihatprime << endl;;
+      // std::cerr << "i = " << it << " al = " << alphahat << " f = " << f << " fprime " << phihatprime <<std::endl;;
 
       if (f - phi0 > mu1 * alphahat * phi1prime + eps0 * fabs (phi0))
 
@@ -224,20 +220,20 @@ void lines (Vector & x,         // i: initial point of line-search
 
 	  c = 
 	    (f - phi1 - phi1prime * (alphahat-alpha1)) / 
-	    sqr (alphahat-alpha1);
+	    ((alphahat-alpha1)*(alphahat-alpha1));
 
 	  alphahat = alpha1 - 0.5 * phi1prime / c;
 
 	  if (alphahat > alpha2)
 	    alphahat = alpha1 + 1/(4*c) *
 	      ( (sigma+mu1) * phi0prime - 2*phi1prime
-		+ sqrt (sqr(phi1prime - mu1 * phi0prime) -
+		+ sqrt ((phi1prime - mu1 * phi0prime)*(phi1prime - mu1 * phi0prime) -
 			4 * (phi1 - phi0 - mu1 * alpha1 * phi0prime) * c));
 
-	  alphahat = max2 (alphahat, alpha1 + tau * (alpha2 - alpha1));
-	  alphahat = min2 (alphahat, alpha2 - tau * (alpha2 - alpha1));
+	  alphahat = std::max (alphahat, alpha1 + tau * (alpha2 - alpha1));
+	  alphahat = std::min (alphahat, alpha2 - tau * (alpha2 - alpha1));
 	  
-	  //	  (*testout) << " if-branch" << endl;
+	  //	  std::cerr << " if-branch" <<std::endl;
 
 	}
 
@@ -264,13 +260,13 @@ void lines (Vector & x,         // i: initial point of line-search
 
 	      if (flag)
 		{
-		  alphaincr = max2 (alphaincr, xi1 * (alphahat-alpha1));
-		  alphaincr = min2 (alphaincr, xi2 * (alphahat-alpha1));
+		  alphaincr = std::max (alphaincr, xi1 * (alphahat-alpha1));
+		  alphaincr = std::min (alphaincr, xi2 * (alphahat-alpha1));
 		}
 	      else
 		{
-		  alphaincr = max2 (alphaincr, tau1 * (alpha2 - alphahat));
-		  alphaincr = min2 (alphaincr, tau2 * (alpha2 - alphahat));
+		  alphaincr = std::max (alphaincr, tau1 * (alpha2 - alphahat));
+		  alphaincr = std::min (alphaincr, tau2 * (alpha2 - alphahat));
 		}
 
 	      alpha1 = alphahat;
@@ -286,21 +282,21 @@ void lines (Vector & x,         // i: initial point of line-search
 	      break;
 	    }
 	  
-	  //	  (*testout) << " else, " << endl;
+	  //	  std::cerr << " else, " <<std::endl;
 
 	}
 
     }
 
-  //  (*testout) << "linsearch: it = " << it << " ifail = " << ifail << endl;
-  // cout << endl;
+  //  std::cerr << "linsearch: it = " << it << " ifail = " << ifail <<std::endl;
+  // std::cout <<std::endl;
   fun.FuncGrad (xneu, g);
 
 
   if (it < 0)
     ifail = 1;
 
-  //  (*testout) << "fail = " << ifail << endl;
+  //  std::cerr << "fail = " << ifail <<std::endl;
 }
 
 
@@ -345,6 +341,6 @@ void SteepestDescent (Vector & x, const MinFunction & fun,
 
       x = xnew;
     }
-  //  testout << endl;
+  //  testout <<std::endl;
 }
 }

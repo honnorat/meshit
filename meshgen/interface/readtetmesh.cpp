@@ -24,7 +24,7 @@ namespace netgen
   {
     const char * filename = hfilename.c_str();
 
-    cout << "Reading .tet mesh" << endl;
+    std::cout << "Reading .tet mesh" <<std::endl;
 
     ifstream in (filename);
 
@@ -98,10 +98,10 @@ namespace netgen
           case 0:
             // version number
             in >> version;
-            cout << "Version number " << version << endl;
+            std::cout << "Version number " << version <<std::endl;
             if(version != "1.1" && version != "2" && version != "2.0")
               {
-                cerr << "WARNING: import only tested for versions 1.1 and 2" << endl;
+                std::cerr << "WARNING: import only tested for versions 1.1 and 2" <<std::endl;
                 //done = true;
               }
             userdata_double.Append(atof(version.c_str()));
@@ -110,14 +110,14 @@ namespace netgen
           case 1:
             // unit code (1=CM 2=MM 3=M 4=MIC 5=NM 6=FT 7=IN 8=MIL)
             in >> unitcode;
-            cout << "unit code " << unitcode << endl;
+            std::cout << "unit code " << unitcode <<std::endl;
             userdata_int.Append(unitcode);
             break;
 
           case 2:
             // Geometric coord "zero" tolerance threshold
             in >> tolerance;
-            cout << "tolerance " << tolerance << endl;
+            std::cout << "tolerance " << tolerance <<std::endl;
             userdata_double.Append(tolerance);
             break;
 
@@ -149,14 +149,14 @@ namespace netgen
           case 6:
             // Topological mesh-entity counts (#elements,#faces,#edges,#nodes)
             in >> nelts >> nfaces >> nedges >> nnodes;
-            cout << nelts << " elements, " << nfaces << " faces, " << nedges << " edges, " << nnodes << " nodes" << endl;
+            std::cout << nelts << " elements, " << nfaces << " faces, " << nedges << " edges, " << nnodes << " nodes" <<std::endl;
             mesh.SetAllocSize(nnodes,2*nedges,nfaces,nelts);
             break;
 
           case 7:
             // NodeID, X, Y, Z, Type (0=Reg 1=PMaster 2=PSlave 3=CPMaster 4=CPSlave), PID:
             {
-              cout << "read nodes" << endl;
+              std::cout << "read nodes" <<std::endl;
               for(int i=0; i<nnodes; i++)
                 {
                   in >> nodeid >> p.X() >> p.Y() >> p.Z() >> type >> pid;
@@ -164,7 +164,7 @@ namespace netgen
                   point_pids.Append(pid);
                   if(pid > maxId0D)
                     maxId0D = pid;
-                  //(*testout) << "point " << p << " type " << type << " mastersexist " << mastersexist << endl;
+                  //std::cerr << "point " << p << " type " << type << " mastersexist " << mastersexist <<std::endl;
                 }
             }
             break;
@@ -221,7 +221,7 @@ namespace netgen
 
           case 14:
             // EdgeID, NodeID0, NodeID1, Type (0=Reg 1=PMaster 2=PSlave 3=CPMaster 4=CPSlave), PID
-            cout << "read edges" << endl;
+            std::cout << "read edges" <<std::endl;
             // nullstarted = false;
             segmentdata.SetSize(nedges);
             for(int i=0; i<nedges; i++)
@@ -271,7 +271,7 @@ namespace netgen
               //Segment seg;
               int segnum_ng[3];
               bool neg[3];
-              cout << "read faces" << endl;
+              std::cout << "read faces" <<std::endl;
               // nullstarted = false;
               for(int i=0; i<nfaces; i++)
                 {
@@ -313,7 +313,7 @@ namespace netgen
                     {
                       //if(nullstarted)
                       //  {
-                      //    cout << "Faces: Assumption about index 0 wrong (face"<<trinum <<")" << endl;
+                      //    std::cout << "Faces: Assumption about index 0 wrong (face"<<trinum <<")" <<std::endl;
                       //  }
                       //mesh.AddSurfaceElement(tri);
 			
@@ -381,7 +381,7 @@ namespace netgen
           case 22:
             // ElemID, FaceID0, FaceID1, FaceID2, FaceID3, PID
             {
-              cout << "read elements (1)" << endl;
+              std::cout << "read elements (1)" <<std::endl;
 
               //SurfaceElementIndex surf[4];
               bool neg[4];
@@ -393,7 +393,7 @@ namespace netgen
               for(int i=0; i<nelts; i++)
                 {
                   if(int(100.*i/nelts) % 5 == 0)
-                    cout << int(100.*i/nelts)
+                    std::cout << int(100.*i/nelts)
 #ifdef WIN32
                          << "%%\r"
 #else
@@ -452,7 +452,7 @@ namespace netgen
                   // 			  }
                   // 		      }
                 }
-              cout << endl;
+              std::cout <<std::endl;
 		
 		
               // 		Array<int> indextodescriptor(maxId2D+1);
@@ -469,14 +469,14 @@ namespace netgen
           case 23:
             // ElemID, NodeID0, NodeID1, NodeID2, NodeID3
             { 
-              cout << "read elements (2)" << endl;
+              std::cout << "read elements (2)" <<std::endl;
               Element el(TET);
               for(ElementIndex i=0; i<nelts; i++)
                 {
                   in >> dummyint;
                   for(int j=1; j<=4; j++)
                     in >> el.PNum(j);
-                  swap(el.PNum(1),el.PNum(2));
+                  std::swap(el.PNum(1),el.PNum(2));
 		    
                   el.SetIndex(eldom[i]);
                   mesh.AddVolumeElement(el);
@@ -515,7 +515,7 @@ namespace netgen
                 {
                   int groupid;
                   in >> groupid;
-                  (*testout) << "3d groupid " << groupid << endl;
+                  std::cerr << "3d groupid " << groupid <<std::endl;
                   //userdata_int.Append(groupid);
                   int nelems;
                   in >> nelems;
@@ -524,7 +524,7 @@ namespace netgen
                     {
                       in >> dummyint;
 			
-                      (*testout) << "read " << dummyint << endl;
+                      std::cerr << "read " << dummyint <<std::endl;
                       //userdata_int.Append(dummyint);
 			
                       if(dummyint < 0) 
@@ -547,7 +547,7 @@ namespace netgen
                 {
                   int groupid;
                   in >> groupid;
-                  (*testout) << "2d groupid " << groupid << endl;
+                  std::cerr << "2d groupid " << groupid <<std::endl;
                   //userdata_int.Append(groupid);
                   int nelems;
                   in >> nelems;
@@ -559,7 +559,7 @@ namespace netgen
                       while((port = in.get()) == ' ')
                         ;
 
-                      (*testout) << "read " << dummyint << endl;
+                      std::cerr << "read " << dummyint <<std::endl;
                       if(dummyint < 0) 
                         dummyint *= -1;
                       int uid = tris[dummyint-1]->GetIndex();
@@ -575,7 +575,7 @@ namespace netgen
                       //userdata_int.Append(dummyint);
 			
                       uid_to_group_2D[uid] = groupid;
-                      (*testout) << "setting " << uid << endl;
+                      std::cerr << "setting " << uid <<std::endl;
 
                       //totnum++;
                     }
