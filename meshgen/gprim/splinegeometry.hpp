@@ -51,9 +51,7 @@ namespace netgen
     int GetNP () const { return geompoints.size(); }
     const GeomPoint<D> & GetPoint(int i) const { return geompoints[i]; }
 
-    // void SetGrading (const double grading);
     DLL_HEADER void AppendPoint (const Point<D> & p, const double reffac = 1., const bool hpref = false);
-
 
     void AppendSegment(SplineSeg<D> * spline)
     {

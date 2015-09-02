@@ -54,7 +54,7 @@ namespace netgen {
         infile.close();
     }
 
-    void SplineGeometry2d::TestComment(std::ifstream & infile)
+    void SplineGeometry2d::TestComment(std::istream & infile)
     {
         bool comment = true;
         char ch;
@@ -79,7 +79,7 @@ namespace netgen {
         return;
     }
 
-    void SplineGeometry2d::LoadData(std::ifstream & infile)
+    void SplineGeometry2d::LoadData(std::istream & infile)
     {
 
         enum
@@ -220,7 +220,7 @@ namespace netgen {
         }
     }
 
-    void SplineGeometry2d::LoadDataNew(std::ifstream & infile)
+    void SplineGeometry2d::LoadDataNew(std::istream & infile)
     {
 
         enum
@@ -440,7 +440,7 @@ namespace netgen {
         return;
     }
 
-    void SplineGeometry2d::LoadDataV2(std::ifstream & infile)
+    void SplineGeometry2d::LoadDataV2(std::istream & infile)
     {
 
         enum

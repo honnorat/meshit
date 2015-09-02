@@ -476,6 +476,9 @@ namespace netgen
     */
     DLL_HEADER void Compress ();
 
+    void Export(
+            const std::string & filename,
+            const std::string & filetype) const;
     ///
     void Save (std::ostream & outfile) const;
     ///
@@ -751,47 +754,6 @@ namespace netgen
     enum GEOM_TYPE { NO_GEOM = 0, GEOM_2D = 1, GEOM_CSG = 10, GEOM_STL = 11, GEOM_OCC = 12, GEOM_ACIS = 13 };
     GEOM_TYPE geomtype;
   
-
-
-#ifdef PARALLEL
-    /// returns parallel topology
-    class ParallelMeshTopology & GetParallelTopology () const
-    { return *paralleltop; }
-
-
-    /// distributes the master-mesh to local meshes
-    void Distribute ();
-    void Distribute (Array<int> & volume_weights, Array<int> & surface_weights, 
-		     Array<int> & segment_weights);
-
-
-    /// find connection to parallel meshes
-    //   void FindExchangePoints () ;
-
-    //   void FindExchangeEdges ();
-    //   void FindExchangeFaces ();
-
-    /// use metis to decompose master mesh 
-    void ParallelMetis (); //  Array<int> & neloc );
-    void ParallelMetis (Array<int> & volume_weights, Array<int> & surface_weights, 
-			Array<int> & segment_weights); 
-
-    void PartHybridMesh (); //  Array<int> & neloc );
-    void PartDualHybridMesh (); //  Array<int> & neloc );
-    void PartDualHybridMesh2D ();  // ( Array<int> & neloc );
-
-
-    /// send mesh from master to local procs
-    void SendRecvMesh ();
-
-    /// send mesh to parallel machine, keep global mesh at master 
-    void SendMesh ( ) const;   // Mesh * mastermesh, Array<int> & neloc) const;
-    /// loads a mesh sent from master processor
-    void ReceiveParallelMesh ();
-
-#endif
-
-
   };
 
   inline std::ostream& operator<<(std::ostream& ost, const Mesh& mesh)

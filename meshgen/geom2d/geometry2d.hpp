@@ -130,9 +130,9 @@ namespace netgen {
 
         void Load(const char * filename);
 
-        void LoadData(std::ifstream & infile);
-        void LoadDataNew(std::ifstream & infile);
-        void LoadDataV2(std::ifstream & infile);
+        void LoadData(std::istream & infile);
+        void LoadDataNew(std::istream & infile);
+        void LoadDataV2(std::istream & infile);
 
         void AddLine(const std::vector<Point2d>& point_list,
                 double hmax = 1e99,
@@ -141,7 +141,7 @@ namespace netgen {
         void FakeData();
 
 
-        void TestComment(std::ifstream & infile);
+        void TestComment(std::istream & infile);
 
         const SplineSegExt & GetSpline(const int i) const
         {

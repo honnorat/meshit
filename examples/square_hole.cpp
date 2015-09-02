@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <meshgen/meshing/meshclass.hpp>
+#include <meshgen/meshing/meshtool.hpp>
 #include <meshgen/geom2d/geometry2d.hpp>
 
 int main(int argc, char ** argv)
@@ -10,7 +11,7 @@ int main(int argc, char ** argv)
     std::cout << "MeshGen Square_hole" << std::endl;
 
     netgen::MeshingParameters mp;
-    netgen::Mesh * mesh = new netgen::Mesh();
+    netgen::Mesh mesh;
 
     // creates geometry structure
     netgen::SplineGeometry2d geom;
@@ -21,7 +22,6 @@ int main(int argc, char ** argv)
     list_outer.push_back(netgen::Point2d(1, 1));
     list_outer.push_back(netgen::Point2d(-1, 1));
     geom.AddLine(list_outer, 0.25);
-    list_outer.resize(10);
 
 //    std::vector<meshit::Point2d> line_inner;
 //    line_inner.push_back(meshit::Point2d(-0.5, -0.5));
@@ -35,19 +35,17 @@ int main(int argc, char ** argv)
     std::cout << "start meshing" << std::endl;
 //
     mp.optsteps2d = 5;
-    geom.SetGrading(2.0);
-//    netgen::MeshFromSpline2D(geom, mesh, mp);
-    mesh->BuildFromSpline2D(geom, mp);
+    geom.SetGrading(0.02);
+    mesh.BuildFromSpline2D(geom, mp);
     std::cout << "meshing done" << std::endl;
-//    meshit::MeshQuality2d(*mesh);
-//    meshit::CheckSurfaceMesh(*mesh);
-//    meshit::CheckSurfaceMesh2(*mesh);
-//    meshit::RemoveProblem(*mesh, 0);
-//    meshit::RemoveProblem(*mesh, 1);
-//    mesh->CheckConsistentBoundary();
-//    mesh->Export(geom, "square_hole.msh", "Gmsh2 Format");
-//    mesh->Save("square_hole.meshit");
-    delete mesh;
+    netgen::MeshQuality2d(mesh);
+    netgen::CheckSurfaceMesh(mesh);
+    netgen::CheckSurfaceMesh2(mesh);
+    netgen::RemoveProblem(mesh, 0);
+    netgen::RemoveProblem(mesh, 1);
+    mesh.CheckConsistentBoundary();
+    mesh.Export("square_hole.msh", "Gmsh2 Format");
+    mesh.Save("square_hole.meshit");
 
     return 0;
 }

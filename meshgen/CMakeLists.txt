@@ -34,25 +34,8 @@ SET(src_GPRIM
 	gprim/transform3d.cpp
 )
 SET(src_INTERFACE
-	interface/read_fnf_mesh.cpp
-	interface/readtetmesh.cpp
-	interface/readuser.cpp
-	interface/writeabaqus.cpp
-	interface/writediffpack.cpp
-	interface/writedolfin.cpp
-	interface/writeelmer.cpp
-	interface/writefeap.cpp
-	interface/writefluent.cpp
 	interface/writegmsh2.cpp
-	interface/writegmsh.cpp
-	interface/writejcm.cpp
-	interface/writeOpenFOAM15x.cpp
-	interface/writepermas.cpp
-	interface/writetecplot.cpp
-	interface/writetet.cpp
-	interface/writetochnog.cpp
 	interface/writeuser.cpp
-	interface/wuchemnitz.cpp
 )
 SET(src_LINALG
 	linalg/bfgs.cpp
@@ -111,6 +94,7 @@ ADD_LIBRARY(meshgen STATIC
 	${src_GENERAL}
 	${src_GEOM2D}
 	${src_GPRIM}
+	${src_INTERFACE}
 	${src_LINALG}
 	${src_MESHING}
 )

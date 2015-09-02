@@ -6,6 +6,7 @@
 #include "../gprim/geomtest3d.hpp"
 #include "../geom2d/geometry2d.hpp"
 #include "meshing2.hpp"
+#include "../interface/writeuser.hpp"
 
 namespace netgen
 {
@@ -604,6 +605,13 @@ namespace netgen
     return ve;
   }
 
+
+    void Mesh::Export(
+            const std::string & filename,
+            const std::string & filetype) const
+    {
+        WriteUserFormat(filetype, const_cast<const Mesh &> (*this), filename);
+    }
 
 
 

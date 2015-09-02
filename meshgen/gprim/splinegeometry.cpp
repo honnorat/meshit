@@ -109,22 +109,12 @@ namespace netgen
       }
   }
 
-  /*
-  template<int D>
-  void SplineGeometry<D> :: SetGrading (const double grading)
-  { 
-    elto0 = grading;
-  }
-  */
-
   template<int D>
   void SplineGeometry<D> :: AppendPoint (const Point<D> & p, const double reffac, const bool hpref)
   {
     geompoints.push_back (GeomPoint<D>(p, reffac));
     geompoints.Last().hpref = hpref;
   }
-
-
 
   template class SplineGeometry<2>;
   template class SplineGeometry<3>;
