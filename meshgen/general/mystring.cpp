@@ -16,13 +16,6 @@
 
 #include <meshgen.hpp>
 
-// string class
-//#include <mystdlib.h>
-//#include <myadt.hpp>
-
-//#include <linalg.hpp>
-//#include <gprim.hpp>
-
 #include <cstdio>
 #include "mystring.hpp"
 #include "../gprim/geom3d.hpp"
@@ -54,27 +47,13 @@ namespace netgen
 	in >> str;
       }
   }
-	    
-	
-    
   
-
-
 void DefaultStringErrHandler()
 {
   std::cerr << "Error : string operation out of range\n" << std::flush;
 }
 
 void (*MyStr::ErrHandler)() = DefaultStringErrHandler;
-
-  /*     
-MyStr::MyStr()
-{
-  length = 0;
-  str = shortstr;
-  str[0] = 0;
-}
-  */
 
 MyStr::MyStr(const char *s)
 {
@@ -86,16 +65,6 @@ MyStr::MyStr(const char *s)
     str = shortstr;
   strcpy(str, s);
 }
-
-/*
-MyStr::MyStr(char s)
-{
-  length = 1;
-  str = shortstr;
-  str[0] = s;
-  str[1] = (char)0;
-}
-*/
 
 MyStr::MyStr(const MyStr& s)
 {
@@ -277,28 +246,6 @@ MyStr &MyStr::WriteAt(unsigned pos, const MyStr& s)
   return *this;
 }
 
-void MyStr::ConvertTextToExcel()
-{
-  /*
-  for (int i = 0; i < Length(); i++)
-    {
-      if ((*this)[i]==',') {(*this)[i] = ';';}
-      else if ((*this)[i]=='.') {(*this)[i] = ',';}
-    }
-  */
-}
-
-void MyStr::ConvertExcelToText()
-{
-  /*
-  for (int i = 0; i < Length(); i++)
-    {
-      if ((*this)[i]==',') {(*this)[i] = '.';}
-      else if ((*this)[i]==';') {(*this)[i] = ',';}
-    }
-  */
-}
-
 MyStr& MyStr::operator = (const MyStr& s)
 {
   if (length > SHORTLEN) delete [] str;
@@ -382,50 +329,4 @@ std::string MyStr::cpp_string(void) const
   std::string aux(str,length);
   return aux;
 }
-
-/*
-istream& operator >> (istream& is, MyStr& s)
-{
-  const int buflen = 1000;
-  char buffer[buflen+1];
-
-  int end = 0;
-  s = "";
-  MyStr str;
-
-  while (!end)
-  {
-    is.get(buffer, buflen);
-    str = MyStr(buffer);
-    s += str;
-    if (is.peek() == EOF) {end = 1;}
-  }
-
-  return is;
-}
-*/
-/*
-#ifdef __borland
-::ifstream& operator >> (::ifstream& is, MyStr& s)       // wb
-{                                                        // wb
-  const int buflen = 1000;                               // wb
-  char buffer[buflen+1];                                 // wb
-                                                         // wb
-  int end = 0;                                           // wb
-  s = "";                                                // wb
-  MyStr str;                                             // wb
-                                                         // wb
-  while (!end)                                           // wb
-  {                                                      // wb
-    is.get(buffer, buflen);                              // wb
-    str = MyStr(buffer);                                 // wb
-    s += str;                                            // wb
-    if (is.peek() == EOF) {end = 1;}                     // wb
-  }                                                      // wb
-                                                         // wb
-  return is;                                             // wb
-}          
-
-#endif
-*/
 }

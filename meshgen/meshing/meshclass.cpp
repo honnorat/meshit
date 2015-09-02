@@ -2010,22 +2010,9 @@ namespace netgen
     for (SurfaceElementIndex sii = 0; sii < nse; sii++)
       {
         int ind = surfelements[sii].GetIndex();
-        /*
-          if (
-          GetFaceDescriptor(ind).DomainIn() && 
-          (dom == 0 || dom == GetFaceDescriptor(ind).DomainIn())
-          ||
-          GetFaceDescriptor(ind).DomainOut() && 
-          (dom == 0 || dom == GetFaceDescriptor(ind).DomainOut())
-          )
-        */
+
         if (hasface[ind])
           {
-            /*
-              Element2d hel = surfelements[i];
-              hel.NormalizeNumbering();	  
-              numonpoint[hel[0]]++;
-            */
             const Element2d & hel = surfelements[sii];
             int mini = 0;
             for (int j = 1; j < hel.GetNP(); j++)
@@ -2040,22 +2027,8 @@ namespace netgen
       {
         int ind = surfelements[sii].GetIndex();
 
-        /*
-          if (
-          GetFaceDescriptor(ind).DomainIn() && 
-          (dom == 0 || dom == GetFaceDescriptor(ind).DomainIn())
-          ||
-          GetFaceDescriptor(ind).DomainOut() && 
-          (dom == 0 || dom == GetFaceDescriptor(ind).DomainOut())
-          )
-        */
         if (hasface[ind])
           {
-            /*
-              Element2d hel = surfelements[i];
-              hel.NormalizeNumbering();	  
-              selsonpoint.Add (hel[0], i);
-            */
             const Element2d & hel = surfelements[sii];
             int mini = 0;
             for (int j = 1; j < hel.GetNP(); j++)

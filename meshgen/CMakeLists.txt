@@ -65,7 +65,6 @@ SET(src_MESHING
 	meshing/adfront2.cpp
 	meshing/adfront3.cpp
 	meshing/basegeom.cpp
-	meshing/bcfunctions.cpp
 	meshing/bisect.cpp
 	meshing/clusters.cpp
 	meshing/curvedelems.cpp

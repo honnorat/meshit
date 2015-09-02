@@ -74,11 +74,6 @@ public:
   char* c_str();
   std::string cpp_string(void) const;
 
-  //change every ',' -> ';', '.' -> ','
-  void ConvertTextToExcel();
-  //change every ','->'.', ';'->','
-  void ConvertExcelToText();
-
   MyStr operator () (unsigned, unsigned);
   operator int();
   operator double();
