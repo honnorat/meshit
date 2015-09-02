@@ -25,7 +25,7 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
     mesh.SetGlobalH(min2 (0.05*Dist (boundingbox.PMin(), boundingbox.PMax()),
 			  mparam.maxh));
 
-  atlas.SetSize(0);
+  atlas.resize(0);
   ClearSpiralPoints();
   BuildSmoothEdges();
 
@@ -55,13 +55,13 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
 
   STLBoundary chartbound(this); //knows the actual chart boundary
   //int chartboundarydivisions = 10;
-  markedsegs.SetSize(0); //for testing!!!
+  markedsegs.resize(0); //for testing!!!
 
   Array<int> chartpointchecked(GetNP()); //for dirty-chart-trigs
 
-  pointstochart.SetSize(GetNP());
-  innerpointstochart.SetSize(GetNP());
-  chartmark.SetSize(GetNT());
+  pointstochart.resize(GetNP());
+  innerpointstochart.resize(GetNP());
+  chartmark.resize(GetNT());
 
   for (int i = 1; i <= GetNP(); i++)
     {
@@ -99,7 +99,7 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
       SetThreadPercent(100.0 * workedarea / atlasarea);
 
       STLChart * chart = new STLChart(this);
-      atlas.Append(chart);
+      atlas.push_back(chart);
 
       // std::cerr << "Chart " << atlas.Size() <<std::endl;
 
@@ -115,8 +115,8 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
 	    break;
 	  }
 
-      chartpoints.SetSize(0);  
-      innerchartpoints.SetSize(0);
+      chartpoints.resize(0);  
+      innerchartpoints.resize(0);
       chartbound.Clear();
       chartbound.SetChart(chart);
 
@@ -147,8 +147,8 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
 	{	      
 	  innerpointstochart.Elem(GetTriangle(starttrig).PNum(i)) = chartnum;
 	  pointstochart.Elem(GetTriangle(starttrig).PNum(i)) = chartnum;
-	  chartpoints.Append(GetTriangle(starttrig).PNum(i));
-	  innerchartpoints.Append(GetTriangle(starttrig).PNum(i));
+	  chartpoints.push_back(GetTriangle(starttrig).PNum(i));
+	  innerchartpoints.push_back(GetTriangle(starttrig).PNum(i));
 	}
 
       bool changed = true;
@@ -250,8 +250,8 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
 					{
 					  innerpointstochart.Elem(GetTriangle(nt).PNum(k)) = chartnum;
 					  pointstochart.Elem(GetTriangle(nt).PNum(k)) = chartnum;
-					  chartpoints.Append(GetTriangle(nt).PNum(k));
-					  innerchartpoints.Append(GetTriangle(nt).PNum(k));
+					  chartpoints.push_back(GetTriangle(nt).PNum(k));
+					  innerchartpoints.push_back(GetTriangle(nt).PNum(k));
 					}
 				    }
 				}
@@ -365,7 +365,7 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
 			      {
 				Point<3> pt = GetPoint(ntrig.PNum(k));					  
 				double h2 = sqr(mesh.GetH(pt));
-				for (int l = 1; l <= innerchartpoints.Size(); l++)
+				for (int l = 1; l <= innerchartpoints.size(); l++)
 				  {
 				    double tdist = 
 				      Dist2(pt, GetPoint (innerchartpoints.Get(l)));
@@ -395,7 +395,7 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
 				      != chartnum) 
 				    {
 				      pointstochart.Elem(GetTriangle(nt).PNum(k)) = chartnum;
-				      chartpoints.Append(GetTriangle(nt).PNum(k));
+				      chartpoints.push_back(GetTriangle(nt).PNum(k));
 				    }
 				}
 			    }
@@ -409,15 +409,15 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
       GetDirtyChartTrigs(chartnum, *chart, outermark, chartpointchecked, dirtycharttrigs);
       //dirtycharttrigs are local (chart) point numbers!!!!!!!!!!!!!!!!
 
-      if (dirtycharttrigs.Size() != 0 && 
-	  (dirtycharttrigs.Size() != chart->GetNChartT() || dirtycharttrigs.Size() != 1))
+      if (dirtycharttrigs.size() != 0 && 
+	  (dirtycharttrigs.size() != chart->GetNChartT() || dirtycharttrigs.size() != 1))
 	{
-	  if (dirtycharttrigs.Size() == chart->GetNChartT() && dirtycharttrigs.Size() != 1)
+	  if (dirtycharttrigs.size() == chart->GetNChartT() && dirtycharttrigs.size() != 1)
 	    {
 	      //if all trigs would be eliminated -> leave 1 trig!
-	      dirtycharttrigs.SetSize(dirtycharttrigs.Size() - 1);
+	      dirtycharttrigs.resize(dirtycharttrigs.size() - 1);
 	    }
-	  for (int k = 1; k <= dirtycharttrigs.Size(); k++)
+	  for (int k = 1; k <= dirtycharttrigs.size(); k++)
 	    {
 	      int tn = chart->GetChartTrig(dirtycharttrigs.Get(k));
 	      outermark.Elem(tn) = 0; //not necessary, for later use
@@ -436,11 +436,11 @@ void STLGeometry :: MakeAtlas(Mesh & mesh)
     }
 
   PrintMessage(5,"");
-  PrintMessage(5,"NO charts=", atlas.Size());
+  PrintMessage(5,"NO charts=", atlas.size());
 
   int cnttrias = 0;
   outerchartspertrig.SetSize(GetNT());
-  for (int i = 1; i <= atlas.Size(); i++)
+  for (int i = 1; i <= atlas.size(); i++)
     {
       for (int j = 1; j <= GetChart(i).GetNT(); j++)
 	{
@@ -523,7 +523,7 @@ int STLGeometry::TrigIsInOC(int tn, int ocn) const
 
 int STLGeometry :: GetChartNr(int i) const
 {
-  if (i > chartmark.Size()) 
+  if (i > chartmark.size()) 
     {
       PrintSysError("GetChartNr(", i, ") not possible!!!");
       i = 1;
@@ -542,11 +542,11 @@ void STLGeometry :: SetMarker(int nr, int m)
 }
 int STLGeometry :: GetNOCharts() const
 {
-  return atlas.Size();
+  return atlas.size();
 }
 const STLChart& STLGeometry :: GetChart(int nr) const 
 {
-  if (nr > atlas.Size()) 
+  if (nr > atlas.size()) 
     {
       PrintSysError("GetChart(", nr, ") not possible!!!");
       nr = 1;
@@ -556,7 +556,7 @@ const STLChart& STLGeometry :: GetChart(int nr) const
 
 int STLGeometry :: AtlasMade() const
 {
-  return chartmark.Size() != 0;
+  return chartmark.size() != 0;
 }
 
 
@@ -580,7 +580,7 @@ void STLGeometry :: GetInnerChartLimes(Array<twoint>& limes, int chartnum)
   
   int t, nt, np1, np2;
   
-  limes.SetSize(0);
+  limes.resize(0);
 
   STLChart& chart = GetChart(chartnum);
 
@@ -596,7 +596,7 @@ void STLGeometry :: GetInnerChartLimes(Array<twoint>& limes, int chartnum)
 	      tt.GetNeighbourPoints(GetTriangle(nt),np1,np2);
 	      if (!IsEdge(np1,np2))
 		{
-		  limes.Append(twoint(np1,np2));
+		  limes.push_back(twoint(np1,np2));
 		  /*
 		  p3p1 = GetPoint(np1);
 		  p3p2 = GetPoint(np2);
@@ -639,7 +639,7 @@ void STLGeometry :: GetDirtyChartTrigs(int chartnum, STLChart& chart,
 				       Array<int>& chartpointchecked,
 				       Array<int>& dirtytrigs)
 {
-  dirtytrigs.SetSize(0);
+  dirtytrigs.resize(0);
   int j,k,n;
 
   int np1, np2, nt;
@@ -658,7 +658,7 @@ void STLGeometry :: GetDirtyChartTrigs(int chartnum, STLChart& chart,
 	      tt.GetNeighbourPoints(GetTriangle(nt),np1,np2);
 	      if (!IsEdge(np1,np2))
 		{
-		  dirtytrigs.Append(j); //local numbers!!!
+		  dirtytrigs.push_back(j); //local numbers!!!
 		  cnt++;
 		  break; //only once per trig!!!
 		}
@@ -693,11 +693,11 @@ void STLGeometry :: GetDirtyChartTrigs(int chartnum, STLChart& chart,
 	      chartpointchecked.Elem(pn) = chartnum;
 
 	      GetSortedTrianglesAroundPoint(pn,t,trigsaroundp);
-	      trigsaroundp.Append(t); //ring
+	      trigsaroundp.push_back(t); //ring
 	      
 	      problem = 0;
 	      //forward:
-	      for (l = 2; l <= trigsaroundp.Size()-1; l++)
+	      for (l = 2; l <= trigsaroundp.size()-1; l++)
 		{
 		  tn1 = trigsaroundp.Get(l-1);
 		  tn2 = trigsaroundp.Get(l);
@@ -710,7 +710,7 @@ void STLGeometry :: GetDirtyChartTrigs(int chartnum, STLChart& chart,
 		}
 
 	      //backwards:
-	      for (l = trigsaroundp.Size()-1; l >= 2; l--)
+	      for (l = trigsaroundp.size()-1; l >= 2; l--)
 		{
 		  tn1 = trigsaroundp.Get(l+1);
 		  tn2 = trigsaroundp.Get(l);
@@ -723,7 +723,7 @@ void STLGeometry :: GetDirtyChartTrigs(int chartnum, STLChart& chart,
 		}
 	      if (problem && !IsInArray(j,dirtytrigs))
 		{
-		  dirtytrigs.Append(j);
+		  dirtytrigs.push_back(j);
 		  cnt++;
 		  break; //only once per triangle
 		}

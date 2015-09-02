@@ -61,9 +61,9 @@ namespace netgen
   void Flags :: SetFlag (const char * name, const Array<char*> & val)
   {
     Array<char*> * strarray = new Array<char*>;
-    for (int i = 1; i <= val.Size(); i++)
+    for (int i = 1; i <= val.size(); i++)
       {
-	strarray->Append (new char[strlen(val.Get(i))+1]);
+	strarray->push_back (new char[strlen(val.Get(i))+1]);
 	strcpy (strarray->Last(), val.Get(i));
       }
     strlistflags.Set (name, strarray);
@@ -72,8 +72,8 @@ namespace netgen
   void Flags :: SetFlag (const char * name, const Array<double> & val)
   {
     Array<double> * numarray = new Array<double>;
-    for (int i = 1; i <= val.Size(); i++)
-      numarray->Append (val.Get(i));
+    for (int i = 1; i <= val.size(); i++)
+      numarray->push_back (val.Get(i));
     numlistflags.Set (name, numarray);
   }
 

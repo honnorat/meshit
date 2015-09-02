@@ -14,9 +14,9 @@ netrule :: netrule ()
 netrule ::  ~netrule()
 {
   delete [] name;
-  for(int i = 0; i < oldutofreearea_i.Size(); i++)
+  for(int i = 0; i < oldutofreearea_i.size(); i++)
     delete oldutofreearea_i[i];
-  for(int i = 0; i < freezone_i.Size(); i++)
+  for(int i = 0; i < freezone_i.size(); i++)
     delete freezone_i[i];
 }
 
@@ -32,10 +32,10 @@ void netrule :: SetFreeZoneTransformation (const Vector & devp, int tolclass)
   int vs = oldutofreearea.Height();
   FlatVector devfree(vs, mem1);
 
-  int fzs = freezone.Size();
-  transfreezone.SetSize (fzs);
+  int fzs = freezone.size();
+  transfreezone.resize (fzs);
 
-  if (tolclass <= oldutofreearea_i.Size())
+  if (tolclass <= oldutofreearea_i.size())
     {
       oldutofreearea_i[tolclass-1] -> Mult (devp, devfree);
 
@@ -126,7 +126,7 @@ int netrule :: IsLineInFreeZone2 (const Point2d & p1, const Point2d & p2) const
        (p1.Y() > fzmaxy && p2.Y() > fzmaxy) ||
        (p1.Y() < fzminy && p2.Y() < fzminy) ) return 0;
 
-  for (int i = 1; i <= transfreezone.Size(); i++)
+  for (int i = 1; i <= transfreezone.size(); i++)
     {
       if (freesetinequ.Get(i, 1) * p1.X() + freesetinequ.Get(i, 2) * p1.Y() +
 	  freesetinequ.Get(i, 3) > -1e-8 &&    // -1e-6
@@ -147,7 +147,7 @@ int netrule :: IsLineInFreeZone2 (const Point2d & p1, const Point2d & p2) const
       allleft = 1;
       allright = 1;
 
-      for (int i = 1; i <= transfreezone.Size(); i++)
+      for (int i = 1; i <= transfreezone.size(); i++)
 	{
 	  left  = transfreezone.Get(i).X() * nx + transfreezone.Get(i).Y() + c <  1e-7;
 	  right = transfreezone.Get(i).X() * nx + transfreezone.Get(i).Y() + c > -1e-7;
@@ -163,7 +163,7 @@ int netrule :: IsLineInFreeZone2 (const Point2d & p1, const Point2d & p2) const
 
 int netrule :: ConvexFreeZone () const
 {
-  int n = transfreezone.Size();
+  int n = transfreezone.size();
   for (int i = 1; i <= n; i++)
     {
       const bool counterclockwise = CCW (transfreezone.Get(i), 

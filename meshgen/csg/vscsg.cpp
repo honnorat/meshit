@@ -155,13 +155,13 @@ namespace netgen
 
     CalcTransformationMatrices();
 
-    for (int i = 0; i < trilists.Size(); i++)
+    for (int i = 0; i < trilists.size(); i++)
       glDeleteLists (trilists[i], 1);
-    trilists.SetSize(0);
+    trilists.resize(0);
 
     for (int i = 0; i < geometry->GetNTopLevelObjects(); i++)
       {
-	trilists.Append (glGenLists (1));
+	trilists.push_back (glGenLists (1));
 	glNewList (trilists.Last(), GL_COMPILE); 
 	glEnable (GL_NORMALIZE);
 	const TriangleApproximation & ta =
@@ -239,9 +239,9 @@ namespace netgen
 	return;
       }
 
-    if (changeval != specpoints.Size())
+    if (changeval != specpoints.size())
       BuildScene();
-    changeval = specpoints.Size();
+    changeval = specpoints.size();
 
 
 
@@ -261,7 +261,7 @@ namespace netgen
       {
 	glColor3d (1, 0, 0);
 	glBegin (GL_LINES);
-	for (int i = 1; i <= specpoints.Size(); i++)
+	for (int i = 1; i <= specpoints.size(); i++)
 	  {
 	    const Point3d p1 = specpoints.Get(i).p;
 	    const Point3d p2 = specpoints.Get(i).p + len * specpoints.Get(i).v;
@@ -301,7 +301,7 @@ namespace netgen
 	{ 1, 5 },
 	{ 2, 6 },
 	{ 3, 7 } };
-    for (int i = 0; i < boxes.Size(); i++)
+    for (int i = 0; i < boxes.size(); i++)
       {
 	for (int j = 0; j < 12; j++)
 	  {
@@ -448,10 +448,10 @@ namespace netgen
 	    box.AddPoint (mesh->Point (mesh->LineSegment(i)[1]));
 	  }
       }
-    else if (specpoints.Size() >= 2)
+    else if (specpoints.size() >= 2)
       {
 	box.SetPoint (specpoints.Get(1).p);
-	for (int i = 2; i <= specpoints.Size(); i++)
+	for (int i = 2; i <= specpoints.size(); i++)
 	  box.AddPoint (specpoints.Get(i).p);
       }
     else

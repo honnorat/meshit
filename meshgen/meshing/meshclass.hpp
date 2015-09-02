@@ -30,7 +30,7 @@ namespace netgen
 		   RESTRICTH_SURFACEELEMENT, RESTRICTH_POINT, RESTRICTH_SEGMENT };
 
   class HPRefElement;
-
+  class SplineGeometry2d;
 
   /// 2d/3d mesh
   class Mesh
@@ -193,6 +193,8 @@ namespace netgen
 
     Mesh & operator= (const Mesh & mesh2);
   
+    void BuildFromSpline2D(SplineGeometry2d & geometry, MeshingParameters & mp);
+
     ///
     DLL_HEADER void DeleteMesh();
   
@@ -202,14 +204,14 @@ namespace netgen
     ///
     void ClearVolumeElements()
     {
-      volelements.SetSize(0); 
+      volelements.resize(0); 
       timestamp = NextTimeStamp();
     }
 
     ///
     void ClearSegments()
     { 
-      segments.SetSize(0); 
+      segments.resize(0); 
       timestamp = NextTimeStamp();
     }
   
@@ -222,7 +224,7 @@ namespace netgen
     DLL_HEADER PointIndex AddPoint (const Point3d & p, int layer = 1);
     DLL_HEADER PointIndex AddPoint (const Point3d & p, int layer, POINTTYPE type);
 
-    int GetNP () const { return points.Size(); }
+    int GetNP () const { return points.size(); }
 
     MeshPoint & Point(int i) { return points.Elem(i); }
     MeshPoint & Point(PointIndex pi) { return points[pi]; }
@@ -247,7 +249,7 @@ namespace netgen
       segments.Delete(segnr-PointIndex::BASE);
     }
 
-    int GetNSeg () const { return segments.Size(); }
+    int GetNSeg () const { return segments.size(); }
     Segment & LineSegment(int i) { return segments.Elem(i); }
     const Segment & LineSegment(int i) const { return segments.Get(i); }
 
@@ -274,7 +276,7 @@ namespace netgen
       DeleteSurfaceElement (int(eli)+1);
     }
 
-    int GetNSE () const { return surfelements.Size(); }
+    int GetNSE () const { return surfelements.size(); }
     Element2d & SurfaceElement(int i) { return surfelements.Elem(i); }
     const Element2d & SurfaceElement(int i) const { return surfelements.Get(i); }
     Element2d & SurfaceElement(SurfaceElementIndex i) { return surfelements[i]; }
@@ -291,7 +293,7 @@ namespace netgen
 
     DLL_HEADER ElementIndex AddVolumeElement (const Element & el);
 
-    int GetNE () const { return volelements.Size(); }
+    int GetNE () const { return volelements.size(); }
 
     Element & VolumeElement(int i) { return volelements.Elem(i); }
     const Element & VolumeElement(int i) const { return volelements.Get(i); }
@@ -358,7 +360,7 @@ namespace netgen
     DLL_HEADER void RemoveOneLayerSurfaceElements ();
 
 
-    int GetNOpenSegments () { return opensegments.Size(); }
+    int GetNOpenSegments () { return opensegments.size(); }
     const Segment & GetOpenSegment (int nr) { return opensegments.Get(nr); }
   
     /**
@@ -425,7 +427,7 @@ namespace netgen
 
     ///
     int GetNOpenElements() const
-    { return openelements.Size(); }
+    { return openelements.size(); }
     ///
     const Element2d & OpenElement(int i) const
     { return openelements.Get(i); }
@@ -571,10 +573,10 @@ namespace netgen
 
     ///
     int AddFaceDescriptor(const FaceDescriptor& fd)
-    { return facedecoding.Append(fd); }
+    { return facedecoding.push_back(fd); }
 
     int AddEdgeDescriptor(const EdgeDescriptor & fd)
-    { return edgedecoding.Append(fd) - 1; }
+    { return edgedecoding.push_back(fd) - 1; }
 
     ///
     DLL_HEADER void SetMaterial (int domnr, const char * mat);
@@ -592,11 +594,11 @@ namespace netgen
 
     ///
     void ClearFaceDescriptors()
-    { facedecoding.SetSize(0); }
+    { facedecoding.resize(0); }
 
     ///
     int GetNFD () const
-    { return facedecoding.Size(); }
+    { return facedecoding.size(); }
 
     const FaceDescriptor & GetFaceDescriptor (int i) const
     { return facedecoding.Get(i); }

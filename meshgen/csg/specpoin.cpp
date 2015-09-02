@@ -100,7 +100,7 @@ namespace netgen
     box.CalcDiamCenter();
     PrintMessage (3, "main-solids: ", geometry->GetNTopLevelObjects());
 
-    numprim_hist.SetSize (geometry->GetNSurf()+1);
+    numprim_hist.resize (geometry->GetNSurf()+1);
     numprim_hist = 0;
 
     for (int i = 0; i < geometry->GetNTopLevelObjects(); i++)
@@ -116,7 +116,7 @@ namespace netgen
 	    tlo->GetSolid()->CalcOnePrimitiveSpecialPoints (box, hpts);
             // if (hpts.Size())
             //  std::cout << "oneprimitivespecialpoints = " << hpts <<std::endl;
-	    for (int j = 0; j < hpts.Size(); j++)
+	    for (int j = 0; j < hpts.size(); j++)
 	      AddPoint (hpts[j], tlo->GetLayer());
 	  }
 
@@ -134,7 +134,7 @@ namespace netgen
 	if(!ident || !ident->IsSkewIdentification())
 	  continue;
 
-	for(int j=0; j<points->Size(); j++)
+	for(int j=0; j<points->size(); j++)
 	  {
 	    if(fabs(ident->GetSurface1().CalcFunctionValue((*points)[j])) < 1e-15)
 	      {
@@ -159,9 +159,9 @@ namespace netgen
       AddPoint (geometry->GetUserPoint(i), 1);
 	
 
-    PrintMessage (3, "Found points ", apoints.Size());
+    PrintMessage (3, "Found points ", apoints.size());
 
-    for (int i = 0; i < boxesinlevel.Size(); i++)
+    for (int i = 0; i < boxesinlevel.size(); i++)
       std::cerr << "level " << i << " has " 
 		 << boxesinlevel[i] << " boxes" <<std::endl;
     std::cerr << "numprim_histogramm = " <<std::endl << numprim_hist <<std::endl;
@@ -209,10 +209,10 @@ namespace netgen
     static int cntbox = 0;
     cntbox++;
 
-    if (level <= boxesinlevel.Size())
+    if (level <= boxesinlevel.size())
       boxesinlevel.Elem(level)++;
     else
-      boxesinlevel.Append (1);
+      boxesinlevel.push_back (1);
 
     /*
       numprim = sol -> NumPrimitives();
@@ -220,7 +220,7 @@ namespace netgen
     */
 
     geometry -> GetIndependentSurfaceIndices (sol, box, locsurf);
-    int numprim = locsurf.Size();
+    int numprim = locsurf.size();
 
 #ifdef DEVELOP
     std::cerr << "numprim = " << numprim <<std::endl;
@@ -279,7 +279,7 @@ namespace netgen
 					  dynamic_cast<const Plane*> (geometry->GetSurface(locsurf[k3])),
 					  pts);
 
-		      for (int j = 0; j < pts.Size(); j++)
+		      for (int j = 0; j < pts.size(); j++)
 			if (Dist (pts[j], box.Center()) < box.Diam()/2)
 			  {
 			    Solid * tansol;
@@ -292,7 +292,7 @@ namespace netgen
 			    int rep1 = geometry->GetSurfaceClassRepresentant(locsurf[k1]);
 			    int rep2 = geometry->GetSurfaceClassRepresentant(locsurf[k2]);
 			    int rep3 = geometry->GetSurfaceClassRepresentant(locsurf[k3]);
-			    for(int jj=0; jj<surfids.Size(); jj++)
+			    for(int jj=0; jj<surfids.size(); jj++)
 			      {
 				int actrep = geometry->GetSurfaceClassRepresentant(surfids[jj]);
 				if(actrep == rep1) ok1 = true;
@@ -323,7 +323,7 @@ namespace netgen
 					    qsurf, pts);
 			//std::cerr << "checking pot. crosspoints: " << pts <<std::endl;
 
-			for (int j = 0; j < pts.Size(); j++)
+			for (int j = 0; j < pts.size(); j++)
 			  if (Dist (pts[j], box.Center()) < box.Diam()/2)
 			    {
 			      Solid * tansol;
@@ -336,7 +336,7 @@ namespace netgen
 			      int rep1 = geometry->GetSurfaceClassRepresentant(locsurf[k1]);
 			      int rep2 = geometry->GetSurfaceClassRepresentant(locsurf[k2]);
 			      //int rep3 = geometry->GetSurfaceClassRepresentant(quadi);
-			      for(int jj=0; jj<surfids.Size(); jj++)
+			      for(int jj=0; jj<surfids.size(); jj++)
 				{
 				  int actrep = geometry->GetSurfaceClassRepresentant(surfids[jj]);
 				  if(actrep == rep1) ok1 = true;
@@ -362,7 +362,7 @@ namespace netgen
 		      ComputeExtremalPoints (dynamic_cast<const Plane*> (geometry->GetSurface(locsurf[k1])),
 					     qsurf, pts);
 		      
-		      for (int j = 0; j < pts.Size(); j++)
+		      for (int j = 0; j < pts.size(); j++)
 			if (Dist (pts[j], box.Center()) < box.Diam()/2)
 			  {
 			    Solid * tansol;
@@ -399,7 +399,7 @@ namespace netgen
 					dynamic_cast<const Sphere*> (geometry->GetSurface(locsurf[k3])),
 					pts);
 		    
-		    for (int j = 0; j < pts.Size(); j++)
+		    for (int j = 0; j < pts.size(); j++)
 		      if (Dist (pts[j], box.Center()) < box.Diam()/2)
 			{
 			  Solid * tansol;
@@ -412,7 +412,7 @@ namespace netgen
 			  int rep1 = geometry->GetSurfaceClassRepresentant(locsurf[k1]);
 			  int rep2 = geometry->GetSurfaceClassRepresentant(locsurf[k2]);
 			  int rep3 = geometry->GetSurfaceClassRepresentant(locsurf[k3]);
-			  for(int jj=0; jj<surfids.Size(); jj++)
+			  for(int jj=0; jj<surfids.size(); jj++)
 			    {
 			      int actrep = geometry->GetSurfaceClassRepresentant(surfids[jj]);
 			      if(actrep == rep1) ok1 = true;
@@ -439,7 +439,7 @@ namespace netgen
 					 dynamic_cast<const Sphere*> (geometry->GetSurface(locsurf[k2])),
 					 pts);
 		  
-		  for (int j = 0; j < pts.Size(); j++)
+		  for (int j = 0; j < pts.size(); j++)
 		    if (Dist (pts[j], box.Center()) < box.Diam()/2)
 		      {
 			Solid * tansol;
@@ -463,14 +463,14 @@ namespace netgen
     possiblecrossp = (numprim >= 3) && calccp;
     surecrossp = 0;
 
-    if (possiblecrossp && (locsurf.Size() <= check_crosspoint || level > 50))
+    if (possiblecrossp && (locsurf.size() <= check_crosspoint || level > 50))
       {
 	decision = 1;
 	surecrossp = 0;
 
-	for (int k1 = 1; k1 <= locsurf.Size() - 2; k1++)
-	  for (int k2 = k1 + 1; k2 <= locsurf.Size() - 1; k2++)
-	    for (int k3 = k2 + 1; k3 <= locsurf.Size(); k3++)
+	for (int k1 = 1; k1 <= locsurf.size() - 2; k1++)
+	  for (int k2 = k1 + 1; k2 <= locsurf.size() - 1; k2++)
+	    for (int k3 = k2 + 1; k3 <= locsurf.size(); k3++)
 	      {
 		int nc, deg;
 		nc = CrossPointNewtonConvergence 
@@ -498,9 +498,9 @@ namespace netgen
 
 	if (decision && surecrossp)
 	  {
-	    for (int k1 = 1; k1 <= locsurf.Size() - 2; k1++)
-	      for (int k2 = k1 + 1; k2 <= locsurf.Size() - 1; k2++)
-		for (int k3 = k2 + 1; k3 <= locsurf.Size(); k3++)
+	    for (int k1 = 1; k1 <= locsurf.size() - 2; k1++)
+	      for (int k2 = k1 + 1; k2 <= locsurf.size() - 1; k2++)
+		for (int k3 = k2 + 1; k3 <= locsurf.size(); k3++)
 		  {
 		    if (CrossPointNewtonConvergence 
 			(geometry->GetSurface(locsurf.Get(k1)), 
@@ -539,7 +539,7 @@ namespace netgen
 			    geometry -> GetIndependentSurfaceIndices (sol, boxp, locsurf2);
 			  
 			    bool found1 = false, found2 = false, found3 = false;
-			    for (int i = 0; i < locsurf2.Size(); i++)
+			    for (int i = 0; i < locsurf2.size(); i++)
 			      {
 				if (locsurf2[i] == locsurf.Get(k1)) found1 = true;
 				if (locsurf2[i] == locsurf.Get(k2)) found2 = true;
@@ -581,8 +581,8 @@ namespace netgen
 	std::cerr << "\n";
 	*/
 
-	for (int k1 = 0; k1 < locsurf.Size() - 1; k1++)
-	  for (int k2 = k1+1; k2 < locsurf.Size(); k2++)
+	for (int k1 = 0; k1 < locsurf.size() - 1; k1++)
+	  for (int k2 = k1+1; k2 < locsurf.size(); k2++)
 	    {
 	      const Surface * surf1 = geometry->GetSurface(locsurf[k1]);
 	      const Surface * surf2 = geometry->GetSurface(locsurf[k2]);
@@ -606,8 +606,8 @@ namespace netgen
 
 	if (decision && sureexp)
 	  {
-	    for (int k1 = 0; k1 < locsurf.Size() - 1; k1++)
-	      for (int k2 = k1+1; k2 < locsurf.Size(); k2++)
+	    for (int k1 = 0; k1 < locsurf.size() - 1; k1++)
+	      for (int k2 = k1+1; k2 < locsurf.size(); k2++)
 		{
 		  const Surface * surf1 = geometry->GetSurface(locsurf[k1]);
 		  const Surface * surf2 = geometry->GetSurface(locsurf[k2]);
@@ -1129,7 +1129,7 @@ namespace netgen
     Vec<3> rhs, sol;
     Point<3> p0(0,0,0);
 
-    pts.SetSize (0);
+    pts.resize (0);
     for (int i = 0; i < 3; i++)
       {
 	const Plane * pi(NULL);
@@ -1153,7 +1153,7 @@ namespace netgen
     if (fabs (Det (mat)) > 1e-8)
       {
 	mat.Solve (rhs, sol);
-	pts.Append (Point<3> (sol));
+	pts.push_back (Point<3> (sol));
       }
   }
 
@@ -1173,7 +1173,7 @@ namespace netgen
     Vec<3> sol, t;
     Point<3> p0(0,0,0);
 
-    pts.SetSize (0);
+    pts.resize (0);
     for (int i = 0; i < 2; i++)
       {
 	const Plane * pi(NULL);
@@ -1221,8 +1221,8 @@ namespace netgen
 	    double s1 = (-b-disc) / (2*c);
 	    double s2 = (-b+disc) / (2*c);
 
-	    pts.Append (p + s1 * t);
-	    pts.Append (p + s2 * t);
+	    pts.push_back (p + s1 * t);
+	    pts.push_back (p + s2 * t);
 	  }
       }
   }
@@ -1243,7 +1243,7 @@ namespace netgen
     Vec<3> sol, t;
     Point<3> p0(0,0,0);
 
-    pts.SetSize (0);
+    pts.resize (0);
 
 
     Point<3> c1 = sphere1 -> Center();
@@ -1300,8 +1300,8 @@ namespace netgen
 	    double s1 = (-b-disc) / (2*c);
 	    double s2 = (-b+disc) / (2*c);
 
-	    pts.Append (p + s1 * t);
-	    pts.Append (p + s2 * t);
+	    pts.push_back (p + s1 * t);
+	    pts.push_back (p + s2 * t);
 	  }
       }
   }
@@ -1325,7 +1325,7 @@ namespace netgen
     // surf2 = 0  <===> quad_a + quad_b x + x^T quad_c x = 0
     // (grad 1 x grad 2)(i) = 0  <====> (grad 1 x e_i) . grad_2 = 0
 
-    pts.SetSize (0);
+    pts.resize (0);
 
     Point<3> p0(0,0,0);
     double plane_a, quad_a;
@@ -1386,8 +1386,8 @@ namespace netgen
 		    double alpha1 = -0.5*b/c + disc;
 		    double alpha2 = -0.5*b/c - disc;
 
-		    pts.Append (Point<3> (sol+alpha1*t));
-		    pts.Append (Point<3> (sol+alpha2*t));
+		    pts.push_back (Point<3> (sol+alpha1*t));
+		    pts.push_back (Point<3> (sol+alpha2*t));
 		    /*
 		    std::cout << "sol1 = " << sol + alpha1 * t
 			 << ", sol2 = " << sol + alpha2 * t <<std::endl;
@@ -1414,7 +1414,7 @@ namespace netgen
     // surf2 = 0  <===> |x-c2|^2 - r2^2 = 0;
     // (grad 1 x grad 2)(i) = 0  <====> (x-p1) x (p1-p2) . e_i = 0;
 
-    pts.SetSize (0);
+    pts.resize (0);
 
     Point<3> c1 = sphere1 -> Center();
     Point<3> c2 = sphere2 -> Center();
@@ -1512,8 +1512,8 @@ namespace netgen
 		double alpha1 = -0.5*b/c + disc;
 		double alpha2 = -0.5*b/c - disc;
 		
-		pts.Append (Point<3> (sol+alpha1*t));
-		pts.Append (Point<3> (sol+alpha2*t));
+		pts.push_back (Point<3> (sol+alpha1*t));
+		pts.push_back (Point<3> (sol+alpha2*t));
 
 		// std::cerr << "pts = " <<std::endl << pts <<std::endl;
 
@@ -1641,13 +1641,13 @@ namespace netgen
 
   bool SpecialPointCalculation :: AddPoint (const Point<3> & p, int layer)
   {
-    for (int i = 0; i < points->Size(); i++)
+    for (int i = 0; i < points->size(); i++)
       if (Dist2 ( (*points)[i], p) < epspointdist2 &&
 	  (*points)[i].GetLayer() == layer)
 	return false;
 
-    points->Append (MeshPoint(p, layer));
-    PrintMessageCR (3, "Found points ", points->Size());
+    points->push_back (MeshPoint(p, layer));
+    PrintMessageCR (3, "Found points ", points->size());
     return true;
   }
 
@@ -1672,7 +1672,7 @@ namespace netgen
     Vec<3> nsurf = 0.0;
 
     Array<int> specpoint2point;
-    specpoints.SetSize (0);
+    specpoints.resize (0);
 
     geometry = &ageometry;
 
@@ -1680,7 +1680,7 @@ namespace netgen
  
     std::cerr << "AnalyzeSpecialPoints\n";
 
-    if (!apoints.Size()) return;
+    if (!apoints.size()) return;
 
 
     {
@@ -1691,8 +1691,8 @@ namespace netgen
       */
       Vec<3> dir(1.2, 1.7, 0.9);
       
-      Array<double> coord(apoints.Size());
-      for (int i = 0; i < apoints.Size(); i++)
+      Array<double> coord(apoints.size());
+      for (int i = 0; i < apoints.size(); i++)
 	coord[i] = dir * Vec<3> (apoints[i]);
       
       QuickSort (coord, apoints);
@@ -1703,7 +1703,7 @@ namespace netgen
 
 
     Box<3> bbox (apoints[0], apoints[0]);
-    for (int i = 1; i < apoints.Size(); i++)
+    for (int i = 1; i < apoints.size(); i++)
       bbox.Add (apoints[i]);
     bbox.Increase (0.1 * bbox.Diam());
 
@@ -1720,7 +1720,7 @@ namespace netgen
 	const Surface * surf = tlo->GetSurface();
 
 
-	for (int i = 0; i < apoints.Size(); i++)
+	for (int i = 0; i < apoints.size(); i++)
 	  {
 	    Point<3> p = apoints[i];
 	    
@@ -1736,10 +1736,10 @@ namespace netgen
 	    sol -> TangentialSolid (p, locsol, surfind, ideps*geomsize);
 
 
-	    rep_surfind.SetSize (surfind.Size());
+	    rep_surfind.resize (surfind.size());
 	    int num_indep_surfs = 0;
 	    
-	    for (int j = 0; j < surfind.Size(); j++)
+	    for (int j = 0; j < surfind.size(); j++)
 	      {
 		rep_surfind[j] = ageometry.GetSurfaceClassRepresentant (surfind[j]);
 		bool found = false;
@@ -1763,7 +1763,7 @@ namespace netgen
 	      {
 		// locsol -> GetSurfaceIndices (surfind);
 		bool hassurf = 0;
-		for (int m = 0; m < surfind.Size(); m++)
+		for (int m = 0; m < surfind.size(); m++)
 		  if (ageometry.GetSurface(surfind[m]) == surf)
 		    hassurf = 1;
 
@@ -1784,14 +1784,14 @@ namespace netgen
 	    // ageometry.GetIndependentSurfaceIndices (surfind);
 
 
-	    normalvecs.SetSize(surfind.Size());
-	    for (int j = 0; j < surfind.Size(); j++)
+	    normalvecs.resize(surfind.size());
+	    for (int j = 0; j < surfind.size(); j++)
 	      normalvecs[j] = 
 		ageometry.GetSurface(surfind[j]) -> GetNormalVector(apoints[i]);
 
 
-	    for (int j = 0; j < normalvecs.Size(); j++)
-	      for (int k = 0; k < normalvecs.Size(); k++)
+	    for (int j = 0; j < normalvecs.size(); j++)
+	      for (int k = 0; k < normalvecs.size(); k++)
 		{
 		  if (rep_surfind[j] == rep_surfind[k]) continue;
 		  //if (j == k) continue;
@@ -1868,8 +1868,8 @@ namespace netgen
 		      
 		      // locsol2 -> GetTangentialSurfaceIndices3 (p, t, t2, surfind2, 1e-9*geomsize);
 
-		      rep_surfind2.SetSize (surfind2.Size());
-		      for (int j2 = 0; j2 < surfind2.Size(); j2++)
+		      rep_surfind2.resize (surfind2.size());
+		      for (int j2 = 0; j2 < surfind2.size(); j2++)
 			rep_surfind2[j2] = ageometry.GetSurfaceClassRepresentant (surfind2[j2]);
 
 #ifdef DEVELOP
@@ -1899,7 +1899,7 @@ namespace netgen
 
 		      // there must be 2 different tangential faces to the edge
 		      int cnt_tang_faces = 0;
-		      for (int l = 0; l < surfind2.Size(); l++)
+		      for (int l = 0; l < surfind2.size(); l++)
 			{
 			  Vec<3> nv =
 			    ageometry.GetSurface(surfind2[l]) -> GetNormalVector(p);
@@ -1960,7 +1960,7 @@ namespace netgen
 		    {
 		      // std::cerr << "succ 1" <<std::endl;
 		      int cnts = 0;
-		      for (int m = 0; m < surfind.Size(); m++)
+		      for (int m = 0; m < surfind.size(); m++)
 			{
 			  if (fabs (normalvecs[m] * t) > 1e-6)
 			    continue;
@@ -2005,7 +2005,7 @@ namespace netgen
 						  apoints[i]+Vec3d(searchradius,searchradius,searchradius), 
 						  locsearch);
 		      
-		      for (int m = 0; m < locsearch.Size(); m++)
+		      for (int m = 0; m < locsearch.size(); m++)
 			{
 			  if (Dist2 (specpoints[locsearch[m]].p, apoints[i]) < 1e-10*geomsize
 			      && Abs2(specpoints[locsearch[m]].v - t) < 1e-8)
@@ -2018,8 +2018,8 @@ namespace netgen
 		      
 		      if (spi == -1)
 			{
-			  spi = specpoints.Append (SpecialPoint()) - 1;
-			  specpoint2point.Append (i);
+			  spi = specpoints.push_back (SpecialPoint()) - 1;
+			  specpoint2point.push_back (i);
 			  specpoints.Last().unconditional = 0;
 			  searchtree.Insert (apoints[i], spi);
 			}
@@ -2085,14 +2085,14 @@ namespace netgen
     // if special point is unconditional on some solid,
     // it must be unconditional everywhere:
 
-    BitArray uncond (apoints.Size());
+    BitArray uncond (apoints.size());
     uncond.Clear();
 
-    for (int i = 0; i < specpoints.Size(); i++)
+    for (int i = 0; i < specpoints.size(); i++)
       if (specpoints[i].unconditional)
 	uncond.Set (specpoint2point[i]);
   
-    for (int i = 0; i < specpoints.Size(); i++)
+    for (int i = 0; i < specpoints.size(); i++)
       specpoints[i].unconditional = 
 	uncond.Test (specpoint2point[i]) ? 1 : 0;
   }

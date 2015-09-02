@@ -79,7 +79,7 @@ namespace netgen
       x2[i] = x1[i] + hmax;
 
     root = new GradingBox (x1, x2);
-    boxes.Append (root);
+    boxes.push_back (root);
   }
 
 
@@ -111,7 +111,7 @@ namespace netgen
       x2[i] = x1[i] + hmax;
 
     root = new GradingBox (x1, x2);
-    boxes.Append (root);
+    boxes.push_back (root);
   }
 
 
@@ -217,7 +217,7 @@ namespace netgen
 	box->childs[childnr] = ngb;
 	ngb->father = box;
 
-	boxes.Append (ngb);
+	boxes.push_back (ngb);
 	box = box->childs[childnr];
       }
 
@@ -317,7 +317,7 @@ namespace netgen
   {
     int nf = adfront->GetNF();
 
-    for (int i = 0; i < boxes.Size(); i++)
+    for (int i = 0; i < boxes.size(); i++)
       boxes[i] -> flags.isinner = 0;
 
     root->flags.isinner = 0;
@@ -384,18 +384,18 @@ namespace netgen
 	const Box3d & facebox = faceboxes.Get(faceinds.Get(j));
   
 	if (boxc.Intersect (facebox))
-	  faceused.Append(faceinds.Get(j));
+	  faceused.push_back(faceinds.Get(j));
 	else
-	  facenotused.Append(faceinds.Get(j));
+	  facenotused.push_back(faceinds.Get(j));
 
 	if (boxcfc.Intersect (facebox))
-	  faceused2.Append (faceinds.Get(j));
+	  faceused2.push_back (faceinds.Get(j));
       }
   
-    for (int j = 1; j <= faceused.Size(); j++)
+    for (int j = 1; j <= faceused.size(); j++)
       faceinds.Elem(j) = faceused.Get(j);
-    for (int j = 1; j <= facenotused.Size(); j++)
-      faceinds.Elem(j+faceused.Size()) = facenotused.Get(j);
+    for (int j = 1; j <= facenotused.size(); j++)
+      faceinds.Elem(j+faceused.size()) = facenotused.Get(j);
 
   
     if (!father->flags.cutboundary)
@@ -425,7 +425,7 @@ namespace netgen
 
     // std::cout << "faceused: " << faceused.Size() << ", " << faceused2.Size() << ", " << facenotused.Size() <<std::endl;
 
-    int nf = faceused.Size();
+    int nf = faceused.size();
     for (int i = 0; i < 8; i++)
       FindInnerBoxesRec2 (box->childs[i], adfront, faceboxes, faceinds, nf);
   }
@@ -471,7 +471,7 @@ namespace netgen
   {
     int nf = adfront->GetNFL();
 
-    for (int i = 0; i < boxes.Size(); i++)
+    for (int i = 0; i < boxes.size(); i++)
       boxes[i] -> flags.isinner = 0;
 
     root->flags.isinner = 0;
@@ -538,18 +538,18 @@ namespace netgen
 	const Box3d & facebox = faceboxes.Get(faceinds.Get(j));
   
 	if (boxc.Intersect (facebox))
-	  faceused.Append(faceinds.Get(j));
+	  faceused.push_back(faceinds.Get(j));
 	else
-	  facenotused.Append(faceinds.Get(j));
+	  facenotused.push_back(faceinds.Get(j));
 
 	if (boxcfc.Intersect (facebox))
-	  faceused2.Append (faceinds.Get(j));
+	  faceused2.push_back (faceinds.Get(j));
       }
   
-    for (int j = 1; j <= faceused.Size(); j++)
+    for (int j = 1; j <= faceused.size(); j++)
       faceinds.Elem(j) = faceused.Get(j);
-    for (int j = 1; j <= facenotused.Size(); j++)
-      faceinds.Elem(j+faceused.Size()) = facenotused.Get(j);
+    for (int j = 1; j <= facenotused.size(); j++)
+      faceinds.Elem(j+faceused.size()) = facenotused.Get(j);
 
   
     if (!father->flags.cutboundary)
@@ -581,7 +581,7 @@ namespace netgen
 
     // std::cout << "faceused: " << faceused.Size() << ", " << faceused2.Size() << ", " << facenotused.Size() <<std::endl;
 
-    int nf = faceused.Size();
+    int nf = faceused.size();
     for (int i = 0; i < 8; i++)
       FindInnerBoxesRec2 (box->childs[i], adfront, faceboxes, faceinds, nf);
   }
@@ -641,7 +641,7 @@ namespace netgen
 
   void LocalH :: WidenRefinement ()
   {
-    for (int i = 0; i < boxes.Size(); i++)
+    for (int i = 0; i < boxes.size(); i++)
       {
 	double h = boxes[i]->hopt;
 	Point3d c = boxes[i]->PMid();
@@ -657,17 +657,17 @@ namespace netgen
 
   void LocalH :: GetInnerPoints (Array<Point<3> > & points)
   {
-    for (int i = 0; i < boxes.Size(); i++)
+    for (int i = 0; i < boxes.size(); i++)
       if (boxes[i] -> flags.isinner)
-	points.Append ( boxes[i] -> PMid() );
+	points.push_back ( boxes[i] -> PMid() );
   }
 
 
   void LocalH :: GetOuterPoints (Array<Point<3> > & points)
   {
-    for (int i = 0; i < boxes.Size(); i++)
+    for (int i = 0; i < boxes.size(); i++)
       if (!boxes[i]->flags.isinner && !boxes[i]->flags.cutboundary)
-	points.Append ( boxes[i] -> PMid());
+	points.push_back ( boxes[i] -> PMid());
   }
 
 
@@ -704,7 +704,7 @@ namespace netgen
 
   void LocalH :: PrintMemInfo (std::ostream & ost) const
   {
-    ost << "LocalH: " << boxes.Size() << " boxes of " << sizeof(GradingBox)
-	<< " bytes = " << boxes.Size()*sizeof(GradingBox) << " bytes" << std::endl;
+    ost << "LocalH: " << boxes.size() << " boxes of " << sizeof(GradingBox)
+	<< " bytes = " << boxes.size()*sizeof(GradingBox) << " bytes" << std::endl;
   }
 }

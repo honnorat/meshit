@@ -152,7 +152,7 @@ namespace netgen
   void BASE_INDEX_CLOSED_HASHTABLE ::
   BaseSetSize (int size)
   {
-    hash.SetSize(size);
+    hash.resize(size);
     for (int i = 1; i <= size; i++)
       hash.Elem(i) = invalid;
   }
@@ -164,7 +164,7 @@ namespace netgen
     while (1)
       {
 	i++;
-	if (i > hash.Size()) i = 1;
+	if (i > hash.size()) i = 1;
 	if (hash.Get(i) == ind) return i;
 	if (hash.Get(i) == invalid) return 0;
       }
@@ -178,7 +178,7 @@ namespace netgen
     while (1)
       {
 	i++;
-	if (i > hash.Size()) i = 1;
+	if (i > hash.size()) i = 1;
 	if (hash.Get(i) == ind) 
 	  {
 	    apos = i;
@@ -197,7 +197,7 @@ namespace netgen
 
   int BASE_INDEX_CLOSED_HASHTABLE :: UsedElements () const
   {
-    int n = hash.Size();
+    int n = hash.size();
     int cnt = 0;
     for (int i = 1; i <= n; i++)
       if (hash.Get(i) != invalid)
@@ -229,7 +229,7 @@ namespace netgen
   void BASE_INDEX_2_CLOSED_HASHTABLE ::
   BaseSetSize (int size)
   {
-    hash.SetSize(size);
+    hash.resize(size);
     for (int i = 1; i <= size; i++)
       hash.Elem(i).I1() = invalid;
   }
@@ -242,7 +242,7 @@ namespace netgen
     while (1)
       {
 	i++;
-	if (i > hash.Size()) i = 1;
+	if (i > hash.size()) i = 1;
 	if (hash.Get(i) == ind) return i;
 	if (hash.Get(i).I1() == invalid) return 0;
       }
@@ -256,7 +256,7 @@ namespace netgen
     while (1)
       {
 	i++;
-	if (i > hash.Size()) i = 1;
+	if (i > hash.size()) i = 1;
 	if (hash.Get(i) == ind) 
 	  {
 	    apos = i;
@@ -275,7 +275,7 @@ namespace netgen
 
   int BASE_INDEX_2_CLOSED_HASHTABLE :: UsedElements () const
   {
-    int n = hash.Size();
+    int n = hash.size();
     int cnt = 0;
     for (int i = 1; i <= n; i++)
       if (hash.Get(i).I1() != invalid)
@@ -293,7 +293,7 @@ namespace netgen
   void BASE_INDEX_3_CLOSED_HASHTABLE ::
   BaseSetSize (int size)
   {
-    hash.SetSize(size);
+    hash.resize(size);
     for (int i = 0; i < size; i++)
       hash[i].I1() = invalid;
   }
@@ -309,7 +309,7 @@ namespace netgen
 	i++;
 	if (i >= hash.Size()) i = 0;
         */
-        i = (i+1) % hash.Size();
+        i = (i+1) % hash.size();
 	if (hash[i] == ind) 
 	  {
 	    apos = i;

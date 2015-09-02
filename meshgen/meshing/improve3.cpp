@@ -92,11 +92,11 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 
 	  // hasonepoint.SetSize(0);
 	  //	  hasbothpoints.SetSize(0);
-	  hasonepi.SetSize(0);
-	  hasbothpi.SetSize(0);
+	  hasonepi.resize(0);
+	  hasbothpi.resize(0);
 
 	  FlatArray<ElementIndex> row1 = elementsonnode[pi1];
-	  for (int k = 0; k < row1.Size(); k++)
+	  for (int k = 0; k < row1.size(); k++)
 	    {
 	      Element & elem = mesh[row1[k]];
 	      if (elem.IsDeleted()) continue;
@@ -104,16 +104,16 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 	      if (elem[0] == pi2 || elem[1] == pi2 ||
 		  elem[2] == pi2 || elem[3] == pi2)
 		{
-		  hasbothpi.Append (row1[k]);
+		  hasbothpi.push_back (row1[k]);
 		}
 	      else
 		{
-		  hasonepi.Append (row1[k]);
+		  hasonepi.push_back (row1[k]);
 		}
 	    } 
 	  
 	  FlatArray<ElementIndex> row2 = elementsonnode[pi2];	  
-	  for (int k = 0; k < row2.Size(); k++)
+	  for (int k = 0; k < row2.size(); k++)
 	    {
 	      Element & elem = mesh[row2[k]];
 	      if (elem.IsDeleted()) continue;
@@ -123,14 +123,14 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 		;
 	      else
 		{
-		  hasonepi.Append (row2[k]);
+		  hasonepi.push_back (row2[k]);
 		}
 	    } 
 	  
 	  double bad1 = 0;
-	  for (int k = 0; k < hasonepi.Size(); k++)
+	  for (int k = 0; k < hasonepi.size(); k++)
 	    bad1 += elerrs[hasonepi[k]];
-	  for (int k = 0; k < hasbothpi.Size(); k++)
+	  for (int k = 0; k < hasbothpi.size(); k++)
 	    bad1 += elerrs[hasbothpi[k]];
 	  
 	  MeshPoint p1 = mesh[pi1];
@@ -151,15 +151,13 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 	  mesh[pi1] = pnew;
 	  mesh[pi2] = pnew;
 
-	  oneperr.SetSize (hasonepi.Size());
+	  oneperr.resize (hasonepi.size());
 
 	  double bad2 = 0;
-	  for (int k = 0; k < hasonepi.Size(); k++)
+	  for (int k = 0; k < hasonepi.size(); k++)
 	    {
 	      const Element & elem = mesh[hasonepi[k]];
 	      double err = CalcBad (mesh.Points(), elem, 0);
-	      // CalcTetBadness (mesh[elem[0]], mesh[elem[1]],  
-	      // mesh[elem[2]], mesh[elem[3]], 0, mparam);
 	      bad2 += err;
 	      oneperr[k] = err;
 	    }
@@ -170,7 +168,7 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 	  // if (mesh.PointType(pi1) != INNERPOINT)
 	  if (p1.Type() != INNERPOINT)
 	    {
-	      for (int k = 0; k < hasonepi.Size(); k++)
+	      for (int k = 0; k < hasonepi.size(); k++)
 		{
 		  Element & elem = mesh[hasonepi[k]];
 		  int l;
@@ -193,14 +191,14 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 		}
 	    }
 
-	  if (bad2 / hasonepi.Size()  < 
-	      bad1 / (hasonepi.Size()+hasbothpi.Size()))
+	  if (bad2 / hasonepi.size()  < 
+	      bad1 / (hasonepi.size()+hasbothpi.size()))
 	    {
 	      mesh[pi1] = pnew;
 	      cnt++;
 
 	      FlatArray<ElementIndex> row = elementsonnode[pi2];
-	      for (int k = 0; k < row.Size(); k++)
+	      for (int k = 0; k < row.size(); k++)
 		{
 		  Element & elem = mesh[row[k]];
 		  if (elem.IsDeleted()) continue;
@@ -215,10 +213,10 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 		    std::cerr << "illegal tet " << elementsonnode[pi2][k] << std::endl;
 		}
 
-	      for (int k = 0; k < hasonepi.Size(); k++)
+	      for (int k = 0; k < hasonepi.size(); k++)
 		elerrs[hasonepi[k]] = oneperr[k];
 	      
-	      for (int k = 0; k < hasbothpi.Size(); k++)
+	      for (int k = 0; k < hasbothpi.size(); k++)
 		{
 		  mesh[hasbothpi[k]].flags.illegal_valid = 0;
 		  mesh[hasbothpi[k]].Delete();
@@ -399,7 +397,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 	  if (edgetested.Used (i2) && !illegaltet.Test(ei+1)) continue;
 	  edgetested.Set (i2, 1);
 
-	  hasbothpoints.SetSize (0);
+	  hasbothpoints.resize (0);
 	  for (k = 1; k <= elementsonnode.EntrySize(pi1); k++)
 	    {
 	      bool has1 = 0, has2 = 0;
@@ -414,16 +412,16 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 		}
 	      if (has1 && has2) 
 		if (!hasbothpoints.Contains (elnr))
-		  hasbothpoints.Append (elnr);
+		  hasbothpoints.push_back (elnr);
 	    }
 	  
 	  bad1 = 0;
-	  for (k = 0; k < hasbothpoints.Size(); k++)
+	  for (k = 0; k < hasbothpoints.size(); k++)
 	    bad1 += CalcBad (mesh.Points(), mesh[hasbothpoints[k]], 0);
 	  
 
 	  bool puretet = 1;
-	  for (k = 0; k < hasbothpoints.Size(); k++)
+	  for (k = 0; k < hasbothpoints.size(); k++)
 	    if (mesh[hasbothpoints[k]].GetType() != TET)
 	      puretet = 0;
 	  if (!puretet) continue;
@@ -450,8 +448,8 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 	  */
 
 
-	  locfaces.SetSize (0);
-	  for (k = 0; k < hasbothpoints.Size(); k++)
+	  locfaces.resize (0);
+	  for (k = 0; k < hasbothpoints.size(); k++)
 	    {
 	      const Element & el = mesh[hasbothpoints[k]];
 
@@ -463,7 +461,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 		    el.GetFace (l+1, face);
 		    for (int kk = 1; kk <= 3; kk++)
 		      i3.I(kk) = face.PNum(kk);
-		    locfaces.Append (i3);
+		    locfaces.push_back (i3);
 		  }
 	    }
 
@@ -491,7 +489,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 	  int hpinew = mesh.AddPoint (pnew);
 	  //	  ptyps.Append (INNERPOINT);
 
-	  for (k = 0; k < hasbothpoints.Size(); k++)
+	  for (k = 0; k < hasbothpoints.size(); k++)
 	    {
 	      Element & oldel = mesh[hasbothpoints[k]];
 	      Element newel1 = oldel;
@@ -522,7 +520,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 
 	      PointIndex pinew = mesh.AddPoint (pnew);
 	      
-	      for (k = 0; k < hasbothpoints.Size(); k++)
+	      for (k = 0; k < hasbothpoints.size(); k++)
 		{
 		  Element & oldel = mesh[hasbothpoints[k]];
 		  Element newel = oldel;
@@ -684,8 +682,8 @@ void MeshOptimize3d :: SwapImprove (Mesh & mesh, OPTIMIZEGOAL goal,
 	  if (edgeused.Used(i2)) continue;
 	  edgeused.Set (i2, 1);
 	  
-	  hasbothpoints.SetSize (0);
-	  for (int k = 0; k < elementsonnode[pi1].Size(); k++)
+	  hasbothpoints.resize (0);
+	  for (int k = 0; k < elementsonnode[pi1].size(); k++)
 	    {
 	      bool has1 = 0, has2 = 0;
 	      ElementIndex elnr = elementsonnode[pi1][k];
@@ -701,23 +699,23 @@ void MeshOptimize3d :: SwapImprove (Mesh & mesh, OPTIMIZEGOAL goal,
 
 	      if (has1 && has2) 
 		{ // only once
-		  for (int l = 0; l < hasbothpoints.Size(); l++)
+		  for (int l = 0; l < hasbothpoints.size(); l++)
 		    if (hasbothpoints[l] == elnr)
 		      has1 = 0;
 		  
 		  if (has1)
-		    hasbothpoints.Append (elnr);
+		    hasbothpoints.push_back (elnr);
 		}
 	    }
 	  
 	  bool puretet = 1;
-	  for (int k = 0; k < hasbothpoints.Size(); k++)
+	  for (int k = 0; k < hasbothpoints.size(); k++)
 	    if (mesh[hasbothpoints[k]].GetType () != TET)
 	      puretet = 0;
 	  if (!puretet)
 	    continue;
 
-	  int nsuround = hasbothpoints.Size();
+	  int nsuround = hasbothpoints.size();
 
 	  if ( nsuround == 3 )
 	    {
@@ -1465,7 +1463,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	{
 	  if(mesh.GetIdentifications().GetType(i) == Identifications::PERIODIC)
 	    {
-	      locidmaps.Append(new Array<int,PointIndex::BASE>);
+	      locidmaps.push_back(new Array<int,PointIndex::BASE>);
 	      mesh.GetIdentifications().GetMap(i,*locidmaps.Last(),true);
 	    }
 	}
@@ -1572,9 +1570,9 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	    	  
 	  
 	  bool found = false;
-	  for(int k=0; !found && k<used_idmaps->Size(); k++)
+	  for(int k=0; !found && k<used_idmaps->size(); k++)
 	    {
-	      if(pi2 < (*used_idmaps)[k]->Size() + PointIndex::BASE)
+	      if(pi2 < (*used_idmaps)[k]->size() + PointIndex::BASE)
 		{
 		  pi1other = (*(*used_idmaps)[k])[pi1];
 		  pi2other = (*(*used_idmaps)[k])[pi2];
@@ -1612,9 +1610,9 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	    }
 	  
 	  
-	  hasbothpoints.SetSize (0);
-	  hasbothpointsother.SetSize (0);
-	  for (int k = 0; k < elementsonnode[pi1].Size(); k++)
+	  hasbothpoints.resize (0);
+	  hasbothpointsother.resize (0);
+	  for (int k = 0; k < elementsonnode[pi1].size(); k++)
 	    {
 	      bool has1 = false, has2 = false;
 	      ElementIndex elnr = elementsonnode[pi1][k];
@@ -1636,22 +1634,22 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		  if(elem.GetIndex() == mattype)
 		    {
 		      // only once
-		      for (int l = 0; l < hasbothpoints.Size(); l++)
+		      for (int l = 0; l < hasbothpoints.size(); l++)
 			if (hasbothpoints[l] == elnr)
 			  has1 = 0;
 		      
 		      if (has1)
-			hasbothpoints.Append (elnr);
+			hasbothpoints.push_back (elnr);
 		    }
 		  else if(elem.GetIndex() == othermattype)
 		    {
 		      // only once
-		      for (int l = 0; l < hasbothpointsother.Size(); l++)
+		      for (int l = 0; l < hasbothpointsother.size(); l++)
 			if (hasbothpointsother[l] == elnr)
 			  has1 = 0;
 		      
 		      if (has1)
-			hasbothpointsother.Append (elnr);
+			hasbothpointsother.push_back (elnr);
 		    }
 		  else
 		    {
@@ -1660,21 +1658,21 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 				 << " elem " << elem << " mt " << elem.GetIndex() << std::endl
 				 << " pi1 " << pi1 << " pi2 " << pi2 << std::endl;
 		      std::cerr << "hasbothpoints:" << std::endl;
-		      for(int ii=0; ii < hasbothpoints.Size(); ii++)
+		      for(int ii=0; ii < hasbothpoints.size(); ii++)
 			std::cerr << mesh[hasbothpoints[ii]] << std::endl;
 		      std::cerr << "hasbothpointsother:" << std::endl;
-		      for(int ii=0; ii < hasbothpointsother.Size(); ii++)
+		      for(int ii=0; ii < hasbothpointsother.size(); ii++)
 			std::cerr << mesh[hasbothpointsother[ii]] << std::endl;
 		    }
 		}
 	    }
 
-	  if(hasbothpointsother.Size() > 0 && periodic)
+	  if(hasbothpointsother.size() > 0 && periodic)
 	    throw NgException("std::swapImproveSurface: Assumption about interface/periodicity wrong!");
 
 	  if(periodic)
 	    {
-	      for (int k = 0; k < elementsonnode[pi1other].Size(); k++)
+	      for (int k = 0; k < elementsonnode[pi1other].size(); k++)
 		{
 		  bool has1 = false, has2 = false;
 		  ElementIndex elnr = elementsonnode[pi1other][k];
@@ -1694,12 +1692,12 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 			othermattype = elem.GetIndex();
 
 		      // only once
-		      for (int l = 0; l < hasbothpointsother.Size(); l++)
+		      for (int l = 0; l < hasbothpointsother.size(); l++)
 			if (hasbothpointsother[l] == elnr)
 			  has1 = 0;
 		      
 		      if (has1)
-			hasbothpointsother.Append (elnr);
+			hasbothpointsother.push_back (elnr);
 		    }
 		}
 	    }
@@ -1711,7 +1709,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	  
 	  SurfaceElementIndex sel1=-1,sel2=-1;
 	  SurfaceElementIndex sel1other=-1,sel2other=-1;
-	  for(int k = 0; k < surfaceelementsonnode[pi1].Size(); k++)
+	  for(int k = 0; k < surfaceelementsonnode[pi1].size(); k++)
 	    {
 	      bool has1 = false, has2 = false;
 	      SurfaceElementIndex elnr = surfaceelementsonnode[pi1][k];
@@ -1734,7 +1732,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 	  if(periodic)
 	    {
-	      for(int k = 0; k < surfaceelementsonnode[pi1other].Size(); k++)
+	      for(int k = 0; k < surfaceelementsonnode[pi1other].size(); k++)
 		{
 		  bool has1 = false, has2 = false;
 		  SurfaceElementIndex elnr = surfaceelementsonnode[pi1other][k];
@@ -1807,17 +1805,17 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 
 	  bool puretet = true;
-	  for (int k = 0; puretet && k < hasbothpoints.Size(); k++)
+	  for (int k = 0; puretet && k < hasbothpoints.size(); k++)
 	    if (mesh[hasbothpoints[k]].GetType () != TET)
 	      puretet = false;
-	  for (int k = 0; puretet && k < hasbothpointsother.Size(); k++)
+	  for (int k = 0; puretet && k < hasbothpointsother.size(); k++)
 	    if (mesh[hasbothpointsother[k]].GetType () != TET)
 	      puretet = false;
 	  if (!puretet)
 	    continue;
 
-	  int nsuround = hasbothpoints.Size();
-	  int nsuroundother = hasbothpointsother.Size();
+	  int nsuround = hasbothpoints.size();
+	  int nsuroundother = hasbothpointsother.size();
 
 	  Array < int > outerpoints(nsuround+1);
 	  outerpoints[0] = sp1;
@@ -1825,7 +1823,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	  for(int i=0; i<nsuround; i++)
 	    {
 	      bool done = false;
-	      for(int jj=i; !done && jj<hasbothpoints.Size(); jj++)
+	      for(int jj=i; !done && jj<hasbothpoints.size(); jj++)
 		{
 		  for(int k=0; !done && k<4; k++)
 		    if(mesh[hasbothpoints[jj]][k] == outerpoints[i])
@@ -1848,7 +1846,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	  if(outerpoints[nsuround] != sp2)
 	    {
 	      std::cerr << "hasbothpoints: " << std::endl;
-	      for(int ii=0; ii < hasbothpoints.Size(); ii++)
+	      for(int ii=0; ii < hasbothpoints.size(); ii++)
 		{
 		  std::cerr << mesh[hasbothpoints[ii]] << std::endl;
 		  for(int jj=0; jj<mesh[hasbothpoints[ii]].GetNP(); jj++)
@@ -1878,14 +1876,14 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 	  if(nsuroundother > 0)
 	    {
-	      outerpointsother.SetSize(nsuroundother+1);
+	      outerpointsother.resize(nsuroundother+1);
 	      outerpointsother[0] = sp2other;
 	    }
 
 	  for(int i=0; i<nsuroundother; i++)
 	    {
 	      bool done = false;
-	      for(int jj=i; !done && jj<hasbothpointsother.Size(); jj++)
+	      for(int jj=i; !done && jj<hasbothpointsother.size(); jj++)
 		{
 		  for(int k=0; !done && k<4; k++)
 		    if(mesh[hasbothpointsother[jj]][k] == outerpointsother[i])
@@ -1910,7 +1908,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	      std::cerr << "OJE OJE OJE (other)" << std::endl;
 	      std::cerr << "pi1 " << pi1 << " pi2 " << pi2 << " sp1 " << sp1 << " sp2 " << sp2 << std::endl;
 	      std::cerr << "hasbothpoints: " << std::endl;
-	      for(int ii=0; ii < hasbothpoints.Size(); ii++)
+	      for(int ii=0; ii < hasbothpoints.size(); ii++)
 		{
 		  std::cerr << mesh[hasbothpoints[ii]] << std::endl;
 		  for(int jj=0; jj<mesh[hasbothpoints[ii]].GetNP(); jj++)
@@ -1936,7 +1934,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		  
 	      std::cerr << "pi1other " << pi1other << " pi2other " << pi2other << " sp1other " << sp1other << " sp2other " << sp2other << std::endl;
 	      std::cerr << "hasbothpointsother: " << std::endl;
-	      for(int ii=0; ii < hasbothpointsother.Size(); ii++)
+	      for(int ii=0; ii < hasbothpointsother.size(); ii++)
 		{
 		  std::cerr << mesh[hasbothpointsother[ii]] << std::endl;
 		  for(int jj=0; jj<mesh[hasbothpointsother[ii]].GetNP(); jj++)
@@ -1962,29 +1960,29 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	    }
 
 	  bad1=0;
-	  for(int i=0; i<hasbothpoints.Size(); i++)
+	  for(int i=0; i<hasbothpoints.size(); i++)
 	    bad1 += CalcBad(mesh.Points(), mesh[hasbothpoints[i]],h);
-	  for(int i=0; i<hasbothpointsother.Size(); i++)
+	  for(int i=0; i<hasbothpointsother.size(); i++)
 	    bad1 += CalcBad(mesh.Points(), mesh[hasbothpointsother[i]],h);
-	  bad1 /= double(hasbothpoints.Size() + hasbothpointsother.Size());
+	  bad1 /= double(hasbothpoints.size() + hasbothpointsother.size());
 
 	  
 	  int startpoints,startpointsother;
 
 
-	  if(outerpoints.Size() == 3)
+	  if(outerpoints.size() == 3)
 	    startpoints = 1;
-	  else if(outerpoints.Size() == 4)
+	  else if(outerpoints.size() == 4)
 	    startpoints = 2;
 	  else
-	    startpoints = outerpoints.Size();
+	    startpoints = outerpoints.size();
 	  
-	  if(outerpointsother.Size() == 3)
+	  if(outerpointsother.size() == 3)
 	    startpointsother = 1;
-	  else if(outerpointsother.Size() == 4)
+	  else if(outerpointsother.size() == 4)
 	    startpointsother = 2;
 	  else
-	    startpointsother = outerpointsother.Size();
+	    startpointsother = outerpointsother.size();
 	  
 
 	  Array < Array < Element* > * > newelts(startpoints);
@@ -2008,13 +2006,13 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 		  newel1[0] = pi1;
 		  newel1[1] = outerpoints[i];
-		  newel1[2] = outerpoints[(i+jj+1)%outerpoints.Size()];
-		  newel1[3] = outerpoints[(i+jj+2)%outerpoints.Size()];
+		  newel1[2] = outerpoints[(i+jj+1)%outerpoints.size()];
+		  newel1[3] = outerpoints[(i+jj+2)%outerpoints.size()];
 
 		  newel2[0] = pi2;
 		  newel2[1] = outerpoints[i];
-		  newel2[2] = outerpoints[(i+jj+2)%outerpoints.Size()];
-		  newel2[3] = outerpoints[(i+jj+1)%outerpoints.Size()];
+		  newel2[2] = outerpoints[(i+jj+2)%outerpoints.size()];
+		  newel2[3] = outerpoints[(i+jj+1)%outerpoints.size()];
 		  
 
 		  //std::cerr << "j " << j << " newel1 " << newel1[0] << " "<< newel1[1] << " "<< newel1[2] << " "<< newel1[3] <<std::endl
@@ -2026,12 +2024,12 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		}
 
 	      bool wrongorientation = true;
-	      for(int jj = 0; wrongorientation && jj<newelts[i]->Size(); jj++)
+	      for(int jj = 0; wrongorientation && jj<newelts[i]->size(); jj++)
 		wrongorientation = wrongorientation && WrongOrientation(mesh.Points(), *(*newelts[i])[jj]);
 	      
 	      currbad = 0;
 
-	      for(int jj=0; jj<newelts[i]->Size(); jj++)
+	      for(int jj=0; jj<newelts[i]->size(); jj++)
 		{
 		  if(wrongorientation)
 		    std::swap((*(*newelts[i])[jj])[2],(*(*newelts[i])[jj])[3]);
@@ -2039,12 +2037,12 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 		  // not two new faces on same surface
 		  Array<int> face_index;
-		  for(int k = 0; k<surfaceindicesonnode[(*(*newelts[i])[jj])[0]].Size(); k++)
-		    face_index.Append(surfaceindicesonnode[(*(*newelts[i])[jj])[0]][k]);
+		  for(int k = 0; k<surfaceindicesonnode[(*(*newelts[i])[jj])[0]].size(); k++)
+		    face_index.push_back(surfaceindicesonnode[(*(*newelts[i])[jj])[0]][k]);
 
 		  for(int k=1; k<4; k++)
 		    {
-		      for(int l=0; l<face_index.Size(); l++)
+		      for(int l=0; l<face_index.size(); l++)
 			{
 			  if(face_index[l] != -1 && 
 			     !(surfaceindicesonnode[(*(*newelts[i])[jj])[k]].Contains(face_index[l])))
@@ -2053,7 +2051,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 		    }
 		      
-		  for(int k=0; k<face_index.Size(); k++)
+		  for(int k=0; k<face_index.size(); k++)
 		    if(face_index[k] != -1)
 		      currbad += 1e12;
 
@@ -2091,13 +2089,13 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 		  newel1[0] = pi1other;
 		  newel1[1] = outerpointsother[i];
-		  newel1[2] = outerpointsother[(i+jj+1)%outerpointsother.Size()];
-		  newel1[3] = outerpointsother[(i+jj+2)%outerpointsother.Size()];
+		  newel1[2] = outerpointsother[(i+jj+1)%outerpointsother.size()];
+		  newel1[3] = outerpointsother[(i+jj+2)%outerpointsother.size()];
 
 		  newel2[0] = pi2other;
 		  newel2[1] = outerpointsother[i];
-		  newel2[2] = outerpointsother[(i+jj+2)%outerpointsother.Size()];
-		  newel2[3] = outerpointsother[(i+jj+1)%outerpointsother.Size()];
+		  newel2[2] = outerpointsother[(i+jj+2)%outerpointsother.size()];
+		  newel2[3] = outerpointsother[(i+jj+1)%outerpointsother.size()];
 		  
 
 		  //std::cerr << "j " << j << " newel1 " << newel1[0] << " "<< newel1[1] << " "<< newel1[2] << " "<< newel1[3] <<std::endl
@@ -2109,12 +2107,12 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		}
 
 	      bool wrongorientation = true;
-	      for(int jj = 0; wrongorientation && jj<neweltsother[i]->Size(); jj++)
+	      for(int jj = 0; wrongorientation && jj<neweltsother[i]->size(); jj++)
 		wrongorientation = wrongorientation && WrongOrientation(mesh.Points(), *(*neweltsother[i])[jj]);
 	      
 	      currbad = 0;
 
-	      for(int jj=0; jj<neweltsother[i]->Size(); jj++)
+	      for(int jj=0; jj<neweltsother[i]->size(); jj++)
 		{
 		  if(wrongorientation)
 		    std::swap((*(*neweltsother[i])[jj])[2],(*(*neweltsother[i])[jj])[3]);
@@ -2141,9 +2139,9 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	    CalcTriangleBadness (mesh[pi2],mesh[sp1],mesh[sp2],0,0);
 	  
 
-	  int denom = newelts[minpos]->Size();
+	  int denom = newelts[minpos]->size();
 	  if(minposother >= 0)
-	    denom += neweltsother[minposother]->Size();
+	    denom += neweltsother[minposother]->size();
 	  
 
 	  if((minbad+minbadother)/double(denom) < bad1 && 
@@ -2230,7 +2228,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 
 
-	      for(int i=0; i<hasbothpoints.Size(); i++)
+	      for(int i=0; i<hasbothpoints.size(); i++)
 		{
 		  mesh[hasbothpoints[i]] = *(*newelts[minpos])[i];
 
@@ -2238,7 +2236,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		    elementsonnode.Add((*(*newelts[minpos])[i])[l],hasbothpoints[i]);
 		}
 
-	      for(int i=hasbothpoints.Size(); i<(*newelts[minpos]).Size(); i++)
+	      for(int i=hasbothpoints.size(); i<(*newelts[minpos]).size(); i++)
 		{
 		  ElementIndex ni = mesh.AddVolumeElement(*(*newelts[minpos])[i]);
 		  
@@ -2246,16 +2244,16 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		    elementsonnode.Add((*(*newelts[minpos])[i])[l],ni);
 		}
 
-	      if(hasbothpointsother.Size() > 0)
+	      if(hasbothpointsother.size() > 0)
 		{
-		  for(int i=0; i<hasbothpointsother.Size(); i++)
+		  for(int i=0; i<hasbothpointsother.size(); i++)
 		    {
 		      mesh[hasbothpointsother[i]] = *(*neweltsother[minposother])[i];
 		      for(int l=0; l<4; l++)
 			elementsonnode.Add((*(*neweltsother[minposother])[i])[l],hasbothpointsother[i]);
 		    }
 		  
-		  for(int i=hasbothpointsother.Size(); i<(*neweltsother[minposother]).Size(); i++)
+		  for(int i=hasbothpointsother.size(); i<(*neweltsother[minposother]).size(); i++)
 		    {
 		      ElementIndex ni = mesh.AddVolumeElement(*(*neweltsother[minposother])[i]);
 		      for(int l=0; l<4; l++)
@@ -2267,16 +2265,16 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 	    }
 
-	  for(int i=0; i<newelts.Size(); i++)
+	  for(int i=0; i<newelts.size(); i++)
 	    {
-	      for(int jj=0; jj<newelts[i]->Size(); jj++)
+	      for(int jj=0; jj<newelts[i]->size(); jj++)
 		delete (*newelts[i])[jj];
 	      delete newelts[i];
 	    }
 
-	  for(int i=0; i<neweltsother.Size(); i++)
+	  for(int i=0; i<neweltsother.size(); i++)
 	    {
-	      for(int jj=0; jj<neweltsother[i]->Size(); jj++)
+	      for(int jj=0; jj<neweltsother[i]->size(); jj++)
 		delete (*neweltsother[i])[jj];
 	      delete neweltsother[i];
 	    }
@@ -2287,7 +2285,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
   PrintMessage (5, cnt, " swaps performed");
 
 
-  for(int i=0; i<locidmaps.Size(); i++)
+  for(int i=0; i<locidmaps.size(); i++)
     delete locidmaps[i];
 
 
@@ -2410,7 +2408,7 @@ void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
 	  
 
 	  bool bface = 0;
-	  for (int k = 0; k < belementsonnode[pi1].Size(); k++)
+	  for (int k = 0; k < belementsonnode[pi1].size(); k++)
 	    {
 	      const Element2d & bel = 
 		mesh[belementsonnode[pi1][k]];
@@ -2434,7 +2432,7 @@ void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
 
 
 	  FlatArray<ElementIndex> row = elementsonnode[pi1];
-	  for (int k = 0; k < row.Size(); k++)
+	  for (int k = 0; k < row.size(); k++)
 	    {
 	      ElementIndex eli2 = row[k];
 

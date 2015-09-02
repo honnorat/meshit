@@ -481,14 +481,14 @@ public:
   ///
   BASE_INDEX_CLOSED_HASHTABLE (int size);
 
-  int Size() const { return hash.Size(); }
+  int Size() const { return hash.size(); }
   int UsedPos (int pos) const { return ! (hash.Get(pos) == invalid); }
   int UsedElements () const;
 
   ///
   int HashValue (const INDEX & ind) const
   {
-    return (3*ind) % hash.Size() + 1;
+    return (3*ind) % hash.size() + 1;
   }
 
 
@@ -500,7 +500,7 @@ public:
 	if (hash.Get(i) == ind) return i;
 	if (hash.Get(i) == invalid) return 0;
 	i++;
-	if (i > hash.Size()) i = 1;
+	if (i > hash.size()) i = 1;
       }
   }
 
@@ -513,7 +513,7 @@ public:
 	if (hash.Get(i) == ind) return costs;
 	if (hash.Get(i) == invalid) return costs;
 	i++;
-	if (i > hash.Size()) i = 1;
+	if (i > hash.size()) i = 1;
 	costs++;
       }
   }
@@ -615,12 +615,12 @@ public:
   inline void SetSize (int size)
   {
     BaseSetSize(size);
-  cont.SetSize(size);
+  cont.resize(size);
   }
   
   ///
   inline void DeleteData ()
-  { SetSize (cont.Size()); }
+  { SetSize (cont.size()); }
 
   void SetName (const char * aname)
   {
@@ -649,14 +649,14 @@ public:
   ///
   BASE_INDEX_2_CLOSED_HASHTABLE (int size);
 
-  int Size() const { return hash.Size(); }
+  int Size() const { return hash.size(); }
   int UsedPos (int pos) const { return ! (hash.Get(pos).I1() == invalid); }
   int UsedElements () const;
 
   ///
   int HashValue (const INDEX_2 & ind) const
     {
-      return (ind.I1() + 71 * ind.I2()) % hash.Size() + 1;
+      return (ind.I1() + 71 * ind.I2()) % hash.size() + 1;
     }
 
 
@@ -668,7 +668,7 @@ public:
 	if (hash.Get(i) == ind) return i;
 	if (hash.Get(i).I1() == invalid) return 0;
 	i++;
-	if (i > hash.Size()) i = 1;
+	if (i > hash.size()) i = 1;
       }
   }
 
@@ -731,7 +731,7 @@ public:
   inline void PrintMemInfo (std::ostream & ost) const;
   ///
   inline void DeleteData ()
-  { SetSize (cont.Size()); }
+  { SetSize (cont.size()); }
 
   void SetName (const char * aname)
   {
@@ -782,7 +782,7 @@ protected:
 public:
   int Size() const 
   {
-    return hash.Size(); 
+    return hash.size(); 
   }
 
   bool UsedPos (int pos) const 
@@ -792,7 +792,7 @@ public:
 
   int UsedElements () const
   {
-    int n = hash.Size();
+    int n = hash.size();
     int cnt = 0;
     for (int i = 0; i < n; i++)
       if (hash[i].I1() != invalid)
@@ -802,7 +802,7 @@ public:
 
   int HashValue (const INDEX_3 & ind) const
   {
-    return (ind.I1() + 15 * ind.I2() + 41 * ind.I3()) % hash.Size();
+    return (ind.I1() + 15 * ind.I2() + 41 * ind.I3()) % hash.size();
   }
   
   int Position (const INDEX_3 & ind) const
@@ -812,7 +812,7 @@ public:
       {
 	if (hash[i] == ind) return i;
 	if (hash[i].I1() == invalid) return -1;
-        i = (i+1) % hash.Size();
+        i = (i+1) % hash.size();
       }
   }
 
@@ -824,7 +824,7 @@ public:
       {
 	if (hash[i] == ind) return c;
 	if (hash[i].I1() == invalid) return c;
-        i = (i+1) % hash.Size();
+        i = (i+1) % hash.size();
         c++;
       }
   }
@@ -917,7 +917,7 @@ public:
    void SetSize (int size)
   {
     BaseSetSize(size);
-    cont.SetSize(size);
+    cont.resize(size);
   }
 
   void PrintMemInfo (std::ostream & ost) const
@@ -930,7 +930,7 @@ public:
 
   void DeleteData ()
   { 
-    SetSize (cont.Size()); 
+    SetSize (cont.size()); 
   }
 
   void SetName (const char * aname)
@@ -1245,7 +1245,7 @@ inline void INDEX_2_CLOSED_HASHTABLE<T> ::
 SetSize (int size)
 {
   BaseSetSize(size);
-  cont.SetSize(size);
+  cont.resize(size);
 }
 
 

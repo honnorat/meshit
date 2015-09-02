@@ -20,7 +20,7 @@ namespace netgen
 
 
   
-  int NetgenGeometry :: GenerateMesh (Mesh*& mesh, MeshingParameters & mparam,
+  int NetgenGeometry :: GenerateMesh (Mesh*& mesh, MeshingParameters & mp,
 				      int perfstepsstart, int perfstepsend)
   {
     if (!mesh) return 1;
@@ -30,7 +30,7 @@ namespace netgen
 	multithread.task = "Volume meshing";
 	
 	MESHING3_RESULT res =
-	  MeshVolume (mparam, *mesh);
+	  MeshVolume (mp, *mesh);
 	
 	if (res != MESHING3_OK) return 1;
 	
@@ -51,7 +51,7 @@ namespace netgen
       {
 	multithread.task = "Volume optimization";
 	
-	OptimizeVolume (mparam, *mesh);
+	OptimizeVolume (mp, *mesh);
 	if (multithread.terminate) return 0;
       }
     

@@ -96,7 +96,7 @@ void splinesegment3d :: EvaluateTangent (double t, Vec<3> & tang) const
 void spline3d :: AddSegment (const Point<3> & ap1, const Point<3> & ap2, 
 			     const Point<3> & ap3)
 {
-  segments.Append (new splinesegment3d (ap1, ap2, ap3));
+  segments.push_back (new splinesegment3d (ap1, ap2, ap3));
 }
 
 void spline3d :: Evaluate (double t, Point<3> & p) const

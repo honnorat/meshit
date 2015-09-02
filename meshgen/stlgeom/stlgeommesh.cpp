@@ -53,15 +53,15 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
   edgepointorigines.SetSize(size);
   edgepointoriginps.SetSize(size);
 
-  edgetrigs.SetSize(size);
-  edgepointnums.SetSize(size);
-  edgetriglocinds.SetSize(size);
+  edgetrigs.resize(size);
+  edgepointnums.resize(size);
+  edgetriglocinds.resize(size);
 
   Array<int> edgelist1;
   Array<int> edgelist2;
 
-  edgelist1.SetSize(0);
-  edgelist2.SetSize(0);
+  edgelist1.resize(0);
+  edgelist2.resize(0);
 
 
   int i, j, k, l, m;
@@ -84,7 +84,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
       hashtab.Set(edgepointnums.Get(edgecnt),edgecnt);
 
       edgetriglocinds.Elem(edgecnt) = i;
-      edgelist1.Append(edgecnt);
+      edgelist1.push_back(edgecnt);
 
       for (j = 1; j <= divisions; j++)
 	{
@@ -112,9 +112,9 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
     {
       finished = 1;
       
-      if (edgelist1.Size() > maxsize) {maxsize = edgelist1.Size();}
+      if (edgelist1.size() > maxsize) {maxsize = edgelist1.size();}
 
-      for (i = 1; i <= edgelist1.Size(); i++)
+      for (i = 1; i <= edgelist1.size(); i++)
 	{
 	  int en = edgelist1.Get(i);
 	  int trig = edgetrigs.Get(en);
@@ -204,7 +204,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
 		      if (minofmindist < endpointmindist-1E-10 && changed)
 			{
 			  finished = 0;
-			  edgelist2.Append(edgenum);
+			  edgelist2.push_back(edgenum);
 			}
 		    }
 		}
@@ -227,10 +227,10 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
 		}
 	    }
 	}
-      edgelist1.SetSize(0);
-      for (i = 1; i <= edgelist2.Size(); i++)
+      edgelist1.resize(0);
+      for (i = 1; i <= edgelist2.size(); i++)
 	{
-	  edgelist1.Append(edgelist2.Get(i));
+	  edgelist1.push_back(edgelist2.Get(i));
 	}
     }
 
@@ -238,7 +238,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
 
   Array<Point3d> plist;
 
-  plist.Append(ap2);
+  plist.push_back(ap2);
   int laste = endpointorigine;
   int lastp = endpointoriginp;
   int lle, llp;
@@ -246,7 +246,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
 
   while (laste)
     {
-      plist.Append(edgepoints.Get(laste,lastp));
+      plist.push_back(edgepoints.Get(laste,lastp));
 
       lle = laste;
       llp = lastp; 
@@ -254,9 +254,9 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
       lastp = edgepointoriginps.Get(lle,llp);
     }
 
-  plist.Append(ap1);
+  plist.push_back(ap1);
 
-  for (i = 1; i <= plist.Size()-1; i++)
+  for (i = 1; i <= plist.size()-1; i++)
     {
       AddMarkedSeg(plist.Get(i),plist.Get(i+1));
     }
@@ -268,7 +268,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
   double dist = 0;
   int found = 0;
   
-  for (i = 1; i <= plist.Size()-1; i++)
+  for (i = 1; i <= plist.size()-1; i++)
     {
       dist += Dist(plist.Get(i),plist.Get(i+1));
       if (dist > endpointmindist*0.5) 
@@ -294,7 +294,7 @@ Point<3> STLGeometry :: PointBetween(const Point<3> & ap1, int t1,
 void STLGeometry :: PrepareSurfaceMeshing()
 {
   meshchart = -1; //clear no old chart
-  meshcharttrigs.SetSize(GetNT());
+  meshcharttrigs.resize(GetNT());
   meshcharttrigs = 0;
 }
 
@@ -322,11 +322,11 @@ void STLGeometry::GetMeshChartBoundary (Array<Point2d > & apoints,
 	      const Point<3> & p3d = GetPoint (pi);
 	      Point<2> p2d;
 
-	      points3d.Append (p3d);
+	      points3d.push_back (p3d);
 	      ToPlane(p3d, 0, p2d, h, zone, 0);
-	      apoints.Append (p2d);
+	      apoints.push_back (p2d);
 	      
-	      lpi = apoints.Size();
+	      lpi = apoints.size();
 	      ha_points.Elem(pi) = lpi;
 	    }
 	  else
@@ -334,7 +334,7 @@ void STLGeometry::GetMeshChartBoundary (Array<Point2d > & apoints,
 
 	  i2.I(j) = lpi;
 	}
-      alines.Append (i2);
+      alines.push_back (i2);
 
       /*
       seg = chart.GetOLimit(i);
@@ -409,7 +409,7 @@ void STLGeometry :: SelectChartOfPoint (const Point<3> & p)
   
 
   //  for (i = 1; i <= GetNT(); i++)
-  for (ii = 1; ii <= trigsinbox.Size(); ii++)
+  for (ii = 1; ii <= trigsinbox.size(); ii++)
     {
       i = trigsinbox.Get(ii);
       Point<3> hp = p;
@@ -475,15 +475,15 @@ void STLGeometry :: ToPlane (const Point<3> & locpoint, int * trigs,
 	      Box<3> box(locpoint, locpoint);
 	      box.Increase (range);
 	      GetTrianglesInBox (box, trigsinbox2);
-	      for (i = 1; i <= trigsinbox2.Size(); i++)
+	      for (i = 1; i <= trigsinbox2.size(); i++)
 		{
-		  if (TrigIsInOC(trigsinbox2.Get(i),meshchart)) {trigsinbox.Append(trigsinbox2.Get(i));}
+		  if (TrigIsInOC(trigsinbox2.Get(i),meshchart)) {trigsinbox.push_back(trigsinbox2.Get(i));}
 		}
 	      
 	    }
 	  
 	  
-	  for (i = 1; i <= trigsinbox.Size(); i++)
+	  for (i = 1; i <= trigsinbox.size(); i++)
 	    {
 	      Point<3> p = locpoint;
 	      if (GetTriangle(trigsinbox.Get(i)).GetNearestPoint(points, p) 
@@ -736,7 +736,7 @@ void STLGeometry :: RestrictLocalHCurv(class Mesh & mesh, double gh)
   if (stlparam.resthatlasenable)
     {
       Array<double> minh; //minimales h pro punkt
-      minh.SetSize(GetNP());
+      minh.resize(GetNP());
       for (i = 1; i <= GetNP(); i++)
 	{
 	  minh.Elem(i) = gh;
@@ -840,7 +840,7 @@ void STLGeometry :: RestrictLocalH(class Mesh & mesh, double gh)
       PushStatusF("Restrict H due to surface curvature");
 
       Array<double> minh; //minimales h pro punkt
-      minh.SetSize(GetNP());
+      minh.resize(GetNP());
       for (i = 1; i <= GetNP(); i++)
 	{
 	  minh.Elem(i) = gh;
@@ -965,7 +965,7 @@ void STLGeometry :: RestrictLocalH(class Mesh & mesh, double gh)
 	  if (multithread.terminate)
 	    {PopStatus(); return;}
 
-	  linenums.SetSize(0);
+	  linenums.resize(0);
 	  lsearchtree->GetIntersecting(pmins.Get(i),pmaxs.Get(i),linenums);
 	      
 	  STLLine* l1 = GetLine(i);
@@ -974,7 +974,7 @@ void STLGeometry :: RestrictLocalH(class Mesh & mesh, double gh)
 	      p3p1 = GetPoint(l1->PNum(j));
 	      h1 = sqr(mesh.GetH(p3p1));
 	      
-	      for (k2 = 1; k2 <= linenums.Size(); k2++)
+	      for (k2 = 1; k2 <= linenums.size(); k2++)
 		{
 		  k = linenums.Get(k2);
 		  if (k <= i) {continue;} 
@@ -1139,13 +1139,13 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
   // Point3d p3p1, p3p2;
   STLTriangle tt;
       
-  limes1.SetSize(0);
-  limes2.SetSize(0);
-  plimes1.SetSize(0);
-  plimes2.SetSize(0);
-  plimes1trigs.SetSize(0);
-  plimes2trigs.SetSize(0);
-  plimes1origin.SetSize(0);
+  limes1.resize(0);
+  limes2.resize(0);
+  plimes1.resize(0);
+  plimes2.resize(0);
+  plimes1trigs.resize(0);
+  plimes2trigs.resize(0);
+  plimes1origin.resize(0);
 
   STLChart& chart = GetChart(chartnum);
   chart.ClearOLimit();
@@ -1167,15 +1167,15 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 		  Point3d p3p2 = GetPoint(np2);
 		  if (AddIfNotExists(limes1,np1)) 
 		    {
-		      plimes1.Append(p3p1); 
-		      plimes1trigs.Append(t);
-		      plimes1origin.Append(np1); 			      
+		      plimes1.push_back(p3p1); 
+		      plimes1trigs.push_back(t);
+		      plimes1origin.push_back(np1); 			      
 		    }
 		  if (AddIfNotExists(limes1,np2)) 
 		    {
-		      plimes1.Append(p3p2); 
-		      plimes1trigs.Append(t);
-		      plimes1origin.Append(np2); 			      
+		      plimes1.push_back(p3p2); 
+		      plimes1trigs.push_back(t);
+		      plimes1origin.push_back(np2); 			      
 		    }
 		  chart.AddILimit(twoint(np1,np2));
 
@@ -1184,11 +1184,11 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 		      double f1 = (double)di/(double)(divisions+1.);
 		      double f2 = (divisions+1.-(double)di)/(double)(divisions+1.);
 			      
-		      plimes1.Append(Point3d(p3p1.X()*f1+p3p2.X()*f2,
+		      plimes1.push_back(Point3d(p3p1.X()*f1+p3p2.X()*f2,
 					     p3p1.Y()*f1+p3p2.Y()*f2,
 					     p3p1.Z()*f1+p3p2.Z()*f2));
-		      plimes1trigs.Append(t);
-		      plimes1origin.Append(0); 			      
+		      plimes1trigs.push_back(t);
+		      plimes1origin.push_back(0); 			      
 		    }
 		}
 	    }
@@ -1214,8 +1214,8 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 		  Point3d p3p1 = GetPoint(np1);
 		  Point3d p3p2 = GetPoint(np2);
 			  
-		  if (AddIfNotExists(limes2,np1)) {plimes2.Append(p3p1); plimes2trigs.Append(t);}
-		  if (AddIfNotExists(limes2,np2)) {plimes2.Append(p3p2); plimes2trigs.Append(t);}
+		  if (AddIfNotExists(limes2,np1)) {plimes2.push_back(p3p1); plimes2trigs.push_back(t);}
+		  if (AddIfNotExists(limes2,np2)) {plimes2.push_back(p3p2); plimes2trigs.push_back(t);}
 		  chart.AddOLimit(twoint(np1,np2));
 
 		  for (int di = 1; di <= divisions; di++)
@@ -1223,10 +1223,10 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 		      double f1 = (double)di/(double)(divisions+1.);
 		      double f2 = (divisions+1.-(double)di)/(double)(divisions+1.);
 			      
-		      plimes2.Append(Point3d(p3p1.X()*f1+p3p2.X()*f2,
+		      plimes2.push_back(Point3d(p3p1.X()*f1+p3p2.X()*f2,
 					     p3p1.Y()*f1+p3p2.Y()*f2,
 					     p3p1.Z()*f1+p3p2.Z()*f2));
-		      plimes2trigs.Append(t);
+		      plimes2trigs.push_back(t);
 		    }
 		}
 	    }
@@ -1235,18 +1235,18 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 	  
   double chartmindist = 1E50;
 
-  if (plimes2.Size())
+  if (plimes2.size())
     {
       Box3d bbox;
       bbox.SetPoint (plimes2.Get(1));
-      for (int j = 2; j <= plimes2.Size(); j++)
+      for (int j = 2; j <= plimes2.size(); j++)
 	bbox.AddPoint (plimes2.Get(j));
       Point3dTree stree(bbox.PMin(), bbox.PMax());
-      for (int j = 1; j <= plimes2.Size(); j++)
+      for (int j = 1; j <= plimes2.size(); j++)
 	stree.Insert (plimes2.Get(j), j);
       Array<int> foundpts;
 	  
-      for (int j = 1; j <= plimes1.Size(); j++) 
+      for (int j = 1; j <= plimes1.size(); j++) 
 	{
 	  double mindist = 1E50;
 
@@ -1259,7 +1259,7 @@ void STLGeometry :: RestrictHChartDistOneChart(int chartnum, Array<int>& acttrig
 	  stree.GetIntersecting (pmin, pmax, foundpts);
 
 
-	  for (int kk = 1; kk <= foundpts.Size(); kk++)
+	  for (int kk = 1; kk <= foundpts.size(); kk++)
 	    {
 	      int k = foundpts.Get(kk);
 	      double dist = Dist2(plimes1.Get(j),plimes2.Get(k));
@@ -1536,12 +1536,6 @@ int STLMeshingDummy (STLGeometry* stlgeometry, Mesh*& mesh, MeshingParameters & 
 	  */
 
 	  OptimizeVolume (mparam, *mesh);
-	  
-#ifdef STAT_STREAM
-	  (*statout) << GetTime() << " & " <<std::endl;
-	  (*statout) << mesh->GetNE() << " & " <<std::endl
-		     << mesh->GetNP() << " " << '\\' << '\\' << " \\" << "hline" <<std::endl;
-#endif
 
 	  extern void Render();
 	  Render();

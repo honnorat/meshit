@@ -321,8 +321,8 @@ namespace netgen
 
 
     //  mesh.mglevels++;
-    int oldsize = mesh.mlbetweennodes.Size();
-    mesh.mlbetweennodes.SetSize(mesh.GetNP());
+    int oldsize = mesh.mlbetweennodes.size();
+    mesh.mlbetweennodes.resize(mesh.GetNP());
     for (int i = oldsize; i < mesh.GetNP(); i++)
       mesh.mlbetweennodes[i] = INDEX_2(0,0);
 
@@ -428,7 +428,7 @@ namespace netgen
 	    should.Elem(i) = can.Elem(i) = mesh.Point(i);
 	  }
 
-	for (int i = 1; i <= parents.Size(); i++)
+	for (int i = 1; i <= parents.size(); i++)
 	  {
 	    if (parents.Get(i).I1())
 	      can.Elem(i) = Center (can.Elem(parents.Get(i).I1()),

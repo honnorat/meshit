@@ -204,7 +204,7 @@ namespace netgen
 	double values[6];
 	Vec3d v;
 	
-	for(int i=0; i<potential_startpoints.Size(); i++)
+	for(int i=0; i<potential_startpoints.size(); i++)
 	  {
 	    int elnr = mesh.GetElementOfPoint(potential_startpoints[i],lami,true) - 1;
 	    if(elnr == -1)
@@ -234,9 +234,9 @@ namespace netgen
 
 
 
-    for(int i=0; i<potential_startpoints.Size(); i++)
+    for(int i=0; i<potential_startpoints.size(); i++)
       {
-	std::cout << "\rFieldline Calculation " << int(100.*i/potential_startpoints.Size()) << "%"; std::cout.flush();
+	std::cout << "\rFieldline Calculation " << int(100.*i/potential_startpoints.size()) << "%"; std::cout.flush();
 
 	if(randomized)
 	  SetCriticalValue((double(rand())/RAND_MAX)*crit);
@@ -247,7 +247,7 @@ namespace netgen
 
 	bool usable = false;
 
-	for(int j=1; j<dirstart.Size(); j++)
+	for(int j=1; j<dirstart.size(); j++)
 	  for(int k=dirstart[j-1]; k<dirstart[j]-1; k++)
 	    {
 	      if(!drawelems[k] || !drawelems[k+1]) continue;
@@ -336,12 +336,12 @@ namespace netgen
     for (int i=0; i<3; i++) lami[i]=0.0;
     for (int i=0; i<3; i++) startlami[i]=0.0;
     
-    points.SetSize(0);
-    vals.SetSize(0);
-    drawelems.SetSize(0);
+    points.resize(0);
+    vals.resize(0);
+    drawelems.resize(0);
 
-    dirstart.SetSize(0);
-    dirstart.Append(0);
+    dirstart.resize(0);
+    dirstart.push_back(0);
 
 
     int startelnr = mesh.GetElementOfPoint(startpoint,startlami,true) - 1;
@@ -371,9 +371,9 @@ namespace netgen
       {
 	if(dir*direction < 0) continue;
 	  
-	points.Append(startpoint);
-	vals.Append(startval);
-	drawelems.Append(startdraw);
+	points.push_back(startpoint);
+	vals.push_back(startval);
+	drawelems.push_back(startdraw);
 	  
 	h = 0.001*rad/startval; // otherwise no nice lines; should be made accessible from outside
 	
@@ -418,21 +418,21 @@ namespace netgen
 		break;
 	      }
 
-	    points.Append(newp);
-	    vals.Append(v.Length());
-	    drawelems.Append(drawelem);
+	    points.push_back(newp);
+	    vals.push_back(v.Length());
+	    drawelems.push_back(drawelem);
 
-	    if(points.Size() % 40 == 0 && points.Size() > 1)
-	      std::cerr << "Points in current fieldline: " << points.Size() << ", current position: " << newp <<std::endl;
+	    if(points.size() % 40 == 0 && points.size() > 1)
+	      std::cerr << "Points in current fieldline: " << points.size() << ", current position: " << newp <<std::endl;
 
-	    if(maxpoints > 0 && points.Size() >= maxpoints)
+	    if(maxpoints > 0 && points.size() >= maxpoints)
 	      {
 		break;
 	      }
 
 	    //std::cout << "length " << length << " h " << h << " vals.Last() " << vals.Last()  << " maxlength " << maxlength <<std::endl;
 	  }
-	dirstart.Append(points.Size());
+	dirstart.push_back(points.size());
       }
   }
 
@@ -457,7 +457,7 @@ namespace netgen
 	fieldlines_startarea_parameter[5] = pmax.Z();
       }
     
-    for (int i = 1; i <= startpoints.Size(); i++)
+    for (int i = 1; i <= startpoints.size(); i++)
       {
 	Point3d p (fieldlines_startarea_parameter[0] + double (rand()) / RAND_MAX * (fieldlines_startarea_parameter[3]-fieldlines_startarea_parameter[0]),
 		   fieldlines_startarea_parameter[1] + double (rand()) / RAND_MAX * (fieldlines_startarea_parameter[4]-fieldlines_startarea_parameter[1]),
@@ -469,7 +469,7 @@ namespace netgen
 
   void VisualSceneSolution :: BuildFieldLinesFromLine(Array<Point3d> & startpoints)
   {
-    for (int i = 1; i <= startpoints.Size(); i++)
+    for (int i = 1; i <= startpoints.size(); i++)
       {
 	double s = double (rand()) / RAND_MAX;
 
@@ -516,7 +516,7 @@ namespace netgen
 
     //std::cout << numpoints << " startpoints" <<std::endl;
 
-    startpoints.SetSize(numpoints);
+    startpoints.resize(numpoints);
     
     infile = new ifstream(fieldlines_filename.c_str());
 
@@ -567,7 +567,7 @@ namespace netgen
     
     //std::cout << "fieldlines_startface " << fieldlines_startface <<std::endl;
     mesh->GetSurfaceElementsOfFace(fieldlines_startface,elements_2d);
-    if(elements_2d.Size() == 0)
+    if(elements_2d.size() == 0)
       {
 	std::cerr << "No Elements on selected face (?)" <<std::endl;
 	return;
@@ -577,7 +577,7 @@ namespace netgen
     double area = 0;
 
 	int i;
-    for(i=0; i<elements_2d.Size(); i++)
+    for(i=0; i<elements_2d.size(); i++)
       {
 	const Element2d & elem = mesh->SurfaceElement(elements_2d[i]);
 	
@@ -598,13 +598,13 @@ namespace netgen
     int startpointsp = 0;
     i = 0;
     
-    while(startpointsp < startpoints.Size())
+    while(startpointsp < startpoints.size())
       {
 	const Element2d & elem = mesh->SurfaceElement(elements_2d[i]);
 	
 	int numtri = (elem.GetNV() == 3) ? 1 : 2;
 	
-	for(int tri = 0; startpointsp < startpoints.Size() && tri<numtri; tri++)
+	for(int tri = 0; startpointsp < startpoints.size() && tri<numtri; tri++)
 	  {
 	    
 	    if(tri == 0)
@@ -622,11 +622,11 @@ namespace netgen
 	    
 	    double thisarea = cross.Length();
 	    
-	    int numloc = int(startpoints.Size()*thisarea/area);
-	    if(double (rand()) / RAND_MAX < startpoints.Size()*thisarea/area - numloc)
+	    int numloc = int(startpoints.size()*thisarea/area);
+	    if(double (rand()) / RAND_MAX < startpoints.size()*thisarea/area - numloc)
 	      numloc++;
 	    
-	    for(int j=0; startpointsp < startpoints.Size() && j<numloc; j++)
+	    for(int j=0; startpointsp < startpoints.size() && j<numloc; j++)
 	      {
 		double s = double (rand()) / RAND_MAX;
 		double t = double (rand()) / RAND_MAX;
@@ -639,7 +639,7 @@ namespace netgen
 	      }
 	  }
 	i++;
-	if(i == elements_2d.Size()) i = 0;
+	if(i == elements_2d.size()) i = 0;
       } 
     
   }

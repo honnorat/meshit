@@ -116,9 +116,9 @@ GetTriangleApproximation (TriangleApproximation & tas,
 Brick :: Brick (Point<3> ap1, Point<3> ap2, 
 		Point<3> ap3, Point<3> ap4)
 {
-  faces.SetSize (6);
-  surfaceids.SetSize (6);
-  surfaceactive.SetSize(6);
+  faces.resize (6);
+  surfaceids.resize (6);
+  surfaceactive.resize(6);
 
   p1 = ap1; p2 = ap2;
   p3 = ap3; p4 = ap4;
@@ -235,7 +235,7 @@ INSOLID_TYPE Brick :: VecInSolid (const Point<3> & p,
 				  double eps) const
 {
   INSOLID_TYPE result = IS_INSIDE;
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       INSOLID_TYPE hres = faces[i]->VecInSolid(p, v, eps);
       if (hres == IS_OUTSIDE || result == IS_OUTSIDE) result = IS_OUTSIDE;
@@ -281,7 +281,7 @@ INSOLID_TYPE Brick :: VecInSolid2 (const Point<3> & p,
 				    double eps) const
 {
   INSOLID_TYPE result = IS_INSIDE;
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       INSOLID_TYPE hres = faces[i]->VecInSolid2(p, v1, v2, eps);
       if (hres == IS_OUTSIDE || result == IS_OUTSIDE) result = IS_OUTSIDE;
@@ -297,7 +297,7 @@ INSOLID_TYPE Brick :: VecInSolid3 (const Point<3> & p,
 				    double eps) const
 {
   INSOLID_TYPE result = IS_INSIDE;
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       INSOLID_TYPE hres = faces[i]->VecInSolid3(p, v1, v2, eps);
       if (hres == IS_OUTSIDE || result == IS_OUTSIDE) result = IS_OUTSIDE;
@@ -314,7 +314,7 @@ INSOLID_TYPE Brick :: VecInSolid4 (const Point<3> & p,
 				    double eps) const
 {
   INSOLID_TYPE result = IS_INSIDE;
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       INSOLID_TYPE hres = faces[i]->VecInSolid4(p, v, v2, m, eps);
       if (hres == IS_OUTSIDE || result == IS_OUTSIDE) result = IS_OUTSIDE;
@@ -346,7 +346,7 @@ void Brick ::
 GetPrimitiveData (const char *& classname, Array<double> & coeffs) const
 {
   classname = "brick";
-  coeffs.SetSize(12);
+  coeffs.resize(12);
   coeffs.Elem(1) = p1(0);
   coeffs.Elem(2) = p1(1);
   coeffs.Elem(3) = p1(2);

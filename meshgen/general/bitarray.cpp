@@ -106,14 +106,14 @@ namespace netgen
   template <int BASE>
   void BitArrayChar<BASE> :: Invert ()
   {
-    for (int i = BASE; i < data.Size()+BASE; i++)
+    for (int i = BASE; i < data.size()+BASE; i++)
       data[i] = 1 - data[i];
   }
 
   template <int BASE>
   void BitArrayChar<BASE> :: And (const BitArrayChar & ba2)
   {
-    for (int i = BASE; i < data.Size()+BASE; i++)
+    for (int i = BASE; i < data.size()+BASE; i++)
       data[i] &= ba2.data[i];
   }
   
@@ -121,7 +121,7 @@ namespace netgen
   template <int BASE>
   void BitArrayChar<BASE> :: Or (const BitArrayChar & ba2)
   {
-    for (int i = BASE; i < data.Size()+BASE; i++)
+    for (int i = BASE; i < data.size()+BASE; i++)
       data[i] |= ba2.data[i];
   }
   

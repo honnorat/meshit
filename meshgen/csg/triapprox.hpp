@@ -42,11 +42,11 @@ namespace netgen
 
   public:
     TriangleApproximation();
-    int GetNP () const { return points.Size(); }
-    int GetNT () const { return trigs.Size(); }
+    int GetNP () const { return points.size(); }
+    int GetNT () const { return trigs.size(); }
 
-    int AddPoint (const Point<3> & p) { points.Append (p); return points.Size()-1; }
-    int AddNormal (const Vec<3> & n) { normals.Append (n); return normals.Size()-1; }
+    int AddPoint (const Point<3> & p) { points.push_back (p); return points.size()-1; }
+    int AddNormal (const Vec<3> & n) { normals.push_back (n); return normals.size()-1; }
     int AddTriangle (const TATriangle & tri, bool invert = 0);
 
     const Point<3> & GetPoint (int i) const { return points[i]; }

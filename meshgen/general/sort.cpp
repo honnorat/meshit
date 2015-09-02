@@ -19,10 +19,10 @@ namespace netgen
   void Sort (const Array<double> & values,
 	     Array<int> & order)
   {
-    int n = values.Size();
+    int n = values.size();
     int i, j;
 
-    order.SetSize (n);
+    order.resize (n);
 
     for (i = 1; i <= n; i++)
       order.Elem(i) = i;
@@ -65,11 +65,11 @@ namespace netgen
   void QuickSort (const Array<double> & values,
 		 Array<int> & order)
   {
-    int i, n = values.Size();
-    order.SetSize (n);
+    int i, n = values.size();
+    order.resize (n);
     for (i = 1; i <= n; i++)
       order.Elem(i) = i;
 
-    QuickSortRec (values, order, 1, order.Size());
+    QuickSortRec (values, order, 1, order.size());
   }
 }

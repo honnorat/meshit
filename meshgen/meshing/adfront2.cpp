@@ -81,7 +81,7 @@ namespace netgen
     // inserts at empty position or resizes array
     int pi;
 
-    if (delpointl.Size() != 0)
+    if (delpointl.size() != 0)
       {
 	pi = delpointl.Last();
 	delpointl.DeleteLast ();
@@ -90,7 +90,7 @@ namespace netgen
       }
     else
       {
-	pi = points.Append (FrontPoint2 (p, globind, mgi, pointonsurface)) - 1;
+	pi = points.push_back (FrontPoint2 (p, globind, mgi, pointonsurface)) - 1;
       }
 
     if (mgi)
@@ -122,7 +122,7 @@ namespace netgen
     p1.DecFrontNr (minfn+1);
     p2.DecFrontNr (minfn+1);
 
-    if (dellinel.Size() != 0)
+    if (dellinel.size() != 0)
       {
 	li = dellinel.Last();
 	dellinel.DeleteLast ();
@@ -130,7 +130,7 @@ namespace netgen
       }
     else
       {
-	li = lines.Append(FrontLine (INDEX_2(pi1, pi2))) - 1;
+	li = lines.push_back(FrontLine (INDEX_2(pi1, pi2))) - 1;
       }
 
   
@@ -176,7 +176,7 @@ namespace netgen
 
 	if (!points[pi].Valid())
 	  {
-	    delpointl.Append (pi);
+	    delpointl.push_back (pi);
 	    if (points[pi].mgi)
 	      {
 		cpointsearchtree.DeleteElement (pi);
@@ -197,7 +197,7 @@ namespace netgen
     lines[li].Invalidate();
     linesearchtree.DeleteElement (li);
 
-    dellinel.Append (li);
+    dellinel.push_back (li);
   }
 
 
@@ -282,8 +282,8 @@ namespace netgen
     pstind = lines[baselineindex].L().I1();
     p0 = points[pstind].P();
 
-    loclines.Append(lines[baselineindex].L());
-    lindex.Append(baselineindex);  
+    loclines.push_back(lines[baselineindex].L());
+    lindex.push_back(baselineindex);  
 
     ArrayMem<int, 1000> nearlines(0);
     ArrayMem<int, 1000> nearpoints(0);
@@ -297,39 +297,39 @@ namespace netgen
                                      p0 + Vec3d(xh, xh, xh),
                                      nearpoints);
     
-    for (int ii = 0; ii < nearlines.Size(); ii++)
+    for (int ii = 0; ii < nearlines.size(); ii++)
       {
 	int i = nearlines[ii];
 	if (lines[i].Valid() && i != baselineindex) 
 	  {
-            loclines.Append(lines[i].L());
-            lindex.Append(i);
+            loclines.push_back(lines[i].L());
+            lindex.push_back(i);
 	  }
       }
 
     // static Array<int> invpindex;
-    invpindex.SetSize (points.Size()); 
+    invpindex.resize (points.size()); 
     // invpindex = -1;
-    for (int i = 0; i < nearpoints.Size(); i++)
+    for (int i = 0; i < nearpoints.size(); i++)
       invpindex[nearpoints[i]] = -1;
 
-    for (int i = 0; i < loclines.Size(); i++)
+    for (int i = 0; i < loclines.size(); i++)
       {
 	invpindex[loclines[i].I1()] = 0;
 	invpindex[loclines[i].I2()] = 0;
       }
 
 
-    for (int i = 0; i < loclines.Size(); i++)
+    for (int i = 0; i < loclines.size(); i++)
       {
 	for (int j = 0; j < 2; j++)
 	  {
 	    int pi = loclines[i][j];
 	    if (invpindex[pi] == 0)
 	      {
-		pindex.Append (pi);
-		invpindex[pi] = pindex.Size();
-		loclines[i][j] = locpoints.Append (points[pi].P());
+		pindex.push_back (pi);
+		invpindex[pi] = pindex.size();
+		loclines[i][j] = locpoints.push_back (points[pi].P());
 	      }
 	    else
 	      loclines[i][j] = invpindex[pi];
@@ -338,7 +338,7 @@ namespace netgen
 
 
     // double xh2 = xh*xh;
-    for (int ii = 0; ii < nearpoints.Size(); ii++)
+    for (int ii = 0; ii < nearpoints.size(); ii++)
       {
         int i = nearpoints[ii];
 	if (points[i].Valid() && 
@@ -346,8 +346,8 @@ namespace netgen
 	    // Dist2 (points.Get(i).P(), p0) <= xh2 &&
 	    invpindex[i] <= 0)
 	  {
-	    invpindex[i] = locpoints.Append (points[i].P());
-	    pindex.Append(i);
+	    invpindex[i] = locpoints.push_back (points[i].P());
+	    pindex.push_back(i);
 	  }
       }
     /*
@@ -366,12 +366,12 @@ namespace netgen
       }
     */
 
-    pgeominfo.SetSize (locpoints.Size());
-    for (int i = 0; i < pgeominfo.Size(); i++)
+    pgeominfo.resize (locpoints.size());
+    for (int i = 0; i < pgeominfo.size(); i++)
       pgeominfo[i].Init();
 
 
-    for (int i = 0; i < loclines.Size(); i++)
+    for (int i = 0; i < loclines.size(); i++)
       for (int j = 0; j < 2; j++)
 	{
 	  int lpi = loclines[i][j];
@@ -402,7 +402,7 @@ namespace netgen
 	  */
 	}
 
-    for (int i = 0; i < locpoints.Size(); i++)
+    for (int i = 0; i < locpoints.size(); i++)
       {
 	int pi = pindex[i];
       
@@ -460,7 +460,7 @@ namespace netgen
     n(1) = 0.15432;
     
     cnt = 0;
-    for (int i = 0; i < lines.Size(); i++)
+    for (int i = 0; i < lines.size(); i++)
       if (lines[i].Valid())
 	{
 	  const Point<3> & p1 = points[lines[i].L().I1()].P();

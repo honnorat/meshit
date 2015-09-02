@@ -94,21 +94,21 @@ public:
   ///
   ~vnetrule ();
   ///
-  int GetNP () const { return points.Size(); }
+  int GetNP () const { return points.size(); }
   ///
-  int GetNF () const { return faces.Size(); }
+  int GetNF () const { return faces.size(); }
   ///
-  int GetNE () const { return elements.Size(); }
+  int GetNE () const { return elements.size(); }
   ///
-  int GetNO () const { return orientations.Size(); }
+  int GetNO () const { return orientations.size(); }
   ///
-  int GetNEd () const { return edges.Size(); }
+  int GetNEd () const { return edges.size(); }
   ///
   int GetNOldP () const { return noldp; }
   ///
   int GetNOldF () const { return noldf; }
   ///
-  int GetNDelF () const { return delfaces.Size(); }
+  int GetNDelF () const { return delfaces.size(); }
   ///
   int GetQuality () const { return quality; }
   ///

@@ -53,8 +53,8 @@ namespace netgen
 	    between.Set (i2, pinew);
 
 
-	    if (pinew >= epgi.Size()+PointIndex::BASE)
-	      epgi.SetSize (pinew+1-PointIndex::BASE);
+	    if (pinew >= epgi.size()+PointIndex::BASE)
+	      epgi.resize (pinew+1-PointIndex::BASE);
 	    epgi[pinew] = ngi;
 	  }
 
@@ -72,7 +72,7 @@ namespace netgen
     // refine surface elements
     Array<PointGeomInfo,PointIndex::BASE> surfgi (8*mesh.GetNP());
     for (int i = PointIndex::BASE;
-	 i < surfgi.Size()+PointIndex::BASE; i++)
+	 i < surfgi.size()+PointIndex::BASE; i++)
       surfgi[i].trignum = -1;
 
 
@@ -128,8 +128,8 @@ namespace netgen
 		      between.Set (i2, pnums.Get(4+j));
 		    }
 
-		  if (surfgi.Size() < pnums.Elem(4+j))
-		    surfgi.SetSize (pnums.Elem(4+j));
+		  if (surfgi.size() < pnums.Elem(4+j))
+		    surfgi.resize (pnums.Elem(4+j));
 		  surfgi.Elem(pnums.Elem(4+j)) = pgis.Elem(4+j);
 		}
 
@@ -205,8 +205,8 @@ namespace netgen
 
 		      between.Set (i2, pnums.Get(5+j));
 		      
-		      if (surfgi.Size() < pnums.Elem(5+j))
-			surfgi.SetSize (pnums.Elem(5+j));
+		      if (surfgi.size() < pnums.Elem(5+j))
+			surfgi.resize (pnums.Elem(5+j));
 		      surfgi.Elem(pnums.Elem(5+j)) = pgis.Elem(5+j);
 		    }
 		}

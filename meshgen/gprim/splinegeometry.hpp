@@ -39,7 +39,7 @@ namespace netgen
     const Array<SplineSeg<D>*> & GetSplines () const
     { return splines; }
 
-    int GetNSplines (void) const { return splines.Size(); }
+    int GetNSplines (void) const { return splines.size(); }
     std::string GetSplineType (const int i) const { return splines[i]->GetType(); }
     SplineSeg<D> & GetSpline (const int i) {return *splines[i];}
     const SplineSeg<D> & GetSpline (const int i) const {return *splines[i];}
@@ -48,7 +48,7 @@ namespace netgen
     Box<D> GetBoundingBox () const 
     { Box<D> box; GetBoundingBox (box); return box; }
 
-    int GetNP () const { return geompoints.Size(); }
+    int GetNP () const { return geompoints.size(); }
     const GeomPoint<D> & GetPoint(int i) const { return geompoints[i]; }
 
     // void SetGrading (const double grading);
@@ -57,7 +57,7 @@ namespace netgen
 
     void AppendSegment(SplineSeg<D> * spline)
     {
-      splines.Append (spline);
+      splines.push_back (spline);
     }
   };
 

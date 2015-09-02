@@ -13,10 +13,10 @@ namespace netgen
 int AddPointIfNotExists(Array<Point3d>& ap, const Point3d& p, double eps)
 {
   double eps2 = sqr(eps);
-  for (int i = 1; i <= ap.Size(); i++)
+  for (int i = 1; i <= ap.size(); i++)
     if (Dist2(ap.Get(i),p) <= eps2 ) 
       return i;
-  return ap.Append(p);
+  return ap.push_back(p);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -621,7 +621,7 @@ STLChart :: STLChart(STLGeometry * ageometry)
 
 void STLChart :: AddChartTrig(int i)
 {
-  charttrigs->Append(i);
+  charttrigs->push_back(i);
   
   const STLTriangle & trig = geometry->GetTriangle(i);
   const Point3d & p1 = geometry->GetPoint (trig.PNum(1));
@@ -640,7 +640,7 @@ void STLChart :: AddChartTrig(int i)
 
 void STLChart :: AddOuterTrig(int i)
 {
-  outertrigs->Append(i);
+  outertrigs->push_back(i);
 
   const STLTriangle & trig = geometry->GetTriangle(i);
   const Point3d & p1 = geometry->GetPoint (trig.PNum(1));
@@ -659,10 +659,10 @@ void STLChart :: AddOuterTrig(int i)
 
 int STLChart :: IsInWholeChart(int nr) const
 {
-  for (int i = 1; i <= charttrigs->Size(); i++)
+  for (int i = 1; i <= charttrigs->size(); i++)
     if (charttrigs->Get(i) == nr) return 1;
 
-  for (int i = 1; i <= outertrigs->Size(); i++)
+  for (int i = 1; i <= outertrigs->size(); i++)
     if (outertrigs->Get(i) == nr) return 1;
 
   return 0;
@@ -682,7 +682,7 @@ void STLChart :: GetTrianglesInBox (const Point3d & pmin,
       box1.Increase (1e-4);
       Box3d box2;
 
-      trias.SetSize(0);
+      trias.resize(0);
       
       int nt = GetNT();
       for (int i = 1; i <= nt; i++)
@@ -694,7 +694,7 @@ void STLChart :: GetTrianglesInBox (const Point3d & pmin,
 	  box2.AddPoint (geometry->GetPoint (trig.PNum(3)));
 	  
 	  if (box1.Intersect (box2))
-	    trias.Append (trignum);
+	    trias.push_back (trignum);
 	}
     }
 }
@@ -702,8 +702,8 @@ void STLChart :: GetTrianglesInBox (const Point3d & pmin,
 //trigs may contain the same triangle double
 void STLChart :: MoveToOuterChart(const Array<int>& trigs)
 {
-  if (!trigs.Size()) {return;}
-  for (int i = 1; i <= trigs.Size(); i++)
+  if (!trigs.size()) {return;}
+  for (int i = 1; i <= trigs.size(); i++)
     {
       if (charttrigs->Get(trigs.Get(i)) != -1) 
 	{AddOuterTrig(charttrigs->Get(trigs.Get(i)));}
@@ -715,27 +715,27 @@ void STLChart :: MoveToOuterChart(const Array<int>& trigs)
 //trigs may contain the same triangle double
 void STLChart :: DelChartTrigs(const Array<int>& trigs)
 {
-  if (!trigs.Size()) {return;}
+  if (!trigs.size()) {return;}
 
-  for (int i = 1; i <= trigs.Size(); i++)
+  for (int i = 1; i <= trigs.size(); i++)
     {
       charttrigs->Elem(trigs.Get(i)) = -1;
     }
 
   int cnt = 0;
-  for (int i = 1; i <= charttrigs->Size(); i++)
+  for (int i = 1; i <= charttrigs->size(); i++)
     {
       if (charttrigs->Elem(i) == -1)
 	{
 	  cnt++;
 	}
-      if (cnt != 0 && i < charttrigs->Size())
+      if (cnt != 0 && i < charttrigs->size())
 	{
 	  charttrigs->Elem(i-cnt+1) = charttrigs->Get(i+1);
 	}
     }
-  int i = charttrigs->Size() - trigs.Size();
-  charttrigs->SetSize(i);
+  int i = charttrigs->size() - trigs.size();
+  charttrigs->resize(i);
 
   if (!geomsearchtreeon && stlparam.usesearchtree == 1)
     {
@@ -744,7 +744,7 @@ void STLChart :: DelChartTrigs(const Array<int>& trigs)
       searchtree = new Box3dTree (geometry->GetBoundingBox().PMin() - Vec3d(1,1,1),
 				  geometry->GetBoundingBox().PMax() + Vec3d(1,1,1));
 
-      for (int i = 1; i <= charttrigs->Size(); i++)
+      for (int i = 1; i <= charttrigs->size(); i++)
 	{
 	  const STLTriangle & trig = geometry->GetTriangle(i);
 	  const Point3d & p1 = geometry->GetPoint (trig.PNum(1));
@@ -832,18 +832,18 @@ void STLBoundary :: AddOrDelSegment(const STLBoundarySeg & seg)
 {
   int i;
   int found = 0;
-  for (i = 1; i <= boundary.Size(); i++)
+  for (i = 1; i <= boundary.size(); i++)
     {
       if (found) {boundary.Elem(i-1) = boundary.Get(i);}
       if (boundary.Get(i) == seg) {found = 1;}
     }
   if (!found) 
     {
-      boundary.Append(seg);
+      boundary.push_back(seg);
     }
   else 
     {
-      boundary.SetSize(boundary.Size()-1);
+      boundary.resize(boundary.size()-1);
     }
 }
 
@@ -878,7 +878,7 @@ void STLBoundary ::AddTriangle(const STLTriangle & t)
       boundary.SetSize(boundary.Size()-offset);
     }    
   */
-  for (i = boundary.Size(); i >= 1; i--)
+  for (i = boundary.size(); i >= 1; i--)
     {
       if (boundary.Get(i) == seg1) 
 	{ boundary.DeleteElement (i); found1 = 1; } 
@@ -888,9 +888,9 @@ void STLBoundary ::AddTriangle(const STLTriangle & t)
 	{ boundary.DeleteElement (i); found3 = 1; } 
     }
 
-  if (!found1) {seg1.Swap(); boundary.Append(seg1);}
-  if (!found2) {seg2.Swap(); boundary.Append(seg2);}
-  if (!found3) {seg3.Swap(); boundary.Append(seg3);}
+  if (!found1) {seg1.Swap(); boundary.push_back(seg1);}
+  if (!found2) {seg2.Swap(); boundary.push_back(seg2);}
+  if (!found3) {seg3.Swap(); boundary.push_back(seg3);}
 }
 
 int STLBoundary :: TestSeg(const Point<3>& p1, const Point<3> & p2, const Vec<3> & sn, 

@@ -624,11 +624,11 @@ namespace netgen
     ~Polygon2d ();
   
     void AddPoint (const Point2d & p);
-    int GetNP() const { return points.Size(); }
+    int GetNP() const { return points.size(); }
     void GetPoint (int i, Point2d & p) const
     { p = points.Get(i); }
     void GetLine (int i, Point2d & p1, Point2d & p2) const
-    { p1 = points.Get(i); p2 = points.Get(i%points.Size()+1); }
+    { p1 = points.Get(i); p2 = points.Get(i%points.size()+1); }
 
     double Area () const { return fabs (HArea()); }
     int CW () const { return HArea() > 0; }
@@ -684,7 +684,7 @@ namespace netgen
       }
     else
       {
-	MyError ("Vec2d::operator /=: Division by zero");
+	std::cerr << "Vec2d::operator /=: Division by zero\n";
       }
     return *this;
   }

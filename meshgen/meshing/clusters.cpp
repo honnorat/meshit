@@ -31,7 +31,7 @@ namespace netgen
     ne = mesh.GetNE();
     int nse = mesh.GetNSE();
 
-    cluster_reps.SetSize (nv+ned+nfa+ne);
+    cluster_reps.resize (nv+ned+nfa+ne);
     cluster_reps = -1;
 
     Array<int> llist (nv+ned+nfa+ne);
@@ -51,10 +51,10 @@ namespace netgen
 	top.GetElementFaces (i, fanums);
       
 	int elnv = top.GetNVertices (typ);
-	int elned = ednums.Size();
-	int elnfa = fanums.Size();
+	int elned = ednums.size();
+	int elnfa = fanums.size();
 	  
-	nnums.SetSize(elnv+elned+elnfa+1);
+	nnums.resize(elnv+elned+elnfa+1);
 	for (int j = 1; j <= elnv; j++)
 	  nnums.Elem(j) = el.PNum(j);
 	for (int j = 1; j <= elned; j++)
@@ -63,7 +63,7 @@ namespace netgen
 	  nnums.Elem(elnv+elned+j) = nv+ned+fanums.Elem(j);
 	nnums.Elem(elnv+elned+elnfa+1) = nv+ned+nfa+i;
 
-	for (int j = 0; j < nnums.Size(); j++)
+	for (int j = 0; j < nnums.size(); j++)
 	  cluster_reps.Elem(nnums[j]) = nnums[j];
       }
 
@@ -78,16 +78,16 @@ namespace netgen
 	int fanum = top.GetSurfaceElementFace (i);
       
 	int elnv = top.GetNVertices (typ);
-	int elned = ednums.Size();
+	int elned = ednums.size();
 	  
-	nnums.SetSize(elnv+elned+1);
+	nnums.resize(elnv+elned+1);
 	for (int j = 1; j <= elnv; j++)
 	  nnums.Elem(j) = el.PNum(j);
 	for (int j = 1; j <= elned; j++)
 	  nnums.Elem(elnv+j) = nv+ednums.Elem(j);
 	nnums.Elem(elnv+elned+1) = fanum;
 
-	for (int j = 0; j < nnums.Size(); j++)
+	for (int j = 0; j < nnums.size(); j++)
 	  cluster_reps.Elem(nnums[j]) = nnums[j];
       }
 
@@ -149,10 +149,10 @@ namespace netgen
 	    top.GetElementFaces (i, fanums);
 	  
 	    int elnv = top.GetNVertices (typ);
-	    int elned = ednums.Size();
-	    int elnfa = fanums.Size();
+	    int elned = ednums.size();
+	    int elnfa = fanums.size();
 	  
-	    nnums.SetSize(elnv+elned+elnfa+1);
+	    nnums.resize(elnv+elned+elnfa+1);
 	    for (int j = 1; j <= elnv; j++)
 	      nnums.Elem(j) = el.PNum(j);
 	    for (int j = 1; j <= elned; j++)
@@ -204,7 +204,7 @@ namespace netgen
 	      }
 	  
 	    if (clustertab)
-	      for (int j = 0; j < nnums.Size(); j++)
+	      for (int j = 0; j < nnums.size(); j++)
 		for (int k = 0; k < j; k++)
 		  if (clustertab[j] == clustertab[k])
 		    {

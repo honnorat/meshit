@@ -376,7 +376,7 @@ void VisualSceneSTLMeshing :: DrawScene ()
 	      const Array<twoint>& me = stlgeometry->SelectedMultiEdge();
 	      if (stlgeometry->GetSelectTrig() > 0 && 
 		  stlgeometry->GetSelectTrig() <= stlgeometry->GetNT() &&
-		  me.Size())
+		  me.size())
 		{
 
 		  int en = stlgeometry->EdgeDataList().GetEdgeNum(me.Get(1).i1,me.Get(1).i2);
@@ -399,7 +399,7 @@ void VisualSceneSTLMeshing :: DrawScene ()
 
 		  glLineWidth (2);
 		  glBegin (GL_LINES);
-		  for (j = 1; j <= me.Size(); j++)
+		  for (j = 1; j <= me.size(); j++)
 		    { 
 		      Point3d p1 = stlgeometry->GetPoint(me.Get(j).i1);
 		      Point3d p2 = stlgeometry->GetPoint(me.Get(j).i2);
@@ -654,7 +654,7 @@ void VisualSceneSTLMeshing :: DrawScene ()
 	  */
 
 	  
-	  if (!stlgeometry->meshlines.Size() || !stldoctor.drawmeshededges)
+	  if (!stlgeometry->meshlines.size() || !stldoctor.drawmeshededges)
 	    {
 	      /*
 	      for (j = 1; j <= stlgeometry -> GetNE(); j++)
@@ -730,10 +730,10 @@ void VisualSceneSTLMeshing :: DrawScene ()
 	    }
 	  */
 	    
-	  else if (stlgeometry->meshlines.Size() != 0)
+	  else if (stlgeometry->meshlines.size() != 0)
 	    {
 	      glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_colgreen);
-	      for (j = 1; j <= stlgeometry->meshlines.Size(); j++)
+	      for (j = 1; j <= stlgeometry->meshlines.size(); j++)
 		{
 		  STLLine* line = stlgeometry->meshlines.Get(j);
 		  int pn1, pn2;
@@ -1172,12 +1172,12 @@ void VisualSceneSTLMeshing :: MouseDblClick (int px, int py)
 
     CalcTransformationMatrices();
 
-    for (int i = 1; i <= trilists.Size(); i++)
+    for (int i = 1; i <= trilists.size(); i++)
       glDeleteLists (trilists.Elem(i), 1);
-    trilists.SetSize(0);
+    trilists.resize(0);
 
 
-    trilists.Append (glGenLists (1));
+    trilists.push_back (glGenLists (1));
     glNewList (trilists.Last(), GL_COMPILE);
 
     glEnable (GL_NORMALIZE);

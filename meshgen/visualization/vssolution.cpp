@@ -835,7 +835,7 @@ namespace netgen
             Array<ClipPlanePoint> cpp;
             GetClippingPlaneGrid (cpp);
 
-            for (int i = 0; i < cpp.Size(); i++)
+            for (int i = 0; i < cpp.size(); i++)
               {
                 const ClipPlanePoint & p = cpp[i];
                 double values[6];
@@ -1066,7 +1066,7 @@ namespace netgen
             glNormal3d (-clipplane[0], -clipplane[1], -clipplane[2]);
           
             if (numisolines)
-              for (int i = 0; i < cpt.Size(); i++)
+              for (int i = 0; i < cpt.size(); i++)
                 {
                   const ClipPlaneTrig & trig = cpt[i];
                   double vali[3];
@@ -1219,7 +1219,7 @@ namespace netgen
     Array<double> values(npt);
 
     Array<double> mvalues(npt);
-    if (sol && sol->draw_surface) mvalues.SetSize (npt * sol->components);
+    if (sol && sol->draw_surface) mvalues.resize (npt * sol->components);
 
     Array<complex<double> > valuesc(npt);
 
@@ -3722,9 +3722,9 @@ namespace netgen
     for (ElementIndex ei = 0; ei < ne; ei++)
       {
         // NgProfiler::RegionTimer reg1a (timer1a);
-        int first_point_of_element = pts.Size();
+        int first_point_of_element = pts.size();
 
-	locgrid.SetSize(n3);
+	locgrid.resize(n3);
         if(vispar.clipdomain > 0 && vispar.clipdomain != (*mesh)[ei].GetIndex()) continue;
         if(vispar.donotclipdomain > 0 && vispar.donotclipdomain == (*mesh)[ei].GetIndex()) continue;
 
@@ -3816,7 +3816,7 @@ namespace netgen
 
             if (type != TET && type != TET10 && type != PRISM) cnt_valid = n3;
 
-	    locgrid.SetSize(cnt_valid);
+	    locgrid.resize(cnt_valid);
 
             // NgProfiler::StopTimer (timer2);
             // NgProfiler::RegionTimer reg4(timer4);
@@ -3977,7 +3977,7 @@ namespace netgen
                                             cppt.lami =  p2 + edgelam[ednr] * (p1-p2);
                                            
  
-                                            pnr = pts.Append (cppt)-1;
+                                            pnr = pts.push_back (cppt)-1;
                                             edges.Set (pair, pnr);
                                           }
 
@@ -3985,7 +3985,7 @@ namespace netgen
                                         cpt.points[k].locpnr = pnr-first_point_of_element;
                                       }
                                   
-                                    trigs.Append (cpt);
+                                    trigs.push_back (cpt);
                                   }
                               }
                           }
@@ -4019,7 +4019,7 @@ namespace netgen
     double xi1mid = (center - p) * t1;
     double xi2mid = (center - p) * t2;
 
-    pts.SetSize(0);
+    pts.resize(0);
 
     for (xi1 = xi1mid-rad+xoffset/gridsize; xi1 <= xi1mid+rad+xoffset/gridsize; xi1 += rad / gridsize)
       for (xi2 = xi2mid-rad+yoffset/gridsize; xi2 <= xi2mid+rad+yoffset/gridsize; xi2 += rad / gridsize)
@@ -4049,7 +4049,7 @@ namespace netgen
               cpp.lami(0) = lami[0];
               cpp.lami(1) = lami[1];
               cpp.lami(2) = lami[2];
-              pts.Append (cpp);
+              pts.push_back (cpp);
             }
         }
   };
@@ -4117,7 +4117,7 @@ namespace netgen
 	glBegin (GL_TRIANGLES);
 
     int maxlpnr = 0;
-    for (int i = 0; i < trigs.Size(); i++)
+    for (int i = 0; i < trigs.size(); i++)
       for (int j = 0; j < 3; j++)
         maxlpnr = max2 (maxlpnr, trigs[i].points[j].locpnr);
 
@@ -4139,7 +4139,7 @@ namespace netgen
     int nlp = -1;
     bool ok = false;
 
-    for (int i = 0; i < trigs.Size(); i++)
+    for (int i = 0; i < trigs.size(); i++)
       {
         const ClipPlaneTrig & trig = trigs[i];
 	if (trig.elnr != lastelnr)
@@ -4147,16 +4147,16 @@ namespace netgen
 	    lastelnr = trig.elnr;
 	    nlp = -1;
 
-	    for (int ii = i; ii < trigs.Size(); ii++)
+	    for (int ii = i; ii < trigs.size(); ii++)
 	      {
 		if (trigs[ii].elnr != trig.elnr) break;
 		for (int j = 0; j < 3; j++)
 		  nlp = max (nlp, trigs[ii].points[j].locpnr);
 	      }
 	    nlp++;
-	    locpoints.SetSize (nlp);
+	    locpoints.resize (nlp);
 
-	    for (int ii = i; ii < trigs.Size(); ii++)
+	    for (int ii = i; ii < trigs.size(); ii++)
 	      {
 		if (trigs[ii].elnr != trig.elnr) break;
 		for (int j = 0; j < 3; j++)

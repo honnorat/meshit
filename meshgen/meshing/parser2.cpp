@@ -91,10 +91,10 @@ void netrule :: LoadRule (std::istream & ist)
 	      ist >> p.Y();
 	      ist >> ch;    // ')'
 
-	      points.Append (p);
+	      points.push_back (p);
 	      noldp++;
 
-	      tolerances.SetSize (noldp);
+	      tolerances.resize (noldp);
 	      tolerances.Elem(noldp).f1 = 1.0;
 	      tolerances.Elem(noldp).f2 = 0;
 	      tolerances.Elem(noldp).f3 = 1.0;
@@ -141,10 +141,10 @@ void netrule :: LoadRule (std::istream & ist)
 
 
 	      //std::cerr << "read line " << lin.I1() << " " << lin.I2() <<std::endl;
-	      lines.Append (lin);
-	      linevecs.Append (points.Get(lin.I2()) - points.Get(lin.I1()));
+	      lines.push_back (lin);
+	      linevecs.push_back (points.Get(lin.I2()) - points.Get(lin.I1()));
 	      noldl++;
-	      linetolerances.SetSize (noldl);
+	      linetolerances.resize (noldl);
 	      linetolerances.Elem(noldl).f1 = 0;
 	      linetolerances.Elem(noldl).f2 = 0;
 	      linetolerances.Elem(noldl).f3 = 0;
@@ -165,7 +165,7 @@ void netrule :: LoadRule (std::istream & ist)
 		    }
 		  else if (ch == 'd')
 		    {
-		      dellines.Append (noldl);
+		      dellines.push_back (noldl);
 		      ist >> ch; // 'e'
 		      ist >> ch; // 'l'
 		      //std::cerr << "read del" <<std::endl;
@@ -194,7 +194,7 @@ void netrule :: LoadRule (std::istream & ist)
 	      ist >> p.Y();
 	      ist >> ch;    // ')'
 
-	      points.Append (p);
+	      points.push_back (p);
 
 	      ist >> ch;
 	      while (ch != ';')
@@ -202,11 +202,11 @@ void netrule :: LoadRule (std::istream & ist)
 		  if (ch == '{')
 		    {
 		      LoadMatrixLine (ist, tempoldutonewu,
-				      2 * (points.Size()-noldp) - 1);
+				      2 * (points.size()-noldp) - 1);
 
 		      ist >> ch; // '{'
 		      LoadMatrixLine (ist, tempoldutonewu,
-				      2 * (points.Size()-noldp));
+				      2 * (points.size()-noldp));
 		    }
 
 		  ist >> ch;
@@ -229,8 +229,8 @@ void netrule :: LoadRule (std::istream & ist)
 	      ist >> lin.I2();
 	      ist >> ch;    // ')'
 
-	      lines.Append (lin);
-	      linevecs.Append (points.Get(lin.I2()) - points.Get(lin.I1()));
+	      lines.push_back (lin);
+	      linevecs.push_back (points.Get(lin.I2()) - points.Get(lin.I1()));
 
 	      ist >> ch;
 	      while (ch != ';')
@@ -255,8 +255,8 @@ void netrule :: LoadRule (std::istream & ist)
 	      ist >> p.Y();
 	      ist >> ch;    // ')'
 
-	      freezone.Append (p);
-	      freezonelimit.Append (p);
+	      freezone.push_back (p);
+	      freezonelimit.push_back (p);
 
 	      ist >> ch;
 	      while (ch != ';')
@@ -264,11 +264,11 @@ void netrule :: LoadRule (std::istream & ist)
 		  if (ch == '{')
 		    {
 		      LoadMatrixLine (ist, tempoldutofreearea,
-				      2 * freezone.Size() - 1);
+				      2 * freezone.size() - 1);
 
 		      ist >> ch; // '{'
 		      LoadMatrixLine (ist, tempoldutofreearea,
-				      2 * freezone.Size());
+				      2 * freezone.size());
 		    }
 
 		  ist >> ch;
@@ -330,7 +330,7 @@ void netrule :: LoadRule (std::istream & ist)
 
 	  while (ch == '(')
 	    {
-	      elements.Append (Element2d());
+	      elements.push_back (Element2d());
 
 	      ist >> elements.Last().PNum(1);
 	      ist >> ch;    // ','
@@ -380,7 +380,7 @@ void netrule :: LoadRule (std::istream & ist)
 	  while (ch == '(')
 	    {
 	      //        threeint a = threeint();
-	      orientations.Append (threeint());
+	      orientations.push_back (threeint());
 
 	      ist >> orientations.Last().i1;
 	      ist >> ch;    // ','
@@ -408,9 +408,9 @@ void netrule :: LoadRule (std::istream & ist)
     }
   while (!ist.eof() && strcmp (buf, "endrule") != 0);
 
-  oldutonewu.SetSize (2 * (points.Size() - noldp), 2 * noldp);
-  oldutofreearea.SetSize (2 * freezone.Size(), 2 * noldp);
-  oldutofreearealimit.SetSize (2 * freezone.Size(), 2 * noldp);
+  oldutonewu.SetSize (2 * (points.size() - noldp), 2 * noldp);
+  oldutofreearea.SetSize (2 * freezone.size(), 2 * noldp);
+  oldutofreearealimit.SetSize (2 * freezone.size(), 2 * noldp);
 
   for (i = 1; i <= oldutonewu.Height(); i++)
     for (j = 1; j <= oldutonewu.Width(); j++)
@@ -424,7 +424,7 @@ void netrule :: LoadRule (std::istream & ist)
     for (j = 1; j <= oldutofreearea.Width(); j++)
       oldutofreearealimit.Elem(i, j) = tempoldutofreearealimit.Elem(i, j);
 
-  freesetinequ.SetSize (freezone.Size());
+  freesetinequ.SetSize (freezone.size());
 
 
   {
@@ -432,7 +432,7 @@ void netrule :: LoadRule (std::istream & ist)
     int minn;
     Array<int> pnearness (noldp);
 
-    for (i = 1; i <= pnearness.Size(); i++)
+    for (i = 1; i <= pnearness.size(); i++)
       pnearness.Elem(i) = 1000;
 
     for (j = 1; j <= 2; j++)
@@ -458,7 +458,7 @@ void netrule :: LoadRule (std::istream & ist)
       }
     while (!ok);
 
-    lnearness.SetSize (noldl);
+    lnearness.resize (noldl);
 
     for (i = 1; i <= noldl; i++)
       {
@@ -468,10 +468,10 @@ void netrule :: LoadRule (std::istream & ist)
       }
   }
 
-  oldutofreearea_i.SetSize (10);
-  freezone_i.SetSize (10);
+  oldutofreearea_i.resize (10);
+  freezone_i.resize (10);
 
-  for (i = 0; i < oldutofreearea_i.Size(); i++)
+  for (i = 0; i < oldutofreearea_i.size(); i++)
     {
       double lam1 = 1.0/(i+1);
 
@@ -481,9 +481,9 @@ void netrule :: LoadRule (std::istream & ist)
 	for (int k = 0; k < oldutofreearea.Width(); k++)
 	  mati(j,k) = lam1 * oldutofreearea(j,k) + (1 - lam1) * oldutofreearealimit(j,k);
 
-      freezone_i[i] = new Array<Point2d> (freezone.Size());
+      freezone_i[i] = new Array<Point2d> (freezone.size());
       Array<Point2d> & fzi = *freezone_i[i];
-      for (int j = 0; j < freezone.Size(); j++)
+      for (int j = 0; j < freezone.size(); j++)
 	fzi[j] = freezonelimit[j] + lam1 * (freezone[j] - freezonelimit[j]);
     }
 }
@@ -521,7 +521,6 @@ void Meshing2 :: LoadRules (const char * filename, bool quad)
       /* connect tetrules to one string */
       const char ** hcp;
 
-      // if (!mparam.quad)
       if (!quad)
 	{
 	  hcp = triarules;
@@ -545,8 +544,6 @@ void Meshing2 :: LoadRules (const char * filename, bool quad)
       //tr1[0] = 0;
       tr1.reserve(len+1);
 
-
-      // if (!mparam.quad)
       if (!quad)
 	hcp = triarules;
       else
@@ -593,7 +590,7 @@ void Meshing2 :: LoadRules (const char * filename, bool quad)
 	  rule -> LoadRule(*ist);
 	  //std::cerr << "fr2" <<std::endl;
 	  
-	  rules.Append (rule);
+	  rules.push_back (rule);
 	}
       //std::cerr << "loop" <<std::endl;
     }

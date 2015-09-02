@@ -14,7 +14,7 @@ namespace netgen
     //const int ne = mesh.GetNE();
     const int np = mesh.GetNP();
 
-    pure_badness.SetSize(np+PointIndex::BASE+1);
+    pure_badness.resize(np+PointIndex::BASE+1);
     pure_badness = -1;
 
     Array< Point<3>* > backup(np);
@@ -59,7 +59,7 @@ namespace netgen
     //if(max_worsening > 0)
     //  std::cerr << "badness " << counter++ <<std::endl;
 
-    bad_elements.SetSize(0);
+    bad_elements.resize(0);
 
     double loc_pure_badness = -1;
 
@@ -71,7 +71,7 @@ namespace netgen
     ElementIndex ind;
 
     if(quality_loss != NULL)
-      quality_loss->SetSize(mesh.GetNE());
+      quality_loss->resize(mesh.GetNE());
 
     for (ElementIndex i = 0; i < mesh.GetNE(); i++)
       {
@@ -87,7 +87,7 @@ namespace netgen
 	double bad = mesh[i].CalcJacobianBadness (mesh.Points());
 	if (bad > 1e10 || 
 	    (max_worsening > 0 && bad > loc_pure_badness*max_worsening))
-	  bad_elements.Append(i);
+	  bad_elements.push_back(i);
 	  
 
 	if(max_worsening > 0)
@@ -114,7 +114,7 @@ namespace netgen
     working_elements.Clear();
     working_points.Clear();
 
-    for(int i=0; i<bad_elements.Size(); i++)
+    for(int i=0; i<bad_elements.size(); i++)
       {
 	working_elements.Set(bad_elements[i]);
 	const Element & el = mesh[bad_elements[i]];
@@ -307,7 +307,7 @@ namespace netgen
 	   
 	if(1==1 || facokedge < 1.-1e-8)
 	  {
-	    for(int i=0; i<nv.Size(); i++)
+	    for(int i=0; i<nv.size(); i++)
 	      *nv[i] = Vec<3>(0,0,0);
 	    for (int i = 1; i <= mesh.GetNSE(); i++)
 	      {
@@ -319,7 +319,7 @@ namespace netgen
 		  if(!isedgepoint.Test(sel.PNum(j)))
 		    *nv[sel.PNum(j) - PointIndex::BASE] += auxvec;
 	      }
-	    for(int i=0; i<nv.Size(); i++)
+	    for(int i=0; i<nv.size(); i++)
 	      nv[i]->Normalize();
 	    
 	    
@@ -363,10 +363,10 @@ namespace netgen
 
 
 		ostrstr.str("");
-		ostrstr << bad_elements.Size() << " bad elements";
+		ostrstr << bad_elements.size() << " bad elements";
 		PrintMessage(5,ostrstr.str());
 	      }
-	    while (bad_elements.Size() > 0 && 
+	    while (bad_elements.size() > 0 && 
 		   cnttrials < maxtrials &&
 		   multithread.terminate != 1);
 	  }
@@ -433,10 +433,10 @@ namespace netgen
 	
 
 		ostrstr.str("");
-		ostrstr << bad_elements.Size() << " bad elements";
+		ostrstr << bad_elements.size() << " bad elements";
 		PrintMessage(5,ostrstr.str());
 	      }
-	    while (bad_elements.Size() > 0 && 
+	    while (bad_elements.size() > 0 && 
 		   cnttrials < maxtrials &&
 		   multithread.terminate != 1);
 	  }
@@ -568,7 +568,7 @@ namespace netgen
 
 	Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
 	
-	for(int i=0; i<bad_elements.Size(); i++)
+	for(int i=0; i<bad_elements.size(); i++)
 	  {
 	    ostrstr.str("");
 	    ostrstr << "bad element:" <<std::endl

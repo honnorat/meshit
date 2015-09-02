@@ -225,7 +225,7 @@ namespace netgen
       ld.meshthis -> GetNormalVector (ld.surfi, ld.sp1, ld.gi1, n);
       Point<3> pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
       
-      for (int j = 0; j < ld.locelements.Size(); j++)
+      for (int j = 0; j < ld.locelements.size(); j++)
         {
           Vec<3> e1 = ld.loc_pnts2[j] - pp1;
           Vec<3> e2 = ld.loc_pnts3[j] - pp1;
@@ -257,7 +257,7 @@ namespace netgen
       
       pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
       
-      for (int j = 0; j < ld.locelements.Size(); j++)
+      for (int j = 0; j < ld.locelements.size(); j++)
         {
           Vec<3> e1 = ld.loc_pnts2[j] - pp1;
           Vec<3> e2 = ld.loc_pnts3[j] - pp1;
@@ -290,7 +290,7 @@ namespace netgen
       Point<3> pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
       Vec<3> dir3d = dir(0) * ld.t1 + dir(1) * ld.t2;
       
-      for (int j = 0; j < ld.locelements.Size(); j++)
+      for (int j = 0; j < ld.locelements.size(); j++)
         {
           Vec<3> e1 = ld.loc_pnts2[j] - pp1;
           Vec<3> e2 = ld.loc_pnts3[j] - pp1;
@@ -369,7 +369,7 @@ namespace netgen
     //  meshthis -> ProjectPoint (surfi, pp1);
     // meshthis -> GetNormalVector (surfi, pp1, n);
 
-    for (int j = 0; j < ld.locelements.Size(); j++)
+    for (int j = 0; j < ld.locelements.size(); j++)
       {
         double g1x, g1y, hbadness;
 
@@ -421,7 +421,7 @@ namespace netgen
     ld.meshthis -> GetNormalVector (ld.surfi, ld.sp1, ld.gi1, n);
     pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
 
-    for (int j = 0; j < ld.locelements.Size(); j++)
+    for (int j = 0; j < ld.locelements.size(); j++)
       {
         double g1x, g1y, hbadness;
 
@@ -506,7 +506,7 @@ namespace netgen
     pp1 = ld.sp1 + x(0) * ld.t1;
     ld.meshthis -> ProjectPoint2 (ld.surfi, ld.surfi2, pp1);
 
-    for (j = 0; j < ld.locelements.Size(); j++)
+    for (j = 0; j < ld.locelements.size(); j++)
       {
 	rot = ld.locrots[j];
 	const Element2d & bel = mesh[ld.locelements[j]];
@@ -587,11 +587,11 @@ namespace netgen
     //  meshthis -> GetNormalVector (surfi, pp1, n);
 
     static Array<Point2d> pts2d;
-    pts2d.SetSize(mesh.GetNP());
+    pts2d.resize(mesh.GetNP());
 
     grad = 0;
 
-    for (int j = 1; j <= ld.locelements.Size(); j++)
+    for (int j = 1; j <= ld.locelements.size(); j++)
       {
 	lpi = ld.locrots.Get(j);
 	const Element2d & bel = 
@@ -658,11 +658,11 @@ namespace netgen
     pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
 
     static Array<Point2d> pts2d;
-    pts2d.SetSize(mesh.GetNP());
+    pts2d.resize(mesh.GetNP());
 
     deriv = 0;
 
-    for (j = 1; j <= ld.locelements.Size(); j++)
+    for (j = 1; j <= ld.locelements.size(); j++)
       {
 	lpi = ld.locrots.Get(j);
 	const Element2d & bel = 
@@ -740,7 +740,7 @@ namespace netgen
     mesh.GetSurfaceElementsOfFace (faceindex, seia);
 
     bool mixed = 0;
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       if (mesh[seia[i]].GetNP() != 3)
 	{
 	  mixed = 1;
@@ -755,32 +755,32 @@ namespace netgen
 
     Array<int, PointIndex::BASE> compress(mesh.GetNP());
     Array<PointIndex> icompress;
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & el = mesh[seia[i]];
 	for (int j = 0; j < el.GetNP(); j++)
 	  compress[el[j]] = -1;
       }
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & el = mesh[seia[i]];
 	for (int j = 0; j < el.GetNP(); j++)
 	  if (compress[el[j]] == -1)
 	    {
-	      compress[el[j]] = icompress.Size();
-	      icompress.Append(el[j]);
+	      compress[el[j]] = icompress.size();
+	      icompress.push_back(el[j]);
 	    }
       }
-    Array<int> cnta(icompress.Size());
+    Array<int> cnta(icompress.size());
     cnta = 0;
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & el = mesh[seia[i]];
 	for (int j = 0; j < el.GetNP(); j++)
 	  cnta[compress[el[j]]]++;
       }
     TABLE<SurfaceElementIndex> elementsonpoint(cnta);
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & el = mesh[seia[i]];
 	for (int j = 0; j < el.GetNP(); j++)
@@ -918,7 +918,7 @@ namespace netgen
     for (PointIndex pi = PointIndex::BASE; pi < mesh.GetNP()+PointIndex::BASE; pi++)
       if (mesh[pi].Type() == SURFACEPOINT)
     */
-    for (int hi = 0; hi < icompress.Size(); hi++)
+    for (int hi = 0; hi < icompress.size(); hi++)
       {
 	PointIndex pi = icompress[hi];
 	if (mesh[pi].Type() == SURFACEPOINT)
@@ -934,7 +934,7 @@ namespace netgen
 	      }
 	    
 	    // if (elementsonpoint[pi].Size() == 0) continue;
-	    if (elementsonpoint[hi].Size() == 0) continue;
+	    if (elementsonpoint[hi].size() == 0) continue;
 	
 	    ld.sp1 = mesh[pi];
 	    
@@ -952,33 +952,33 @@ namespace netgen
 	    ld.gi1 = hel.GeomInfoPi(hpi);
 	    SelectSurfaceOfPoint (ld.sp1, ld.gi1);
 	  
-	    ld.locelements.SetSize(0);
-	    ld.locrots.SetSize (0);
-	    ld.lochs.SetSize (0);
-            ld.loc_pnts2.SetSize (0);
-            ld.loc_pnts3.SetSize (0);
+	    ld.locelements.resize(0);
+	    ld.locrots.resize (0);
+	    ld.lochs.resize (0);
+            ld.loc_pnts2.resize (0);
+            ld.loc_pnts3.resize (0);
 	
-	    for (int j = 0; j < elementsonpoint[hi].Size(); j++)
+	    for (int j = 0; j < elementsonpoint[hi].size(); j++)
 	      {
 		SurfaceElementIndex sei = elementsonpoint[hi][j];
 		const Element2d & bel = mesh[sei];
 		ld.surfi = mesh.GetFaceDescriptor(bel.GetIndex()).SurfNr();
 		
-		ld.locelements.Append (sei);
+		ld.locelements.push_back (sei);
 		
 		for (int k = 1; k <= bel.GetNP(); k++)
 		  if (bel.PNum(k) == pi)
 		    {
-		      ld.locrots.Append (k);
-                      ld.loc_pnts2.Append (mesh[bel.PNumMod(k + 1)]);
-                      ld.loc_pnts3.Append (mesh[bel.PNumMod(k + 2)]);
+		      ld.locrots.push_back (k);
+                      ld.loc_pnts2.push_back (mesh[bel.PNumMod(k + 1)]);
+                      ld.loc_pnts3.push_back (mesh[bel.PNumMod(k + 2)]);
 		      break;
 		    }
 		
 		if (ld.uselocalh)
 		  {
 		    Point3d pmid = Center (mesh[bel[0]], mesh[bel[1]], mesh[bel[2]]);
-		    ld.lochs.Append (mesh.GetH(pmid));
+		    ld.lochs.push_back (mesh.GetH(pmid));
 		  }
 	      }
 	    
@@ -987,14 +987,14 @@ namespace netgen
 	  ld.t2 = Cross (ld.normal, ld.t1);
 	  
 	  // save points, and project to tangential plane
-	  for (int j = 0; j < ld.locelements.Size(); j++)
+	  for (int j = 0; j < ld.locelements.size(); j++)
 	    {
 	      const Element2d & el = mesh[ld.locelements[j]];
 	      for (int k = 0; k < el.GetNP(); k++)
 		savepoints[el[k]] = mesh[el[k]];
 	    }
 
-	  for (int j = 0; j < ld.locelements.Size(); j++)
+	  for (int j = 0; j < ld.locelements.size(); j++)
 	    {
 	      const Element2d & el = mesh[ld.locelements[j]];
 	      for (int k = 0; k < el.GetNP(); k++)
@@ -1023,7 +1023,7 @@ namespace netgen
 	  int moveisok = 0;
 
 	  // restore other points
-	  for (int j = 0; j < ld.locelements.Size(); j++)
+	  for (int j = 0; j < ld.locelements.size(); j++)
 	    {
 	      const Element2d & el = mesh[ld.locelements[j]];
 	      for (int k = 0; k < el.GetNP(); k++)
@@ -1061,7 +1061,7 @@ namespace netgen
 	    
 	      if (moveisok)
 		{
-		  for (int j = 0; j < ld.locelements.Size(); j++)
+		  for (int j = 0; j < ld.locelements.size(); j++)
 		    mesh[ld.locelements[j]].GeomInfoPi(ld.locrots[j]) = ngi;
 		}
 	      else

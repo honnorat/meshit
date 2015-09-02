@@ -556,7 +556,7 @@ namespace netgen
   void Solid :: Boundaries (const Point<3> & p, Array<int> & bounds) const
   {
     int in, strin;
-    bounds.SetSize (0);
+    bounds.resize (0);
     RecBoundaries (p, bounds, in, strin);
   }
 
@@ -575,7 +575,7 @@ namespace netgen
 	    if (in && !strin) bounds.Append (id);
 	  */
 	  if (prim->PointInSolid (p, 1e-6) == DOES_INTERSECT)
-	    bounds.Append (prim->GetSurfaceId (1));
+	    bounds.push_back (prim->GetSurfaceId (1));
 	  break;
 	}
       case SECTION:
@@ -588,10 +588,10 @@ namespace netgen
 
 	  if (in1 && in2)
 	    {
-	      for (i = 1; i <= bounds1.Size(); i++)
-		bounds.Append (bounds1.Get(i));
-	      for (i = 1; i <= bounds2.Size(); i++)
-		bounds.Append (bounds2.Get(i));
+	      for (i = 1; i <= bounds1.size(); i++)
+		bounds.push_back (bounds1.Get(i));
+	      for (i = 1; i <= bounds2.size(); i++)
+		bounds.push_back (bounds2.Get(i));
 	    }
 	  in = (in1 && in2);
 	  strin = (strin1 && strin2);
@@ -607,10 +607,10 @@ namespace netgen
 
 	  if (!strin1 && !strin2)
 	    {
-	      for (i = 1; i <= bounds1.Size(); i++)
-		bounds.Append (bounds1.Get(i));
-	      for (i = 1; i <= bounds2.Size(); i++)
-		bounds.Append (bounds2.Get(i));
+	      for (i = 1; i <= bounds1.size(); i++)
+		bounds.push_back (bounds1.Get(i));
+	      for (i = 1; i <= bounds2.size(); i++)
+		bounds.push_back (bounds2.Get(i));
 	    }
 	  in = (in1 || in2);
 	  strin = (strin1 || strin2);
@@ -638,7 +638,7 @@ namespace netgen
   {
     int in, strin;
     RecTangentialSolid (p, tansol, surfids, in, strin, eps);
-    surfids.SetSize (0);
+    surfids.resize (0);
     if (tansol)
       tansol -> GetTangentialSurfaceIndices (p, surfids, eps);
   }
@@ -741,7 +741,7 @@ namespace netgen
 				  Solid *& tansol, Array<int> & surfids, double eps) const
   {
     int in, strin;
-    surfids.SetSize (0);
+    surfids.resize (0);
     RecTangentialSolid2 (p, t, tansol, surfids, in, strin, eps);
     if (tansol)
       tansol -> GetTangentialSurfaceIndices2 (p, t, surfids, eps);
@@ -856,7 +856,7 @@ namespace netgen
 				  double eps) const
   {
     int in, strin;
-    surfids.SetSize (0);
+    surfids.resize (0);
     RecTangentialSolid3 (p, t, t2, tansol, surfids, in, strin, eps);
 
     if (tansol)
@@ -967,7 +967,7 @@ namespace netgen
 				     double eps) const
   {
     int in, strin;
-    surfids.SetSize (0);
+    surfids.resize (0);
 
     // std::cerr << "tangentialedgesolid,sol = " << (*this) <<std::endl;
     RecTangentialEdgeSolid (p, t, t2, m, tansol, surfids, in, strin, eps);
@@ -1367,7 +1367,7 @@ namespace netgen
 
   void Solid :: GetSurfaceIndices (Array<int> & surfind) const
   {
-    surfind.SetSize (0);
+    surfind.resize (0);
     RecGetSurfaceIndices (surfind);
   }
 
@@ -1391,13 +1391,13 @@ namespace netgen
 		bool found = 0;
 		int siprim = prim->GetSurfaceId(j);
 
-		for (int i = 0; i < surfind.Size(); i++)
+		for (int i = 0; i < surfind.size(); i++)
 		  if (surfind[i] == siprim)
 		    {
 		      found = 1;
 		      break;
 		    }
-		if (!found) surfind.Append (siprim);
+		if (!found) surfind.push_back (siprim);
 	      }
 	  break;
 	}
@@ -1421,7 +1421,7 @@ namespace netgen
 
   void Solid :: GetTangentialSurfaceIndices (const Point<3> & p, Array<int> & surfind, double eps) const
   {
-    surfind.SetSize (0);
+    surfind.resize (0);
     RecGetTangentialSurfaceIndices (p, surfind, eps);
   }
 
@@ -1464,7 +1464,7 @@ namespace netgen
   void Solid :: GetTangentialSurfaceIndices2 (const Point<3> & p, const Vec<3> & v,
 					     Array<int> & surfind, double eps) const
   {
-    surfind.SetSize (0);
+    surfind.resize (0);
     RecGetTangentialSurfaceIndices2 (p, v, surfind, eps);
   }
 
@@ -1484,7 +1484,7 @@ namespace netgen
 		  if (sqr (grad * v) < 1e-6 * v.Length2() * grad.Length2())
 		    {
 		      if (!surfind.Contains (prim->GetSurfaceId(j)))
-			surfind.Append (prim->GetSurfaceId(j));
+			surfind.push_back (prim->GetSurfaceId(j));
 		    }
 		}
 	    }
@@ -1516,7 +1516,7 @@ namespace netgen
   void Solid :: GetTangentialSurfaceIndices3 (const Point<3> & p, const Vec<3> & v, const Vec<3> & v2, 
 					     Array<int> & surfind, double eps) const
   {
-    surfind.SetSize (0);
+    surfind.resize (0);
     RecGetTangentialSurfaceIndices3 (p, v, v2, surfind, eps);
   }
 
@@ -1542,7 +1542,7 @@ namespace netgen
 		      if (fabs (hv2) < 1e-6) 
 			{
 			  if (!surfind.Contains (prim->GetSurfaceId(j)))
-			    surfind.Append (prim->GetSurfaceId(j));
+			    surfind.push_back (prim->GetSurfaceId(j));
 			}
 		      /*
 		      else
@@ -1691,9 +1691,9 @@ namespace netgen
   {
     double eps = 1e-8 * box.Diam ();
 
-    pts.SetSize (0);
+    pts.resize (0);
     this -> RecCalcOnePrimitiveSpecialPoints (pts);
-    for (int i = pts.Size()-1; i >= 0; i--)
+    for (int i = pts.size()-1; i >= 0; i--)
       {
 	if (!IsIn (pts[i],eps) || IsStrictIn (pts[i],eps))
 	  pts.Delete (i);

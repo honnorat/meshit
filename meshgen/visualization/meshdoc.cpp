@@ -554,7 +554,7 @@ void VisualSceneMeshDoctor :: UpdateTables ()
 {
   if (!mesh) return;
 
-  edgedist.SetSize(mesh->GetNP());
+  edgedist.resize(mesh->GetNP());
   int i, changed;
 
   for (i = 1; i <= mesh->GetNP(); i++)

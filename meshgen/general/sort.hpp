@@ -38,8 +38,8 @@ inline void BubbleSort (int size, T * data)
 template <class T>
 inline void BubbleSort (Array<T> & data)
 {
-  if(data.Size() > 0)
-	  BubbleSort (data.Size(), &data[data.Begin()]);
+  if(data.size() > 0)
+	  BubbleSort (data.size(), &data[data.Begin()]);
 }
 
 }

@@ -77,7 +77,7 @@ namespace netgen
     virtual Vec<3> SpecialPointTangentialVector (const Point<3> & p, int s1, int s2) const;
 
     virtual int GetNSurfaces() const 
-    { return planes.Size(); }
+    { return planes.size(); }
     virtual Surface & GetSurface (int i) 
     { return *planes[i]; }
     virtual const Surface & GetSurface (int i) const

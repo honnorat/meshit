@@ -515,8 +515,8 @@ namespace netgen
 		if ( ! el.PNum(5)) //  eltype == TET )
                   {
 
-		    pnums.SetSize(4);
-		    for( int j = 0; j < pnums.Size(); j++)
+		    pnums.resize(4);
+		    for( int j = 0; j < pnums.size(); j++)
 		      pnums[j] = mesh->VolumeElement(i).PNum(j+1);
 
 
@@ -528,8 +528,8 @@ namespace netgen
                   }
 		else if ( ! el.PNum(6)) // eltype == PYRAMID
                   {
-		    pnums.SetSize(5);
-		    for( int j = 0; j < pnums.Size(); j++)
+		    pnums.resize(5);
+		    for( int j = 0; j < pnums.size(); j++)
 		      pnums[j] = mesh->VolumeElement(i).PNum(j+1);
 
 
@@ -546,8 +546,8 @@ namespace netgen
                   }
 		else if ( ! el.PNum(7) ) // eltype == PRISM
                   {
-		    pnums.SetSize(6);
-		    for( int j = 0; j < pnums.Size(); j++)
+		    pnums.resize(6);
+		    for( int j = 0; j < pnums.size(); j++)
 		      pnums[j] = mesh->VolumeElement(i).PNum(j+1);
 
 		    const Point3d & p1 = mesh->Point(pnums[0]);
@@ -561,8 +561,8 @@ namespace netgen
                   }
 		else if (! el.PNum(9) ) // eltype == HEX
                   {
-		    pnums.SetSize(8);
-		    for( int j = 0; j < pnums.Size(); j++)
+		    pnums.resize(8);
+		    for( int j = 0; j < pnums.size(); j++)
 		      pnums[j] = mesh->VolumeElement(i).PNum(j+1);
 
 		    const Point3d & p1 = mesh->Point(pnums[0]);
@@ -624,7 +624,7 @@ namespace netgen
 		  {
 		    glBegin (GL_TRIANGLES);
 
-		    for (int j = 1; j <= faces.Size(); j++)
+		    for (int j = 1; j <= faces.size(); j++)
 		      {
 			Element2d & face = faces.Elem(j);
 			const Point3d & lp1 = mesh->Point (el.PNum(face.PNum(1)));
@@ -1002,7 +1002,7 @@ namespace netgen
 	
 
 
-	for (int hi = 0; hi < seia.Size(); hi++)
+	for (int hi = 0; hi < seia.size(); hi++)
 	  {
 	    SurfaceElementIndex sei = seia[hi];
             const Element2d & el = (*mesh)[sei];
@@ -2374,7 +2374,7 @@ namespace netgen
 
 		el.GetSurfaceTriangles (faces);
 		glBegin (GL_TRIANGLES);
-		for (j = 1; j <= faces.Size(); j++)
+		for (j = 1; j <= faces.size(); j++)
 		  {
 		    Element2d & face = faces.Elem(j);
 		    Point3d lp1 = mesh->Point (el.PNum(face.PNum(1)));
@@ -2575,7 +2575,7 @@ namespace netgen
 		glBegin (GL_TRIANGLES);
 
 		el.GetSurfaceTriangles (faces);
-		for (int j = 1; j <= faces.Size(); j++)
+		for (int j = 1; j <= faces.size(); j++)
 		  {
 		    Element2d & face = faces.Elem(j);
 		    Point<3> lp1 = mesh->Point (el.PNum(face.PNum(1)));
@@ -2925,7 +2925,7 @@ namespace netgen
 		  {
 		    glBegin (GL_TRIANGLES);
 
-		    for (int j = 1; j <= faces.Size(); j++)
+		    for (int j = 1; j <= faces.size(); j++)
 		      {
 			Element2d & face = faces.Elem(j);
 			Point3d lp1 = mesh->Point (el.PNum(face.PNum(1)));

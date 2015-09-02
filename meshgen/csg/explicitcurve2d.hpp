@@ -89,7 +89,7 @@ namespace netgen
     ///
     virtual double MinParam () const { return 0; }
     ///
-    virtual double MaxParam () const { return points.Size(); }
+    virtual double MaxParam () const { return points.size(); }
     ///
     virtual Point<2> Eval (double t) const;
     ///

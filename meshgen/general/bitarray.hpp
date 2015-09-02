@@ -179,11 +179,11 @@ public:
 
   ///
   void SetSize (int asize)
-  { data.SetSize(asize); }
+  { data.resize(asize); }
 
   ///
   inline int Size () const
-  { return data.Size(); }
+  { return data.size(); }
 
   ///
   void Set ();

@@ -68,25 +68,25 @@ public:
   //get all trigs:
   int GetTrig(int i) const
     {
-      if (i <= charttrigs->Size()) {return charttrigs->Get(i);}
-      else {return outertrigs->Get(i-charttrigs->Size());}
+      if (i <= charttrigs->size()) {return charttrigs->Get(i);}
+      else {return outertrigs->Get(i-charttrigs->size());}
     }
   
-  int GetNChartT() const {return charttrigs->Size();}
-  int GetNOuterT() const {return outertrigs->Size();}
-  int GetNT() const {return charttrigs->Size()+outertrigs->Size(); }
+  int GetNChartT() const {return charttrigs->size();}
+  int GetNOuterT() const {return outertrigs->size();}
+  int GetNT() const {return charttrigs->size()+outertrigs->size(); }
 
   void GetTrianglesInBox (const Point3d & pmin,
 			  const Point3d & pmax,
 			  Array<int> & trias) const;
-  void AddOLimit(twoint l) {olimit->Append(l);}
-  void AddILimit(twoint l) {ilimit->Append(l);}
+  void AddOLimit(twoint l) {olimit->push_back(l);}
+  void AddILimit(twoint l) {ilimit->push_back(l);}
 
-  void ClearOLimit() {olimit->SetSize(0);}
-  void ClearILimit() {ilimit->SetSize(0);}
+  void ClearOLimit() {olimit->resize(0);}
+  void ClearILimit() {ilimit->resize(0);}
 
-  int GetNOLimit() const {return olimit->Size();}
-  int GetNILimit() const {return ilimit->Size();}
+  int GetNOLimit() const {return olimit->size();}
+  int GetNILimit() const {return ilimit->size();}
 
   twoint GetOLimit(int i) const {return olimit->Get(i);}
   twoint GetILimit(int i) const {return ilimit->Get(i);}
@@ -168,15 +168,15 @@ public:
   STLBoundary(STLGeometry * ageometry);
   // : boundary() {};
 
-  void Clear() {boundary.SetSize(0);};
+  void Clear() {boundary.resize(0);};
   void SetChart (const STLChart * achart) { chart = achart; }
   //don't check, if already exists!
-  void AddNewSegment(const STLBoundarySeg & seg) {boundary.Append(seg);};
+  void AddNewSegment(const STLBoundarySeg & seg) {boundary.push_back(seg);};
   //check if segment exists
   void AddOrDelSegment(const STLBoundarySeg & seg);
   //addordelsegment for all 3 triangle segments!
   void AddTriangle(const STLTriangle & t);
-  int NOSegments() {return boundary.Size();};
+  int NOSegments() {return boundary.size();};
   const STLBoundarySeg & GetSegment(int i) {return boundary.Get(i);}
 
   int TestSeg(const Point<3> & p1, const Point<3> & p2, const Vec<3> & sn, 

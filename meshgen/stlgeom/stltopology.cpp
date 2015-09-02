@@ -74,7 +74,7 @@ STLGeometry *  STLTopology :: LoadBinary (std::istream & ist)
 	  FIOReadFloat(ist,f); pts[j](2) = f;	  
 	} 
 
-      readtrigs.Append (STLReadTriangle (pts, normal));
+      readtrigs.push_back (STLReadTriangle (pts, normal));
       FIOReadString(ist,spaces,nospaces);
     }	    
   PrintMessage (3, nofacets, " triangles loaded\r");  
@@ -213,7 +213,7 @@ STLGeometry *  STLTopology :: LoadNaomi (std::istream & ist)
 	  ist >> px;
 	  ist >> py;
 	  ist >> pz;
-	  readpoints.Append(Point<3> (px,py,pz));
+	  readpoints.push_back(Point<3> (px,py,pz));
 	}
     }
   else
@@ -245,10 +245,10 @@ STLGeometry *  STLTopology :: LoadNaomi (std::istream & ist)
 	  
 	  normal = Cross (pts[1]-pts[0], pts[2]-pts[0]) . Normalize();
 
-	  readtrigs.Append (STLReadTriangle (pts, normal));
+	  readtrigs.push_back (STLReadTriangle (pts, normal));
 
 	}
-      PrintMessage(5,"read ", readtrigs.Size(), " triangles");
+      PrintMessage(5,"read ", readtrigs.size(), " triangles");
     }
   else
     {
@@ -402,10 +402,10 @@ STLGeometry *  STLTopology ::Load (std::istream & ist)
 		   (Dist2 (pts[1], pts[2]) > 1e-16) )
 		
 		{
-		  readtrigs.Append (STLReadTriangle (pts, normal));
+		  readtrigs.push_back (STLReadTriangle (pts, normal));
 
-		  if (readtrigs.Size() % 100000 == 0)
-		    PrintMessageCR (3, readtrigs.Size(), " triangles loaded\r");
+		  if (readtrigs.size() % 100000 == 0)
+		    PrintMessageCR (3, readtrigs.size(), " triangles loaded\r");
 		}
               else
                 {
@@ -418,7 +418,7 @@ STLGeometry *  STLTopology ::Load (std::istream & ist)
 	    }
 	}
     }
-  PrintMessage (3, readtrigs.Size(), " triangles loaded");
+  PrintMessage (3, readtrigs.size(), " triangles loaded");
 
   if (badnormals) 
     {
@@ -446,16 +446,16 @@ void STLTopology :: InitSTLGeometry(const Array<STLReadTriangle> & readtrigs)
   // const double geometry_tol_fact = 1E6; 
   // distances lower than max_box_size/tol are ignored
 
-  trias.SetSize(0);
-  points.SetSize(0);
+  trias.resize(0);
+  points.resize(0);
 
-  PrintMessage(3,"number of triangles = ", readtrigs.Size());
+  PrintMessage(3,"number of triangles = ", readtrigs.size());
 
-  if (!readtrigs.Size()) return;
+  if (!readtrigs.size()) return;
   
 
   boundingbox.Set (readtrigs[0][0]);
-  for (int i = 0; i < readtrigs.Size(); i++)
+  for (int i = 0; i < readtrigs.size(); i++)
     for (int k = 0; k < 3; k++)
       boundingbox.Add (readtrigs[i][k]);
   
@@ -473,7 +473,7 @@ void STLTopology :: InitSTLGeometry(const Array<STLReadTriangle> & readtrigs)
   PrintMessage(5,"point tolerance = ", pointtol);
   PrintMessageCR(5,"identify points ...");  
 
-  for(int i = 0; i < readtrigs.Size(); i++)
+  for(int i = 0; i < readtrigs.size(); i++)
     {
       const STLReadTriangle & t = readtrigs[i];
 
@@ -489,10 +489,10 @@ void STLTopology :: InitSTLGeometry(const Array<STLReadTriangle> & readtrigs)
 	  
 	  pointtree->GetIntersecting (pmin, pmax, pintersect);
 	  
-	  if (pintersect.Size() > 1)
+	  if (pintersect.size() > 1)
             PrintError("too many close points");
 	  int foundpos = -1;
-	  if (pintersect.Size())
+	  if (pintersect.size())
 	    foundpos = pintersect[0];
 	  
 	  if (foundpos == -1)
@@ -534,7 +534,7 @@ int STLTopology :: GetPointNum (const Point<3> & p)
   Array<int> pintersect;
 
   pointtree->GetIntersecting (pmin, pmax, pintersect);
-  if (pintersect.Size() == 1)
+  if (pintersect.size() == 1)
     return pintersect[0];
   else 
     return 0;
@@ -556,7 +556,7 @@ void STLTopology :: FindNeighbourTrigs()
 
   INDEX_2_HASHTABLE<int> * oldedges = ht_topedges;
   ht_topedges = new INDEX_2_HASHTABLE<int> (GetNP()+1);
-  topedges.SetSize(0);
+  topedges.resize(0);
   
   for (int i = 1; i <= nt; i++)
     {
@@ -590,7 +590,7 @@ void STLTopology :: FindNeighbourTrigs()
 	    }
 	  else
 	    {
-	      enr = topedges.Append (STLTopEdge (pi1, pi2, i, 0));
+	      enr = topedges.push_back (STLTopEdge (pi1, pi2, i, 0));
 	      ht_topedges->Set (i2, enr);
 	      trig.EdgeNum(j) = enr;
 	    }
@@ -718,7 +718,7 @@ void STLTopology :: FindNeighbourTrigs()
 
 	  double phimin = 10, phimax = -1; // out of (0, 2 pi)
 
-	  for (int j = 0; j < trigsperpoint[pi].Size(); j++)
+	  for (int j = 0; j < trigsperpoint[pi].size(); j++)
 	    {
 	      STLTrigIndex ti2 = trigsperpoint[pi][j] - STLBASE;
 	      const STLTriangle & trig2 = trias[ti2];
@@ -861,14 +861,14 @@ void STLTopology :: GetTrianglesInBox (/*
       Box<3> box1 = box;
       box1.Increase (1e-4);
 
-      btrias.SetSize(0);
+      btrias.resize(0);
    
       int nt = GetNT();
       for (i = 1; i <= nt; i++)
 	{
 	  if (box1.Intersect (GetTriangle(i).box))
 	    {
-	      btrias.Append (i);
+	      btrias.push_back (i);
 	    }
 	}    
     }
@@ -878,7 +878,7 @@ void STLTopology :: GetTrianglesInBox (/*
 
 void STLTopology :: AddTriangle(const STLTriangle& t)
 {
-  trias.Append(t);
+  trias.push_back(t);
   
   const Point<3> & p1 = GetPoint (t.PNum(1));
   const Point<3> & p2 = GetPoint (t.PNum(2));
@@ -904,7 +904,7 @@ void STLTopology :: AddTriangle(const STLTriangle& t)
   trias.Last().rad = max2 (max2 (r1, r2), r3);
 
   if (geomsearchtreeon)
-    {searchtree->Insert (box.PMin(), box.PMax(), trias.Size());}
+    {searchtree->Insert (box.PMin(), box.PMax(), trias.size());}
 }
 
 
@@ -1001,9 +1001,9 @@ void STLTopology :: OrientAfterTrig (int trig)
     {
 
       Array <int> oriented;
-      oriented.SetSize(GetNT());
+      oriented.resize(GetNT());
       int i;
-      for (i = 1; i <= oriented.Size(); i++)
+      for (i = 1; i <= oriented.size(); i++)
 	{
 	  oriented.Elem(i) = 0;
 	}
@@ -1013,10 +1013,10 @@ void STLTopology :: OrientAfterTrig (int trig)
       int k;
       
       Array <int> list1;
-      list1.SetSize(0);
+      list1.resize(0);
       Array <int> list2;
-      list2.SetSize(0);
-      list1.Append(starttrig);
+      list2.resize(0);
+      list1.push_back(starttrig);
 
       int cnt = 1;
       int end = 0;
@@ -1024,7 +1024,7 @@ void STLTopology :: OrientAfterTrig (int trig)
       while (!end)
 	{
 	  end = 1;
-	  for (i = 1; i <= list1.Size(); i++)
+	  for (i = 1; i <= list1.size(); i++)
 	    {
 	      const STLTriangle& tt = GetTriangle(list1.Get(i));
 	      for (k = 1; k <= 3; k++)
@@ -1037,18 +1037,18 @@ void STLTopology :: OrientAfterTrig (int trig)
 			  GetTriangle(nt).ChangeOrientation();
 			}
 		      oriented.Elem(nt) = 1;
-		      list2.Append(nt);
+		      list2.push_back(nt);
 		      cnt++;
 		      end = 0;
 		    }
 		}
 	    }
-	  list1.SetSize(0);
-	  for (i = 1; i <= list2.Size(); i++)
+	  list1.resize(0);
+	  for (i = 1; i <= list2.size(); i++)
 	    {
-	      list1.Append(list2.Get(i));
+	      list1.push_back(list2.Get(i));
 	    }
-	  list2.SetSize(0);
+	  list2.resize(0);
 	}
 
       PrintMessage(5,"NO corrected triangles = ",cnt);

@@ -188,7 +188,7 @@ namespace netgen
 
     glLoadIdentity();
 
-    for(int i=0; i<alpha.Size() && i<vec.Size(); i++)
+    for(int i=0; i<alpha.size() && i<vec.size(); i++)
       {
 	glRotatef(alpha[i], vec[i].X(), vec[i].Y(), vec[i].Z());
       }

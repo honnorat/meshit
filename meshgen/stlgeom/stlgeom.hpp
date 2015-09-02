@@ -37,7 +37,7 @@ namespace netgen
   inline bool AddIfNotExists(Array<int>& list, int x)
   {
     if (list.Contains(x)) return false;
-    list.Append(x);
+    list.push_back(x);
     return true;
   }
   
@@ -242,7 +242,7 @@ namespace netgen
     void AddExternalEdge(int p1, int p2);
     void DeleteExternalEdge(int p1, int p2);
     int IsExternalEdge(int p1, int p2);
-    int NOExternalEdges() const {return externaledges.Size();}
+    int NOExternalEdges() const {return externaledges.size();}
     twoint GetExternalEdge(int i) const {return externaledges.Get(i);}
 
     void DestroyDirtyTrigs();
@@ -257,10 +257,10 @@ namespace netgen
 
     void LoadMarkedTrigs();
     void SaveMarkedTrigs();
-    void ClearMarkedSegs() {markedsegs.SetSize(0);}
+    void ClearMarkedSegs() {markedsegs.resize(0);}
     void AddMarkedSeg(const Point<3> & ap1, const Point<3> & ap2) 
     {
-      markedsegs.Append(ap1);markedsegs.Append(ap2);
+      markedsegs.push_back(ap1);markedsegs.push_back(ap2);
     }
 
     void GetMarkedSeg(int i, Point<3> & ap1, Point<3> & ap2) 
@@ -268,7 +268,7 @@ namespace netgen
       ap1=markedsegs.Get(i*2-1); 
       ap2=markedsegs.Get(i*2);
     }
-    int GetNMarkedSegs() {return markedsegs.Size()/2;}
+    int GetNMarkedSegs() {return markedsegs.size()/2;}
     void CalcVicinity(int starttrig);
     void GetVicinity(int starttrig, int size, Array<int>& vic);
 
@@ -291,15 +291,15 @@ namespace netgen
     int GetNodeOfSelTrig() const;
 
 
-    int AddNormal(const Vec3d& n) {return normals.Append(n);}
+    int AddNormal(const Vec3d& n) {return normals.push_back(n);}
     const Vec3d & GetNormal(int nr) const {return normals.Get(nr);}
     void SetNormal(int nr, const Vec3d& n) {normals.Elem(nr) = n;}
 
-    int AddEdge(const STLEdge& v) {return edges.Append(v);}
+    int AddEdge(const STLEdge& v) {return edges.push_back(v);}
     int AddEdge(int p1, int p2);
 
     STLEdge GetEdge(int nr) {return edges.Get(nr);}
-    int GetNE() {return edges.Size();}
+    int GetNE() {return edges.size();}
 
     double Area();
 
@@ -422,15 +422,15 @@ namespace netgen
     int Project(Point<3> & p3d) const;
     int ProjectOnWholeSurface (Point<3> & p3d) const;
 
-    int GetNLines() const {return lines.Size();}
-    int AddLine(STLLine* line) {return lines.Append(line);}
+    int GetNLines() const {return lines.size();}
+    int AddLine(STLLine* line) {return lines.push_back(line);}
     STLLine* GetLine(int nr) const {return lines.Get(nr);}
     int GetLineP(int lnr, int pnr) const {return lines.Get(lnr)->PNum(pnr);}
     int GetLineNP(int nr) const {return lines.Get(nr)->NP();}
 
     void SetLineEndPoint(int pn);
     int IsLineEndPoint(int pn);
-    int LineEndPointsSet() const {return lineendpoints.Size() == GetNP();}
+    int LineEndPointsSet() const {return lineendpoints.size() == GetNP();}
     void ClearLineEndPoints();
 
     void RestrictLocalH(class Mesh & mesh, double gh);

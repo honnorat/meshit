@@ -35,7 +35,7 @@ namespace netgen
     ///
     void AddSegment (const Point<3> & ap1, const Point<3> & ap2, const Point<3> & ap3);
     ///
-    int GetNumSegments () const { return segments.Size(); }
+    int GetNumSegments () const { return segments.size(); }
     ///
     double ProjectToSpline (Point<3> & p) const;
     ///

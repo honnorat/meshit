@@ -53,7 +53,7 @@ namespace netgen
    */
    void GetFaceColours(Mesh & mesh, Array<Vec3d> & face_colours)
    {
-      face_colours.SetSize(1);
+      face_colours.resize(1);
       face_colours.Elem(1) = mesh.GetFaceDescriptor(1).SurfColour();
       
       for(int i = 1; i <= mesh.GetNFD(); i++)
@@ -61,7 +61,7 @@ namespace netgen
          Vec3d face_colour = mesh.GetFaceDescriptor(i).SurfColour();
          bool col_found = false;
          
-         for(int j = 1; j <= face_colours.Size(); j++)
+         for(int j = 1; j <= face_colours.size(); j++)
          {
             if(ColourMatch(face_colours.Elem(j),face_colour))
             {
@@ -70,13 +70,13 @@ namespace netgen
             }
          }
          
-         if(!col_found) face_colours.Append(face_colour);
+         if(!col_found) face_colours.push_back(face_colour);
       }
 
       if(printmessage_importance >= 3)
       {
          std::cout << std::endl << "-------- Face Colours --------" << std::endl;
-         for( int i = 1; i <= face_colours.Size(); i++)
+         for( int i = 1; i <= face_colours.size(); i++)
          {
             std::cout << face_colours.Elem(i) << std::endl;
          }
@@ -191,7 +191,7 @@ namespace netgen
       // list will be given boundary condition numbers higher than this 
       // number
       int max_bcnum = DEFAULT_BCNUM;
-      for(int i = 1; i <= bc_num.Size();i++)
+      for(int i = 1; i <= bc_num.size();i++)
       {
          if(bc_num.Elem(i) > max_bcnum) max_bcnum = bc_num.Elem(i);
       }
@@ -202,9 +202,9 @@ namespace netgen
       
       // Extract all the colours to see how many there are
       GetFaceColours(mesh,all_colours);
-      PrintMessage(3,"\nNumber of colours defined in Mesh: ", all_colours.Size());
+      PrintMessage(3,"\nNumber of colours defined in Mesh: ", all_colours.size());
 
-      if(all_colours.Size() == 0)
+      if(all_colours.size() == 0)
       {
          PrintMessage(3,"No colour data detected in Mesh... no changes made!");
          return;
@@ -226,7 +226,7 @@ namespace netgen
             // does not exist in the list of colours in the profile file
             bool bc_assigned = false;
 
-            for(int col_index = 1; col_index <= bc_colours.Size(); col_index++)
+            for(int col_index = 1; col_index <= bc_colours.size(); col_index++)
             {
                if((ColourMatch(face_colour,bc_colours.Elem(col_index))) && (!bc_assigned))
                {
@@ -242,9 +242,9 @@ namespace netgen
             if(!bc_assigned)
             {
                max_bcnum++;
-               bc_num.Append(max_bcnum);
-               bc_colours.Append(face_colour);
-               bc_used.Append(true);
+               bc_num.push_back(max_bcnum);
+               bc_colours.push_back(face_colour);
+               bc_used.push_back(true);
 
                mesh.GetFaceDescriptor(face_index).SetBCProperty(max_bcnum);
             }
@@ -259,7 +259,7 @@ namespace netgen
       // User Information of the results of the operation
       Vec3d ref_colour(0.0,1.0,0.0);
       PrintMessage(3,"Colour based Boundary Condition Property details:");
-      for(int bc_index = 0; bc_index <= bc_num.Size(); bc_index++)
+      for(int bc_index = 0; bc_index <= bc_num.size(); bc_index++)
       {
          if(bc_index > 0) ref_colour = bc_colours.Elem(bc_index);
 
@@ -299,7 +299,7 @@ namespace netgen
 
       // Delete the default colour from the list since it will be accounted 
       // for automatically
-      for(int i = 1; i <= all_colours.Size(); i++)
+      for(int i = 1; i <= all_colours.size(); i++)
       {
          if(ColourMatch(all_colours.Elem(i),Vec3d(DEFAULT_R,DEFAULT_G,DEFAULT_B)))
          {
@@ -307,9 +307,9 @@ namespace netgen
             break;
          }
       }
-      PrintMessage(3,"\nNumber of colours defined in Mesh: ", all_colours.Size());
+      PrintMessage(3,"\nNumber of colours defined in Mesh: ", all_colours.size());
 
-      if(all_colours.Size() == 0)
+      if(all_colours.size() == 0)
       {
          PrintMessage(3,"No colour data detected in Mesh... no changes made!");
          return;
@@ -318,15 +318,15 @@ namespace netgen
       // One more slot than the number of colours are required, to 
       // account for individual faces which have no colour data 
       // assigned to them in the CAD software
-      faces_sorted.SetSize(all_colours.Size()+1);
-      colours_sorted.SetSize(all_colours.Size()+1);
+      faces_sorted.resize(all_colours.size()+1);
+      colours_sorted.resize(all_colours.size()+1);
       faces_sorted = 0;
       
       // Slave Array to identify the colours the faces were assigned to, 
       // after the bubble sort routine to sort the automatic boundary 
       // identifiers according to the number of surface mesh elements 
       // of a given colour
-      for(int i = 0; i <= all_colours.Size(); i++) colours_sorted[i] = i;
+      for(int i = 0; i <= all_colours.size(); i++) colours_sorted[i] = i;
 
       // Used to hold the number of surface elements without any OCC 
       // colour definition
@@ -351,11 +351,11 @@ namespace netgen
          face_colour = mesh.GetFaceDescriptor(face_index).SurfColour();
          if(!ColourMatch(face_colour,Vec3d(DEFAULT_R,DEFAULT_G,DEFAULT_B)))
          {
-            for(int i = 1; i <= all_colours.Size(); i++)
+            for(int i = 1; i <= all_colours.size(); i++)
             {
                if(ColourMatch(face_colour, all_colours.Elem(i)))
                {
-                  faces_sorted[i] = faces_sorted[i] + se_face.Size();
+                  faces_sorted[i] = faces_sorted[i] + se_face.size();
                }
             }
          }
@@ -363,7 +363,7 @@ namespace netgen
          {
             // Add the number of surface elements without any colour 
             // definition separately
-            no_colour_faces = no_colour_faces + se_face.Size();
+            no_colour_faces = no_colour_faces + se_face.size();
          }
       }
 
@@ -383,7 +383,7 @@ namespace netgen
          face_colour = mesh.GetFaceDescriptor(face_index).SurfColour();
          if(!ColourMatch(face_colour,Vec3d(DEFAULT_R,DEFAULT_G,DEFAULT_B)))
          {
-            for(int i = 0; i < colours_sorted.Size(); i++)
+            for(int i = 0; i < colours_sorted.size(); i++)
             {
                Vec3d ref_colour;
                if(i != no_colour_index) ref_colour = all_colours.Elem(colours_sorted[i]);
@@ -405,7 +405,7 @@ namespace netgen
       // User Information of the results of the operation
       Vec3d ref_colour(0.0,1.0,0.0);
       PrintMessage(3,"Colour based Boundary Condition Property details:");
-      for(int i = 0; i < faces_sorted.Size(); i++)
+      for(int i = 0; i < faces_sorted.size(); i++)
       {
          if(colours_sorted[i] > 0) ref_colour = all_colours.Elem(colours_sorted[i]);
 

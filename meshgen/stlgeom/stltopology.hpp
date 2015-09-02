@@ -292,8 +292,8 @@ public:
 			  Array<int> & trias) const;
 
 
-  int GetNP() const { return points.Size(); }
-  int AddPoint(const Point<3> & p) { return points.Append(p); }
+  int GetNP() const { return points.size(); }
+  int AddPoint(const Point<3> & p) { return points.push_back(p); }
   const Point<3> & GetPoint(int nr) const { return points.Get(nr); }
   int GetPointNum (const Point<3> & p);
   void SetPoint(int nr, const Point<3> & p) { points.Elem(nr) = p; }
@@ -305,7 +305,7 @@ public:
 
 
 
-  int GetNT() const { return trias.Size(); }
+  int GetNT() const { return trias.size(); }
   void AddTriangle(const STLTriangle& t);
   const STLTriangle & GetTriangle (int nr) const { return trias.Get(nr); }
   STLTriangle & GetTriangle (int nr) { return trias.Elem(nr); }
@@ -314,7 +314,7 @@ public:
   STLTriangle & operator[] (STLTrigIndex i) { return trias[i]; }
 
 
-  int GetNTE() const { return topedges.Size(); }
+  int GetNTE() const { return topedges.size(); }
   const STLTopEdge & GetTopEdge (int nr) const { return topedges.Get(nr); }
   STLTopEdge & GetTopEdge (int nr)  { return topedges.Elem(nr); }
   int GetTopEdgeNum (int pi1, int pi2) const;

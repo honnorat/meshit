@@ -205,8 +205,8 @@ double Surface :: LocH (const Point<3> & p, double x,
 
 Primitive :: Primitive ()
 {
-  surfaceids.SetSize (1);
-  surfaceactive.SetSize (1);
+  surfaceids.resize (1);
+  surfaceactive.resize (1);
   surfaceactive[0] = 1;
 }
 
@@ -232,7 +232,7 @@ void Primitive :: GetPrimitiveData (const char *& classname,
 				    Array<double> & coeffs) const
 {
   classname = "undef";
-  coeffs.SetSize (0);
+  coeffs.resize (0);
 }
 
 void Primitive :: SetPrimitiveData (Array<double> & coeffs)
@@ -281,7 +281,7 @@ void Primitive :: GetTangentialSurfaceIndices (const Point<3> & p,
   for (int j = 0; j < GetNSurfaces(); j++)
     if (fabs (GetSurface(j).CalcFunctionValue (p)) < eps)
       if (!surfind.Contains (GetSurfaceId(j)))
-	surfind.Append (GetSurfaceId(j));
+	surfind.push_back (GetSurfaceId(j));
 }
 
 
@@ -290,7 +290,7 @@ GetTangentialVecSurfaceIndices (const Point<3> & p, const Vec<3> & v,
 				Array<int> & surfind, double eps) const
 {
   std::cout << "get tangvecsurfind not implemented" <<std::endl;
-  surfind.SetSize (0);
+  surfind.resize (0);
 }
 
 void Primitive :: 
@@ -307,7 +307,7 @@ GetTangentialVecSurfaceIndices2 (const Point<3> & p, const Vec<3> & v1, const Ve
 	      sqr (grad * v2) < 1e-6 * v2.Length2() * grad.Length2() )   // new, 18032006 JS
 	    {
 	      if (!surfind.Contains (GetSurfaceId(j)))
-		surfind.Append (GetSurfaceId(j));
+		surfind.push_back (GetSurfaceId(j));
 	    }
 	}
     }

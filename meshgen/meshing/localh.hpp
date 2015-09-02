@@ -119,7 +119,7 @@ namespace netgen
     ///
     void Convexify ();
     ///
-    int GetNBoxes () { return boxes.Size(); } 
+    int GetNBoxes () { return boxes.size(); } 
     const Box3d & GetBoundingBox () const
     { return boundingbox; }
     ///

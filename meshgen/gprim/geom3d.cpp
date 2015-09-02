@@ -715,8 +715,8 @@ void referencetransform :: ToPlain (const Array<Point3d> & p,
   Vec3d v;
   int i;
 
-  pp.SetSize (p.Size());
-  for (i = 1; i <= p.Size(); i++)
+  pp.resize (p.size());
+  for (i = 1; i <= p.size(); i++)
     {
       v = p.Get(i) - rp;
       pp.Elem(i).X() = (ex_h * v);

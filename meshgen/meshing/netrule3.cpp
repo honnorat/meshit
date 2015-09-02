@@ -16,13 +16,13 @@ vnetrule :: ~vnetrule ()
 {
   // if (strlen(name)) 
   delete [] name;
-  for (int i = 1; i <= freefaces.Size(); i++)
+  for (int i = 1; i <= freefaces.size(); i++)
     delete freefaces.Elem(i);
-  for (int i = 1; i <= freesets.Size(); i++)
+  for (int i = 1; i <= freesets.size(); i++)
     delete freesets.Elem(i);
-  for (int i = 1; i <= freeedges.Size(); i++)
+  for (int i = 1; i <= freeedges.size(); i++)
     delete freeedges.Elem(i);
-  for (int i = 1; i <= freefaceinequ.Size(); i++)
+  for (int i = 1; i <= freefaceinequ.size(); i++)
     delete freefaceinequ.Elem(i);
   delete oldutofreezone;
   delete oldutofreezonelimit;
@@ -30,7 +30,7 @@ vnetrule :: ~vnetrule ()
 
 int vnetrule :: TestFlag (char flag) const
 {
-  for (int i = 1; i <= flags.Size(); i++)
+  for (int i = 1; i <= flags.size(); i++)
     if (flags.Get(i) == flag) return 1;
   return 0;
 }
@@ -47,10 +47,10 @@ void vnetrule :: SetFreeZoneTransformation (const Vector & allp, int tolclass)
   double lam1 = 1.0/(2 * tolclass - 1);
   double lam2 = 1-lam1;
 
-  transfreezone.SetSize (freezone.Size());
+  transfreezone.resize (freezone.size());
   
-  int np = points.Size();
-  int nfp = freezone.Size();
+  int np = points.size();
+  int nfp = freezone.size();
   Vector vp(np), vfp1(nfp), vfp2(nfp);
 
 
@@ -73,19 +73,19 @@ void vnetrule :: SetFreeZoneTransformation (const Vector & allp, int tolclass)
 
 
   fzbox.SetPoint (transfreezone.Elem(1));
-  for (i = 2; i <= freezone.Size(); i++)
+  for (i = 2; i <= freezone.size(); i++)
     fzbox.AddPoint (transfreezone.Elem(i));
   
   
   // MARK(setfz3);
 
 
-  for (fs = 1; fs <= freesets.Size(); fs++)
+  for (fs = 1; fs <= freesets.size(); fs++)
     {
       Array<threeint> & freesetfaces = *freefaces.Get(fs);
       DenseMatrix & freesetinequ = *freefaceinequ.Get(fs);
       
-      for (i = 1; i <= freesetfaces.Size(); i++)
+      for (i = 1; i <= freesetfaces.size(); i++)
 	{
 	  ti = &freesetfaces.Get(i);
 	  const Point3d & p1 = transfreezone.Get(ti->i1);
@@ -136,7 +136,7 @@ int vnetrule :: ConvexFreeZone () const
   int ret1=1;
   // int ret2=1;
 
-  for (fs = 1; fs <= freesets.Size(); fs++)
+  for (fs = 1; fs <= freesets.size(); fs++)
     {
       const DenseMatrix & freesetinequ = *freefaceinequ.Get(fs);
 
@@ -144,7 +144,7 @@ int vnetrule :: ConvexFreeZone () const
       const Array<twoint> & freesetedges = *freeedges.Get(fs);
       // const Array<threeint> & freesetfaces = *freefaces.Get(fs);
       
-      for (i = 1; i <= freesetedges.Size(); i++)
+      for (i = 1; i <= freesetedges.size(); i++)
 	{
 	  j = freesetedges.Get(i).i1;    //triangle j with opposite point k
 	  k = freesetedges.Get(i).i2;
@@ -170,13 +170,13 @@ int vnetrule :: IsInFreeZone (const Point3d & p) const
   char inthis;
   
   
-  for (fs = 1; fs <= freesets.Size(); fs++)
+  for (fs = 1; fs <= freesets.size(); fs++)
     {
       inthis = 1;
       Array<threeint> & freesetfaces = *freefaces.Get(fs);
       DenseMatrix & freesetinequ = *freefaceinequ.Get(fs);
       
-      for (i = 1; i <= freesetfaces.Size() && inthis; i++)
+      for (i = 1; i <= freesetfaces.size() && inthis; i++)
 	{
 	  if (freesetinequ.Get(i, 1) * p.X() + freesetinequ.Get(i, 2) * p.Y() +
 	      freesetinequ.Get(i, 3) * p.Z() + freesetinequ.Get(i, 4) > 0)
@@ -208,19 +208,19 @@ int vnetrule :: IsTriangleInFreeZone (const Point3d & p1,
       pfi.Elem(i) = 0;
       if (pi.Get(i))
 	{
-	  for (j = 1; j <= freezonepi.Size(); j++)
+	  for (j = 1; j <= freezonepi.size(); j++)
 	    if (freezonepi.Get(j) == pi.Get(i))
 	      pfi.Elem(i) = j;
 	}
     }
 
-  for (fs = 1; fs <= freesets.Size(); fs++)
+  for (fs = 1; fs <= freesets.size(); fs++)
     {
       const Array<int> & freeseti = *freesets.Get(fs);
       for (i = 1; i <= 3; i++)
 	{
 	  pfi2.Elem(i) = 0;
-	  for (j = 1; j <= freeseti.Size(); j++)
+	  for (j = 1; j <= freeseti.size(); j++)
 	    if (pfi.Get(i) == freeseti.Get(j))
 	      pfi2.Elem(i) = pfi.Get(i);
 	}
@@ -311,7 +311,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
       n /= n.Length();
 
       //      std::cerr << "Test new: " << std::endl;
-      for (i = 1; i <= freesetfaces.Size(); i++)
+      for (i = 1; i <= freesetfaces.size(); i++)
 	{
 	  if ( (freesetfaces.Get(i).i1 == lpiu) || 
 	       (freesetfaces.Get(i).i2 == lpiu) ||
@@ -441,7 +441,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
       //      std::cerr << "orig v1, v2 = " << v1 << ", " << v2 << std::endl;
 
       
-      for (i = 1; i <= freesetfaces.Size(); i++)
+      for (i = 1; i <= freesetfaces.size(); i++)
 	{
 	  if ( (freesetfaces.Get(i).i1 == lpiu) || 
 	       (freesetfaces.Get(i).i2 == lpiu) ||
@@ -573,14 +573,14 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 	case 3: trivec = (p3 - p2); break;
 	}
 
-      Array<int> lpi(freezonepi.Size());
-      for (i = 1; i <= lpi.Size(); i++)
+      Array<int> lpi(freezonepi.size());
+      for (i = 1; i <= lpi.size(); i++)
 	lpi.Elem(i) = 0;
       lpi.Elem(pi1) = 1;
       lpi.Elem(pi2) = 1;
       
       int ff1 = 0, ff2 = 0;
-      for (i = 1; i <= freesetfaces.Size(); i++)
+      for (i = 1; i <= freesetfaces.size(); i++)
 	{
 	  if (lpi.Get(freesetfaces.Get(i).i1) + 
 	      lpi.Get(freesetfaces.Get(i).i2) + 
@@ -612,14 +612,14 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
     {
       // MARK(triinfz3);  
 
-      Array<int> lpi(freezonepi.Size());
-      for (i = 1; i <= lpi.Size(); i++)
+      Array<int> lpi(freezonepi.size());
+      for (i = 1; i <= lpi.size(); i++)
 	lpi.Elem(i) = 0;
 
       for (i = 1; i <= 3; i++)
 	lpi.Elem(pi.Get(i)) = 1;
       
-      for (i = 1; i <= freesetfaces.Size(); i++)
+      for (i = 1; i <= freesetfaces.size(); i++)
 	{
 	  if (lpi.Get(freesetfaces.Get(i).i1) + 
 	      lpi.Get(freesetfaces.Get(i).i2) + 
@@ -635,11 +635,11 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 
   
   os1 = os2 = os3 = 0;
-  activefaces.SetSize(0);
+  activefaces.resize(0);
 
   // is point inside ?
 
-  for (i = 1; i <= freesetfaces.Size(); i++)
+  for (i = 1; i <= freesetfaces.size(); i++)
     {
       hos1 = freesetinequ.Get(i, 1) * p1.X() +
 	freesetinequ.Get(i, 2) * p1.Y() +
@@ -662,7 +662,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
       if (hos2) os2 = 1;
       if (hos3) os3 = 1;
       
-      if (hos1 || hos2 || hos3) activefaces.Append (i);
+      if (hos1 || hos2 || hos3) activefaces.push_back (i);
     }
   
   if (!os1 || !os2 || !os3) return 1;
@@ -681,7 +681,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
   n /= n.Length();
 
   allleft = allright = 1;
-  for (i = 1; i <= transfreezone.Size() && (allleft || allright); i++)
+  for (i = 1; i <= transfreezone.size() && (allleft || allright); i++)
     {
       const Point3d & p = transfreezone.Get(i);
       float scal = (p.X() - p1.X()) * n.X() +
@@ -734,7 +734,7 @@ int vnetrule :: IsTriangleInFreeSet (const Point3d & p1, const Point3d & p2,
 
       isin = 1;
 
-      for (i = 1; i <= activefaces.Size(); i++)
+      for (i = 1; i <= activefaces.size(); i++)
 	{
 	  ii = activefaces.Get(i);
 
@@ -876,19 +876,19 @@ int vnetrule :: IsQuadInFreeZone (const Point3d & p1,
       pfi.Elem(i) = 0;
       if (pi.Get(i))
 	{
-	  for (j = 1; j <= freezonepi.Size(); j++)
+	  for (j = 1; j <= freezonepi.size(); j++)
 	    if (freezonepi.Get(j) == pi.Get(i))
 	      pfi.Elem(i) = j;
 	}
     }
 
-  for (fs = 1; fs <= freesets.Size(); fs++)
+  for (fs = 1; fs <= freesets.size(); fs++)
     {
       const Array<int> & freeseti = *freesets.Get(fs);
       for (i = 1; i <= 4; i++)
 	{
 	  pfi2.Elem(i) = 0;
-	  for (j = 1; j <= freeseti.Size(); j++)
+	  for (j = 1; j <= freeseti.size(); j++)
 	    if (pfi.Get(i) == freeseti.Get(j))
 	      pfi2.Elem(i) = pfi.Get(i);
 	}
@@ -984,27 +984,27 @@ float vnetrule :: CalcPointDist (int pi, const Point3d & p) const
 
 int vnetrule :: TestOk () const
 {
-  Array<int> cntpused(points.Size());
+  Array<int> cntpused(points.size());
   Array<int> edge1, edge2;
-  Array<int> delf(faces.Size());
+  Array<int> delf(faces.size());
   int i, j, k;
   int pi1, pi2;
   int found;
 
-  for (i = 1; i <= cntpused.Size(); i++)
+  for (i = 1; i <= cntpused.size(); i++)
     cntpused.Elem(i) = 0;
-  for (i = 1; i <= faces.Size(); i++)
+  for (i = 1; i <= faces.size(); i++)
     delf.Elem(i) = 0;
-  for (i = 1; i <= delfaces.Size(); i++)
+  for (i = 1; i <= delfaces.size(); i++)
     delf.Elem(delfaces.Get(i)) = 1;
 
 
-  for (i = 1; i <= faces.Size(); i++)
+  for (i = 1; i <= faces.size(); i++)
     if (delf.Get(i) || i > noldf)
       for (j = 1; j <= faces.Get(i).GetNP(); j++)
         cntpused.Elem(faces.Get(i).PNum(j))++;
 
-  for (i = 1; i <= cntpused.Size(); i++)
+  for (i = 1; i <= cntpused.size(); i++)
     if (cntpused.Get(i) > 0 && cntpused.Get(i) < 2)
       {
 	return 0;
@@ -1012,7 +1012,7 @@ int vnetrule :: TestOk () const
 
 
   //  std::cerr << std::endl;
-  for (i = 1; i <= faces.Size(); i++)
+  for (i = 1; i <= faces.size(); i++)
     {
       //      std::cerr << "face " << i << std::endl;
       for (j = 1; j <= faces.Get(i).GetNP(); j++)
@@ -1032,7 +1032,7 @@ int vnetrule :: TestOk () const
 	  found = 0;
 	  if (pi1)
 	    {
-	      for (k = 1; k <= edge1.Size(); k++)
+	      for (k = 1; k <= edge1.size(); k++)
 		if (edge1.Get(k) == pi1 && edge2.Get(k) == pi2)
 		  {
 		    found = 1;
@@ -1043,8 +1043,8 @@ int vnetrule :: TestOk () const
 		  }
 	      if (!found)
 		{
-		  edge1.Append (pi2);
-		  edge2.Append (pi1);
+		  edge1.push_back (pi2);
+		  edge2.push_back (pi1);
 		  //		  std::cerr << "Add edge " << pi1 << "-" << pi2 << std::endl;
 		}
 	    }
@@ -1052,7 +1052,7 @@ int vnetrule :: TestOk () const
     }
 
 
-  if (edge1.Size() > 0)
+  if (edge1.size() > 0)
     {
       return 0;
     }

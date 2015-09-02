@@ -228,7 +228,7 @@ public:
   void GetPoints (Array<Point<3> > & apoints) const;
   ///
   int GetNP() const 
-  { return points.Size(); }
+  { return points.size(); }
   ///
   const Point<3> & GetPoint (PointIndex pi) const
   { return points[pi].P(); }

@@ -267,7 +267,7 @@ Polygon2d :: ~Polygon2d ()
 
 void Polygon2d :: AddPoint (const Point2d & p)
 { 
-  points.Append(p); 
+  points.push_back(p); 
 }
 
 
@@ -275,10 +275,10 @@ double Polygon2d :: HArea () const
 {
   int i;
   double ar = 0;
-  for (i = 1; i <= points.Size(); i++)
+  for (i = 1; i <= points.size(); i++)
     {
       const Point2d & p1 = points.Get(i);
-      const Point2d & p2 = points.Get(i%points.Size()+1);
+      const Point2d & p2 = points.Get(i%points.size()+1);
       ar += 
 	(p2.X()-p1.X()) * p1.Y() -
 	(p2.Y()-p1.Y()) * p1.X();
@@ -305,10 +305,10 @@ double Polygon2d :: HArea () const
 int Polygon2d :: IsOn (const Point2d & p) const
 {
   int i;
-  for (i = 1; i <= points.Size(); i++)
+  for (i = 1; i <= points.size(); i++)
     {
       const Point2d & p1 = points.Get(i);
-      const Point2d & p2 = points.Get(i%points.Size()+1);
+      const Point2d & p2 = points.Get(i%points.size()+1);
       if (IsOnLine (Line2d(p1, p2), p)) return 1;
     }
   return 0;
@@ -332,10 +332,10 @@ int Polygon2d :: IsIn (const Point2d & p) const
 {
   int i;
   double sum = 0, ang;
-  for (i = 1; i <= points.Size(); i++)
+  for (i = 1; i <= points.size(); i++)
     {
       const Point2d & p1 = points.Get(i);
-      const Point2d & p2 = points.Get(i%points.Size()+1);
+      const Point2d & p2 = points.Get(i%points.size()+1);
       ang = Angle ( (p1 - p), (p2 - p) );
       if (ang > M_PI) ang -= 2 * M_PI;
       sum += ang;

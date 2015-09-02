@@ -48,8 +48,8 @@ Polyhedra::Face::Face (int pi1, int pi2, int pi3,
 
 Polyhedra :: Polyhedra ()
 {
-  surfaceactive.SetSize(0);
-  surfaceids.SetSize(0);
+  surfaceactive.resize(0);
+  surfaceids.resize(0);
   eps_base1 = 1e-8;
 }
 
@@ -70,7 +70,7 @@ INSOLID_TYPE Polyhedra :: BoxInSolid (const BoxSphere<3> & box) const
     if (FaceBoxIntersection (i, box))
       return DOES_INTERSECT;
   */
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       if (!faces[i].bbox.Intersect (box))
 	continue;
@@ -123,7 +123,7 @@ INSOLID_TYPE Polyhedra :: PointInSolid (const Point<3> & p,
 
   int cnt = 0;
 
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       const Point<3> & p1 = points[faces[i].pnums[0]];
       
@@ -167,7 +167,7 @@ INSOLID_TYPE Polyhedra :: PointInSolid (const Point<3> & p,
 void Polyhedra :: GetTangentialSurfaceIndices (const Point<3> & p, 
 					       Array<int> & surfind, double eps) const
 {
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       const Point<3> & p1 = points[faces[i].pnums[0]];
       
@@ -181,7 +181,7 @@ void Polyhedra :: GetTangentialSurfaceIndices (const Point<3> & p,
 
       if (lam1 >= -eps_base1 && lam2 >= -eps_base1 && lam1+lam2 <= 1+eps_base1)
 	if (!surfind.Contains (GetSurfaceId(i)))
-	  surfind.Append (GetSurfaceId(i));
+	  surfind.push_back (GetSurfaceId(i));
     }
 
 }
@@ -197,7 +197,7 @@ INSOLID_TYPE Polyhedra :: VecInSolid (const Point<3> & p,
 
   Vec<3> vn = v;
   vn.Normalize();
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       const Point<3> & p1 = points[faces[i].pnums[0]];
       
@@ -213,7 +213,7 @@ INSOLID_TYPE Polyhedra :: VecInSolid (const Point<3> & p,
 
       if (lam1 >= -eps_base1 && lam2 >= -eps_base1 && lam1+lam2 <= 1+eps_base1)
 	{
-	  point_on_faces.Append(i);
+	  point_on_faces.push_back(i);
 
 	  double scal = vn * faces[i].nn; // n->nn
 	
@@ -226,9 +226,9 @@ INSOLID_TYPE Polyhedra :: VecInSolid (const Point<3> & p,
   //std::cerr << "point_on_faces.Size() " << point_on_faces.Size() 
   //	     << " res " << res <<std::endl;
 
-  if (point_on_faces.Size() == 0)
+  if (point_on_faces.size() == 0)
     return PointInSolid (p, 0);
-  if (point_on_faces.Size() == 1)
+  if (point_on_faces.size() == 1)
     return res;
 
 
@@ -237,7 +237,7 @@ INSOLID_TYPE Polyhedra :: VecInSolid (const Point<3> & p,
   double mindist(0);
   bool first = true;
 
-  for(int i=0; i<point_on_faces.Size(); i++)
+  for(int i=0; i<point_on_faces.size(); i++)
     {
       for(int j=0; j<3; j++)
 	{
@@ -341,7 +341,7 @@ INSOLID_TYPE Polyhedra :: VecInSolid2 (const Point<3> & p,
   double cosv2, cosv2max = -99;
 
   
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       const Point<3> & p1 = points[faces[i].pnums[0]];
       
@@ -396,7 +396,7 @@ void Polyhedra :: GetTangentialVecSurfaceIndices2 (const Point<3> & p, const Vec
   v2n.Normalize();
 
 
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     {
       const Point<3> & p1 = points[faces[i].pnums[0]];
       
@@ -430,7 +430,7 @@ void Polyhedra :: GetTangentialVecSurfaceIndices2 (const Point<3> & p, const Vec
       if (ok1 && ok2 && ok3)
 	{
 	  if (!surfind.Contains (GetSurfaceId(faces[i].planenr)))
-	    surfind.Append (GetSurfaceId(faces[i].planenr));
+	    surfind.push_back (GetSurfaceId(faces[i].planenr));
 	}
     }  
 }
@@ -450,10 +450,10 @@ void Polyhedra :: GetPrimitiveData (const char *& classname,
 				    Array<double> & coeffs) const
 {
   classname = "Polyhedra";
-  coeffs.SetSize(0);
-  coeffs.Append (points.Size());
-  coeffs.Append (faces.Size());
-  coeffs.Append (planes.Size());
+  coeffs.resize(0);
+  coeffs.push_back (points.size());
+  coeffs.push_back (faces.size());
+  coeffs.push_back (planes.size());
 
   /*
   int i, j;
@@ -478,28 +478,28 @@ void Polyhedra :: SetPrimitiveData (Array<double> & /* coeffs */)
 
 void Polyhedra :: Reduce (const BoxSphere<3> & box)
 {
-  for (int i = 0; i < planes.Size(); i++)
+  for (int i = 0; i < planes.size(); i++)
     surfaceactive[i] = 0;
 
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     if (FaceBoxIntersection (i, box))
       surfaceactive[faces[i].planenr] = 1;
 }
 
 void Polyhedra :: UnReduce ()
 {
-  for (int i = 0; i < planes.Size(); i++)
+  for (int i = 0; i < planes.size(); i++)
     surfaceactive[i] = 1;
 }
 
 int Polyhedra :: AddPoint (const Point<3> & p)
 {
-  if(points.Size() == 0)
+  if(points.size() == 0)
     poly_bbox.Set(p);
   else
     poly_bbox.Add(p);
 
-  return points.Append (p);
+  return points.push_back (p);
 }
 
 int Polyhedra :: AddFace (int pi1, int pi2, int pi3, int inputnum)
@@ -513,7 +513,7 @@ int Polyhedra :: AddFace (int pi1, int pi2, int pi3, int inputnum)
       throw NgException(msg.str());
     }
 
-  faces.Append (Face (pi1, pi2, pi3, points, inputnum));
+  faces.push_back (Face (pi1, pi2, pi3, points, inputnum));
   
   Point<3> p1 = points[pi1];
   Point<3> p2 = points[pi2];
@@ -541,15 +541,15 @@ int Polyhedra :: AddFace (int pi1, int pi2, int pi3, int inputnum)
 //     faces.Last().planenr = identicto;
 //   else
     {
-      planes.Append (new Plane (p1, n));
-      surfaceactive.Append (1);
-      surfaceids.Append (0);
-      faces.Last().planenr = planes.Size()-1;
+      planes.push_back (new Plane (p1, n));
+      surfaceactive.push_back (1);
+      surfaceids.push_back (0);
+      faces.Last().planenr = planes.size()-1;
     }
 
 //  std::cerr << "is plane nr " << faces.Last().planenr <<std::endl;
 
-  return faces.Size();
+  return faces.size();
 }
 
 
@@ -593,25 +593,25 @@ void Polyhedra :: GetPolySurfs(Array < Array<int> * > & polysurfs)
 {
   int maxnum = -1;
   
-  for(int i = 0; i<faces.Size(); i++)
+  for(int i = 0; i<faces.size(); i++)
     {
       if(faces[i].inputnr > maxnum)
 	maxnum = faces[i].inputnr;
     }
   
-  polysurfs.SetSize(maxnum+1);
-  for(int i=0; i<polysurfs.Size(); i++)
+  polysurfs.resize(maxnum+1);
+  for(int i=0; i<polysurfs.size(); i++)
     polysurfs[i] = new Array<int>;
 
-  for(int i = 0; i<faces.Size(); i++)
-    polysurfs[faces[i].inputnr]->Append(faces[i].planenr);
+  for(int i = 0; i<faces.size(); i++)
+    polysurfs[faces[i].inputnr]->push_back(faces[i].planenr);
 }
 
 
 void Polyhedra::CalcSpecialPoints (Array<Point<3> > & pts) const
 {
-  for (int i = 0; i < points.Size(); i++)
-    pts.Append (points[i]);
+  for (int i = 0; i < points.size(); i++)
+    pts.push_back (points[i]);
 }
 
 
@@ -625,8 +625,8 @@ Vec<3> Polyhedra :: SpecialPointTangentialVector (const Point<3> & p, int s1, in
 {
   const double eps = 1e-10*poly_bbox.Diam();
 
-  for (int fi1 = 0; fi1 < faces.Size(); fi1++)
-    for (int fi2 = 0; fi2 < faces.Size(); fi2++)
+  for (int fi1 = 0; fi1 < faces.size(); fi1++)
+    for (int fi2 = 0; fi2 < faces.size(); fi2++)
       {
 	int si1 = faces[fi1].planenr;
 	int si2 = faces[fi2].planenr;

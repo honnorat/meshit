@@ -40,8 +40,6 @@ class Meshing2
   /// 
   Box<3> boundingbox;
   ///
-  double starttime;
-  ///
   double maxarea;
 
   Vec3d ex, ey;
@@ -71,10 +69,6 @@ public:
   ///
   DLL_HEADER void AddBoundaryElement (INDEX i1, INDEX i2,
 			   const PointGeomInfo & gi1, const PointGeomInfo & gi2);
-  
-  ///
-  void SetStartTime (double astarttime);
-
   ///
   void SetMaxArea (double amaxarea);
 

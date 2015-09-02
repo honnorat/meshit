@@ -602,7 +602,7 @@ namespace netgen
             std::cerr << "HPRefElement: illegal elementtype (1) " << mesh[i].GetType() << std::endl;
             throw NgException ("HPRefElement: illegal elementtype (1)");
 	  } 
-	elements.Append(hpel); 
+	elements.push_back(hpel); 
       }
 	    
     for(SurfaceElementIndex i = 0; i < mesh.GetNSE(); i++)
@@ -618,7 +618,7 @@ namespace netgen
             std::cerr << "HPRefElement: illegal elementtype (1b) " << mesh[i].GetType() << std::endl;
             throw NgException ("HPRefElement: illegal elementtype (1b)");
 	  } 
-	elements.Append(hpel);
+	elements.push_back(hpel);
       } 
         
     for(SegmentIndex i = 0; i < mesh.GetNSeg(); i++) 
@@ -632,7 +632,7 @@ namespace netgen
 	  {
 	    throw NgException("assumption that seg.edgenr < 10000 is wrong");
 	  }
-	elements.Append(hpel); 
+	elements.push_back(hpel); 
       }
   }
 
@@ -642,16 +642,16 @@ namespace netgen
   void DoRefinement (Mesh & mesh, Array<HPRefElement> & elements,
 		     Refinement * ref, double fac1) 
   {
-    elements.SetAllocSize (5 * elements.Size());
-    INDEX_2_HASHTABLE<int> newpts(elements.Size()+1);
-    INDEX_3_HASHTABLE<int> newfacepts(elements.Size()+1);
+    elements.reserve (5 * elements.size());
+    INDEX_2_HASHTABLE<int> newpts(elements.size()+1);
+    INDEX_3_HASHTABLE<int> newfacepts(elements.size()+1);
 
     // prepare new points  
     
     fac1 = std::max(0.001,std::min(0.33,fac1));
     std::cout << " in HP-REFINEMENT with fac1 " << fac1 << std::endl; 
 
-    int oldelsize = elements.Size();
+    int oldelsize = elements.size();
        
     for (int i = 0; i < oldelsize; i++)
       {
@@ -872,7 +872,7 @@ namespace netgen
 	    if (j == 0) 
 	      elements[i] = newel; // overwrite old element
 	    else        
-	      elements.Append (newel);
+	      elements.push_back (newel);
 	    j++;
 	  }
       } 
@@ -888,7 +888,7 @@ namespace netgen
   void DoRefineDummies (Mesh & mesh, Array<HPRefElement> & elements,
 			Refinement * ref)
   {
-    int oldelsize = elements.Size();
+    int oldelsize = elements.size();
 
     for (int i = 0; i < oldelsize; i++)
       {
@@ -952,7 +952,7 @@ namespace netgen
 	    if (j == 0)
 	      elements[i] = newel;
 	    else
-	      elements.Append (newel);
+	      elements.push_back (newel);
 	    j++;
 	  }
       }
@@ -966,7 +966,7 @@ namespace netgen
 
   void SubdivideDegeneratedHexes (Mesh & mesh, Array<HPRefElement> & elements, double fac1)
   {
-    int oldne = elements.Size();
+    int oldne = elements.size();
     for (int i = 0; i < oldne; i++)
       if (Get_HPRef_Struct (elements[i].type)->geom == HP_HEX)
 	{
@@ -1008,16 +1008,16 @@ namespace netgen
 		  for (int k = 0; k < 4; k++)
 		    {
 		      bool same = 0;
-		      for (int l = 0; l < pts.Size(); l++)
+		      for (int l = 0; l < pts.size(); l++)
 			if (el.pnums[pts[l]] == el.pnums[faces[j][k]-1])
 			  same = 1;
 		      if (!same)
-			pts.Append (faces[j][k]-1);
+			pts.push_back (faces[j][k]-1);
 
 		    }
 		  
 		  
-		  if (pts.Size() == 3) // TrigFace -> TET 
+		  if (pts.size() == 3) // TrigFace -> TET 
 		    {
 		      
 		      for (int k = 0; k < 3; k++)
@@ -1053,7 +1053,7 @@ namespace netgen
 		  if (j == 0)
 		    elements[i] = newel;
 		  else
-		    elements.Append (newel); 
+		    elements.push_back (newel); 
 
 		  
 		}
@@ -1120,7 +1120,7 @@ namespace netgen
     for (int k = 0; k < 5; k++)
       {
         nwrong = nright = 0;
-        for (int i = 0; i < hpelements.Size(); i++)
+        for (int i = 0; i < hpelements.size(); i++)
           {
             const HPRefElement & hpel = hpelements[i];
             
@@ -1160,7 +1160,7 @@ namespace netgen
     for (int i = 1; i <= mesh.GetNP(); i++)
       mesh.Point(i) = hpts[i];
 
-    for (int i = 0; i < hpelements.Size(); i++)
+    for (int i = 0; i < hpelements.size(); i++)
       {
         HPRefElement & hpel = hpelements[i];
         for (int j = 0; j < hpel.np; j++)
@@ -1196,7 +1196,7 @@ namespace netgen
     InitHPElements(mesh,hpelements); 
     
     Array<int> nplevel;
-    nplevel.Append (mesh.GetNP());
+    nplevel.push_back (mesh.GetNP());
     
     int act_ref=1;
     bool sing = ClassifyHPElements (mesh,hpelements, act_ref, levels); 
@@ -1209,7 +1209,7 @@ namespace netgen
 	DoRefinement (mesh, hpelements, ref, fac1); 
 	DoRefineDummies (mesh, hpelements, ref);
 	
-	nplevel.Append (mesh.GetNP());
+	nplevel.push_back (mesh.GetNP());
 	CalcStatistics (hpelements);
 	
 	SubdivideDegeneratedHexes (mesh, hpelements,fac1);
@@ -1220,7 +1220,7 @@ namespace netgen
 	mesh.ClearSurfaceElements();
   	mesh.ClearVolumeElements();
 
-	for (int i = 0; i < hpelements.Size(); i++)
+	for (int i = 0; i < hpelements.size(); i++)
 	  {
 	    HPRefElement & hpel = hpelements[i];
 	    if (Get_HPRef_Struct (hpel.type))
@@ -1709,7 +1709,7 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 
     std::cerr << "edgepoint_dom = " << std::endl << edgepoint_dom << std::endl;
 
-    for( int i = 0; i<elements.Size(); i++) 
+    for( int i = 0; i<elements.size(); i++) 
       {
 	// std::cerr << "classify element " << i <<std::endl;
 
@@ -1822,7 +1822,7 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
     std::cout << "undefined elements update classification: " << cnt_undef << std::endl;
     std::cout << "non-implemented in update classification: " << cnt_nonimplement << std::endl;
 
-    for (int i = 0; i < misses.Size(); i++)
+    for (int i = 0; i < misses.size(); i++)
       if (misses[i])
 	std::cout << " in update classification missing case " << i << " occured " << misses[i] << " times" << std::endl;
 

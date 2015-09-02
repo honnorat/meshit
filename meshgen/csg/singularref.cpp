@@ -37,17 +37,17 @@ namespace netgen
 void SingularEdge :: FindPointsOnEdge (class Mesh & mesh)
 {
   std::cerr << "find points on edge" <<std::endl;
-  points.SetSize(0);
-  segms.SetSize(0);
+  points.resize(0);
+  segms.resize(0);
 
 
   Array<int> si1, si2;
   sol1->GetSurfaceIndices (si1);
   sol2->GetSurfaceIndices (si2);
 
-  for (int i = 0; i < si1.Size(); i++)
+  for (int i = 0; i < si1.size(); i++)
     si1[i] = geom.GetSurfaceClassRepresentant(si1[i]);
-  for (int i = 0; i < si2.Size(); i++)
+  for (int i = 0; i < si2.size(); i++)
     si2[i] = geom.GetSurfaceClassRepresentant(si2[i]);
 
 
@@ -91,10 +91,10 @@ void SingularEdge :: FindPointsOnEdge (class Mesh & mesh)
 
 	// if (onedge)
 	{
-	  segms.Append (i2);
+	  segms.push_back (i2);
 	  //	  PrintMessage (5, "sing segment ", i2.I1(), " - ", i2.I2());
-	  points.Append (mesh[ PointIndex (i2.I1())]);
-	  points.Append (mesh[ PointIndex (i2.I2())]);
+	  points.push_back (mesh[ PointIndex (i2.I1())]);
+	  points.push_back (mesh[ PointIndex (i2.I2())]);
 	  mesh[si].singedge_left = factor;
 	  mesh[si].singedge_right = factor;
 	}	    
@@ -114,20 +114,20 @@ void SingularEdge :: SetMeshSize (class Mesh & mesh, double globalh)
   if(maxhinit > 0 && maxhinit < hloc)
     {
       hloc = maxhinit;
-      if(points.Size() > 1)
+      if(points.size() > 1)
 	{
-	  for (int i = 0; i < points.Size()-1; i++)
+	  for (int i = 0; i < points.size()-1; i++)
 	    mesh.RestrictLocalHLine(points[i],points[i+1],hloc);
 	}
       else
 	{
-	  for (int i = 0; i < points.Size(); i++)
+	  for (int i = 0; i < points.size(); i++)
 	    mesh.RestrictLocalH (points[i], hloc);
 	}
     }
   else
     {
-      for (int i = 0; i < points.Size(); i++)
+      for (int i = 0; i < points.size(); i++)
 	mesh.RestrictLocalH (points[i], hloc);
     }
 }
@@ -149,7 +149,7 @@ SingularPoint :: SingularPoint (double abeta,
 
 void SingularPoint :: FindPoints (class Mesh & mesh)
 {
-  points.SetSize(0);
+  points.resize(0);
   Array<int> surfk, surf;
 
 
@@ -164,7 +164,7 @@ void SingularPoint :: FindPoints (class Mesh & mesh)
       if (sol1->IsIn (p) && sol2->IsIn(p) && sol3->IsIn(p) &&
 	  !sol1->IsStrictIn (p) && !sol2->IsStrictIn(p) && !sol3->IsStrictIn(p))
 	{
-	  surf.SetSize (0);
+	  surf.resize (0);
 	  for (int k = 1; k <= 3; k++)
 	    {
 	      const Solid * solk(NULL);
@@ -191,16 +191,16 @@ void SingularPoint :: FindPoints (class Mesh & mesh)
 
 	      std::cerr << "surfinds = " << surfk <<std::endl;
 
-	      for (int i = 0; i < surfk.Size(); i++)
+	      for (int i = 0; i < surfk.size(); i++)
 		if (!surf.Contains (surfk[i]))
-		  surf.Append (surfk[i]);
+		  surf.push_back (surfk[i]);
 	      
 	      delete tansol;
 	    }
 
-	  if (surf.Size() < 3) continue;
+	  if (surf.size() < 3) continue;
 
-	  points.Append (p);
+	  points.push_back (p);
 	  PrintMessage (5, "Point (", p(0), ", ", p(1), ", ", p(2), ") is singular");
 	  mesh[pi].Singularity(factor);
 	}
@@ -211,7 +211,7 @@ void SingularPoint :: FindPoints (class Mesh & mesh)
 void SingularPoint :: SetMeshSize (class Mesh & mesh, double globalh)
 {
   double hloc = pow (globalh, 1/beta);
-  for (int i = 1; i <= points.Size(); i++)
+  for (int i = 1; i <= points.size(); i++)
     mesh.RestrictLocalH (points.Get(i), hloc);  
 }
 }

@@ -74,7 +74,7 @@ namespace netgen
     Array<SurfaceElementIndex> seia;
     mesh.GetSurfaceElementsOfFace (faceindex, seia);
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       if (mesh[seia[i]].GetNP() != 3)
 	{
 	  GenericImprove (mesh);
@@ -84,7 +84,7 @@ namespace netgen
     int surfnr = mesh.GetFaceDescriptor (faceindex).SurfNr();
 
     Array<Neighbour> neighbors(mesh.GetNSE());
-    INDEX_2_HASHTABLE<trionedge> other(seia.Size() + 2);
+    INDEX_2_HASHTABLE<trionedge> other(seia.size() + 2);
 
 
     Array<char> swapped(mesh.GetNSE());
@@ -100,7 +100,7 @@ namespace netgen
     static const double minangle[] = { 0, 1.481, 2.565, 3.627, 4.683, 5.736, 7, 9 };
 
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & sel = mesh[seia[i]];
 	for (int j = 0; j < 3; j++)
@@ -108,7 +108,7 @@ namespace netgen
       }
     // pangle = 0;
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & sel = mesh[seia[i]];
 	for (int j = 0; j < 3; j++)
@@ -127,7 +127,7 @@ namespace netgen
     // pi < mesh.GetNP()+PointIndex::BASE; pi++)
     
     // pdef = 0;
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & sel = mesh[seia[i]];
 	for (int j = 0; j < 3; j++)
@@ -142,14 +142,14 @@ namespace netgen
 	  }
       }
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & sel = mesh[seia[i]];
 	for (int j = 0; j < 3; j++)
 	  pdef[sel[j]]++;
       }
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	for (int j = 0; j < 3; j++)
 	  {
@@ -175,7 +175,7 @@ namespace netgen
       }
     */	    
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	const Element2d & sel = mesh[seia[i]];
 
@@ -217,14 +217,14 @@ namespace netgen
 	  }
       }
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       swapped[seia[i]] = 0;
 
     int t = 4;
     int done = 0;
     while (!done && t >= 2)
       {
-	for (int i = 0; i < seia.Size(); i++)
+	for (int i = 0; i < seia.size(); i++)
 	  {
 	    SurfaceElementIndex t1 = seia[i];
 
@@ -432,7 +432,7 @@ namespace netgen
     mesh.GetSurfaceElementsOfFace (faceindex, seia);
 
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       if (mesh[seia[i]].GetNP() != 3)
 	return;
 
@@ -454,7 +454,7 @@ namespace netgen
     TABLE<SurfaceElementIndex,PointIndex::BASE> elementsonnode(np); 
     Array<SurfaceElementIndex> hasonepi, hasbothpi;
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	Element2d & el = mesh[seia[i]];
 	for (int j = 0; j < el.GetNP(); j++)
@@ -464,7 +464,7 @@ namespace netgen
     Array<bool,PointIndex::BASE> fixed(np);
     fixed = false;
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	Element2d & sel = mesh[seia[i]];
 	for (int j = 0; j < sel.GetNP(); j++)
@@ -481,7 +481,7 @@ namespace netgen
 
 
 
-    for(int i = 0; i < mesh.LockedPoints().Size(); i++)
+    for(int i = 0; i < mesh.LockedPoints().size(); i++)
       fixed[mesh.LockedPoints()[i]] = true;
 
 
@@ -490,7 +490,7 @@ namespace netgen
 
     for (PointIndex pi = mesh.Points().Begin(); pi < mesh.Points().End(); pi++)
       {
-	if (elementsonnode[pi].Size())
+	if (elementsonnode[pi].size())
 	  {
 	    Element2d & hel = mesh[elementsonnode[pi][0]];
 	    for (int k = 0; k < 3; k++)
@@ -503,7 +503,7 @@ namespace netgen
 	  }
       }
 
-    for (int i = 0; i < seia.Size(); i++)
+    for (int i = 0; i < seia.size(); i++)
       {
 	SurfaceElementIndex sei = seia[i];
 	Element2d & elem = mesh[sei];
@@ -558,10 +558,10 @@ namespace netgen
 	      edgetested.Set (si2, 1);
 	    */
 
-	    hasonepi.SetSize(0);
-	    hasbothpi.SetSize(0);
+	    hasonepi.resize(0);
+	    hasbothpi.resize(0);
 
-	    for (int k = 0; k < elementsonnode[pi1].Size(); k++)
+	    for (int k = 0; k < elementsonnode[pi1].size(); k++)
 	      {
 		const Element2d & el2 = mesh[elementsonnode[pi1][k]];
 
@@ -569,13 +569,13 @@ namespace netgen
 
 		if (el2[0] == pi2 || el2[1] == pi2 || el2[2] == pi2)
 		  {
-		    hasbothpi.Append (elementsonnode[pi1][k]);
+		    hasbothpi.push_back (elementsonnode[pi1][k]);
 		    nv = Cross (Vec3d (mesh[el2[0]], mesh[el2[1]]),
 				Vec3d (mesh[el2[0]], mesh[el2[2]]));
 		  }
 		else
 		  {
-		    hasonepi.Append (elementsonnode[pi1][k]);
+		    hasonepi.push_back (elementsonnode[pi1][k]);
 		  }
 	      } 
 
@@ -594,7 +594,7 @@ namespace netgen
 
 
 
-	    for (int k = 0; k < elementsonnode[pi2].Size(); k++)
+	    for (int k = 0; k < elementsonnode[pi2].size(); k++)
 	      {
 		const Element2d & el2 = mesh[elementsonnode[pi2][k]];
 		if (el2.IsDeleted()) continue;
@@ -602,12 +602,12 @@ namespace netgen
 		if (el2[0] == pi1 || el2[1] == pi1 || el2[2] == pi1)
 		  ;
 		else
-		  hasonepi.Append (elementsonnode[pi2][k]);
+		  hasonepi.push_back (elementsonnode[pi2][k]);
 	      } 
 
 	    bad1 = 0;
 	    int illegal1 = 0, illegal2 = 0;
-	    for (int k = 0; k < hasonepi.Size(); k++)
+	    for (int k = 0; k < hasonepi.size(); k++)
 	      {
 		const Element2d & el = mesh[hasonepi[k]];
 		bad1 += CalcTriangleBadness (mesh[el[0]], mesh[el[1]], mesh[el[2]],
@@ -615,14 +615,14 @@ namespace netgen
 		illegal1 += 1-mesh.LegalTrig(el);
 	      }
 	  
-	    for (int k = 0; k < hasbothpi.Size(); k++)
+	    for (int k = 0; k < hasbothpi.size(); k++)
 	      {
 		const Element2d & el = mesh[hasbothpi[k]];
 		bad1 += CalcTriangleBadness (mesh[el[0]], mesh[el[1]], mesh[el[2]],
 					     nv, -1, loch);
 		illegal1 += 1-mesh.LegalTrig(el);
 	      }
-	    bad1 /= (hasonepi.Size()+hasbothpi.Size());
+	    bad1 /= (hasonepi.size()+hasbothpi.size());
 
 	    MeshPoint p1 = mesh[pi1];
 	    MeshPoint p2 = mesh[pi2];
@@ -632,7 +632,7 @@ namespace netgen
 	    mesh[pi2] = pnew;
 
 	    bad2 = 0;
-	    for (int k = 0; k < hasonepi.Size(); k++)
+	    for (int k = 0; k < hasonepi.size(); k++)
 	      {
 		Element2d & el = mesh[hasonepi[k]];
 		double err = 
@@ -653,7 +653,7 @@ namespace netgen
 
 		illegal2 += 1-mesh.LegalTrig(el);
 	      }
-	    bad2 /= hasonepi.Size();
+	    bad2 /= hasonepi.size();
 
 	    mesh[pi1] = p1;
 	    mesh[pi2] = p2;
@@ -700,7 +700,7 @@ namespace netgen
 		    }
 
 		// std::cerr << "Connect point " << pi2 << " to " << pi1 << "\n";
-		for (int k = 0; k < elementsonnode[pi2].Size(); k++)
+		for (int k = 0; k < elementsonnode[pi2].size(); k++)
 		  {
 		    Element2d & el = mesh[elementsonnode[pi2][k]];
 		    if(el.IsDeleted()) continue;
@@ -734,7 +734,7 @@ namespace netgen
 		  }
 		*/
 
-		for (int k = 0; k < hasbothpi.Size(); k++)
+		for (int k = 0; k < hasbothpi.size(); k++)
 		  {
 		    mesh[hasbothpi[k]].Delete();
 		    /*

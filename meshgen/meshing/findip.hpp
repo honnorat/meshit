@@ -83,12 +83,12 @@ inline int FindInnerPoint (POINTArray & points,
   Vec<3> rs, x = 0.0, center;
   double f;
 
-  int nf = faces.Size();
+  int nf = faces.size();
 
   // minimize_x  max_i  a_i x + c_i
 
-  a.SetSize (nf+4);
-  c.SetSize (nf+4);
+  a.resize (nf+4);
+  c.resize (nf+4);
 
   for (int i = 0; i < nf; i++)
     {
@@ -107,10 +107,10 @@ inline int FindInnerPoint (POINTArray & points,
   */
 
   center = 0;
-  for (int i = 0; i < faces.Size(); i++)
+  for (int i = 0; i < faces.size(); i++)
     for (int j = 0; j < 3; j++)
       center += Vec<3> (points.Get(faces[i][j]));
-  center /= (3*faces.Size());
+  center /= (3*faces.size());
 
 
   // std::cerr << "center = " << center <<std::endl;

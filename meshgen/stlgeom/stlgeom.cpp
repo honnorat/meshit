@@ -46,7 +46,7 @@ void STLMeshing (STLGeometry & geom,
 {
   ref = NULL;
   edgedata = new STLEdgeDataList(*this);
-  externaledges.SetSize(0);
+  externaledges.resize(0);
   Clear();
   meshchart = 0; // initialize all ?? JS
 
@@ -141,7 +141,7 @@ void STLGeometry :: MarkNonSmoothNormals()
 
   int i,j;
 
-  markedtrigs.SetSize(GetNT());
+  markedtrigs.resize(GetNT());
 
   for (i = 1; i <= GetNT(); i++)
     {
@@ -459,7 +459,7 @@ int STLGeometry :: AddEdge(int ap1, int ap2)
   STLEdge e(ap1,ap2);
   e.SetLeftTrig(GetLeftTrig(ap1,ap2));
   e.SetRightTrig(GetRightTrig(ap1,ap2));
-  return edges.Append(e);
+  return edges.push_back(e);
 }
 
 void STLGeometry :: STLDoctorConfirmEdge()
@@ -476,7 +476,7 @@ void STLGeometry :: STLDoctorConfirmEdge()
       else if (stldoctor.selectmode == 3 || stldoctor.selectmode == 4)
 	{
 	  int i;
-	  for (i = 1; i <= selectedmultiedge.Size(); i++)
+	  for (i = 1; i <= selectedmultiedge.size(); i++)
 	    {
 	      int ap1 = selectedmultiedge.Get(i).i1;
 	      int ap2 = selectedmultiedge.Get(i).i2;
@@ -500,7 +500,7 @@ void STLGeometry :: STLDoctorCandidateEdge()
       else if (stldoctor.selectmode == 3 || stldoctor.selectmode == 4)
 	{
 	  int i;
-	  for (i = 1; i <= selectedmultiedge.Size(); i++)
+	  for (i = 1; i <= selectedmultiedge.size(); i++)
 	    {
 	      int ap1 = selectedmultiedge.Get(i).i1;
 	      int ap2 = selectedmultiedge.Get(i).i2;
@@ -524,7 +524,7 @@ void STLGeometry :: STLDoctorExcludeEdge()
       else if (stldoctor.selectmode == 3 || stldoctor.selectmode == 4)
 	{
 	  int i;
-	  for (i = 1; i <= selectedmultiedge.Size(); i++)
+	  for (i = 1; i <= selectedmultiedge.size(); i++)
 	    {
 	      int ap1 = selectedmultiedge.Get(i).i1;
 	      int ap2 = selectedmultiedge.Get(i).i2;
@@ -548,7 +548,7 @@ void STLGeometry :: STLDoctorUndefinedEdge()
       else if (stldoctor.selectmode == 3 || stldoctor.selectmode == 4)
 	{
 	  int i;
-	  for (i = 1; i <= selectedmultiedge.Size(); i++)
+	  for (i = 1; i <= selectedmultiedge.size(); i++)
 	    {
 	      int ap1 = selectedmultiedge.Get(i).i1;
 	      int ap2 = selectedmultiedge.Get(i).i2;
@@ -609,7 +609,7 @@ twoint STLGeometry :: GetNearestSelectedDefinedEdge()
   double dist;
   Point<3> p;
 
-  for (i = 1; i <= vic.Size(); i++)
+  for (i = 1; i <= vic.size(); i++)
   {
     const STLTriangle& t = GetTriangle(vic.Get(i));
     for (j = 1; j <= 3; j++)
@@ -639,7 +639,7 @@ void STLGeometry :: BuildSelectedMultiEdge(twoint ep)
       return; 
     }
 
-  selectedmultiedge.SetSize(0);
+  selectedmultiedge.resize(0);
   int tenum = GetTopEdgeNum (ep.i1, ep.i2);
 
   if (edgedata->Get(tenum).GetStatus() == ED_UNDEFINED)
@@ -652,7 +652,7 @@ void STLGeometry :: BuildSelectedMultiEdge(twoint ep)
 	}
     }
 
-  selectedmultiedge.Append(twoint(ep));
+  selectedmultiedge.push_back(twoint(ep));
 
   if (edgedata->Get(tenum).GetStatus() == ED_UNDEFINED)
     {
@@ -670,9 +670,9 @@ void STLGeometry :: BuildSelectedEdge(twoint ep)
       return; 
     }
 
-  selectedmultiedge.SetSize(0);
+  selectedmultiedge.resize(0);
 
-  selectedmultiedge.Append(twoint(ep));
+  selectedmultiedge.push_back(twoint(ep));
 }
 
 void STLGeometry :: BuildSelectedCluster(twoint ep)
@@ -683,7 +683,7 @@ void STLGeometry :: BuildSelectedCluster(twoint ep)
       return; 
     }
 
-  selectedmultiedge.SetSize(0);
+  selectedmultiedge.resize(0);
 
   int tenum = GetTopEdgeNum (ep.i1, ep.i2);
 
@@ -697,7 +697,7 @@ void STLGeometry :: BuildSelectedCluster(twoint ep)
 	}
     }
 
-  selectedmultiedge.Append(twoint(ep));
+  selectedmultiedge.push_back(twoint(ep));
 
   if (edgedata->Get(tenum).GetStatus() == ED_UNDEFINED)
     {
@@ -726,7 +726,7 @@ void STLGeometry :: ImportEdges()
       fin >> p(0); 
       fin >> p(1); 
       fin >> p(2);
-      eps.Append(p);
+      eps.push_back(p);
     }
   AddEdges(eps);
 }
@@ -734,7 +734,7 @@ void STLGeometry :: ImportEdges()
 void STLGeometry :: AddEdges(const Array<Point<3> >& eps)
 {
   int i;
-  int ne = eps.Size()/2;
+  int ne = eps.size()/2;
   
   Array<int> epsi;
   Box<3> bb = GetBoundingBox();
@@ -761,12 +761,12 @@ void STLGeometry :: AddEdges(const Array<Point<3> >& eps)
       Point3d pmax = p + Vec3d (gtol, gtol, gtol);
 	  
       ptree.GetIntersecting (pmin, pmax, pintersect);
-      if (pintersect.Size() > 1)
+      if (pintersect.size() > 1)
 	{
 	  PrintError("Found too much points in epsilon-dist");
 	  error = 1;
 	}
-      else if (pintersect.Size() == 0)
+      else if (pintersect.size() == 0)
 	{
 	  error = 1;
 	  PrintError("edgepoint does not exist!");
@@ -774,7 +774,7 @@ void STLGeometry :: AddEdges(const Array<Point<3> >& eps)
 	}
       else
 	{
-	  epsi.Append(pintersect.Get(1));
+	  epsi.push_back(pintersect.Get(1));
 	}
     }
 
@@ -838,7 +838,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
       if (strcmp (filter+flen-17, "EDGE NODE NUMBERS") == 0)
 	{
 	  int nodenr;
-	  importlines.SetSize (units);
+	  importlines.resize (units);
 	  for (i = 1; i <= units; i++)
 	    {
 	      inf >> nodenr;
@@ -853,7 +853,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
 
 	  inf >> coord;
 	  
-	  importpoints.SetSize (units);
+	  importpoints.resize (units);
 
 	  inf >> ch;
 	  inf.putback (ch);
@@ -880,7 +880,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
 
 
 
-  importpnums.SetSize (importpoints.Size());
+  importpnums.resize (importpoints.size());
   
 
   Box3d bb (GetBoundingBox().PMin() + Vec3d (-1,-1,-1),
@@ -894,7 +894,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
   
   Box3d ebb;
   ebb.SetPoint (importpoints.Get(1));
-  for (i = 1; i <= importpoints.Size(); i++)
+  for (i = 1; i <= importpoints.size(); i++)
     ebb.AddPoint (importpoints.Get(i));
   PrintMessage(7,"edgep - bb: ", ebb.PMin(), " - ", ebb.PMax());
 
@@ -910,19 +910,19 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
     }
   
 
-  for (i = 1; i <= importpoints.Size(); i++)
+  for (i = 1; i <= importpoints.size(); i++)
     {
       Point3d p = importpoints.Get(i);
       Point3d pmin = p - Vec3d (gtol, gtol, gtol);
       Point3d pmax = p + Vec3d (gtol, gtol, gtol);
 	  
       ptree.GetIntersecting (pmin, pmax, pintersect);
-      if (pintersect.Size() > 1)
+      if (pintersect.size() > 1)
 	{
 	  importpnums.Elem(i) = 0;
 	  PrintError("Found too many points in epsilon-dist");
 	}
-      else if (pintersect.Size() == 0)
+      else if (pintersect.size() == 0)
 	{
 	  importpnums.Elem(i) = 0;
 	  PrintError("Edgepoint does not exist!");
@@ -942,7 +942,7 @@ void STLGeometry :: ImportExternalEdges(const char * filename)
 
       int oldp = 0;
 
-      for (i = 1; i <= importlines.Size(); i++)
+      for (i = 1; i <= importlines.size(); i++)
 	{
 	  int newp = importlines.Get(i);
 	  if (!importpnums.Get(abs(newp)))
@@ -1038,12 +1038,12 @@ void STLGeometry :: SaveExternalEdges()
 */
 void STLGeometry :: StoreExternalEdges()
 {
-  storedexternaledges.SetSize(0);
+  storedexternaledges.resize(0);
   undoexternaledges = 1;
   int i;
-  for (i = 1; i <= externaledges.Size(); i++)
+  for (i = 1; i <= externaledges.size(); i++)
     {
-      storedexternaledges.Append(externaledges.Get(i));      
+      storedexternaledges.push_back(externaledges.Get(i));      
     }
 
 }
@@ -1061,11 +1061,11 @@ void STLGeometry :: UndoExternalEdges()
 
 void STLGeometry :: RestoreExternalEdges()
 {
-  externaledges.SetSize(0);
+  externaledges.resize(0);
   int i;
-  for (i = 1; i <= storedexternaledges.Size(); i++)
+  for (i = 1; i <= storedexternaledges.size(); i++)
     {
-      externaledges.Append(storedexternaledges.Get(i));      
+      externaledges.push_back(storedexternaledges.Get(i));      
     }
 
 }
@@ -1233,7 +1233,7 @@ void STLGeometry :: AddExternalEdgesFromGeomLine()
 void STLGeometry :: ClearEdges()
 {
   edgesfound = 0;
-  edges.SetSize(0);
+  edges.resize(0);
   //edgedata->SetSize(0);
   // externaledges.SetSize(0);
   edgesperpoint.SetSize(0);
@@ -1246,7 +1246,7 @@ void STLGeometry :: STLDoctorBuildEdges()
   //  if (!trigsconverted) {return;}
   ClearEdges();
 
-  meshlines.SetSize(0);
+  meshlines.resize(0);
   FindEdgesFromAngles();
 }
 
@@ -1264,7 +1264,7 @@ void STLGeometry :: DeleteExternalEdgeAtSelected()
 void STLGeometry :: DeleteExternalEdgeInVicinity()
 {
   StoreExternalEdges();
-  if (!stldoctor.showvicinity || vicinity.Size() != GetNT()) {return;}
+  if (!stldoctor.showvicinity || vicinity.size() != GetNT()) {return;}
 
   int i, j, ap1, ap2;
   
@@ -1293,7 +1293,7 @@ void STLGeometry :: BuildExternalEdgesFromEdges()
   if (GetNE() == 0) {PrintWarning("Edges possibly not generated!");}
 
   int i;
-  externaledges.SetSize(0);
+  externaledges.resize(0);
 
   for (i = 1; i <= GetNE(); i++)
     {
@@ -1306,7 +1306,7 @@ void STLGeometry :: BuildExternalEdgesFromEdges()
 
 void STLGeometry :: AddExternalEdge(int ap1, int ap2)
 {
-  externaledges.Append(twoint(ap1,ap2));
+  externaledges.push_back(twoint(ap1,ap2));
 }
 
 void STLGeometry :: DeleteExternalEdge(int ap1, int ap2)
@@ -1326,7 +1326,7 @@ void STLGeometry :: DeleteExternalEdge(int ap1, int ap2)
   if (!found) {PrintWarning("edge not found");}
   else
     {
-      externaledges.SetSize(externaledges.Size()-1);
+      externaledges.resize(externaledges.size()-1);
     }
 
 }
@@ -1619,10 +1619,10 @@ void STLGeometry :: GetVicinity(int starttrig, int size, Array<int>& vic)
   if (starttrig == 0 || starttrig > GetNT()) {return;} 
 
   Array<int> vicarray;
-  vicarray.SetSize(GetNT());
+  vicarray.resize(GetNT());
 
   int i;
-  for (i = 1; i <= vicarray.Size(); i++)
+  for (i = 1; i <= vicarray.size(); i++)
     {
       vicarray.Elem(i) = 0;
     }
@@ -1632,38 +1632,38 @@ void STLGeometry :: GetVicinity(int starttrig, int size, Array<int>& vic)
   int j = 0,k;
 
   Array <int> list1;
-  list1.SetSize(0);
+  list1.resize(0);
   Array <int> list2;
-  list2.SetSize(0);
-  list1.Append(starttrig);
+  list2.resize(0);
+  list1.push_back(starttrig);
 
   while (j < size)
     {
       j++;
-      for (i = 1; i <= list1.Size(); i++)
+      for (i = 1; i <= list1.size(); i++)
 	{
 	  for (k = 1; k <= NONeighbourTrigs(i); k++)
 	    {
 	      int nbtrig = NeighbourTrig(list1.Get(i),k);
 	      if (nbtrig && vicarray.Get(nbtrig) == 0)
 		{
-		  list2.Append(nbtrig);
+		  list2.push_back(nbtrig);
 		  vicarray.Elem(nbtrig) = 1;
 		}
 	    }
 	}
-      list1.SetSize(0);
-      for (i = 1; i <= list2.Size(); i++)
+      list1.resize(0);
+      for (i = 1; i <= list2.size(); i++)
 	{
-	  list1.Append(list2.Get(i));
+	  list1.push_back(list2.Get(i));
 	}
-      list2.SetSize(0);
+      list2.resize(0);
     }
 
-  vic.SetSize(0);
-  for (i = 1; i <= vicarray.Size(); i++)
+  vic.resize(0);
+  for (i = 1; i <= vicarray.size(); i++)
     {
-      if (vicarray.Get(i)) {vic.Append(i);}
+      if (vicarray.Get(i)) {vic.push_back(i);}
     }
 }
 
@@ -1671,12 +1671,12 @@ void STLGeometry :: CalcVicinity(int starttrig)
 {
   if (starttrig == 0 || starttrig > GetNT()) {return;} 
 
-  vicinity.SetSize(GetNT());
+  vicinity.resize(GetNT());
 
   if (!stldoctor.showvicinity) {return;}
 
   int i;
-  for (i = 1; i <= vicinity.Size(); i++)
+  for (i = 1; i <= vicinity.size(); i++)
     {
       vicinity.Elem(i) = 0;
     }
@@ -1686,41 +1686,41 @@ void STLGeometry :: CalcVicinity(int starttrig)
   int j = 0,k;
 
   Array <int> list1;
-  list1.SetSize(0);
+  list1.resize(0);
   Array <int> list2;
-  list2.SetSize(0);
-  list1.Append(starttrig);
+  list2.resize(0);
+  list1.push_back(starttrig);
 
   //  int cnt = 1;
   while (j < stldoctor.vicinity)
     {
       j++;
-      for (i = 1; i <= list1.Size(); i++)
+      for (i = 1; i <= list1.size(); i++)
 	{
 	  for (k = 1; k <= NONeighbourTrigs(i); k++)
 	    {
 	      int nbtrig = NeighbourTrig(list1.Get(i),k);
 	      if (nbtrig && vicinity.Get(nbtrig) == 0)
 		{
-		  list2.Append(nbtrig);
+		  list2.push_back(nbtrig);
 		  vicinity.Elem(nbtrig) = 1;
 		  //cnt++;
 		}
 	    }
 	}
-      list1.SetSize(0);
-      for (i = 1; i <= list2.Size(); i++)
+      list1.resize(0);
+      for (i = 1; i <= list2.size(); i++)
 	{
-	  list1.Append(list2.Get(i));
+	  list1.push_back(list2.Get(i));
 	}
-      list2.SetSize(0);
+      list2.resize(0);
     }
 
 }
 
 int STLGeometry :: Vicinity(int trig) const 
 {
-  if (trig <= vicinity.Size() && trig >=1)
+  if (trig <= vicinity.size() && trig >=1)
     {
       return vicinity.Get(trig);
     }
@@ -1730,7 +1730,7 @@ int STLGeometry :: Vicinity(int trig) const
 
 void STLGeometry :: InitMarkedTrigs()
 {
-  markedtrigs.SetSize(GetNT());
+  markedtrigs.resize(GetNT());
   int i;
   for (i = 1; i <= GetNT(); i++)
     {
@@ -1743,7 +1743,7 @@ void STLGeometry :: MarkDirtyTrigs()
   PrintFnStart("mark dirty trigs");
   int i,j;
 
-  markedtrigs.SetSize(GetNT());
+  markedtrigs.resize(GetNT());
 
   for (i = 1; i <= GetNT(); i++)
     {
@@ -1783,7 +1783,7 @@ void STLGeometry :: MarkDirtyTrigs()
 void STLGeometry :: MarkTopErrorTrigs()
 {
   int cnt = 0;
-  markedtrigs.SetSize(GetNT());
+  markedtrigs.resize(GetNT());
   for (int i = 1; i <= GetNT(); i++)
     {
       const STLTriangle & trig = GetTriangle(i);
@@ -1968,7 +1968,7 @@ void STLGeometry :: SmoothDirtyTrigs()
 
 int STLGeometry :: IsMarkedTrig(int trig) const 
 {
-  if (trig <= markedtrigs.Size() && trig >=1)
+  if (trig <= markedtrigs.size() && trig >=1)
     {
       return markedtrigs.Get(trig);
     }
@@ -1979,7 +1979,7 @@ int STLGeometry :: IsMarkedTrig(int trig) const
 
 void STLGeometry :: SetMarkedTrig(int trig, int num)
 {
-  if (trig <= markedtrigs.Size() && trig >=1)
+  if (trig <= markedtrigs.size() && trig >=1)
     {
       markedtrigs.Elem(trig) = num;
     }
@@ -1994,11 +1994,11 @@ void STLGeometry :: Clear()
   surfaceoptimized = 0;
   volumemeshed = 0;
 
-  selectedmultiedge.SetSize(0);
-  meshlines.SetSize(0);
+  selectedmultiedge.resize(0);
+  meshlines.resize(0);
   // neighbourtrigs.SetSize(0);
   outerchartspertrig.SetSize(0);
-  atlas.SetSize(0);
+  atlas.resize(0);
   ClearMarkedSegs();
   ClearSpiralPoints();
   ClearLineEndPoints();
@@ -2045,7 +2045,7 @@ void STLGeometry :: InitSTLGeometry(const Array<STLReadTriangle> & readtrias)
 
   int np = GetNP();
   PrintMessage(5,"NO points= ", GetNP());
-  normals.SetSize(GetNP());
+  normals.resize(GetNP());
   Array<int> normal_cnt(GetNP()); // counts number of added normals in a point
 
   for (i = 1; i <= np; i++)
@@ -2078,15 +2078,15 @@ void STLGeometry :: InitSTLGeometry(const Array<STLReadTriangle> & readtrias)
 
   trigsconverted = 1;
 
-  vicinity.SetSize(GetNT());
-  markedtrigs.SetSize(GetNT());
+  vicinity.resize(GetNT());
+  markedtrigs.resize(GetNT());
   for (i = 1; i <= GetNT(); i++)
     {
       markedtrigs.Elem(i) = 0;
       vicinity.Elem(i) = 1;
     }
 
-  ha_points.SetSize(GetNP());
+  ha_points.resize(GetNP());
   for (i = 1; i <= GetNP(); i++)
     ha_points.Elem(i) = 0;
 
@@ -2121,7 +2121,7 @@ int STLGeometry :: CheckGeometryOverlapping()
   Box3dTree setree(pmin, pmax);
 
   int oltrigs = 0;
-  markedtrigs.SetSize(GetNT());
+  markedtrigs.resize(GetNT());
 
   for (int i = 1; i <= GetNT(); i++)
     SetMarkedTrig(i, 0);
@@ -2155,7 +2155,7 @@ int STLGeometry :: CheckGeometryOverlapping()
 	
 	setree.GetIntersecting (tpmin, tpmax, inters);
 	
-	for (int j = 1; j <= inters.Size(); j++)
+	for (int j = 1; j <= inters.size(); j++)
 	  {
 	    const STLTriangle & tri2 = GetTriangle(inters.Get(j));
 	    
@@ -2311,21 +2311,21 @@ void STLGeometry :: InitSTLGeometry()
 
 void STLGeometry :: SetLineEndPoint(int pn) 
 {
-  if (pn <1 || pn > lineendpoints.Size()) {PrintSysError("Illegal pnum in SetLineEndPoint!!!"); return; }
+  if (pn <1 || pn > lineendpoints.size()) {PrintSysError("Illegal pnum in SetLineEndPoint!!!"); return; }
   lineendpoints.Elem(pn) = 1;
 }
 
 int STLGeometry :: IsLineEndPoint(int pn) 
 {
   //  return 0;
-  if (pn <1 || pn > lineendpoints.Size()) 
+  if (pn <1 || pn > lineendpoints.size()) 
     {PrintSysError("Illegal pnum in IsLineEndPoint!!!"); return 0;}
   return lineendpoints.Get(pn);
 }
 
 void STLGeometry :: ClearLineEndPoints()
 {
-  lineendpoints.SetSize(GetNP());
+  lineendpoints.resize(GetNP());
   int i;
   for (i = 1; i <= GetNP(); i++)
     {
@@ -2363,8 +2363,8 @@ int STLGeometry :: IsEdgeNum(int ap1, int ap2)
 void STLGeometry :: BuildEdges()
 {
   //PrintFnStart("build edges");
-  edges.SetSize(0);
-  meshlines.SetSize(0);
+  edges.resize(0);
+  meshlines.resize(0);
   FindEdgesFromAngles();
 }
 
@@ -2649,8 +2649,8 @@ void STLGeometry :: AddFaceEdges()
 
   Array<int> edgecnt;
   Array<int> chartindex;
-  edgecnt.SetSize(GetNOFaces());
-  chartindex.SetSize(GetNOFaces());
+  edgecnt.resize(GetNOFaces());
+  chartindex.resize(GetNOFaces());
 
   for (int i = 1; i <= GetNOFaces(); i++)
     {
@@ -2721,7 +2721,7 @@ void STLGeometry :: LinkEdges()
 
   int i;
 
-  lines.SetSize(0);
+  lines.resize(0);
   int starte(0);
   int edgecnt = 0;
   int found;
@@ -2941,11 +2941,11 @@ int STLGeometry :: GetNOBodys()
       bodycnt++;
       markedtrigs1++;
       bodynum.Elem(starttrig) = bodycnt;
-      todolist.Append(starttrig);
+      todolist.push_back(starttrig);
 
-      while(todolist.Size())
+      while(todolist.size())
 	{
-	  for (i = 1; i <= todolist.Size(); i++)
+	  for (i = 1; i <= todolist.size(); i++)
 	    {
 	      //const STLTriangle& tt = GetTriangle(todolist.Get(i));
 	      for (k = 1; k <= NONeighbourTrigs(todolist.Get(i)); k++)
@@ -2953,19 +2953,19 @@ int STLGeometry :: GetNOBodys()
 		  nnt = NeighbourTrig(todolist.Get(i),k);
 		  if (!bodynum.Get(nnt))
 		    {
-		      nextlist.Append(nnt);
+		      nextlist.push_back(nnt);
 		      bodynum.Elem(nnt) = bodycnt;
 		      markedtrigs1++;
 		    }
 		}
 	    }
 	  
-	  todolist.SetSize(0);
-	  for (i = 1; i <= nextlist.Size(); i++)
+	  todolist.resize(0);
+	  for (i = 1; i <= nextlist.size(); i++)
 	    {
-	      todolist.Append(nextlist.Get(i));
+	      todolist.push_back(nextlist.Get(i));
 	    }
-	  nextlist.SetSize(0);	  
+	  nextlist.resize(0);	  
 	}
     }
   PrintMessage(3, "Geometry has ", bodycnt, " separated bodys");
@@ -3003,12 +3003,12 @@ void STLGeometry :: CalcFaceNums()
       facecnt++;
       markedtrigs1++;
       GetTriangle(starttrig).SetFaceNum(facecnt);
-      todolist.Append(starttrig);
+      todolist.push_back(starttrig);
       int ap1, ap2;
 
-      while(todolist.Size())
+      while(todolist.size())
 	{
-	  for (i = 1; i <= todolist.Size(); i++)
+	  for (i = 1; i <= todolist.size(); i++)
 	    {
 	      const STLTriangle& tt = GetTriangle(todolist.Get(i));
 	      for (k = 1; k <= NONeighbourTrigs(todolist.Get(i)); k++)
@@ -3020,7 +3020,7 @@ void STLGeometry :: CalcFaceNums()
 		      tt.GetNeighbourPoints(nt,ap1,ap2);
 		      if (!IsEdge(ap1,ap2))
 			{
-			  nextlist.Append(nnt);
+			  nextlist.push_back(nnt);
 			  nt.SetFaceNum(facecnt);
 			  markedtrigs1++;
 			}
@@ -3028,12 +3028,12 @@ void STLGeometry :: CalcFaceNums()
 		}
 	    }
 	  
-	  todolist.SetSize(0);
-	  for (i = 1; i <= nextlist.Size(); i++)
+	  todolist.resize(0);
+	  for (i = 1; i <= nextlist.size(); i++)
 	    {
-	      todolist.Append(nextlist.Get(i));
+	      todolist.push_back(nextlist.Get(i));
 	    }
-	  nextlist.SetSize(0);	  
+	  nextlist.resize(0);	  
 	}
     }
   GetNOBodys();
@@ -3042,9 +3042,9 @@ void STLGeometry :: CalcFaceNums()
  
 void STLGeometry :: ClearSpiralPoints()
 {
-  spiralpoints.SetSize(GetNP());
+  spiralpoints.resize(GetNP());
   int i;
-  for (i = 1; i <= spiralpoints.Size(); i++)
+  for (i = 1; i <= spiralpoints.size(); i++)
     {
       spiralpoints.Elem(i) = 0;
     }
@@ -3185,7 +3185,7 @@ void STLGeometry :: AddConeAndSpiralEdges()
 
   Array<int> trigsaroundp;
   Array<int> chartpointchecked; //gets number of chart, if in this chart already checked
-  chartpointchecked.SetSize(GetNP());
+  chartpointchecked.resize(GetNP());
 
   for (i = 1; i <= GetNP(); i++)
     {
@@ -3233,10 +3233,10 @@ void STLGeometry :: AddConeAndSpiralEdges()
 		  int worked = 0;
 		  int spworked = 0;
 		  GetSortedTrianglesAroundPoint(pn,t,trigsaroundp);
-		  trigsaroundp.Append(t);
+		  trigsaroundp.push_back(t);
 		      
 		  problem = 0;
-		  for (l = 2; l <= trigsaroundp.Size()-1; l++)
+		  for (l = 2; l <= trigsaroundp.size()-1; l++)
 		    {
 		      tn1 = trigsaroundp.Get(l-1);
 		      tn2 = trigsaroundp.Get(l);
@@ -3250,7 +3250,7 @@ void STLGeometry :: AddConeAndSpiralEdges()
 
 		  if (problem)
 		    {
-		      for (l = 2; l <= trigsaroundp.Size()-1; l++)
+		      for (l = 2; l <= trigsaroundp.size()-1; l++)
 			{
 			  tn1 = trigsaroundp.Get(l-1);
 			  tn2 = trigsaroundp.Get(l);
@@ -3283,7 +3283,7 @@ void STLGeometry :: AddConeAndSpiralEdges()
 		    }
 		  //backwards:
 		  problem = 0;
-		  for (l = trigsaroundp.Size()-1; l >= 2; l--)
+		  for (l = trigsaroundp.size()-1; l >= 2; l--)
 		    {
 		      tn1 = trigsaroundp.Get(l+1);
 		      tn2 = trigsaroundp.Get(l);
@@ -3295,7 +3295,7 @@ void STLGeometry :: AddConeAndSpiralEdges()
 		      if (GetChartNr(tn2) != i && !TrigIsInOC(tn2,i)) {problem = 1;}
 		    }
 		  if (problem)
-		    for (l = trigsaroundp.Size()-1; l >= 2; l--)
+		    for (l = trigsaroundp.size()-1; l >= 2; l--)
 		      {
 			tn1 = trigsaroundp.Get(l+1);
 			tn2 = trigsaroundp.Get(l);
@@ -3384,7 +3384,7 @@ void STLGeometry :: AddConeAndSpiralEdges()
 		      int here = 1; //we start on this side of edge, !here = there
 		      int thereOC = 0;
 		      int thereNotOC = 0;
-		      for (l = 2; l <= trigsaroundp.Size(); l++)
+		      for (l = 2; l <= trigsaroundp.size(); l++)
 			{
 			  GetTriangle(trigsaroundp.Get(l-1)).
 			    GetNeighbourPoints(GetTriangle(trigsaroundp.Get(l)), ap1, ap2);
@@ -3410,9 +3410,9 @@ void STLGeometry :: AddConeAndSpiralEdges()
 void STLGeometry :: GetSortedTrianglesAroundPoint(int p, int starttrig, Array<int>& trigs)
 {
   int acttrig = starttrig;
-  trigs.SetAllocSize(trigsperpoint.EntrySize(p));
-  trigs.SetSize(0);
-  trigs.Append(acttrig);
+  trigs.reserve(trigsperpoint.EntrySize(p));
+  trigs.resize(0);
+  trigs.push_back(acttrig);
   int i, j, t, ap1, ap2, locindex1(0), locindex2(0);
 
   //(*mystd::cout) << "trigs around point " << p <<std::endl;
@@ -3440,7 +3440,7 @@ void STLGeometry :: GetSortedTrianglesAroundPoint(int p, int starttrig, Array<in
 		{
 		  if (t != starttrig)
 		    {
-		      trigs.Append(t);
+		      trigs.push_back(t);
 		      //		      (*mystd::cout) << "trig " << t <<std::endl;
 		      acttrig = t;
 		    }
@@ -3573,7 +3573,7 @@ void STLGeometry :: SmoothGeometry ()
   public:
     STLInit()
     {
-      geometryregister.Append (new STLGeometryRegister);
+      geometryregister.push_back (new STLGeometryRegister);
     }
   };
 

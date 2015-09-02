@@ -24,7 +24,7 @@ STLEdgeDataList :: ~STLEdgeDataList()
 void STLEdgeDataList :: Store ()
 {
   int i, ne = geom.GetNTE();
-  storedstatus.SetSize(ne);
+  storedstatus.resize(ne);
   for (i = 1; i <= ne; i++)
     {
       storedstatus.Elem(i) = Get(i).GetStatus();
@@ -34,7 +34,7 @@ void STLEdgeDataList :: Store ()
 void STLEdgeDataList :: Restore ()
 {
   int i, ne = geom.GetNTE();
-  if (storedstatus.Size() == ne)
+  if (storedstatus.size() == ne)
     for (i = 1; i <= ne; i++)
       geom.GetTopEdge(i).SetStatus (storedstatus.Elem(i));
 }
@@ -221,7 +221,7 @@ void STLEdgeDataList :: BuildLineWithEdge(int ep1, int ep2, Array<twoint>& line)
 	      if (pnew == pstart) {closed = 1;}
 	      else
 		{
-		  line.Append(twoint(p,pnew));
+		  line.push_back(twoint(p,pnew));
 		  p = pnew;
 		  en = ennew;
 		  found = 1;
@@ -235,7 +235,7 @@ void STLEdgeDataList :: BuildLineWithEdge(int ep1, int ep2, Array<twoint>& line)
 int Exists(int p1, int p2, const Array<twoint>& line)
 {
   int i;
-  for (i = 1; i <= line.Size(); i++)
+  for (i = 1; i <= line.size(); i++)
     {
       if ( (line.Get(i).i1 == p1 && line.Get(i).i2 == p2) ||
 	   (line.Get(i).i1 == p2 && line.Get(i).i2 == p1) )
@@ -261,8 +261,8 @@ void STLEdgeDataList :: BuildClusterWithEdge(int ep1, int ep2, Array<twoint>& li
       for (j = 1; j <= 2; j++)
 	{
 	  oldend = newend;
-	  newend = line.Size();
-	  for (k = oldend; k <= line.Size(); k++)
+	  newend = line.size();
+	  for (k = oldend; k <= line.size(); k++)
 	    {
 	      if (j == 1) p = line.Get(k).i1;
 	      if (j == 2) p = line.Get(k).i2;
@@ -284,7 +284,7 @@ void STLEdgeDataList :: BuildClusterWithEdge(int ep1, int ep2, Array<twoint>& li
 		  if (pnew && !Exists(p,pnew,line))
 		    {
 		      changed = 1;
-		      line.Append(twoint(p,pnew));
+		      line.push_back(twoint(p,pnew));
 		      p = pnew;
 		      en = ennew;
 		    }
@@ -319,8 +319,8 @@ STLLine :: STLLine(const STLGeometry * ageometry)
 
 int STLLine :: GetNS() const
 {
-  if (pts.Size() <= 1) {return 0;}
-  return pts.Size()-1;
+  if (pts.size() <= 1) {return 0;}
+  return pts.size()-1;
 }
 void STLLine :: GetSeg(int nr, int& p1, int& p2) const
 {
@@ -330,13 +330,13 @@ void STLLine :: GetSeg(int nr, int& p1, int& p2) const
 
 int STLLine :: GetLeftTrig(int nr) const 
 {
-  if (nr > lefttrigs.Size()) {PrintSysError("In STLLine::GetLeftTrig!!!"); return 0;}
+  if (nr > lefttrigs.size()) {PrintSysError("In STLLine::GetLeftTrig!!!"); return 0;}
   return lefttrigs.Get(nr);
 };
 
 int STLLine :: GetRightTrig(int nr) const 
 {
-  if (nr > righttrigs.Size()) {PrintSysError("In STLLine::GetRightTrig!!!"); return 0;}
+  if (nr > righttrigs.size()) {PrintSysError("In STLLine::GetRightTrig!!!"); return 0;}
   return righttrigs.Get(nr);
 };
 
@@ -348,7 +348,7 @@ double STLLine :: GetSegLen(const Array<Point<3> >& ap, int nr) const
 double STLLine :: GetLength(const Array<Point<3> >& ap) const
 {
   double len = 0;
-  for (int i = 2; i <= pts.Size(); i++)
+  for (int i = 2; i <= pts.size(); i++)
     {
       len += (ap.Get(pts.Get(i)) - ap.Get(pts.Get(i-1))).Length();
     }
@@ -358,7 +358,7 @@ double STLLine :: GetLength(const Array<Point<3> >& ap) const
 void STLLine :: GetBoundingBox (const Array<Point<3> > & ap, Box<3> & box) const
 {
   box.Set (ap.Get (pts[0]));
-  for (int i = 1; i < pts.Size(); i++)
+  for (int i = 1; i < pts.size(); i++)
     box.Add (ap.Get(pts[i]));
 }
 
@@ -375,7 +375,7 @@ GetPointInDist(const Array<Point<3> >& ap, double dist, int& index) const
   
   double len = 0;
   int i;
-  for (i = 1; i < pts.Size(); i++)
+  for (i = 1; i < pts.size(); i++)
     {
       double seglen = Dist (ap.Get(pts.Get(i)),
 			    ap.Get(pts.Get(i+1)));
@@ -391,7 +391,7 @@ GetPointInDist(const Array<Point<3> >& ap, double dist, int& index) const
       len += seglen;
     }
 
-  index = pts.Size() - 1;
+  index = pts.size() - 1;
   return ap.Get(EndP());
 }
 
@@ -480,7 +480,7 @@ STLLine* STLLine :: Mesh(const Array<Point<3> >& ap,
   inthl = 0; //restart each meshseg
   for (int i = 1; i <= inthlint; i++)
     {
-      while (inthl < 1.000000001 && j <= inthi.Size())
+      while (inthl < 1.000000001 && j <= inthi.size())
 	{
 	  inthl += inthi.Get(j)/fact;
 	  dist += curvelen.Get(j);

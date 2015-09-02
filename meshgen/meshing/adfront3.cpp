@@ -92,13 +92,13 @@ void AdFront3 :: GetPoints (Array<Point<3> > & apoints) const
 {
   for (PointIndex pi = points.Begin(); pi < points.End(); pi++)
     
-    apoints.Append (points[pi].P());
+    apoints.push_back (points[pi].P());
 }
 
 
 PointIndex AdFront3 :: AddPoint (const Point<3> & p, PointIndex globind)
 {
-  if (delpointl.Size())
+  if (delpointl.size())
     {
       PointIndex pi = delpointl.Last();
       delpointl.DeleteLast ();
@@ -108,7 +108,7 @@ PointIndex AdFront3 :: AddPoint (const Point<3> & p, PointIndex globind)
     }
   else
     {
-      points.Append (FrontPoint3 (p, globind));
+      points.push_back (FrontPoint3 (p, globind));
       return --points.End();
       // return points.Size()-1+PointIndex::BASE;
     }
@@ -164,7 +164,7 @@ INDEX AdFront3 :: AddFace (const MiniElement2d & aface)
   for (i = 1; i <= aface.GetNP(); i++)
     points[aface.PNum(i)].DecFrontNr (minfn+1);
 
-  int nfn = faces.Append(FrontFace (aface));
+  int nfn = faces.push_back(FrontFace (aface));
   faces.Elem(nfn).cluster = cluster;
 
   if (hashon && hashcreated) 
@@ -184,7 +184,7 @@ void AdFront3 :: DeleteFace (INDEX fi)
       PointIndex pi = faces.Get(fi).Face().PNum(i);
       points[pi].RemoveFace();
       if (!points[pi].Valid())
-	delpointl.Append (pi);
+	delpointl.push_back (pi);
     }
 
   const MiniElement2d & face = faces.Get(fi).Face();
@@ -286,7 +286,7 @@ void AdFront3 :: GetFaceBoundingBox (int i, Box3d & box) const
 void AdFront3 :: RebuildInternalTables ()
 {
   int hi = 0;
-  for (int i = 1; i <= faces.Size(); i++)
+  for (int i = 1; i <= faces.size(); i++)
     if (faces.Get(i).Valid())
       {
 	hi++;
@@ -294,9 +294,9 @@ void AdFront3 :: RebuildInternalTables ()
 	  faces.Elem(hi) = faces.Get(i);
       }
   
-  faces.SetSize (nff);
+  faces.resize (nff);
 
-  int np = points.Size();
+  int np = points.size();
 
   for (PointIndex pi = points.Begin(); pi < points.End(); pi++)
     points[pi].cluster = pi;
@@ -305,7 +305,7 @@ void AdFront3 :: RebuildInternalTables ()
   do
     {
       change = 0;
-      for (int i = 1; i <= faces.Size(); i++)
+      for (int i = 1; i <= faces.size(); i++)
 	{
 	  const MiniElement2d & el = faces.Get(i).Face();
 
@@ -331,7 +331,7 @@ void AdFront3 :: RebuildInternalTables ()
 
   BitArrayChar<PointIndex::BASE> usecl(np);
   usecl.Clear();
-  for (int i = 1; i <= faces.Size(); i++)
+  for (int i = 1; i <= faces.size(); i++)
     {
       usecl.Set (points[faces.Get(i).Face().PNum(1)].cluster);
       faces.Elem(i).cluster =
@@ -346,7 +346,7 @@ void AdFront3 :: RebuildInternalTables ()
   Array<double, PointIndex::BASE> clvol (np);
   clvol = 0.0;
 
-  for (int i = 1; i <= faces.Size(); i++)
+  for (int i = 1; i <= faces.size(); i++)
     {
       const MiniElement2d & face = faces.Get(i).Face();
 
@@ -371,7 +371,7 @@ void AdFront3 :: RebuildInternalTables ()
 
   int negvol = 0;
   for (int i = PointIndex::BASE; 
-       i < clvol.Size()+PointIndex::BASE; i++)
+       i < clvol.size()+PointIndex::BASE; i++)
     {
       if (clvol[i] < 0)
 	negvol = 1;
@@ -379,7 +379,7 @@ void AdFront3 :: RebuildInternalTables ()
 
   if (negvol)
     {
-      for (int i = 1; i <= faces.Size(); i++)
+      for (int i = 1; i <= faces.size(); i++)
 	faces.Elem(i).cluster = 1;
       for (PointIndex pi = points.Begin(); pi < points.End(); pi++)
 	points[pi].cluster = 1;
@@ -422,7 +422,7 @@ int AdFront3 :: SelectBaseElement ()
   
   fstind = 0;
 
-  for (i = lasti+1; i <= faces.Size() && !fstind; i++)
+  for (i = lasti+1; i <= faces.size() && !fstind; i++)
     if (faces.Elem(i).Valid())
       {
 	hi = faces.Get(i).QualClass() +
@@ -441,7 +441,7 @@ int AdFront3 :: SelectBaseElement ()
   if (!fstind)
     {
       minval = INT_MAX;
-      for (i = 1; i <= faces.Size(); i++)
+      for (i = 1; i <= faces.size(); i++)
 	if (faces.Elem(i).Valid())
 	  {
 	    hi = faces.Get(i).QualClass() +
@@ -474,7 +474,7 @@ int AdFront3 :: GetLocals (int fstind,
 			   float relh,
 			   INDEX& facesplit)
 {
-  if (hashon && faces.Size() < 500) { hashon=0; }
+  if (hashon && faces.size() < 500) { hashon=0; }
   if (hashon && !hashcreated) 
     {
       hashtable.Create(); 
@@ -491,17 +491,17 @@ int AdFront3 :: GetLocals (int fstind,
   Array<int> locfaces3;           // all faces in outer radius relh
   Array<INDEX> findex2;
 
-  locfaces2.SetSize(0);
-  locfaces3.SetSize(0);
-  findex2.SetSize(0);
+  locfaces2.resize(0);
+  locfaces3.resize(0);
+  findex2.resize(0);
 
   int cluster = faces.Get(fstind).cluster;
 
   pstind = faces.Get(fstind).Face().PNum(1);
   p0 = points[pstind].P();
   
-  locfaces2.Append(faces.Get(fstind).Face());
-  findex2.Append(fstind);
+  locfaces2.push_back(faces.Get(fstind).Face());
+  findex2.push_back(fstind);
 
 
   Box3d b1 (p0 - Vec3d(xh, xh, xh), p0 + Vec3d (xh, xh, xh));
@@ -512,7 +512,7 @@ int AdFront3 :: GetLocals (int fstind,
     }
   else
     {
-      for (i = 1; i <= faces.Size(); i++)
+      for (i = 1; i <= faces.size(); i++)
 	{
 	  const MiniElement2d & face = faces.Get(i).Face();
 	  if (faces.Get(i).cluster == cluster && faces.Get(i).Valid() && i != fstind)
@@ -524,15 +524,15 @@ int AdFront3 :: GetLocals (int fstind,
 
 	      if (b1.Intersect (b2))
 		{
-		  locfaces2.Append(faces.Get(i).Face());
-		  findex2.Append(i);
+		  locfaces2.push_back(faces.Get(i).Face());
+		  findex2.push_back(i);
 		}
 	    }
 	}
     }
 
   //local faces for inner radius:
-  for (i = 1; i <= locfaces2.Size(); i++)
+  for (i = 1; i <= locfaces2.size(); i++)
     {
       const MiniElement2d & face = locfaces2.Get(i);
       const Point3d & p1 = points[face[0]].P();
@@ -543,42 +543,42 @@ int AdFront3 :: GetLocals (int fstind,
 
       if (Dist2 (midp, p0) <= relh * relh || i == 1)
 	{
-          locfaces.Append(locfaces2.Get(i));
-	  findex.Append(findex2.Get(i));
+          locfaces.push_back(locfaces2.Get(i));
+	  findex.push_back(findex2.Get(i));
 	}
       else
-	locfaces3.Append (i);
+	locfaces3.push_back (i);
     }
   
-  facesplit=locfaces.Size();
+  facesplit=locfaces.size();
   
   
   //local faces for outer radius:
-  for (i = 1; i <= locfaces3.Size(); i++)
+  for (i = 1; i <= locfaces3.size(); i++)
     {
-      locfaces.Append (locfaces2.Get(locfaces3.Get(i)));
-      findex.Append (findex2.Get(locfaces3.Get(i)));
+      locfaces.push_back (locfaces2.Get(locfaces3.Get(i)));
+      findex.push_back (findex2.Get(locfaces3.Get(i)));
     }
 
 
-  invpindex.SetSize (points.Size());
-  for (i = 1; i <= locfaces.Size(); i++)
+  invpindex.resize (points.size());
+  for (i = 1; i <= locfaces.size(); i++)
     for (j = 1; j <= locfaces.Get(i).GetNP(); j++)
       {
 	PointIndex pi = locfaces.Get(i).PNum(j);
 	invpindex[pi] = -1;
       }
 
-  for (i = 1; i <= locfaces.Size(); i++)
+  for (i = 1; i <= locfaces.size(); i++)
     {
       for (j = 1; j <= locfaces.Get(i).GetNP(); j++)
 	{
 	  PointIndex pi = locfaces.Get(i).PNum(j);
 	  if (invpindex[pi] == -1)
 	    {
-	      pindex.Append (pi);
-	      invpindex[pi] = pindex.Size();  // -1+PointIndex::BASE;
-	      locfaces.Elem(i).PNum(j) = locpoints.Append (points[pi].P());
+	      pindex.push_back (pi);
+	      invpindex[pi] = pindex.size();  // -1+PointIndex::BASE;
+	      locfaces.Elem(i).PNum(j) = locpoints.push_back (points[pi].P());
 	    }
 	  else
 	    locfaces.Elem(i).PNum(j) = invpindex[pi];
@@ -590,7 +590,7 @@ int AdFront3 :: GetLocals (int fstind,
 
   if (connectedpairs)
     {
-      for (i = 1; i <= locpoints.Size(); i++)
+      for (i = 1; i <= locpoints.size(); i++)
 	{
 	  int pind = pindex.Get(i);
 	  if (pind >= 1 && pind <= connectedpairs->Size ())
@@ -599,7 +599,7 @@ int AdFront3 :: GetLocals (int fstind,
 		{
 		  int oi = connectedpairs->Get(pind, j);
 		  int other = invpindex.Get(oi);
-		  if (other >= 1 && other <= pindex.Size() && 
+		  if (other >= 1 && other <= pindex.size() && 
 		      pindex.Get(other) == oi)
 		    {
 		      // INDEX_2 coned(i, other);
@@ -640,7 +640,7 @@ void AdFront3 :: GetGroup (int fi,
   // static Array<char> pingroup;
   int i, j, changed;
 
-  pingroup.SetSize(points.Size());
+  pingroup.resize(points.size());
 
   pingroup = 0;
   for (j = 1; j <= 3; j++)
@@ -650,7 +650,7 @@ void AdFront3 :: GetGroup (int fi,
     {
       changed = 0;
 
-      for (i = 1; i <= faces.Size(); i++)
+      for (i = 1; i <= faces.size(); i++)
 	if (faces.Get(i).Valid())
 	  {
 	    const MiniElement2d & face = faces.Get(i).Face();
@@ -674,18 +674,18 @@ void AdFront3 :: GetGroup (int fi,
 
 
   //  static Array<int> invpindex;
-  invpindex.SetSize (points.Size());
+  invpindex.resize (points.size());
   
 
   for (PointIndex pi = points.Begin(); pi < points.End(); pi++)
     if (points.Get(i).Valid())
       {
-	grouppoints.Append (points[pi].P());
-	pindex.Append (pi);
-	invpindex[pi] = pindex.Size();
+	grouppoints.push_back (points[pi].P());
+	pindex.push_back (pi);
+	invpindex[pi] = pindex.size();
       }
 
-  for (i = 1; i <= faces.Size(); i++)
+  for (i = 1; i <= faces.size(); i++)
     if (faces.Get(i).Valid())
       {
 	int fused = 0;
@@ -695,12 +695,12 @@ void AdFront3 :: GetGroup (int fi,
 
 	if (fused >= 2)
 	  {
-	    groupelements.Append (faces.Get(i).Face());
-	    findex.Append (i);
+	    groupelements.push_back (faces.Get(i).Face());
+	    findex.push_back (i);
 	  }
       }
       
-  for (i = 1; i <= groupelements.Size(); i++)
+  for (i = 1; i <= groupelements.size(); i++)
     for (j = 1; j <= 3; j++)
       {
 	groupelements.Elem(i).PNum(j) =
@@ -725,7 +725,7 @@ void AdFront3 :: SetStartFront (int /* baseelnp */)
   INDEX i;
   int j;
 
-  for (i = 1; i <= faces.Size(); i++)
+  for (i = 1; i <= faces.size(); i++)
     if (faces.Get(i).Valid())
       {
 	const MiniElement2d & face = faces.Get(i).Face();
@@ -757,7 +757,7 @@ bool AdFront3 :: Inside (const Point<3> & p) const
   n.Z() = -0.43989;
 
   cnt = 0;
-  for (int i = 1; i <= faces.Size(); i++)
+  for (int i = 1; i <= faces.size(); i++)
     if (faces.Get(i).Valid())
       {
 	const Point<3> & p1 = points[faces.Get(i).Face().PNum(1)].P();
@@ -812,16 +812,16 @@ int AdFront3 :: SameSide (const Point<3> & lp1, const Point<3> & lp2,
   pmax.SetToMax (lp2);
   
   ArrayMem<int, 100> aprif;
-  aprif.SetSize(0);
+  aprif.resize(0);
   
   if (!testfaces)
     facetree->GetIntersecting (pmin, pmax, aprif);
   else
-    for (int i = 1; i <= testfaces->Size(); i++)
-      aprif.Append (testfaces->Get(i));
+    for (int i = 1; i <= testfaces->size(); i++)
+      aprif.push_back (testfaces->Get(i));
 
   int cnt = 0;
-  for (int ii = 1; ii <= aprif.Size(); ii++)
+  for (int ii = 1; ii <= aprif.size(); ii++)
     {
       int i = aprif.Get(ii);
       

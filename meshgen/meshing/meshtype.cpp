@@ -823,8 +823,8 @@ namespace netgen
   {
     switch (np)
       {
-      case 3: if (ipdtrig.Size()) return; break;
-      case 4: if (ipdquad.Size()) return; break;
+      case 3: if (ipdtrig.size()) return; break;
+      case 4: if (ipdquad.size()) return; break;
       }
 
     for (int i = 1; i <= GetNIP(); i++)
@@ -844,8 +844,8 @@ namespace netgen
 
         switch (np)
           {
-          case 3: ipdtrig.Append (ipd); break;
-          case 4: ipdquad.Append (ipd); break;
+          case 3: ipdtrig.push_back (ipd); break;
+          case 4: ipdquad.push_back (ipd); break;
           }
       }
   }
@@ -1152,7 +1152,7 @@ namespace netgen
   {
     GetTetsLocal (locels);
     int i, j;
-    for (i = 1; i <= locels.Size(); i++)
+    for (i = 1; i <= locels.size(); i++)
       for (j = 1; j <= 4; j++)
         locels.Elem(i).PNum(j) = PNum ( locels.Elem(i).PNum(j) );
   }
@@ -1160,7 +1160,7 @@ namespace netgen
   void Element :: GetTetsLocal (Array<Element> & locels) const
   {
     int i, j;
-    locels.SetSize(0);
+    locels.resize(0);
     switch (GetType())
       {
       case TET:
@@ -1173,7 +1173,7 @@ namespace netgen
               Element tet(4);
               for (j = 1; j <= 4; j++)
                 tet.PNum(j) = linels[i][j-1];
-              locels.Append (tet);
+              locels.push_back (tet);
             }
           break;
         }
@@ -1193,7 +1193,7 @@ namespace netgen
               Element tet(4);
               for (j = 1; j <= 4; j++)
                 tet.PNum(j) = linels[i][j-1];
-              locels.Append (tet);
+              locels.push_back (tet);
             }
           break;
         }
@@ -1207,7 +1207,7 @@ namespace netgen
               Element tet(4);
               for (j = 1; j <= 4; j++)
                 tet.PNum(j) = linels[i][j-1];
-              locels.Append (tet);
+              locels.push_back (tet);
             }
           break;
         }
@@ -1224,7 +1224,7 @@ namespace netgen
               Element tet(4);
               for (j = 0; j < 4; j++)
                 tet[j] = linels[i][j];
-              locels.Append (tet);
+              locels.push_back (tet);
             }
           break;
         }
@@ -1243,7 +1243,7 @@ namespace netgen
               Element tet(4);
               for (j = 0; j < 4; j++)
                 tet[j] = linels[i][j];
-              locels.Append (tet);
+              locels.push_back (tet);
             }
           break;
         }
@@ -1461,9 +1461,9 @@ namespace netgen
         }
       }
   
-    points.SetSize(0);
+    points.resize(0);
     for (i = 0; i < np; i++)
-      points.Append (Point<3> (pp[i][0], pp[i][1], pp[i][2]));
+      points.push_back (Point<3> (pp[i][0], pp[i][1], pp[i][2]));
   }
 
 
@@ -1581,7 +1581,7 @@ namespace netgen
       }
 
   
-    surftrigs.SetSize (nf);
+    surftrigs.resize (nf);
     for (j = 0; j < nf; j++)
       {
         surftrigs.Elem(j+1) = Element2d(TRIG);
@@ -2158,16 +2158,16 @@ namespace netgen
   {
     switch (GetType())
       {
-      case TET: if (ipdtet.Size()) return; break;
-      case TET10: if (ipdtet10.Size()) return; break;
+      case TET: if (ipdtet.size()) return; break;
+      case TET10: if (ipdtet10.size()) return; break;
       default:
         PrintSysError ("Element::ComputeIntegrationPoint, illegal type ", int(typ));
       }
 
     switch (GetType())
       {
-      case TET: ipdtet.SetSize(GetNIP()); break;
-      case TET10: ipdtet10.SetSize(GetNIP()); break;
+      case TET: ipdtet.resize(GetNIP()); break;
+      case TET10: ipdtet10.resize(GetNIP()); break;
       default:
         PrintSysError ("Element::ComputeIntegrationPoint, illegal type2 ", int(typ));
       }
@@ -2371,11 +2371,11 @@ namespace netgen
 
   void Identifications :: GetMap (int identnr, Array<int,PointIndex::BASE> & identmap, bool symmetric) const
   {
-    identmap.SetSize (mesh.GetNP());
+    identmap.resize (mesh.GetNP());
     identmap = 0;
 
     if (identnr)
-      for (int i = 0; i < idpoints_table[identnr].Size(); i++)
+      for (int i = 0; i < idpoints_table[identnr].size(); i++)
         {
           INDEX_2 pair = idpoints_table[identnr][i];
           identmap[pair.I1()] = pair.I2();
@@ -2409,7 +2409,7 @@ namespace netgen
   void Identifications :: GetPairs (int identnr, 
                                     Array<INDEX_2> & identpairs) const
   {
-    identpairs.SetSize(0);
+    identpairs.resize(0);
   
     if (identnr == 0)
       for (int i = 1; i <= identifiedpoints->GetNBags(); i++)
@@ -2418,7 +2418,7 @@ namespace netgen
             INDEX_2 i2;
             int nr;
             identifiedpoints->GetData (i, j, i2, nr);
-            identpairs.Append (i2);
+            identpairs.push_back (i2);
           }  
     else
       for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++)
@@ -2429,7 +2429,7 @@ namespace netgen
             identifiedpoints_nr->GetData (i, j, i3 , dummy);
 	  
             if (i3.I3() == identnr)
-              identpairs.Append (INDEX_2(i3.I1(), i3.I2()));
+              identpairs.push_back (INDEX_2(i3.I1(), i3.I2()));
           }  
   }
 

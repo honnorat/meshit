@@ -85,8 +85,8 @@ namespace netgen
 	    memcpy (node->data, p, dim * sizeof(float));
 	    node->pi = pi;
 
-	    if (ela.Size() < pi+1)
-	      ela.SetSize (pi+1);
+	    if (ela.size() < pi+1)
+	      ela.resize (pi+1);
 	    ela[pi] = node;
 
 	    return;
@@ -118,8 +118,8 @@ namespace netgen
     next->boxmin = bmin;
     next->boxmax = bmax;
 
-    if (ela.Size() < pi+1)
-      ela.SetSize (pi+1);
+    if (ela.size() < pi+1)
+      ela.resize (pi+1);
     ela[pi] = next;
 
 
@@ -215,7 +215,7 @@ namespace netgen
     Reset();
 
     while ( (nodenr = Next()) != -1)
-      matches.Append (nodenr);
+      matches.push_back (nodenr);
   }
 
 
@@ -334,8 +334,8 @@ namespace netgen
 	    memcpy (node->data, p, 3 * sizeof(float));
 	    node->pi = pi;
 
-	    if (ela.Size() < pi+1)
-	      ela.SetSize (pi+1);
+	    if (ela.size() < pi+1)
+	      ela.resize (pi+1);
 	    ela[pi] = node;
 
 	    return;
@@ -366,8 +366,8 @@ namespace netgen
     next->sep = (bmin[dir] + bmax[dir]) / 2;
 
 
-    if (ela.Size() < pi+1)
-      ela.SetSize (pi+1);
+    if (ela.size() < pi+1)
+      ela.resize (pi+1);
     ela[pi] = next;		
 
 
@@ -407,9 +407,9 @@ namespace netgen
     ADTreeNode3 * node;
     int dir, stacks;
 
-    stack.SetSize (1000);
-    stackdir.SetSize(1000);
-    pis.SetSize(0);
+    stack.resize (1000);
+    stackdir.resize(1000);
+    pis.resize(0);
 
     stack.Elem(1) = root;
     stackdir.Elem(1) = 0;
@@ -427,7 +427,7 @@ namespace netgen
 		node->data[1] >= bmin[1] && node->data[1] <= bmax[1] &&
 		node->data[2] >= bmin[2] && node->data[2] <= bmax[2])
 
-	      pis.Append (node->pi);
+	      pis.push_back (node->pi);
 	  }
 
 
@@ -1620,8 +1620,8 @@ namespace netgen
 	    memcpy (node->data, p, 6 * sizeof(float));
 	    node->pi = pi;
 
-	    if (ela.Size() < pi+1)
-	      ela.SetSize (pi+1);
+	    if (ela.size() < pi+1)
+	      ela.resize (pi+1);
 	    ela[pi] = node;
 
 	    return;
@@ -1650,8 +1650,8 @@ namespace netgen
     next->pi = pi;
     next->sep = (bmin[dir] + bmax[dir]) / 2;
 
-    if (ela.Size() < pi+1)
-      ela.SetSize (pi+1);
+    if (ela.size() < pi+1)
+      ela.resize (pi+1);
     ela[pi] = next;
 
     if (lr)
@@ -1686,7 +1686,7 @@ namespace netgen
     ost << Elements() << " elements a " << sizeof(ADTreeNode6) 
 	<< " Bytes = "
 	<< Elements() * sizeof(ADTreeNode6) << std::endl;
-    ost << "maxind = " << ela.Size() << " = " << sizeof(ADTreeNode6*) * ela.Size() << " Bytes" << std::endl;
+    ost << "maxind = " << ela.size() << " = " << sizeof(ADTreeNode6*) * ela.size() << " Bytes" << std::endl;
   }
 
 
@@ -1707,7 +1707,7 @@ namespace netgen
     // static Array<inttn6> stack(10000);
     // stack.SetSize (10000);
     ArrayMem<inttn6,10000> stack(10000);
-    pis.SetSize(0);
+    pis.resize(0);
 
     stack[0].node = root;
     stack[0].dir = 0;
@@ -1730,7 +1730,7 @@ namespace netgen
 	      ;
 	    else
               {
-                pis.Append (node->pi);
+                pis.push_back (node->pi);
               }
 	  }
 

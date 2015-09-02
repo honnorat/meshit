@@ -95,14 +95,14 @@ int Meshing3 :: ApplyRules
   static int cnt = 0;
   cnt++;
   
-  delfaces.SetSize (0);
-  elements.SetSize (0);
+  delfaces.resize (0);
+  elements.resize (0);
 
   // determine topological distance of faces and points to
   // base element
 
-  pnearness.SetSize (lpoints.Size());
-  fnearness.SetSize (lfacesplit);
+  pnearness.resize (lpoints.size());
+  fnearness.resize (lfacesplit);
 
   pnearness = INT_MAX/10;
   for (j = 0; j < lfaces[0].GetNP(); j++)
@@ -143,7 +143,7 @@ int Meshing3 :: ApplyRules
 
     }
 
-  for (i = 0; i < fnearness.Size(); i++)
+  for (i = 0; i < fnearness.size(); i++)
     {
       int sum = 0;
       for (j = 0; j < lfaces[i].GetNP(); j++)
@@ -154,8 +154,8 @@ int Meshing3 :: ApplyRules
   
   // find bounding boxes of faces
 
-  triboxes.SetSize (lfaces.Size());
-  for (i = 0; i < lfaces.Size(); i++)
+  triboxes.resize (lfaces.size());
+  for (i = 0; i < lfaces.size(); i++)
     {
       const MiniElement2d & face = lfaces[i];
       triboxes[i].SetPoint (lpoints.Get(face[0]));
@@ -164,7 +164,7 @@ int Meshing3 :: ApplyRules
     }
   
   bool useedges = 0;
-  for (ri = 0; ri < rules.Size(); ri++)
+  for (ri = 0; ri < rules.size(); ri++)
     if (rules[ri]->GetNEd()) useedges = 1;
 
   if (useedges)
@@ -187,8 +187,8 @@ int Meshing3 :: ApplyRules
 	  }
     }
 
-  pused.SetSize (lpoints.Size());
-  fused.SetSize (lfaces.Size());
+  pused.resize (lpoints.size());
+  fused.resize (lfaces.size());
 
   found = 0;
   minerr = tolfak * tolerance * tolerance;
@@ -200,7 +200,7 @@ int Meshing3 :: ApplyRules
 
   // check each rule:
 
-  for (ri = 1; ri <= rules.Size(); ri++)
+  for (ri = 1; ri <= rules.size(); ri++)
     { 
       // sprintf (problems.Elem(ri), "");
       *problems.Elem(ri) = '\0';
@@ -217,15 +217,15 @@ int Meshing3 :: ApplyRules
 	  continue;
 	}
       
-      pmap.SetSize (rule->GetNP());
-      fmapi.SetSize (rule->GetNF());
-      fmapr.SetSize (rule->GetNF());
+      pmap.resize (rule->GetNP());
+      fmapi.resize (rule->GetNF());
+      fmapr.resize (rule->GetNF());
       
       fused = 0;
       pused = 0;
       pmap = 0;
       fmapi = 0;
-      for (i = 1; i <= fmapr.Size(); i++)
+      for (i = 1; i <= fmapr.size(); i++)
 	fmapr.Set(i, rule->GetNP(i));
       
       fused[0] = 1;
@@ -375,8 +375,8 @@ int Meshing3 :: ApplyRules
 	      npok = 1;
 	      incnpok = 1;
 	      
-	      pfixed.SetSize (pmap.Size());
-	      for (i = 1; i <= pmap.Size(); i++)
+	      pfixed.resize (pmap.size());
+	      for (i = 1; i <= pmap.size(); i++)
 		pfixed.Set(i, (pmap.Get(i) != 0) );
 	      
 	      while (npok >= 1)
@@ -403,7 +403,7 @@ int Meshing3 :: ApplyRules
 			  if (locpi)
 			    pused.Elem(locpi)--;
 			  
-			  while (!ok && locpi < lpoints.Size())
+			  while (!ok && locpi < lpoints.size())
 			    {
 			      ok = 1;
 			      locpi++;
@@ -577,7 +577,7 @@ int Meshing3 :: ApplyRules
 
 		      // check freezone:
 		      
-		      for (i = 1; i <= lpoints.Size(); i++)
+		      for (i = 1; i <= lpoints.size(); i++)
 			{
 			  if ( !pused.Get(i) )
 			    {
@@ -594,7 +594,7 @@ int Meshing3 :: ApplyRules
 			    }
 			}
 
-		      for (i = 1; i <= lfaces.Size() && ok; i++)
+		      for (i = 1; i <= lfaces.size() && ok; i++)
 			{
 			  static Array<int> lpi(4);
 
@@ -695,8 +695,8 @@ int Meshing3 :: ApplyRules
 			  // set new points:
 			  
 			  oldnp = rule->GetNOldP();
-			  noldlp = lpoints.Size();
-			  noldlf = lfaces.Size();
+			  noldlp = lpoints.size();
+			  noldlf = lfaces.size();
 			  
 			  
 			  for (i = oldnp + 1; i <= rule->GetNP(); i++)
@@ -706,7 +706,7 @@ int Meshing3 :: ApplyRules
 			      np.Y() += newu (3 * (i-oldnp) - 2);
 			      np.Z() += newu (3 * (i-oldnp) - 1);
 			      
-			      pmap.Elem(i) = lpoints.Append (np);
+			      pmap.Elem(i) = lpoints.push_back (np);
 			    }
 			  
 			  // Set new Faces:
@@ -718,18 +718,18 @@ int Meshing3 :: ApplyRules
 				for (j = 1; j <= nface.GetNP(); j++)
 				  nface.PNum(j) = pmap.Get(rule->GetPointNr (i, j));
 				
-				lfaces.Append (nface);
+				lfaces.push_back (nface);
 			      }
 			  
 			  
 			  // Delete old Faces:
 
 			  for (i = 1; i <= rule->GetNDelF(); i++)
-			    delfaces.Append (fmapi.Get(rule->GetDelFace(i)));
+			    delfaces.push_back (fmapi.Get(rule->GetDelFace(i)));
 			  for (i = rule->GetNOldF()+1; i <= rule->GetNF(); i++)
 			    if (fmapi.Get(i))
 			      {
-				delfaces.Append (fmapi.Get(i));
+				delfaces.push_back (fmapi.Get(i));
 				fmapi.Elem(i) = 0;
 			      }
 			  
@@ -770,7 +770,7 @@ int Meshing3 :: ApplyRules
 			  
 			  for (i = 1; i <= rule->GetNE(); i++)
 			    {
-			      elements.Append (rule->GetElement(i));
+			      elements.push_back (rule->GetElement(i));
 			      for (j = 1; j <= elements.Get(i).NP(); j++)
 				elements.Elem(i).PNum(j) = pmap.Get(elements.Get(i).PNum(j));
 			    }
@@ -779,7 +779,7 @@ int Meshing3 :: ApplyRules
 			  // Calculate Element badness
 			  
 			  teterr = 0;
-			  for (i = 1; i <= elements.Size(); i++)
+			  for (i = 1; i <= elements.size(); i++)
 			    {
 			      hf = CalcElementBadness (lpoints, elements.Get(i));
 			      if (hf > teterr) teterr = hf;
@@ -870,28 +870,28 @@ int Meshing3 :: ApplyRules
 			      found = ri;
 			      minteterr = teterr;
 			      
-			      tempnewpoints.SetSize (0);
-			      for (i = noldlp+1; i <= lpoints.Size(); i++)
-				tempnewpoints.Append (lpoints.Get(i));
+			      tempnewpoints.resize (0);
+			      for (i = noldlp+1; i <= lpoints.size(); i++)
+				tempnewpoints.push_back (lpoints.Get(i));
 			      
-			      tempnewfaces.SetSize (0);
-			      for (i = noldlf+1; i <= lfaces.Size(); i++)
-				tempnewfaces.Append (lfaces.Get(i));
+			      tempnewfaces.resize (0);
+			      for (i = noldlf+1; i <= lfaces.size(); i++)
+				tempnewfaces.push_back (lfaces.Get(i));
 
-			      tempdelfaces.SetSize (0);
-			      for (i = 1; i <= delfaces.Size(); i++)
-				tempdelfaces.Append (delfaces.Get(i));
+			      tempdelfaces.resize (0);
+			      for (i = 1; i <= delfaces.size(); i++)
+				tempdelfaces.push_back (delfaces.Get(i));
 			      
-			      tempelements.SetSize (0);
-			      for (i = 1; i <= elements.Size(); i++)
-				tempelements.Append (elements.Get(i));
+			      tempelements.resize (0);
+			      for (i = 1; i <= elements.size(); i++)
+				tempelements.push_back (elements.Get(i));
 			    }
 			  
 
-			  lpoints.SetSize (noldlp);
-			  lfaces.SetSize (noldlf);
-			  delfaces.SetSize (0);
-			  elements.SetSize (0);
+			  lpoints.resize (noldlp);
+			  lfaces.resize (noldlf);
+			  delfaces.resize (0);
+			  elements.resize (0);
 			}
 		      
 		      npok = rule->GetNOldP();
@@ -918,15 +918,15 @@ int Meshing3 :: ApplyRules
 
   if (found)
     {
-      for (i = 1; i <= tempnewpoints.Size(); i++)
-	lpoints.Append (tempnewpoints.Get(i));
-      for (i = 1; i <= tempnewfaces.Size(); i++)
+      for (i = 1; i <= tempnewpoints.size(); i++)
+	lpoints.push_back (tempnewpoints.Get(i));
+      for (i = 1; i <= tempnewfaces.size(); i++)
 	if (tempnewfaces.Get(i).PNum(1))
-	  lfaces.Append (tempnewfaces.Get(i));
-      for (i = 1; i <= tempdelfaces.Size(); i++)
-	delfaces.Append (tempdelfaces.Get(i));
-      for (i = 1; i <= tempelements.Size(); i++)
-	elements.Append (tempelements.Get(i));
+	  lfaces.push_back (tempnewfaces.Get(i));
+      for (i = 1; i <= tempdelfaces.size(); i++)
+	delfaces.push_back (tempdelfaces.Get(i));
+      for (i = 1; i <= tempelements.size(); i++)
+	elements.push_back (tempelements.Get(i));
     }
   
   retminerr = minerr;

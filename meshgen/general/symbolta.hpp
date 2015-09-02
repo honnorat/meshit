@@ -94,7 +94,7 @@ inline SYMBOLTABLE<T> :: SYMBOLTABLE ()
 template <class T>
 inline INDEX SYMBOLTABLE<T> :: Size() const
 {
-  return data.Size();
+  return data.size();
 }
 
 template <class T>
@@ -139,10 +139,10 @@ inline void SYMBOLTABLE<T> :: Set (const char * name, const T & el)
     data.Set(i, el);
   else
     {
-      data.Append (el);
+      data.push_back (el);
       char * hname = new char [strlen (name) + 1];
       strcpy (hname, name);
-      names.Append (hname);
+      names.push_back (hname);
     }
 }
 

@@ -49,7 +49,7 @@ class MeshTopology
   TABLE<int,PointIndex::BASE> *vert2segment;
   int timestamp;
 public:
-  int GetNSurfedges() const {return surfedges.Size();}
+  int GetNSurfedges() const {return surfedges.size();}
 
   MeshTopology (const Mesh & amesh);
   ~MeshTopology ();
@@ -67,8 +67,8 @@ public:
   void Update();
 
 
-  int GetNEdges () const { return edge2vert.Size(); }
-  int GetNFaces () const { return face2vert.Size(); }
+  int GetNEdges () const { return edge2vert.size(); }
+  int GetNFaces () const { return face2vert.size(); }
 
   static inline int GetNVertices (ELEMENT_TYPE et);
   static inline int GetNPoints (ELEMENT_TYPE et);

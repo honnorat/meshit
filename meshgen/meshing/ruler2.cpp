@@ -48,12 +48,12 @@ namespace netgen
     double maxerr = 0.5 + 0.3 * tolerance;
     double minelerr = 2 + 0.5 * tolerance * tolerance;
 
-    int noldlp = lpoints.Size();
-    int noldll = llines1.Size();
+    int noldlp = lpoints.size();
+    int noldll = llines1.size();
 
 
     ArrayMem<int,100> pused(maxlegalpoint), lused(maxlegalline);
-    ArrayMem<int,100> pnearness(noldlp), lnearness(llines1.Size());
+    ArrayMem<int,100> pnearness(noldlp), lnearness(llines1.size());
 
     ArrayMem<int, 20> pmap, pfixed, lmap;
   
@@ -63,8 +63,8 @@ namespace netgen
     ArrayMem<Element2d,100> tempelements;
 
 
-    elements.SetSize (0);
-    dellines.SetSize (0);
+    elements.resize (0);
+    dellines.resize (0);
 
     // check every rule
 
@@ -104,8 +104,8 @@ namespace netgen
 
 
     // resort lines after lnearness
-    Array<INDEX_2> llines(llines1.Size());
-    Array<int> sortlines(llines1.Size());
+    Array<INDEX_2> llines(llines1.size());
+    Array<int> sortlines(llines1.size());
     int lnearness_class[MAX_NEARNESS];
 
     for (int j = 0; j < MAX_NEARNESS; j++)
@@ -136,7 +136,7 @@ namespace netgen
 	  cumm++;
 	}
 
-    for (int i = maxlegalline; i < llines1.Size(); i++)
+    for (int i = maxlegalline; i < llines1.size(); i++)
       {
 	llines[cumm] = llines1[i];
 	sortlines[cumm] = i+1;
@@ -170,7 +170,7 @@ namespace netgen
     pused = 0;
 
 
-    for (int ri = 1; ri <= rules.Size(); ri++)
+    for (int ri = 1; ri <= rules.size(); ri++)
       {
 	// NgProfiler::RegionTimer reg(timers[ri-1]);
 	netrule * rule = rules.Get(ri);
@@ -182,8 +182,8 @@ namespace netgen
 
 	if (rule->GetQuality() > tolerance) continue;
 
-	pmap.SetSize (rule->GetNP());
-	lmap.SetSize (rule->GetNL());
+	pmap.resize (rule->GetNP());
+	lmap.resize (rule->GetNL());
       
 	pmap = 0;
 	lmap = 0;
@@ -319,8 +319,8 @@ namespace netgen
 		int npok = 1;
 		int incnpok = 1;
 
-		pfixed.SetSize (pmap.Size());
-		for (int i = 0; i < pmap.Size(); i++)
+		pfixed.resize (pmap.size());
+		for (int i = 0; i < pmap.size(); i++)
 		  pfixed[i] = (pmap[i] >= 1);
  
 		while (npok >= 1)
@@ -471,7 +471,7 @@ namespace netgen
 			  }
 
 			if (!ok) continue;
-			for (int i = maxlegalpoint+1; i <= lpoints.Size(); i++)
+			for (int i = maxlegalpoint+1; i <= lpoints.size(); i++)
 			  {
 			    if ( rule->IsInFreeZone (lpoints.Get(i)) )
 			      {
@@ -504,7 +504,7 @@ namespace netgen
 
 			if (!ok) continue;
 
-			for (int i = maxlegalline+1; i <= llines.Size(); i++)
+			for (int i = maxlegalline+1; i <= llines.size(); i++)
 			  {
 			    if (rule->IsLineInFreeZone (lpoints.Get(llines.Get(i).I1()),
 							lpoints.Get(llines.Get(i).I2())))
@@ -557,7 +557,7 @@ namespace netgen
 				np.X() += newu (2 * (i-oldnp) - 2);
 				np.Y() += newu (2 * (i-oldnp) - 1);
 				
-				pmap.Elem(i) = lpoints.Append (np);
+				pmap.Elem(i) = lpoints.push_back (np);
 			      }
 			  }
 
@@ -565,14 +565,14 @@ namespace netgen
 
 			for (int i = rule->GetNOldL() + 1; i <= rule->GetNL(); i++)
 			  {
-			    llines.Append (INDEX_2 (pmap.Get(rule->GetLine (i)[0]),
+			    llines.push_back (INDEX_2 (pmap.Get(rule->GetLine (i)[0]),
 						    pmap.Get(rule->GetLine (i)[1])));
 			  }
 
 
 			// delete old lines:
 			for (int i = 1; i <= rule->GetNDelL(); i++)
-			  dellines.Append (sortlines.Elem (lmap.Get(rule->GetDelLine(i))));
+			  dellines.push_back (sortlines.Elem (lmap.Get(rule->GetDelLine(i))));
 			// dellines.Append (lmap.Get(rule->GetDelLine(i))));
 
 			// dellines.Append (lmap.Elem(rule->GetDelLines()));
@@ -583,14 +583,14 @@ namespace netgen
 
 			for (int i = 1; i <= rule->GetNE(); i++)
 			  {
-			    elements.Append (rule->GetElement(i));
+			    elements.push_back (rule->GetElement(i));
 			    for (int j = 1; j <= elements.Get(i).GetNP(); j++)
 			      elements.Elem(i).PNum(j) = pmap.Get(elements.Get(i).PNum(j));
 			  }
 
 
 			double elerr = 0;
-			for (int i = 1; i <= elements.Size(); i++)
+			for (int i = 1; i <= elements.size(); i++)
 			  {
 			    double hf;
 			    if (!mp.quad)
@@ -619,14 +619,14 @@ namespace netgen
 				std::cerr << "rule = " << rule->Name() <<std::endl;
 				std::cerr << "class = " << tolerance <<std::endl;
 				std::cerr << "lpoints: " <<std::endl;
-				for (int i = 1; i <= lpoints.Size(); i++)
+				for (int i = 1; i <= lpoints.size(); i++)
 				  std::cerr << lpoints.Get(i) <<std::endl;
 				std::cerr << "llines: " <<std::endl;
-				for (int i = 1; i <= llines.Size(); i++)
+				for (int i = 1; i <= llines.size(); i++)
 				  std::cerr << llines.Get(i).I1() << " " << llines.Get(i).I2() <<std::endl;
 
 				std::cerr << "Freezone: ";
-				for (int i = 1; i <= rule -> GetTransFreeZone().Size(); i++)
+				for (int i = 1; i <= rule -> GetTransFreeZone().size(); i++)
 				  std::cerr << rule->GetTransFreeZone().Get(i) <<std::endl;
 			      }
 #endif
@@ -634,16 +634,16 @@ namespace netgen
 			    minelerr = elerr;
 			    found = ri;
 
-			    tempnewpoints = lpoints.Range (noldlp, lpoints.Size());
-			    tempnewlines = llines.Range (noldll, llines.Size());
+			    tempnewpoints = lpoints.Range (noldlp, lpoints.size());
+			    tempnewlines = llines.Range (noldll, llines.size());
 			    tempdellines = dellines;
 			    tempelements = elements;
 			  }
 
-			lpoints.SetSize (noldlp);
-			llines.SetSize (noldll);
-			dellines.SetSize (0);
-			elements.SetSize (0);
+			lpoints.resize (noldlp);
+			llines.resize (noldll);
+			dellines.resize (0);
+			elements.resize (0);
 			ok = 0;
 		      }
 		  }

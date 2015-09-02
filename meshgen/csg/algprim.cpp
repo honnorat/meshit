@@ -115,7 +115,7 @@ namespace netgen
                                   Array<double> & coeffs) const
   {
     classname = "plane";
-    coeffs.SetSize (6);
+    coeffs.resize (6);
     coeffs.Elem(1) = p(0);
     coeffs.Elem(2) = p(1);
     coeffs.Elem(3) = p(2);
@@ -365,7 +365,7 @@ namespace netgen
   void Sphere :: GetPrimitiveData (const char *& classname, Array<double> & coeffs) const
   {
     classname = "sphere";
-    coeffs.SetSize (4);
+    coeffs.resize (4);
     coeffs.Elem(1) = c(0);
     coeffs.Elem(2) = c(1);
     coeffs.Elem(3) = c(2);
@@ -770,7 +770,7 @@ namespace netgen
   void Cylinder :: GetPrimitiveData (const char *& classname, Array<double> & coeffs) const
   {
     classname = "cylinder";
-    coeffs.SetSize (7);
+    coeffs.resize (7);
     coeffs.Elem(1) = a(0);
     coeffs.Elem(2) = a(1);
     coeffs.Elem(3) = a(2);
@@ -1127,7 +1127,7 @@ namespace netgen
   void EllipticCylinder :: GetPrimitiveData (const char *& classname, Array<double> & coeffs) const
   {
     classname = "ellipticcylinder";
-    coeffs.SetSize (9);
+    coeffs.resize (9);
     coeffs[0] = a(0);
     coeffs[1] = a(1);
     coeffs[2] = a(2);
@@ -1297,7 +1297,7 @@ namespace netgen
   void Cone :: GetPrimitiveData (const char *& classname, Array<double> & coeffs) const
   {
     classname = "cone";
-    coeffs.SetSize (8);
+    coeffs.resize (8);
     coeffs.Elem(1) = a(0);
     coeffs.Elem(2) = a(1);
     coeffs.Elem(3) = a(2);
@@ -1504,7 +1504,7 @@ namespace netgen
   void Torus :: GetPrimitiveData (const char *& classname, Array<double> & coeffs) const
   {
     classname = "torus";
-    coeffs.SetSize (8);
+    coeffs.resize (8);
     coeffs.Elem(1) = c(0);
     coeffs.Elem(2) = c(1);
     coeffs.Elem(3) = c(2);

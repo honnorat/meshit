@@ -201,7 +201,7 @@ namespace netgen
 
 
     int GetNTopLevelObjects () const
-    { return toplevelobjects.Size(); }
+    { return toplevelobjects.size(); }
     int SetTopLevelObject (Solid * sol, Surface * surf = NULL);
     void GetTopLevelObject (int nr, Solid *& sol, Surface *& surf)
     {
@@ -223,18 +223,18 @@ namespace netgen
 
 
     void AddUserPoint (const Point<3> & p, double ref_factor = 0)
-    { userpoints.Append (p); userpoints_ref_factor.Append (ref_factor); }
+    { userpoints.push_back (p); userpoints_ref_factor.push_back (ref_factor); }
     int GetNUserPoints () const
-    { return userpoints.Size(); }
+    { return userpoints.size(); }
     const Point<3> & GetUserPoint (int nr) const
     { return userpoints[nr]; }
     double GetUserPointRefFactor (int nr) const
     { return userpoints_ref_factor[nr]; }
   
     void AddIdentPoint (const Point<3> & p) const
-    { identpoints.Append(p);}
+    { identpoints.push_back(p);}
     int GetNIdentPoints (void) const
-    { return identpoints.Size();}
+    { return identpoints.size();}
     const Point<3> & GetIdentPoint(int nr) const
     { return identpoints[nr]; }
     void DeleteIdentPoints(void) const
@@ -247,7 +247,7 @@ namespace netgen
     Array<SingularPoint*> singpoints;
     Array<Identification*> identifications;
 
-    int GetNIdentifications (void) const { return identifications.Size(); }
+    int GetNIdentifications (void) const { return identifications.size(); }
     void AddIdentification (Identification * ident);
 
 
@@ -280,7 +280,7 @@ namespace netgen
     ///
     const TriangleApproximation * GetTriApprox (int msnr)
     {
-      if (msnr < triapprox.Size())
+      if (msnr < triapprox.size())
 	return triapprox[msnr];
       return 0;
     }

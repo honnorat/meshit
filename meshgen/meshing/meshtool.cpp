@@ -559,7 +559,7 @@ namespace netgen
     Vec3d v1, v2, v3;
   
     vol = 0;
-    for (int i = 0; i < elements.Size(); i++)
+    for (int i = 0; i < elements.size(); i++)
       {
 	v1 = points.Get(elements[i][1]) - points.Get(elements[i][0]);
 	v2 = points.Get(elements[i][2]) - points.Get(elements[i][0]);
@@ -582,7 +582,7 @@ namespace netgen
     double sum = 0;
     int nontet  = 0;
 
-    for (i = 1; i <= incl.Size(); i++)
+    for (i = 1; i <= incl.size(); i++)
       incl.Elem(i) = 0;
 
     for (ElementIndex ei = 0; ei < mesh.GetNE(); ei++)

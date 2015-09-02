@@ -35,27 +35,27 @@ static void STLFindEdges (STLGeometry & geom,
 
   for (int i = 1; i <= geom.GetNLines(); i++)
     {
-      meshlines.Append(geom.GetLine(i)->Mesh(geom.GetPoints(), meshpoints, h, mesh)); 
+      meshlines.push_back(geom.GetLine(i)->Mesh(geom.GetPoints(), meshpoints, h, mesh)); 
       SetThreadPercent(100.0 * (double)i/(double)geom.GetNLines());
     }
 
-  geom.meshpoints.SetSize(0); //testing
-  geom.meshlines.SetSize(0);  //testing
-  for (int i = 1; i <= meshpoints.Size(); i++)
+  geom.meshpoints.resize(0); //testing
+  geom.meshlines.resize(0);  //testing
+  for (int i = 1; i <= meshpoints.size(); i++)
     {
-      geom.meshpoints.Append(meshpoints.Get(i)); //testing
+      geom.meshpoints.push_back(meshpoints.Get(i)); //testing
       mesh.AddPoint(meshpoints.Get(i));
     }
   //(++++++++++++++testing
   for (int i = 1; i <= geom.GetNLines(); i++)
     {
-      geom.meshlines.Append(meshlines.Get(i));
+      geom.meshlines.push_back(meshlines.Get(i));
     }
   //++++++++++++++testing)
 
   PrintMessage(7,"feed with edges");
 
-  for (int i = 1; i <= meshlines.Size(); i++)
+  for (int i = 1; i <= meshlines.size(); i++)
     {
       STLLine* line = meshlines.Get(i);
       std::cerr << "store line " << i <<std::endl;
@@ -456,8 +456,8 @@ int STLSurfaceMeshing (STLGeometry & geom, class Mesh & mesh)
 	      {
 		for (int j = 1; j <= 3; j++)
 		  {
-		    refpts.Append (mesh.Point (mesh.SurfaceElement(i).PNum(j)));
-		    refh.Append (mesh.GetH (refpts.Last()) / 2);
+		    refpts.push_back (mesh.Point (mesh.SurfaceElement(i).PNum(j)));
+		    refh.push_back (mesh.GetH (refpts.Last()) / 2);
 		  }
 		mesh.DeleteSurfaceElement(i);
 	      }
@@ -476,14 +476,14 @@ int STLSurfaceMeshing (STLGeometry & geom, class Mesh & mesh)
 	      Vec3d ng = geom.GetTriangle(el.GeomInfoPi(1).trignum).Normal();
 	      if (n * ng < 0)
 		{
-		  refpts.Append (mesh.Point (mesh.SurfaceElement(i).PNum(1)));
-		  refh.Append (mesh.GetH (refpts.Last()) / 2);
+		  refpts.push_back (mesh.Point (mesh.SurfaceElement(i).PNum(1)));
+		  refh.push_back (mesh.GetH (refpts.Last()) / 2);
 		  mesh.DeleteSurfaceElement(i);
 		}
 	    }
 	  // end comments
 
-	  for (int i = 1; i <= refpts.Size(); i++)
+	  for (int i = 1; i <= refpts.size(); i++)
 	    mesh.RestrictLocalH (refpts.Get(i), refh.Get(i));
 
 	  mesh.RemoveOneLayerSurfaceElements();
@@ -529,12 +529,12 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
   mesh.FindOpenSegments();
   
   Array<int> spiralps(0);
-  spiralps.SetSize(0);
+  spiralps.resize(0);
   for (int i = 1; i <= geom.GetNP(); i++)
     if (geom.GetSpiralPoint(i)) 
-      spiralps.Append(i);
+      spiralps.push_back(i);
   
-  PrintMessage(7,"NO spiralpoints = ", spiralps.Size());
+  PrintMessage(7,"NO spiralpoints = ", spiralps.size());
   //int spfound;
 
   /*
@@ -552,16 +552,14 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
   Array<int> ispiral_point;
   for (int i = 1; i <= mesh.GetNP(); i++)
     {
-      for (int j = 1; j <= spiralps.Size(); j++)
+      for (int j = 1; j <= spiralps.size(); j++)
 	if (Dist2(geom.GetPoint(spiralps.Get(j)), mesh.Point(i)) < 1e-20) 
 	  {
-	    imeshsp.Append(i);
-	    ispiral_point.Append(spiralps.Get(j));
+	    imeshsp.push_back(i);
+	    ispiral_point.push_back(spiralps.Get(j));
 	    break;
 	  }
     }
-
-  double starttime = GetTime ();
   mesh.SurfaceArea().ReCalc();
 
   // int oldnp = mesh.GetNP();
@@ -592,20 +590,19 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 
       PrintMessage(5,"Meshing surface ", fnr, "/", mesh.GetNFD());
       MeshingSTLSurface meshing (geom, mparam);
-      meshing.SetStartTime (starttime);
       
       // compress = 0;
-      icompress.SetSize(0); 
+      icompress.resize(0); 
       int cntused = 0;
 
-      for (int i = 0; i < imeshsp.Size(); i++)
+      for (int i = 0; i < imeshsp.size(); i++)
 	{
 	  compress[imeshsp[i]] = ++cntused;
-	  icompress.Append(imeshsp[i]);
+	  icompress.push_back(imeshsp[i]);
 	}
 
       FlatArray<int> segs = opensegments[fnr];
-      for (int hi = 0; hi < segs.Size(); hi++)
+      for (int hi = 0; hi < segs.size(); hi++)
 	{
 	  int i = segs[hi];
 	  const Segment & seg = mesh.GetOpenSegment (i);
@@ -613,11 +610,11 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 	    if (compress[seg[j]] == 0)
 	      {
 		compress[seg[j]] = ++cntused;
-		icompress.Append(seg[j]);
+		icompress.push_back(seg[j]);
 	      }
 	}
 
-      for (int hi = 0; hi < icompress.Size(); hi++)
+      for (int hi = 0; hi < icompress.size(); hi++)
 	{
 	  PointIndex pi = icompress[hi];
 	  
@@ -630,7 +627,7 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 	  if (sppointnum)
 	    {
 	  */
-	  if (hi < ispiral_point.Size())
+	  if (hi < ispiral_point.size())
 	    {
 	      int sppointnum = ispiral_point[hi];
 
@@ -656,7 +653,7 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
 	}
 
       // FlatArray<int> segs = opensegments[fnr];
-      for (int hi = 0; hi < segs.Size(); hi++)
+      for (int hi = 0; hi < segs.size(); hi++)
 	{
 	  int i = segs[hi];
 	  const Segment & seg = mesh.GetOpenSegment (i);
@@ -670,7 +667,7 @@ void STLSurfaceMeshing1 (STLGeometry & geom,
       
       meshing.GenerateMesh (mesh, mparam, h, fnr);  
       
-      for (int i = 0; i < icompress.Size(); i++)
+      for (int i = 0; i < icompress.size(); i++)
 	compress[icompress[i]] = 0;
       
       
@@ -876,9 +873,9 @@ GetChartBoundary (Array<Point2d > & points,
 		  Array<Point3d > & points3d,
 		  Array<INDEX_2> & lines, double h) const
 {
-  points.SetSize (0);
-  points3d.SetSize (0);
-  lines.SetSize (0);
+  points.resize (0);
+  points3d.resize (0);
+  lines.resize (0);
   geom.GetMeshChartBoundary (points, points3d, lines, h);
 }
 

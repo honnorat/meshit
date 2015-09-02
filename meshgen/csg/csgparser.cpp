@@ -389,7 +389,7 @@ namespace netgen
 		  Array<int> pnums,cleaned_pnums;
 		  for(int i=0; i<3; i++)
 		    {
-		      pnums.Append((int) (ParseNumber (scan)));
+		      pnums.push_back((int) (ParseNumber (scan)));
 		      if(i<2) 
 			ParseChar (scan, ',');
 		    }
@@ -397,21 +397,21 @@ namespace netgen
 		  if (scan.GetToken() == TOK_COMMA)
 		    {
 		      ParseChar (scan, ',');
-		      pnums.Append((int) (ParseNumber (scan)));	
+		      pnums.push_back((int) (ParseNumber (scan)));	
 		    }
 
-		  for(int i=0; i<pnums.Size(); i++)
+		  for(int i=0; i<pnums.size(); i++)
 		    if(!cleaned_pnums.Contains(pnums[i]))
-		      cleaned_pnums.Append(pnums[i]);
+		      cleaned_pnums.push_back(pnums[i]);
 
-		  if(cleaned_pnums.Size() == 3)
+		  if(cleaned_pnums.size() == 3)
 		    {
 		      polyhedron->AddFace(cleaned_pnums[0]-1,
 					  cleaned_pnums[1]-1,
 					  cleaned_pnums[2]-1,
 					  inputface);
 		    }
-		  else if(cleaned_pnums.Size() == 4)
+		  else if(cleaned_pnums.size() == 4)
 		    {
 		      polyhedron->AddFace(cleaned_pnums[0]-1,
 					  cleaned_pnums[1]-1,
@@ -426,7 +426,7 @@ namespace netgen
 		    {
 		      ostringstream msg;
 		      msg << "Something wrong with polyhedron face:";
-		      for(int i=0; i<pnums.Size(); i++)
+		      for(int i=0; i<pnums.size(); i++)
 			msg << " " << pnums[i];
 		      throw NgException(msg.str());
 		    }
@@ -703,7 +703,7 @@ namespace netgen
     scan >> nump >> ';';
     
     hd = 1;
-    spline.geompoints.SetSize(nump);
+    spline.geompoints.resize(nump);
     for(int i = 0; i<nump; i++)
       {
 	if(D==2)
@@ -716,7 +716,7 @@ namespace netgen
     
     scan >> numseg;// >> ';';
 
-    spline.splines.SetSize(numseg);
+    spline.splines.resize(numseg);
 
   int pnums,pnum1,pnum2,pnum3;
     
@@ -774,11 +774,11 @@ namespace netgen
 		if(scan.GetToken() == '-' || scan.GetToken() == TOK_NUM)
 		  {
 		    Array<double> vals;
-		    vals.Append (ParseNumber(scan));
+		    vals.push_back (ParseNumber(scan));
 		    while (scan.GetToken() == ',')
 		      {
 			scan.ReadNext();
-			vals.Append (ParseNumber(scan));
+			vals.push_back (ParseNumber(scan));
 		      }
 		    ParseChar (scan, ']');
 		    flags.SetFlag (name.c_str(), vals);
@@ -787,7 +787,7 @@ namespace netgen
 		  { // string list
 		    Array<char*> vals;
 		    string val = scan.GetStringValue();
-		    vals.Append(new char[val.size()+1]);
+		    vals.push_back(new char[val.size()+1]);
 		    strcpy(vals.Last(),val.c_str());
 		    scan.ReadNext();
 
@@ -795,13 +795,13 @@ namespace netgen
 		      {
 			scan.ReadNext();
 			val = scan.GetStringValue();
-			vals.Append(new char[val.size()+1]);
+			vals.push_back(new char[val.size()+1]);
 			strcpy(vals.Last(),val.c_str());
 			scan.ReadNext();
 		      }
 		    ParseChar (scan, ']');
 		    flags.SetFlag (name.c_str(), vals);
-		    for(int i=0; i<vals.Size(); i++)
+		    for(int i=0; i<vals.size(); i++)
 		      delete [] vals[i];
 		  }
 	      }
@@ -1048,7 +1048,7 @@ namespace netgen
 		      else
 			for (int i = 0; i < geom->GetNTopLevelObjects(); i++)
 			  if (name1 == geom->GetTopLevelObject (i)->GetSolid()->Name())
-			    geom->singfaces.Append (new SingularFace (i+1, sol,factor));
+			    geom->singfaces.push_back (new SingularFace (i+1, sol,factor));
 
 		      break;
 		    }
@@ -1089,7 +1089,7 @@ namespace netgen
 		      if(!s1 || !s2)
 			scan.Error ("unknown solid ins singular edge definition");
 		      else
-			geom->singedges.Append (new SingularEdge (1, domnr, 
+			geom->singedges.push_back (new SingularEdge (1, domnr, 
 								  *geom, s1, s2, factor,
 								  maxhinit));
 		      break;
@@ -1116,7 +1116,7 @@ namespace netgen
 		      const Solid * s3 = geom->GetSolid(name3);
 		      // std::cout << "Singular Point with factor " << factor <<std::endl; 
 		      PrintMessageCR (3, "Singular Point  with factor ", factor);
-		      geom->singpoints.Append (new SingularPoint (1, s1, s2, s3, factor));
+		      geom->singpoints.push_back (new SingularPoint (1, s1, s2, s3, factor));
 		      break;
 		    }
 		  default:
@@ -1230,7 +1230,7 @@ namespace netgen
 		Array<int> si;
 		
 		geom->GetSolid(name1)->GetSurfaceIndices(si);
-		if(si.Size() == 0)
+		if(si.size() == 0)
 		  {
 		    string errstring = "solid \""; errstring += name1; errstring += "\" has no surfaces";
 		    scan.Error (errstring);
@@ -1253,10 +1253,10 @@ namespace netgen
 		
 		
 		bcm.bcnr = num;
-		for (i = 0; i < si.Size(); i++)
+		for (i = 0; i < si.size(); i++)
 		  {
 		    bcm.si = si[i];
-		    geom->bcmodifications.Append (bcm);
+		    geom->bcmodifications.push_back (bcm);
 		  }
 	      }
 	    
@@ -1282,7 +1282,7 @@ namespace netgen
 		Array<int> si;
 		
 		geom->GetSolid(name1)->GetSurfaceIndices(si);
-		if(si.Size() == 0)
+		if(si.size() == 0)
 		  {
 		    string errstring = "solid \""; errstring += name1; errstring += "\" has no surfaces";
 		    scan.Error (errstring);
@@ -1305,10 +1305,10 @@ namespace netgen
 		
 		
 		bcm.bcnr = -1;
-		for (i = 0; i < si.Size(); i++)
+		for (i = 0; i < si.size(); i++)
 		  {
 		    bcm.si = si[i];
-		    geom->bcmodifications.Append (bcm);
+		    geom->bcmodifications.push_back (bcm);
 		    geom->bcmodifications.Last().bcname = new string(bcname);
 		  }
 	      }

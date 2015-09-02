@@ -166,7 +166,7 @@ namespace netgen
     while (!vst.eof())
       {
 	vst >> val;
-	coeffs.Append (val);
+	coeffs.push_back (val);
       }
 
     ((Primitive*)
@@ -227,7 +227,7 @@ namespace netgen
     geometry->GetSolid (name)->GetPrimitive()->GetPrimitiveData (classname, coeffs);
 
     ostringstream vst;
-    for (int i = 1; i <= coeffs.Size(); i++)
+    for (int i = 1; i <= coeffs.size(); i++)
       vst << coeffs.Get(i) << " ";
 
     std::cout << "GetPrimitiveData, name = " << name
@@ -512,7 +512,7 @@ namespace netgen
       }
 
     double globh = mparam.maxh;
-    for (int i = 1; i <= geometry->singedges.Size(); i++)
+    for (int i = 1; i <= geometry->singedges.size(); i++)
       geometry->singedges.Get(i)->SetMeshSize (*mesh, globh);
     return TCL_OK;
   }
@@ -530,7 +530,7 @@ namespace netgen
       }
 
     double globh = mparam.maxh;
-    for (int i = 1; i <= geometry->singpoints.Size(); i++)
+    for (int i = 1; i <= geometry->singpoints.size(); i++)
       geometry->singpoints.Get(i)->SetMeshSize (*mesh, globh);
     return TCL_OK;
   }
@@ -647,7 +647,7 @@ using namespace netgen;
 
 int Ng_CSG_Init (Tcl_Interp * interp)
 {
-  geometryregister.Append (new CSGeometryVisRegister);
+  geometryregister.push_back (new CSGeometryVisRegister);
   if (interp == NULL) return TCL_OK;
   
 

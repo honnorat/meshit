@@ -100,7 +100,7 @@ namespace netgen
 	and stored in points */
     virtual void LineIntersections (const double a, const double b, const double c,
 				    Array < Point<D> > & points, const double eps) const
-    {points.SetSize(0);}
+    {points.resize(0);}
 
     virtual double MaxCurvature(void) const = 0;
 
@@ -299,7 +299,7 @@ namespace netgen
   template<int D>
   void SplineSeg<D> :: GetPoints (int n, Array<Point<D> > & points) const
   {
-    points.SetSize (n);
+    points.resize (n);
     if (n >= 2)
       for (int i = 0; i < n; i++)
 	points[i] = GetPoint(double(i) / (n-1));
@@ -385,7 +385,7 @@ namespace netgen
   void LineSeg<D> :: LineIntersections (const double a, const double b, const double c,
 					Array < Point<D> > & points, const double eps) const
   {
-    points.SetSize(0);
+    points.resize(0);
 
     double denom = -a*p2(0)+a*p1(0)-b*p2(1)+b*p1(1);
     if(fabs(denom) < 1e-20)
@@ -393,7 +393,7 @@ namespace netgen
 
     double t = (a*p1(0)+b*p1(1)+c)/denom;
     if((t > -eps) && (t <  1.+eps))
-      points.Append(GetPoint(t));
+      points.push_back(GetPoint(t));
   }
 
 
@@ -418,11 +418,11 @@ namespace netgen
   template<int D>
   void LineSeg<D> :: GetRawData (Array<double> & data) const
   {
-    data.Append(2);
+    data.push_back(2);
     for(int i=0; i<D; i++)
-      data.Append(p1[i]);
+      data.push_back(p1[i]);
     for(int i=0; i<D; i++)
-      data.Append(p2[i]);
+      data.push_back(p2[i]);
   }
 
 
@@ -540,7 +540,7 @@ namespace netgen
   DiscretePointsSeg<D> ::   DiscretePointsSeg (const Array<Point<D> > & apts)
     : pts (apts)
   { 
-    for(int i=0; i<D; i++)
+    for(unsigned i=0; i<D; i++)
       {
 	p1n(i) = apts[0](i);
 	p2n(i) = apts.Last()(i);
@@ -559,10 +559,10 @@ namespace netgen
   template<int D>
   Point<D> DiscretePointsSeg<D> :: GetPoint (double t) const
   {
-    double t1 = t * (pts.Size()-1);
+    double t1 = t * (pts.size()-1);
     int segnr = int(t1);
     if (segnr < 0) segnr = 0;
-    if (segnr >= pts.Size()) segnr = pts.Size()-1;
+    if (segnr >= pts.size()) segnr = pts.size()-1;
 
     double rest = t1 - segnr;
     
@@ -628,8 +628,8 @@ namespace netgen
     p2n.hmax = 1e99;
     */
 
-    int m=pts.Size()+ORDER;
-    ti.SetSize(m);
+    int m=pts.size()+ORDER;
+    ti.resize(m);
     // b.SetSize(m-1);
     ti=0;    
     //    b=0.0;
@@ -648,7 +648,7 @@ namespace netgen
   template<int D,int ORDER>
   Point<D> BSplineSeg<D,ORDER> :: GetPoint (double t_in) const
   {    
-    int m=pts.Size()+ORDER;           
+    int m=pts.size()+ORDER;           
 
     double t = t_in * (m-2*ORDER+1);    
 

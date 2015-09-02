@@ -102,14 +102,14 @@ BuildVolumeElements (Array<class Element2d> & surfels,
 void Identification :: 
 GetIdentifiedFaces (Array<INDEX_2> & idfaces) const
 {
-  idfaces.SetSize(0);
+  idfaces.resize(0);
   for (int i = 1; i <= identfaces.GetNBags(); i++)
     for (int j = 1; j <= identfaces.GetBagSize(i); j++)
       {
 	INDEX_2 i2;
 	int val;
 	identfaces.GetData (i, j, i2, val);
-	idfaces.Append (i2);
+	idfaces.push_back (i2);
       }
 }
 
@@ -460,11 +460,11 @@ BuildSurfaceElements (Array<Segment> & segs,
             {
 	      for (int k = 0; k < sel.GetNP(); k++)
                 if (!copy_points.Contains (sel[k]))
-                  copy_points.Append (sel[k]);
+                  copy_points.push_back (sel[k]);
             }      
         }
       BubbleSort (copy_points);
-      for (int k = 0; k < copy_points.Size(); k++)
+      for (int k = 0; k < copy_points.size(); k++)
         GetIdentifiedPoint (mesh, copy_points[k]);
 
 
@@ -502,7 +502,7 @@ BuildSurfaceElements (Array<Segment> & segs,
       // (*mystd::cout) << " copy face " << facei << " from face " << fother;
       PrintMessage (4, " copy face ", facei, " from face ", fother);
       
-      segs.SetSize(0);
+      segs.resize(0);
     }
 }
 
@@ -551,7 +551,7 @@ CloseSurfaceIdentification (int anr,
   ref_levels_s1 = int (flags.GetNumFlag ("reflevels1", 0));
   ref_levels_s2 = int (flags.GetNumFlag ("reflevels2", 0));
   slices = flags.GetNumListFlag ("slices");
-  for(int i=0; i<slices.Size(); i++)
+  for(int i=0; i<slices.size(); i++)
     if((i==0 && slices[i] <= 0) ||
        (i>0 && slices[i] <= slices[i-1]) ||
        (slices[i] >= 1))
@@ -678,8 +678,8 @@ Identifyable (const SpecialPoint & sp1, const SpecialPoint & sp2,
 	}
       else
 	{
-	  hsurf.SetSize (geom.GetNSurf());
-	  for (int j = 0; j < hsurf.Size(); j++)
+	  hsurf.resize (geom.GetNSurf());
+	  for (int j = 0; j < hsurf.size(); j++)
 	    hsurf[j] = j;
 	}
     }
@@ -687,10 +687,10 @@ Identifyable (const SpecialPoint & sp1, const SpecialPoint & sp2,
   if (domain)
     {
       bool has1 = 0, has2 = 0;
-      for (int i = 0; i < specpoint2solid[sp1.nr].Size(); i++)
+      for (int i = 0; i < specpoint2solid[sp1.nr].size(); i++)
 	if (specpoint2solid[sp1.nr][i] == dom_nr)
 	  { has1 = 1; break; }
-      for (int i = 0; i < specpoint2solid[sp2.nr].Size(); i++)
+      for (int i = 0; i < specpoint2solid[sp2.nr].size(); i++)
 	if (specpoint2solid[sp2.nr][i] == dom_nr)
 	  { has2 = 1; break; }
 
@@ -746,17 +746,17 @@ Identifyable (const SpecialPoint & sp1, const SpecialPoint & sp2,
       if (snr1 < snr2) 
 	{
 	  j++;
-	  if (j == specpoint2surface[sp1.nr].Size()) break;
+	  if (j == specpoint2surface[sp1.nr].size()) break;
 	}
       else if (snr2 < snr1) 
 	{
 	  k++;
-	  if (k == specpoint2surface[sp2.nr].Size()) break;
+	  if (k == specpoint2surface[sp2.nr].size()) break;
 	}
       else
 	{
 	  bool dom_surf = 0;
-	  for (int l = 0; l < domain_surfaces.Size(); l++)
+	  for (int l = 0; l < domain_surfaces.size(); l++)
 	    if (domain_surfaces[l] == snr1)
 	      dom_surf = 1;
 
@@ -773,9 +773,9 @@ Identifyable (const SpecialPoint & sp1, const SpecialPoint & sp2,
 	    }
 
 	  j++;
-	  if (j == specpoint2surface[sp1.nr].Size()) break;
+	  if (j == specpoint2surface[sp1.nr].size()) break;
 	  k++;
-	  if (k == specpoint2surface[sp2.nr].Size()) break;
+	  if (k == specpoint2surface[sp2.nr].size()) break;
 	}
     }
 
@@ -953,7 +953,7 @@ void CloseSurfaceIdentification :: IdentifyPoints (Mesh & mesh)
 
   for (int i2 = 1; i2 <= np; i2++)
     if (s2->PointOnSurface (mesh.Point(i2)))
-      points_on_surf2.Append (i2);
+      points_on_surf2.push_back (i2);
     
   Array<int> surfs_of_p1;
 
@@ -975,16 +975,16 @@ void CloseSurfaceIdentification :: IdentifyPoints (Mesh & mesh)
 	  n1 = s1->GetNormalVector (p1);
 	  n1.Normalize();
 	   
-	  surfs_of_p1.SetSize(0);
-	  for (int jj = 0; jj < domain_surfaces.Size(); jj++)
+	  surfs_of_p1.resize(0);
+	  for (int jj = 0; jj < domain_surfaces.size(); jj++)
 	    {
 	      int j = domain_surfaces[jj];
 	      if (geom.GetSurface(j) -> PointOnSurface(p1))
-		surfs_of_p1.Append (j);
+		surfs_of_p1.push_back (j);
 	    }
 	  //std::cerr << " surfs of p1 = " <<std::endl << surfs_of_p1 <<std::endl;
 
-	  for (int ii2 = 0; ii2 < points_on_surf2.Size(); ii2++)
+	  for (int ii2 = 0; ii2 < points_on_surf2.size(); ii2++)
 	    {
 	      int i2 = points_on_surf2[ii2];
 	      if (i2 == i1) continue;
@@ -994,7 +994,7 @@ void CloseSurfaceIdentification :: IdentifyPoints (Mesh & mesh)
 	      n.Normalize();
 	      
 	      bool joint = 0;
-	      for (int jj = 0; jj < surfs_of_p1.Size(); jj++)
+	      for (int jj = 0; jj < surfs_of_p1.size(); jj++)
 		{
 		  int j = surfs_of_p1[jj];
 		  if (geom.GetSurface(j) -> PointOnSurface(p2))
@@ -1112,15 +1112,15 @@ void CloseSurfaceIdentification :: IdentifyFaces (class Mesh & mesh)
 		}
 	      
 
-	      segs_on_face1.SetSize(0);
-	      segs_on_face2.SetSize(0);
+	      segs_on_face1.resize(0);
+	      segs_on_face2.resize(0);
 
 	      for (int k = 1; k <= mesh.GetNSeg(); k++)
 		{
 		  if (mesh.LineSegment(k).si == fi1)
-		    segs_on_face1.Append (k);
+		    segs_on_face1.push_back (k);
 		  if (mesh.LineSegment(k).si == fi2)
-		    segs_on_face2.Append (k);
+		    segs_on_face2.push_back (k);
 		}
 
 
@@ -1138,7 +1138,7 @@ void CloseSurfaceIdentification :: IdentifyFaces (class Mesh & mesh)
 		      if (seg2.si != fi2)
 			continue;
 		  */
-		  for (int ll = 0; ll < segs_on_face2.Size(); ll++)
+		  for (int ll = 0; ll < segs_on_face2.size(); ll++)
 		    {
 		      int l = segs_on_face2[ll];
 		      const Segment & seg2 = mesh.LineSegment(l);
@@ -1211,7 +1211,7 @@ BuildSurfaceElements (Array<Segment> & segs,
 
   mesh.GetIdentifications().GetMap (nr, identmap);
   
-  for (int i = PointIndex::BASE; i < identmap.Size()+PointIndex::BASE; i++)
+  for (int i = PointIndex::BASE; i < identmap.size()+PointIndex::BASE; i++)
     if (identmap[i])  identmap[identmap[i]] = i;
 
     
@@ -1225,7 +1225,7 @@ BuildSurfaceElements (Array<Segment> & segs,
   //foundseg = false;
 
   // insert quad layer:
-  for (int i1 = 0; i1 < segs.Size(); i1++)
+  for (int i1 = 0; i1 < segs.size(); i1++)
     {
       const Segment & s1 = segs[i1];
       if (identmap[s1[0]] && identmap[s1[1]])
@@ -1278,7 +1278,7 @@ BuildSurfaceElements (Array<Segment> & segs,
       //for(int i=0; i<segs.Size();i++)
       //	if(!foundseg[i])
       //	  aux.Append(segs[i]);
-      segs.SetSize(0);
+      segs.resize(0);
     }
   else
     {
@@ -1301,7 +1301,7 @@ BuildSurfaceElements2 (Array<Segment> & segs,
   //  std::cerr << "copy trig face, identnr = " << nr <<std::endl;
   //  std::cerr << "identfaces = " <<std::endl << identfaces <<std::endl;
 
-  if (!segs.Size()) return;
+  if (!segs.size()) return;
 
   bool found = 0;
   int fother = -1;
@@ -1375,7 +1375,7 @@ BuildSurfaceElements2 (Array<Segment> & segs,
     {
       // (*mystd::cout) << " copy face " << facei << " from face " << fother;
       PrintMessage (4, " copy face ", facei, " from face ", fother);
-      segs.SetSize(0);
+      segs.resize(0);
     }
 }
 
@@ -1614,7 +1614,7 @@ BuildSurfaceElements (Array<Segment> & segs,
   if (surf != facet)
     return;
 
-  for (int i1 = 1; i1 <= segs.Size(); i1++)
+  for (int i1 = 1; i1 <= segs.size(); i1++)
     for (int i2 = 1; i2 < i1; i2++)
       {
 	const Segment & s1 = segs.Get(i1);
@@ -1655,7 +1655,7 @@ BuildSurfaceElements (Array<Segment> & segs,
       }
 
   if (found)
-    segs.SetSize(0);
+    segs.resize(0);
 }
 
 }

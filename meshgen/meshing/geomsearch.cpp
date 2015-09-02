@@ -80,7 +80,7 @@ namespace netgen
 	Vec3d midext(0,0,0);
       
 	//get max Extension of Frontfaces
-	for (i = 1; i <= faces->Size(); i++)
+	for (i = 1; i <= faces->size(); i++)
 	  {
 	    ElemMaxExt(minp, maxp, faces->Get(i).Face());
 	    MinCoords(minp, minext);
@@ -92,7 +92,7 @@ namespace netgen
 	maxextreal = maxext;
 	maxext = maxext + 1e-4 * (maxext - minext);
 
-	midext*=1./faces->Size();
+	midext*=1./faces->size();
 	Vec3d boxext = maxext - minext;
       
 	//delete old Hashtable:
@@ -114,7 +114,7 @@ namespace netgen
 	elemsize.Z()=boxext.Z()/size.i3;
 
 	//create Hasharrays:
-	hashtable.SetSize(size.i1*size.i2*size.i3);
+	hashtable.resize(size.i1*size.i2*size.i3);
 	for (i = 1; i <= size.i1; i++)
 	  {
 	    for (j = 1; j <= size.i2; j++)
@@ -137,14 +137,14 @@ namespace netgen
 		for (k = 1; k <= size.i3; k++)
 		  {
 		    INDEX ind=i+(j-1)*size.i1+(k-1)*size.i2*size.i1;
-		    hashtable.Elem(ind)->SetSize(0);
+		    hashtable.Elem(ind)->resize(0);
 		  }
 	      }
 	  }	  
       }
   
     //Faces in Hashtable einfuegen:
-    for (i = 1; i <= faces->Size(); i++)
+    for (i = 1; i <= faces->size(); i++)
       {
 	AddElem(faces->Get(i).Face(),i);
       }
@@ -173,7 +173,7 @@ namespace netgen
                 std::cerr << "Position: " << ix << "," << iy << "," << iz << std::endl;
 		    throw NgException ("Illegal position in Geomsearch");
               }
-            hashtable.Elem(ind)->Append(elemnum);		      
+            hashtable.Elem(ind)->push_back(elemnum);		      
           }
   }
 
@@ -215,7 +215,7 @@ namespace netgen
 	      
 		//go through all elements in one hash area
 		const Array <int> & area = *hashtable.Elem(ind);
-		for (k = 1; k <= area.Size(); k++)
+		for (k = 1; k <= area.size(); k++)
 		  {
 		    cnt2++;
 		    i = area.Get(k);
@@ -240,8 +240,8 @@ namespace netgen
                            (Dist2 (midp, p0) <= xh*xh) )  // by Jochen Wild
 			  {
 			    cnt3++;
-			    locfaces.Append(faces->Get(i).Face());
-			    findex.Append(i);
+			    locfaces.push_back(faces->Get(i).Face());
+			    findex.push_back(i);
 			    faces->Elem(i).SetHashValue(hashcount);
 			  }
 		      }

@@ -11,7 +11,7 @@ namespace netgen
   double MinFunctionSum :: Func (const Vector & x) const
   {
     double retval = 0;
-    for(int i=0; i<functions.Size(); i++)
+    for(int i=0; i<functions.size(); i++)
       retval += functions[i]->Func(x);
       
     return retval;
@@ -21,7 +21,7 @@ namespace netgen
   {
     g = 0.;
     VectorMem<3> gi;
-    for(int i=0; i<functions.Size(); i++)
+    for(int i=0; i<functions.size(); i++)
       {
 	functions[i]->Grad(x,gi);
 	for(int j=0; j<g.Size(); j++)
@@ -35,7 +35,7 @@ namespace netgen
     double retval = 0;
     g = 0.;
     VectorMem<3> gi;
-    for(int i=0; i<functions.Size(); i++)
+    for(int i=0; i<functions.size(); i++)
       {
 	retval += functions[i]->FuncGrad(x,gi);
 	for(int j=0; j<g.Size(); j++)
@@ -49,7 +49,7 @@ namespace netgen
     double retval = 0;
     deriv = 0.;
     double derivi;
-    for(int i=0; i<functions.Size(); i++)
+    for(int i=0; i<functions.size(); i++)
       {
 	retval += functions[i]->FuncDeriv(x,dir,derivi);
 	deriv += derivi;
@@ -60,7 +60,7 @@ namespace netgen
   double MinFunctionSum :: GradStopping (const Vector & x) const
   {
     double minfs(0), mini;
-    for(int i=0; i<functions.Size(); i++)
+    for(int i=0; i<functions.size(); i++)
       {
 	mini = functions[i]->GradStopping(x);
 	if(i==0 || mini < minfs)
@@ -72,7 +72,7 @@ namespace netgen
 
   void MinFunctionSum :: AddFunction(MinFunction & fun)
   {
-    functions.Append(&fun);
+    functions.push_back(&fun);
   }
   
   const MinFunction & MinFunctionSum :: Function(int i) const
@@ -99,7 +99,7 @@ namespace netgen
     double badness = 0;
     Point<3> pp(vp(0), vp(1), vp(2));
 
-    for (int j = 0; j < faces.Size(); j++)
+    for (int j = 0; j < faces.size(); j++)
       {
 	const INDEX_3 & el = faces[j];
 
@@ -193,7 +193,7 @@ namespace netgen
     h = ah;
   
 
-    int nf = faces.Size();
+    int nf = faces.size();
 
     m.SetSize (nf, 4);
   
@@ -322,9 +322,9 @@ namespace netgen
   PointFunction :: PointFunction (Mesh::T_POINTS & apoints, 
 				  const Mesh::T_VOLELEMENTS & aelements,
 				  const MeshingParameters & amp)
-    : points(apoints), elements(aelements), elementsonpoint(apoints.Size()), mp(amp)
+    : points(apoints), elements(aelements), elementsonpoint(apoints.size()), mp(amp)
   {
-    for (int i = 0; i < elements.Size(); i++)
+    for (int i = 0; i < elements.size(); i++)
       if (elements[i].NP() == 4)
         for (int j = 0; j < elements[i].NP(); j++)
           elementsonpoint.Add (elements[i][j], i);  
@@ -345,7 +345,7 @@ namespace netgen
     hp = points[actpind];
     points[actpind] = Point<3> (pp);
 
-    for (int j = 0; j < elementsonpoint[actpind].Size(); j++)
+    for (int j = 0; j < elementsonpoint[actpind].size(); j++)
       {
         const Element & el = elements[elementsonpoint[actpind][j]];
 	badness += CalcTetBadness (points[el[0]], points[el[1]], 
@@ -365,7 +365,7 @@ namespace netgen
     Vec<3> vgradi, vgrad(0,0,0);
     points[actpind] = Point<3> (pp);
 
-    for (int j = 0; j < elementsonpoint[actpind].Size(); j++)
+    for (int j = 0; j < elementsonpoint[actpind].size(); j++)
       {
         const Element & el = elements[elementsonpoint[actpind][j]];
 	for (int k = 0; k < 4; k++)
@@ -395,7 +395,7 @@ namespace netgen
     points[actpind] = pp;
     double f = 0;
 
-    for (int j = 0; j < elementsonpoint[actpind].Size(); j++)
+    for (int j = 0; j < elementsonpoint[actpind].size(); j++)
       {
         const Element & el = elements[elementsonpoint[actpind][j]];
 
@@ -421,7 +421,7 @@ namespace netgen
     // try point movement 
     Array<Element2d> faces;
   
-    for (int j = 0; j < elementsonpoint[actpind].Size(); j++)
+    for (int j = 0; j < elementsonpoint[actpind].size(); j++)
       {
 	const Element & el = 
 	  elements[elementsonpoint[actpind][j]];
@@ -432,7 +432,7 @@ namespace netgen
 	      Element2d face;
 	      el.GetFace (k, face);
 	      std::swap (face.PNum(2), face.PNum(3));
-	      faces.Append (face);
+	      faces.push_back (face);
 	    }
       }
   
@@ -495,7 +495,7 @@ namespace netgen
   {
     actpind = aactpind; 
 
-    int ne = elementsonpoint[actpind].Size();
+    int ne = elementsonpoint[actpind].size();
     int i, j;
     PointIndex pi1, pi2, pi3;
 
@@ -923,12 +923,12 @@ double CalcTotalBad (const Mesh::T_POINTS & points,
   double sum = 0;
   double elbad;
   
-  tets_in_qualclass.SetSize(20);
+  tets_in_qualclass.resize(20);
   tets_in_qualclass = 0;
 
   double teterrpow = mp.opterrpow;
 
-  for (int i = 1; i <= elements.Size(); i++)
+  for (int i = 1; i <= elements.size(); i++)
     {
       elbad = pow (max2(CalcBad (points, elements.Get(i), 0, mp),1e-10),
 		   1/teterrpow);
@@ -998,12 +998,12 @@ int WrongOrientation (const Mesh::T_POINTS & points, const Element & el)
 JacobianPointFunction :: 
 JacobianPointFunction (Mesh::T_POINTS & apoints, 
 		       const Mesh::T_VOLELEMENTS & aelements)
-  : points(apoints), elements(aelements), elementsonpoint(apoints.Size())
+  : points(apoints), elements(aelements), elementsonpoint(apoints.size())
 {
   INDEX i;
   int j;
   
-  for (i = 1; i <= elements.Size(); i++)
+  for (i = 1; i <= elements.size(); i++)
     {
       for (j = 1; j <= elements.Get(i).NP(); j++)
 	elementsonpoint.Add1 (elements.Get(i).PNum(j), i);  
@@ -1158,195 +1158,6 @@ FuncDeriv (const Vector & x, const Vector & dir, double & deriv) const
   return badness;
   
 }
-
-
-
-
-
-
-
-
-
-
-#ifdef SOLIDGEOMxxxx
-void Mesh :: ImproveMesh (const CSGeometry & geometry, OPTIMIZEGOAL goal)
-{
-  INDEX i, eli;
-  int j;
-  int typ = 1;
-
-  if (!&geometry || geometry.GetNSurf() == 0)
-    {
-      ImproveMesh (goal);
-      return;
-    }
-
-  const char * savetask = multithread.task;
-  multithread.task = "Smooth Mesh";
-
-
-  TABLE<INDEX> surfelementsonpoint(points.Size());
-  Vector x(3), xsurf(2), xedge(1);
-  int surf, surf1, surf2, surf3;
-
-  int uselocalh = mparam.uselocalh;
-
-  std::cerr << std::setprecision(8);
-  std::cerr << "Improve Mesh" << "\n";
-  PrintMessage (3, "ImproveMesh");
-  //  (*mystd::cout) << "Vol = " << CalcVolume (points, volelements) <<std::endl;
-
-
-  for (i = 1; i <= surfelements.Size(); i++)
-    for (j = 1; j <= 3; j++)
-      surfelementsonpoint.Add1 (surfelements.Get(i).PNum(j), i);
-
-
-  PointFunction * pf;
-  if (typ == 1)
-    pf = new PointFunction(points, volelements);
-  else
-    pf = new CheapPointFunction(points, volelements);
-
-  //  pf->SetLocalH (h);
-  
-  Opti3FreeMinFunction freeminf(*pf);
-  Opti3SurfaceMinFunction surfminf(*pf);
-  Opti3EdgeMinFunction edgeminf(*pf);
-  
-  OptiParameters par;
-  par.maxit_linsearch = 20;
-  par.maxit_bfgs = 20;
-
-  int printmod = 1;
-  char printdot = '.';
-  if (points.Size() > 1000)
-    {
-      printmod = 10;
-      printdot = '+';
-    }
-  if (points.Size() > 10000)
-    {
-      printmod = 100;
-      printdot = '*';
-    }
-
-  for (i = 1; i <= points.Size(); i++)
-    {
-      //      if (ptyps.Get(i) == FIXEDPOINT) continue;
-      if (ptyps.Get(i) != INNERPOINT) continue;
-
-      if (multithread.terminate)
-	throw NgException ("Meshing stopped");
-      /*
-      if (multithread.terminate)
-	break;
-      */
-      multithread.percent = 100.0 * i /points.Size();
-
-      /*
-      if (points.Size() < 1000)
-	PrintDot ();
-      else
-	if (i % 10 == 0)
-	  PrintDot ('+');
-      */
-      if (i % printmod == 0) PrintDot (printdot);
-
-      //    std::cerr << "Now point " << i << "\n";
-      //    std::cerr << "Old: " << points.Get(i) << "\n";
-
-      pf->SetPointIndex (i);
-
-      //      if (uselocalh)
-      {
-	double lh = GetH (points.Get(i));
-	pf->SetLocalH (GetH (points.Get(i)));
-	par.typx = lh / 10;
-	//	  std::cerr << "lh(" << points.Get(i) << ") = " << lh << "\n";
-      }
-
-      surf1 = surf2 = surf3 = 0;
-
-      for (j = 1; j <= surfelementsonpoint.EntrySize(i); j++)
-	{
-	  eli = surfelementsonpoint.Get(i, j);
-	  int surfi = surfelements.Get(eli).GetIndex();
-
-	  if (surfi)
-	    {
-	      surf = GetFaceDescriptor(surfi).SurfNr();
-	    
-	      if (!surf1)
-		surf1 = surf;
-	      else if (surf1 != surf)
-		{
-		  if (!surf2)
-		    surf2 = surf;
-		  else if (surf2 != surf)
-		    surf3 = surf;
-		}
-	    }
-	  else
-	    {
-	      surf1 = surf2 = surf3 = 1;   // simulates corner point
-	    }
-	}
-
-
-      if (surf2 && !surf3)
-	{
-	  //      std::cerr << "On Edge" << "\n";
-	  /*
-	    xedge = 0;
-	    edgeminf.SetPoint (geometry.GetSurface(surf1),
-	    geometry.GetSurface(surf2), 
-	    points.Elem(i));
-	    BFGS (xedge, edgeminf, par);
-
-	    edgeminf.CalcNewPoint (xedge, points.Elem(i));
-	  */
-	}
-
-      if (surf1 && !surf2)
-	{
-	  //      std::cerr << "In Surface" << "\n";
-	  /*
-	    xsurf = 0;
-	    surfminf.SetPoint (geometry.GetSurface(surf1),
-	    points.Get(i));
-	    BFGS (xsurf, surfminf, par);
-   
-	    surfminf.CalcNewPoint (xsurf, points.Elem(i));
-	  */
-	}
- 
-      if (!surf1)
-	{
-	  //      std::cerr << "In Volume" << "\n";
-	  x = 0;
-	  freeminf.SetPoint (points.Elem(i));
-	  //	  par.typx = 
-	  BFGS (x, freeminf, par);
-
-	  points.Elem(i).X() += x.Get(1);
-	  points.Elem(i).Y() += x.Get(2);
-	  points.Elem(i).Z() += x.Get(3);
-	}
-      
-      //    std::cerr << "New Point: " << points.Elem(i) << "\n" << "\n";
-    
-    }
-  PrintDot ('\n');
-  //  (*mystd::cout) << "Vol = " << CalcVolume (points, volelements) <<std::endl;
-
-  multithread.task = savetask;
-
-}
-#endif
-
-
-
   
 void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
 {
@@ -1396,9 +1207,6 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
   Vector x(3);
   
   std::cerr << std::setprecision(8);
-  
-  //int uselocalh = mparam.uselocalh;
-
 
   PointFunction * pf;
 
@@ -1415,11 +1223,11 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
   par.maxit_linsearch = 20;
   par.maxit_bfgs = 20;
 
-  Array<double, PointIndex::BASE> pointh (points.Size());
+  Array<double, PointIndex::BASE> pointh (points.size());
 
   if(lochfunc)
     {
-      for(int i=1; i<=points.Size(); i++)
+      for(int i=1; i<=points.size(); i++)
 	pointh[i] = GetH(points.Get(i));
     }
   else
@@ -1438,12 +1246,12 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
 
   int printmod = 1;
   char printdot = '.';
-  if (points.Size() > 1000)
+  if (points.size() > 1000)
     {
       printmod = 10;
       printdot = '+';
     }
-  if (points.Size() > 10000)
+  if (points.size() > 10000)
     {
       printmod = 100;
       printdot = '*';
@@ -1459,7 +1267,7 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
 	if (multithread.terminate)
 	  throw NgException ("Meshing stopped");
 
-	multithread.percent = 100.0 * (pi+1-PointIndex::BASE) / points.Size();
+	multithread.percent = 100.0 * (pi+1-PointIndex::BASE) / points.size();
         /*
 	if (points.Size() < 1000)
 	  PrintDot ();
@@ -1552,11 +1360,11 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
 	  badnodes.Set (el.PNum(j));
     }
 
-  Array<double, PointIndex::BASE> pointh (points.Size());
+  Array<double, PointIndex::BASE> pointh (points.size());
 
   if(lochfunc)
     {
-      for(i = 1; i<=points.Size(); i++)
+      for(i = 1; i<=points.size(); i++)
 	pointh[i] = GetH(points.Get(i));
     }
   else
@@ -1598,9 +1406,9 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
       if (multithread.terminate)
 	throw NgException ("Meshing stopped");
 
-      multithread.percent = 100.0 * i / points.Size();
+      multithread.percent = 100.0 * i / points.size();
 
-      if (points.Size() < 1000)
+      if (points.size() < 1000)
 	PrintDot ();
       else
 	if (i % 10 == 0)
@@ -1672,14 +1480,14 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 	{
 	  if(GetIdentifications().GetType(i) == Identifications::PERIODIC)
 	    {
-	      locidmaps.Append(new Array<int,PointIndex::BASE>);
+	      locidmaps.push_back(new Array<int,PointIndex::BASE>);
 	      GetIdentifications().GetMap(i,*locidmaps.Last(),true);
 	    }
 	}
     }
 
   
-  bool usesum = (used_idmaps->Size() > 0);
+  bool usesum = (used_idmaps->size() > 0);
   MinFunctionSum pf_sum;
   
   JacobianPointFunction * pf2ptr = NULL;
@@ -1707,11 +1515,11 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 	  badnodes.Set (el.PNum(j));
     }
 
-  Array<double, PointIndex::BASE> pointh (points.Size());
+  Array<double, PointIndex::BASE> pointh (points.size());
  
   if(lochfunc)
     {
-      for(i=1; i<=points.Size(); i++)
+      for(i=1; i<=points.size(); i++)
 	pointh[i] = GetH(points.Get(i));
     }
   else
@@ -1747,9 +1555,9 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 	if (multithread.terminate)
 	  throw NgException ("Meshing stopped");
 
-	multithread.percent = 100.0 * i / points.Size();
+	multithread.percent = 100.0 * i / points.size();
 
-	if (points.Size() < 1000)
+	if (points.size() < 1000)
 	  PrintDot ();
 	else
 	  if (i % 10 == 0)
@@ -1763,9 +1571,9 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 	PointIndex brother (-1);
 	if(usesum)
 	  {
-	    for(j=0; brother == -1 && j<used_idmaps->Size(); j++)
+	    for(j=0; brother == -1 && j<used_idmaps->size(); j++)
 	      {
-		if(i < (*used_idmaps)[j]->Size() + PointIndex::BASE)
+		if(i < (*used_idmaps)[j]->size() + PointIndex::BASE)
 		  {
 		    brother = (*(*used_idmaps)[j])[i];
 		    if(brother == i || brother == 0)
@@ -1822,7 +1630,7 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
   PrintDot ('\n');
 
   delete pf2ptr;
-  for(i=0; i<locidmaps.Size(); i++)
+  for(i=0; i<locidmaps.size(); i++)
     delete locidmaps[i];
 
   multithread.task = savetask;

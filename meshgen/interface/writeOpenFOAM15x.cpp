@@ -717,20 +717,20 @@ namespace netgen
 
       // Build the owner, neighbour, faces and boundary lists 
       // from the Netgen mesh
-      std::cout << "\nBuilding Owner, Neighbour and Face Lists: ";
+//      std::cout << "\nBuilding Owner, Neighbour and Face Lists: ";
 
       error = BuildOwnerNeighbourLists(mesh);
 
-      std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+//      std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
 
 
       // Write the "owner" file
       if(outfile_own->good() && !error)
       {
-         std::cout << "Writing the owner file: ";
+//         std::cout << "Writing the owner file: ";
          WriteOwnerFile(outfile_own);
          delete outfile_own;
-         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+//         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
@@ -742,10 +742,10 @@ namespace netgen
       // Write the "neighbour" file
       if(outfile_nei->good() && !error)
       {
-         std::cout << "Writing the neighbour file: ";
+//         std::cout << "Writing the neighbour file: ";
          WriteNeighbourFile(outfile_nei);
          delete outfile_nei;
-         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+//         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
@@ -757,10 +757,10 @@ namespace netgen
       // Write the "faces" file
       if(outfile_faces->good() && !error)
       {
-         std::cout << "Writing the faces file: ";
+//         std::cout << "Writing the faces file: ";
          WriteFacesFile(outfile_faces, mesh);
          delete outfile_faces;
-         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+//         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
@@ -772,10 +772,10 @@ namespace netgen
       // Write the "points" file
       if(outfile_pnts->good() && !error)
       {
-         std::cout << "Writing the points file: ";
+//         std::cout << "Writing the points file: ";
          WritePointsFile(outfile_pnts,mesh);
          delete outfile_pnts;
-         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+//         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
@@ -787,10 +787,10 @@ namespace netgen
       // Write the "boundary" file
       if(outfile_bnd->good() && !error)
       {
-         std::cout << "Writing the boundary file: ";
+//         std::cout << "Writing the boundary file: ";
          WriteBoundaryFile(outfile_bnd);
          delete outfile_bnd;
-         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
+//         std::cout << "Done! (Time Elapsed = " << GetTime() << " sec)\n";
       }
       else
       {
@@ -800,7 +800,7 @@ namespace netgen
 
       if(!error)
       {
-         std::cout << "OpenFOAM 1.5+ Export successfully completed (Time elapsed = " << GetTime() << " sec) !\n";
+         std::cout << "OpenFOAM 1.5+ Export successfully completed !\n";
       }
       else
       {

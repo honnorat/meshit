@@ -13,8 +13,8 @@ BSplineCurve2d :: BSplineCurve2d ()
 
 void BSplineCurve2d :: AddPoint (const Point<2> & apoint)
 {
-  points.Append (apoint);
-  intervallused.Append (0);
+  points.push_back (apoint);
+  intervallused.push_back (0);
 }
 
 bool BSplineCurve2d :: Inside (const Point<2> & p, double & dist) const
@@ -41,7 +41,7 @@ double BSplineCurve2d :: ProjectParam (const Point<2> & p) const
   
   mindist = 1e10;
   dt = 0.2;
-  for (n1 = 1; n1 <= points.Size(); n1++)
+  for (n1 = 1; n1 <= points.size(); n1++)
     if (intervallused.Get(n1) == 0)
       for (t = n1; t <= n1+1; t += dt)
         if (Dist (Eval(t), p) < mindist)
@@ -52,7 +52,7 @@ double BSplineCurve2d :: ProjectParam (const Point<2> & p) const
     
   if (mindist > 1e9) 
     {
-      for (t = 0; t <= points.Size(); t += dt)
+      for (t = 0; t <= points.size(); t += dt)
 	if (Dist (Eval(t), p) < mindist)
 	  {
 	    mint = t;
@@ -96,13 +96,13 @@ Point<2> BSplineCurve2d :: Eval (double t) const
   b2 = 0.5 - b4;
   b3 = 0.5 - b1;
   
-  n1 = (n + 10 * points.Size() -1) % points.Size() + 1;
+  n1 = (n + 10 * points.size() -1) % points.size() + 1;
   n2 = n1+1;
-  if (n2 > points.Size()) n2 = 1;
+  if (n2 > points.size()) n2 = 1;
   n3 = n2+1;
-  if (n3 > points.Size()) n3 = 1;
+  if (n3 > points.size()) n3 = 1;
   n4 = n3+1;
-  if (n4 > points.Size()) n4 = 1;
+  if (n4 > points.size()) n4 = 1;
 
   //  (*mystd::cout) << "t = " << t << " n = " << n << " loct = " << loct 
   //      << " n1 = " << n1 <<std::endl;
@@ -129,13 +129,13 @@ Vec<2> BSplineCurve2d :: EvalPrime (double t) const
   db2 = -db4;
   db3 = -db1;
   
-  n1 = (n + 10 * points.Size() -1) % points.Size() + 1;
+  n1 = (n + 10 * points.size() -1) % points.size() + 1;
   n2 = n1+1;
-  if (n2 > points.Size()) n2 = 1;
+  if (n2 > points.size()) n2 = 1;
   n3 = n2+1;
-  if (n3 > points.Size()) n3 = 1;
+  if (n3 > points.size()) n3 = 1;
   n4 = n3+1;
-  if (n4 > points.Size()) n4 = 1;
+  if (n4 > points.size()) n4 = 1;
   
   hv(0) = db1 * points.Get(n1)(0) + db2 * points.Get(n2)(0) +
     db3 * points.Get(n3)(0) + db4 * points.Get(n4)(0);
@@ -158,13 +158,13 @@ Vec<2> BSplineCurve2d :: EvalPrimePrime (double t) const
   ddb2 = -0.5;
   ddb3 = -0.5;
   
-  n1 = (n + 10 * points.Size() -1) % points.Size() + 1;
+  n1 = (n + 10 * points.size() -1) % points.size() + 1;
   n2 = n1+1;
-  if (n2 > points.Size()) n2 = 1;
+  if (n2 > points.size()) n2 = 1;
   n3 = n2+1;
-  if (n3 > points.Size()) n3 = 1;
+  if (n3 > points.size()) n3 = 1;
   n4 = n3+1;
-  if (n4 > points.Size()) n4 = 1;
+  if (n4 > points.size()) n4 = 1;
   
   hv(0) = ddb1 * points.Get(n1)(0) + ddb2 * points.Get(n2)(0) +
     ddb3 * points.Get(n3)(0) + ddb4 * points.Get(n4)(0);
@@ -177,7 +177,7 @@ Vec<2> BSplineCurve2d :: EvalPrimePrime (double t) const
 int BSplineCurve2d :: SectionUsed (double t) const
 {
   int n1 = int(t);   
-  n1 = (n1 + 10 * points.Size() - 1) % points.Size() + 1;
+  n1 = (n1 + 10 * points.size() - 1) % points.size() + 1;
   return (intervallused.Get(n1) == 0);
 }
 
@@ -191,7 +191,7 @@ void BSplineCurve2d :: Reduce (const Point<2> & p, double rad)
   
   redlevel++;
   
-  for (n1 = 1; n1 <= points.Size(); n1++)
+  for (n1 = 1; n1 <= points.size(); n1++)
     {
       if (intervallused.Get(n1) != 0) continue;
     
@@ -202,7 +202,7 @@ void BSplineCurve2d :: Reduce (const Point<2> & p, double rad)
       for (j = 1; j <= 3; j++)
 	{
 	  n++;
-	  if (n > points.Size()) n = 1;
+	  if (n > points.size()) n = 1;
 	  if (points.Get(n)(0) < minx) minx = points.Get(n)(0);
 	  if (points.Get(n)(1) < miny) miny = points.Get(n)(1);
 	  if (points.Get(n)(0) > maxx) maxx = points.Get(n)(0);
@@ -227,7 +227,7 @@ void BSplineCurve2d :: Reduce (const Point<2> & p, double rad)
 void BSplineCurve2d :: UnReduce () 
 {
   int i;
-  for (i = 1; i <= intervallused.Size(); i++)
+  for (i = 1; i <= intervallused.size(); i++)
     if (intervallused.Get(i) == redlevel)
       intervallused.Set (i, 0);
   redlevel--;
@@ -235,8 +235,8 @@ void BSplineCurve2d :: UnReduce ()
   
 void BSplineCurve2d :: Print (ostream & ost) const
 {
-  ost << "SplineCurve: " << points.Size() << " points." <<std::endl;
-  for (int i = 1; i <= points.Size(); i++)
+  ost << "SplineCurve: " << points.size() << " points." <<std::endl;
+  for (int i = 1; i <= points.size(); i++)
     ost << "P" << i << " = " << points.Get(i) <<std::endl;
 }
 }

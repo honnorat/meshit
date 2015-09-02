@@ -98,29 +98,29 @@ namespace netgen
       delete surfaces[i];
     surfaces.DeleteAll ();
     */
-    for(int i = 0; i<delete_them.Size(); i++)
+    for(int i = 0; i<delete_them.size(); i++)
       delete delete_them[i];
     delete_them.DeleteAll();
     surfaces.DeleteAll();
 
-    for (int i = 0; i < toplevelobjects.Size(); i++)
+    for (int i = 0; i < toplevelobjects.size(); i++)
       delete toplevelobjects[i];
     toplevelobjects.DeleteAll ();
-    for (int i = 0; i < triapprox.Size(); i++)
+    for (int i = 0; i < triapprox.size(); i++)
       delete triapprox[i];
     triapprox.DeleteAll();
 
-    for(int i = 0; i < identifications.Size(); i++)
+    for(int i = 0; i < identifications.size(); i++)
       delete identifications[i];
     identifications.DeleteAll();
 
-    for (int i = 0; i < singfaces.Size(); i++)
+    for (int i = 0; i < singfaces.size(); i++)
       delete singfaces[i];
     singfaces.DeleteAll();
-    for (int i = 0; i < singedges.Size(); i++)
+    for (int i = 0; i < singedges.size(); i++)
       delete singedges[i];
     singedges.DeleteAll();
-    for (int i = 0; i < singpoints.Size(); i++)
+    for (int i = 0; i < singpoints.size(); i++)
       delete singpoints[i];
     singpoints.DeleteAll();
 
@@ -172,8 +172,8 @@ namespace netgen
 	if (sol->Name())
 	  ost << "primitive " 
 	      << sol->Name() << " "
-	      << classname << "  " << coeffs.Size();
-	for (int i = 0; i < coeffs.Size(); i++)
+	      << classname << "  " << coeffs.size();
+	for (int i = 0; i < coeffs.size(); i++)
 	  ost << " " << coeffs[i];
 	ost <<std::endl;
       }
@@ -223,7 +223,7 @@ namespace netgen
 	ost <<std::endl;
       }
 
-    for (int i = 0; i < identifications.Size(); i++)
+    for (int i = 0; i < identifications.size(); i++)
       {
 	ost << "identify ";
 	identifications[i] -> GetData (ost);
@@ -255,7 +255,7 @@ namespace netgen
 	if (strcmp (key, "primitive") == 0)
 	  {
 	    ist >> name >> classname >> ncoeff;
-	    coeff.SetSize (ncoeff);
+	    coeff.resize (ncoeff);
 	    for (i = 0; i < ncoeff; i++)
 	      ist >> coeff[i];
 
@@ -330,7 +330,7 @@ namespace netgen
 
   void CSGeometry :: SaveSurfaces (ostream & out) const
   {
-    if(singfaces.Size() > 0 || singedges.Size() > 0 || singpoints.Size() > 0)
+    if(singfaces.size() > 0 || singedges.size() > 0 || singpoints.size() > 0)
       {
 	PrintMessage(3,"Singular faces/edges/points => no csg-information in .vol file");
 	return;
@@ -369,14 +369,14 @@ namespace netgen
 	else if(dummyf)
 	  {
 	    out << "dummy ";
-            coeffs.SetSize(0);
+            coeffs.resize(0);
 	  }
 	else
 	  throw NgException ("Cannot write csg surface. Please, contact developers!");
       
 	
-	out << coeffs.Size() << "\n";
-	for(int j=0; j<coeffs.Size(); j++)
+	out << coeffs.size() << "\n";
+	for(int j=0; j<coeffs.size(); j++)
 	  out << coeffs[j] << " ";
 	    
 	out << "\n";
@@ -405,7 +405,7 @@ namespace netgen
 	in >> classname;
 	in >> size;
 
-	coeffs.SetSize(size);
+	coeffs.resize(size);
 
 	for(int j=0; j<size; j++)
 	  in >> coeffs[j];
@@ -416,7 +416,7 @@ namespace netgen
 	    plane->SetPrimitiveData(coeffs);
 
 	    AddSurface(plane);
-	    delete_them.Append(plane);
+	    delete_them.push_back(plane);
 	  }
 
 	else if(classname == "sphere")
@@ -425,7 +425,7 @@ namespace netgen
 	    sphere->SetPrimitiveData(coeffs);
 
 	    AddSurface(sphere);
-	    delete_them.Append(sphere);
+	    delete_them.push_back(sphere);
 	  }
 
 	else if(classname == "cylinder")
@@ -433,14 +433,14 @@ namespace netgen
 	    Cylinder * cylinder = new Cylinder(coeffs);
 
 	    AddSurface(cylinder);
-	    delete_them.Append(cylinder);
+	    delete_them.push_back(cylinder);
 	  }
 
 	else if(classname == "ellipticcylinder")
 	  {
 	    EllipticCylinder * cylinder = new EllipticCylinder(coeffs);
 	    AddSurface(cylinder);
-	    delete_them.Append(cylinder);
+	    delete_them.push_back(cylinder);
 	  }
 
 
@@ -449,7 +449,7 @@ namespace netgen
 	    Torus * torus = new Torus(dummypoint,dummyvec,dummydouble, dummydouble);
 	    torus->SetPrimitiveData(coeffs);
 	    AddSurface(torus);
-	    delete_them.Append(torus);
+	    delete_them.push_back(torus);
 	  }
 
 
@@ -459,7 +459,7 @@ namespace netgen
 	    cone->SetPrimitiveData(coeffs);
 
 	    AddSurface(cone);
-	    delete_them.Append(cone);
+	    delete_them.push_back(cone);
 	  }
 
 	else if(classname == "extrusionface")
@@ -468,7 +468,7 @@ namespace netgen
 	      new ExtrusionFace(coeffs);
 
 	    AddSurface(ef);
-	    delete_them.Append(ef);
+	    delete_them.push_back(ef);
 	  }
 
 	else if(classname == "revolutionface")
@@ -477,7 +477,7 @@ namespace netgen
 	      new RevolutionFace(coeffs);
 
 	    AddSurface(rf);
-	    delete_them.Append(rf);
+	    delete_them.push_back(rf);
 	  }
 
 	else if(classname == "dummy")
@@ -485,7 +485,7 @@ namespace netgen
 	    Surface * surf = new DummySurface();
             
 	    AddSurface(surf);
-	    delete_them.Append(surf);
+	    delete_them.push_back(surf);
 	  }
 
       }    
@@ -523,7 +523,7 @@ namespace netgen
       {
 	AddSurface (&prim->GetSurface(i));
 	prim->SetSurfaceId (i, GetNSurf()-1);
-	surf2prim.Append (prim);
+	surf2prim.push_back (prim);
       }
   }
 
@@ -651,13 +651,13 @@ namespace netgen
 
   int CSGeometry :: SetTopLevelObject (Solid * sol, Surface * surf)
   {
-    return toplevelobjects.Append (new TopLevelObject (sol, surf)) - 1;
+    return toplevelobjects.push_back (new TopLevelObject (sol, surf)) - 1;
   }
 
   TopLevelObject * CSGeometry :: 
   GetTopLevelObject (const Solid * sol, const Surface * surf)
   {
-    for (int i = 0; i < toplevelobjects.Size(); i++)
+    for (int i = 0; i < toplevelobjects.size(); i++)
       {
 	if (toplevelobjects[i]->GetSolid() == sol &&
 	    toplevelobjects[i]->GetSurface() == surf)
@@ -668,7 +668,7 @@ namespace netgen
 
   void CSGeometry :: RemoveTopLevelObject (Solid * sol, Surface * surf)
   {
-    for (int i = 0; i < toplevelobjects.Size(); i++)
+    for (int i = 0; i < toplevelobjects.size(); i++)
       {
 	if (toplevelobjects[i]->GetSolid() == sol &&
 	    toplevelobjects[i]->GetSurface() == surf)
@@ -683,7 +683,7 @@ namespace netgen
 
   void CSGeometry :: AddIdentification (Identification * ident)
   {
-    identifications.Append (ident);
+    identifications.push_back (ident);
   }
 
   void CSGeometry :: SetFlags (const char * solidname, const Flags & flags)
@@ -697,7 +697,7 @@ namespace netgen
       {
 	solid->GetSurfaceIndices (surfind);
 
-	for (i = 0; i < surfind.Size(); i++)
+	for (i = 0; i < surfind.size(); i++)
 	  {
 	    if (surfaces[surfind[i]]->GetMaxH() > maxh)
 	      surfaces[surfind[i]] -> SetMaxH (maxh);
@@ -710,7 +710,7 @@ namespace netgen
       {
 	solid->GetSurfaceIndices (surfind);
 	string bcn = flags.GetStringFlag("bcname", "default");
-	for (i = 0; i < surfind.Size(); i++)
+	for (i = 0; i < surfind.size(); i++)
 	  {
 	    if(surfaces[surfind[i]]->GetBCName() == "default")
 	      surfaces[surfind[i]]->SetBCName(bcn);
@@ -731,13 +731,13 @@ namespace netgen
 	  {
 	    Array < Array<int> * > polysurfs;
 	    polyh->GetPolySurfs(polysurfs);
-	    if(bcname.Size() != polysurfs.Size())
-	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.Size()
-		   << " surfaces and should get " << bcname.Size() << " bc-names!" <<std::endl;
+	    if(bcname.size() != polysurfs.size())
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.size()
+		   << " surfaces and should get " << bcname.size() << " bc-names!" <<std::endl;
 	    
-	    for ( i = 0; i < min2(polysurfs.Size(),bcname.Size()); i++)
+	    for ( i = 0; i < min2(polysurfs.size(),bcname.size()); i++)
 	      {
-		for (int j = 0; j < polysurfs[i]->Size(); j++)
+		for (int j = 0; j < polysurfs[i]->size(); j++)
 		  {
 		    if(surfaces[(*polysurfs[i])[j]]->GetBCName() == "default")
 		      surfaces[(*polysurfs[i])[j]]->SetBCName(bcname[i]);
@@ -748,11 +748,11 @@ namespace netgen
 	else
 	  {
 	    solid->GetSurfaceIndices (surfind);
-	    if(bcname.Size() != surfind.Size())
-	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.Size()
-		   << " surfaces and should get " << bcname.Size() << " bc-names!" <<std::endl;
+	    if(bcname.size() != surfind.size())
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.size()
+		   << " surfaces and should get " << bcname.size() << " bc-names!" <<std::endl;
 	    
-	    for (i = 0; i < min2(surfind.Size(),bcname.Size()); i++)
+	    for (i = 0; i < min2(surfind.size(),bcname.size()); i++)
 	      {
 		if(surfaces[surfind[i]]->GetBCName() == "default")
 		  surfaces[surfind[i]]->SetBCName(bcname[i]);
@@ -764,7 +764,7 @@ namespace netgen
       {
 	solid->GetSurfaceIndices (surfind);
 	int bc = int (flags.GetNumFlag("bc", -1));
-	for (i = 0; i < surfind.Size(); i++)
+	for (i = 0; i < surfind.size(); i++)
 	  {
 	    if (surfaces[surfind[i]]->GetBCProperty() == -1)
 	      surfaces[surfind[i]]->SetBCProperty(bc);
@@ -785,13 +785,13 @@ namespace netgen
 	  {
 	    Array < Array<int> * > polysurfs;
 	    polyh->GetPolySurfs(polysurfs);
-	    if(bcnum.Size() != polysurfs.Size())
-	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.Size()
-		   << " surfaces and should get " << bcnum.Size() << " bc-numbers!" <<std::endl;
+	    if(bcnum.size() != polysurfs.size())
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << polysurfs.size()
+		   << " surfaces and should get " << bcnum.size() << " bc-numbers!" <<std::endl;
 	    
-	    for ( i = 0; i < min2(polysurfs.Size(),bcnum.Size()); i++)
+	    for ( i = 0; i < min2(polysurfs.size(),bcnum.size()); i++)
 	      {
-		for (int j = 0; j < polysurfs[i]->Size(); j++)
+		for (int j = 0; j < polysurfs[i]->size(); j++)
 		  {
 		    if ( surfaces[(*polysurfs[i])[j]]->GetBCProperty() == -1 )
 		      surfaces[(*polysurfs[i])[j]]->SetBCProperty(int(bcnum[i]));
@@ -802,11 +802,11 @@ namespace netgen
 	else
 	  {
 	    solid->GetSurfaceIndices (surfind);
-	    if(bcnum.Size() != surfind.Size())
-	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.Size()
-		   << " surfaces and should get " << bcnum.Size() << " bc-numbers!" <<std::endl;
+	    if(bcnum.size() != surfind.size())
+	      std::cerr << "WARNING: solid \"" << solidname << "\" has " << surfind.size()
+		   << " surfaces and should get " << bcnum.size() << " bc-numbers!" <<std::endl;
 	    
-	    for (i = 0; i < min2(surfind.Size(),bcnum.Size()); i++)
+	    for (i = 0; i < min2(surfind.size(),bcnum.size()); i++)
 	      {
 		if (surfaces[surfind[i]]->GetBCProperty() == -1)
 		  surfaces[surfind[i]]->SetBCProperty(int(bcnum[i]));
@@ -821,7 +821,7 @@ namespace netgen
     int inv;
     int nsurf = GetNSurf();
 
-    isidenticto.SetSize(nsurf);
+    isidenticto.resize(nsurf);
     for (int i = 0; i < nsurf; i++)
       isidenticto[i] = i;
   
@@ -837,7 +837,7 @@ namespace netgen
 	}
 
     std::cerr << "identicmap:" <<std::endl;
-    for (int i = 0; i < isidenticto.Size(); i++)
+    for (int i = 0; i < isidenticto.size(); i++)
       std::cerr << i << " -> " << isidenticto[i] <<std::endl;
   }
   
@@ -855,7 +855,7 @@ namespace netgen
     sol -> GetSurfaceIndices (locsurf);
     const_cast<Solid*> (sol) -> IterateSolid (urpi);
 
-    for (int i = locsurf.Size()-1; i >= 0; i--)
+    for (int i = locsurf.size()-1; i >= 0; i--)
       {
 	bool indep = 1;
 	for (int j = 0; j < i; j++)
@@ -884,10 +884,10 @@ namespace netgen
     sol -> GetSurfaceIndices (locsurf);
     ((Solid*)sol) -> IterateSolid (urpi);
 
-    for (int i = 0; i < locsurf.Size(); i++)
+    for (int i = 0; i < locsurf.size(); i++)
       locsurf[i] = isidenticto[locsurf[i]];
 
-    for (int i = locsurf.Size()-1; i >= 0; i--)
+    for (int i = locsurf.size()-1; i >= 0; i--)
       {
 	bool indep = 1;
 	for (int j = 0; j < i; j++)
@@ -948,10 +948,10 @@ namespace netgen
   void CSGeometry ::
   GetIndependentSurfaceIndices (Array<int> & locsurf) const
   {
-    for (int i = 0; i < locsurf.Size(); i++)
+    for (int i = 0; i < locsurf.size(); i++)
       locsurf[i] = isidenticto[locsurf[i]];
 
-    for (int i = locsurf.Size()-1; i >= 0; i--)
+    for (int i = locsurf.size()-1; i >= 0; i--)
       {
 	bool indep = 1;
 	for (int j = 0; j < i; j++)
@@ -984,9 +984,9 @@ namespace netgen
   
     int ntlo = GetNTopLevelObjects();
 
-    for (int i = 0; i < triapprox.Size(); i++)
+    for (int i = 0; i < triapprox.size(); i++)
       delete triapprox[i];
-    triapprox.SetSize (ntlo);
+    triapprox.resize (ntlo);
 
     Array<int> surfind;
     IndexSet iset(GetNSurf());
@@ -1130,7 +1130,7 @@ namespace netgen
     locsol -> IterateSolid (urpi);
 
     int surfii = -1;
-    for (int i = 0; i < lsurfi.Size(); i++)
+    for (int i = 0; i < lsurfi.size(); i++)
       if (lsurfi[i] == surfind)
 	{
 	  surfii = i;
@@ -1142,13 +1142,13 @@ namespace netgen
 
     int cntindep = 0;
 
-    for (int i = 0; i < lsurfi.Size(); i++)
+    for (int i = 0; i < lsurfi.size(); i++)
       {
 	int linkto = isidenticto[lsurfi[i]];
 	surfused[linkto] = 0;
       }
 
-    for (int i = 0; i < lsurfi.Size(); i++)
+    for (int i = 0; i < lsurfi.size(); i++)
       {
 	int linkto = isidenticto[lsurfi[i]];
 	if (!surfused[linkto])
@@ -1174,7 +1174,7 @@ namespace netgen
 
 	int otherind = -1;
 
-	for (int i = 0; i < lsurfi.Size(); i++)
+	for (int i = 0; i < lsurfi.size(); i++)
 	  {
 	    INDEX_2 i2 (lsurfi[i], surfind);
 	    i2.Sort();
@@ -1553,7 +1553,7 @@ namespace netgen
   public:
     CSGInit()
     {
-      geometryregister.Append (new CSGeometryRegister);
+      geometryregister.push_back (new CSGeometryRegister);
     }
   };
 

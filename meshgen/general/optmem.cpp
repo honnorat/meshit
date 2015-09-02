@@ -27,7 +27,7 @@ namespace netgen
 
   BlockAllocator :: ~BlockAllocator ()
   {
-    for (int i = 0; i < bablocks.Size(); i++)
+    for (int i = 0; i < bablocks.size(); i++)
       delete [] bablocks[i];
   }
 
@@ -39,7 +39,7 @@ namespace netgen
 	// std::cout << "freelist = " << freelist <<std::endl;
 	// std::cout << "BlockAlloc: " << size*blocks <<std::endl;
 	char * hcp = new char [size * blocks];
-	bablocks.Append (hcp);
+	bablocks.push_back (hcp);
 	bablocks.Last() = hcp;
 	for (unsigned i = 0; i < blocks-1; i++)
 	  *(void**)&(hcp[i * size]) = &(hcp[ (i+1) * size]);

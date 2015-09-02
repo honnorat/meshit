@@ -15,8 +15,8 @@ inline int FindInnerPoint2 (POINTArray & points,
 
   int nf = faces.Size();
 
-  a.SetSize (nf);
-  c.SetSize (nf);
+  a.resize (nf);
+  c.resize (nf);
 
   for (int i = 0; i < nf; i++)
     {

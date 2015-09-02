@@ -1288,15 +1288,15 @@ namespace netgen
     ///
     ID_TYPE GetType(int identnr) const
     {
-      if(identnr <= type.Size())
+      if(identnr <= type.size())
 	return type[identnr-1];
       else
 	return UNDEFINED;
     }
     void SetType(int identnr, ID_TYPE t)
     {
-      while(type.Size() < identnr)
-	type.Append(UNDEFINED);
+      while(type.size() < identnr)
+	type.push_back(UNDEFINED);
       type[identnr-1] = t;
     }
     

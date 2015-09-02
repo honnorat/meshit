@@ -62,132 +62,132 @@ namespace netgen
 
     // 2 triangles to quad
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3));
-    r1->oldels.Append (Element2d (3, 2, 4));
-    r1->newels.Append (Element2d (1, 2, 4, 3));
-    r1->deledges.Append (INDEX_2 (2,3));
+    r1->oldels.push_back (Element2d (1, 2, 3));
+    r1->oldels.push_back (Element2d (3, 2, 4));
+    r1->newels.push_back (Element2d (1, 2, 4, 3));
+    r1->deledges.push_back (INDEX_2 (2,3));
     r1->onp = 4;
     r1->bonus = 2;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     // 2 quad to 1 quad
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (4, 3, 2, 5));
-    r1->newels.Append (Element2d (1, 2, 5, 4));
-    r1->deledges.Append (INDEX_2 (2, 3));
-    r1->deledges.Append (INDEX_2 (3, 4));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (4, 3, 2, 5));
+    r1->newels.push_back (Element2d (1, 2, 5, 4));
+    r1->deledges.push_back (INDEX_2 (2, 3));
+    r1->deledges.push_back (INDEX_2 (3, 4));
     r1->onp = 5;
     r1->bonus = 0;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     // std::swap quads
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (3, 2, 5, 6));
-    r1->newels.Append (Element2d (1, 6, 3, 4));
-    r1->newels.Append (Element2d (1, 2, 5, 6));
-    r1->deledges.Append (INDEX_2 (2, 3));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (3, 2, 5, 6));
+    r1->newels.push_back (Element2d (1, 6, 3, 4));
+    r1->newels.push_back (Element2d (1, 2, 5, 6));
+    r1->deledges.push_back (INDEX_2 (2, 3));
     r1->onp = 6;
     r1->bonus = 0;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     // three quads to 2
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (2, 5, 6, 3));
-    r1->oldels.Append (Element2d (3, 6, 7, 4));
-    r1->newels.Append (Element2d (1, 2, 5, 4));
-    r1->newels.Append (Element2d (4, 5, 6, 7));
-    r1->deledges.Append (INDEX_2 (2, 3));
-    r1->deledges.Append (INDEX_2 (3, 4));
-    r1->deledges.Append (INDEX_2 (3, 6));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (2, 5, 6, 3));
+    r1->oldels.push_back (Element2d (3, 6, 7, 4));
+    r1->newels.push_back (Element2d (1, 2, 5, 4));
+    r1->newels.push_back (Element2d (4, 5, 6, 7));
+    r1->deledges.push_back (INDEX_2 (2, 3));
+    r1->deledges.push_back (INDEX_2 (3, 4));
+    r1->deledges.push_back (INDEX_2 (3, 6));
     r1->onp = 7;
     r1->bonus = -1;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     // quad + 2 connected trigs to quad
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (2, 5, 3));
-    r1->oldels.Append (Element2d (3, 5, 4));
-    r1->newels.Append (Element2d (1, 2, 5, 4));
-    r1->deledges.Append (INDEX_2 (2, 3));
-    r1->deledges.Append (INDEX_2 (3, 4));
-    r1->deledges.Append (INDEX_2 (3, 5));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (2, 5, 3));
+    r1->oldels.push_back (Element2d (3, 5, 4));
+    r1->newels.push_back (Element2d (1, 2, 5, 4));
+    r1->deledges.push_back (INDEX_2 (2, 3));
+    r1->deledges.push_back (INDEX_2 (3, 4));
+    r1->deledges.push_back (INDEX_2 (3, 5));
     r1->onp = 5;
     r1->bonus = 0;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     // quad + 2 non-connected trigs to quad (a and b)
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (2, 6, 3));
-    r1->oldels.Append (Element2d (1, 4, 5));
-    r1->newels.Append (Element2d (1, 3, 4, 5));
-    r1->newels.Append (Element2d (1, 2, 6, 3));
-    r1->deledges.Append (INDEX_2 (1, 4));
-    r1->deledges.Append (INDEX_2 (2, 3));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (2, 6, 3));
+    r1->oldels.push_back (Element2d (1, 4, 5));
+    r1->newels.push_back (Element2d (1, 3, 4, 5));
+    r1->newels.push_back (Element2d (1, 2, 6, 3));
+    r1->deledges.push_back (INDEX_2 (1, 4));
+    r1->deledges.push_back (INDEX_2 (2, 3));
     r1->onp = 6;
     r1->bonus = 0;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (2, 6, 3));
-    r1->oldels.Append (Element2d (1, 4, 5));
-    r1->newels.Append (Element2d (1, 2, 4, 5));
-    r1->newels.Append (Element2d (4, 2, 6, 3));
-    r1->deledges.Append (INDEX_2 (1, 4));
-    r1->deledges.Append (INDEX_2 (2, 3));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (2, 6, 3));
+    r1->oldels.push_back (Element2d (1, 4, 5));
+    r1->newels.push_back (Element2d (1, 2, 4, 5));
+    r1->newels.push_back (Element2d (4, 2, 6, 3));
+    r1->deledges.push_back (INDEX_2 (1, 4));
+    r1->deledges.push_back (INDEX_2 (2, 3));
     r1->onp = 6;
     r1->bonus = 0;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     // two quad + trig -> one quad + trig
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (2, 5, 6, 3));
-    r1->oldels.Append (Element2d (4, 3, 6));
-    r1->newels.Append (Element2d (1, 2, 6, 4));
-    r1->newels.Append (Element2d (2, 5, 6));
-    r1->deledges.Append (INDEX_2 (2, 3));
-    r1->deledges.Append (INDEX_2 (3, 4));
-    r1->deledges.Append (INDEX_2 (3, 6));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (2, 5, 6, 3));
+    r1->oldels.push_back (Element2d (4, 3, 6));
+    r1->newels.push_back (Element2d (1, 2, 6, 4));
+    r1->newels.push_back (Element2d (2, 5, 6));
+    r1->deledges.push_back (INDEX_2 (2, 3));
+    r1->deledges.push_back (INDEX_2 (3, 4));
+    r1->deledges.push_back (INDEX_2 (3, 6));
     r1->onp = 6;
     r1->bonus = -1;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     // std::swap quad + trig (a and b)
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (2, 5, 3));
-    r1->newels.Append (Element2d (2, 5, 3, 4));
-    r1->newels.Append (Element2d (1, 2, 4));
-    r1->deledges.Append (INDEX_2 (2, 3));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (2, 5, 3));
+    r1->newels.push_back (Element2d (2, 5, 3, 4));
+    r1->newels.push_back (Element2d (1, 2, 4));
+    r1->deledges.push_back (INDEX_2 (2, 3));
     r1->onp = 5;
     r1->bonus = 0;
-    rules.Append (r1);
+    rules.push_back (r1);
 
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (2, 5, 3));
-    r1->newels.Append (Element2d (1, 2, 5, 3));
-    r1->newels.Append (Element2d (1, 3, 4));
-    r1->deledges.Append (INDEX_2 (2, 3));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (2, 5, 3));
+    r1->newels.push_back (Element2d (1, 2, 5, 3));
+    r1->newels.push_back (Element2d (1, 3, 4));
+    r1->deledges.push_back (INDEX_2 (2, 3));
     r1->onp = 5;
     r1->bonus = 0;
-    rules.Append (r1);
+    rules.push_back (r1);
 
 
     // 2 quads to quad + 2 trigs
     r1 = new ImprovementRule;
-    r1->oldels.Append (Element2d (1, 2, 3, 4));
-    r1->oldels.Append (Element2d (3, 2, 5, 6));
-    r1->newels.Append (Element2d (1, 5, 6, 4));
-    r1->newels.Append (Element2d (1, 2, 5));
-    r1->newels.Append (Element2d (4, 6, 3));
-    r1->deledges.Append (INDEX_2 (2, 3));
+    r1->oldels.push_back (Element2d (1, 2, 3, 4));
+    r1->oldels.push_back (Element2d (3, 2, 5, 6));
+    r1->newels.push_back (Element2d (1, 5, 6, 4));
+    r1->newels.push_back (Element2d (1, 2, 5));
+    r1->newels.push_back (Element2d (4, 6, 3));
+    r1->deledges.push_back (INDEX_2 (2, 3));
     r1->onp = 6;
     r1->bonus = 0;
     //    rules.Append (r1);
@@ -195,18 +195,18 @@ namespace netgen
 
 
 
-    Array<int> mapped(rules.Size());
-    Array<int> used(rules.Size());
+    Array<int> mapped(rules.size());
+    Array<int> used(rules.size());
     used = 0;
     mapped = 0;
 
   
 
-    for (int ri = 0; ri < rules.Size(); ri++)
+    for (int ri = 0; ri < rules.size(); ri++)
       {
 	ImprovementRule & rule = *rules[ri];
-	rule.incelsonnode.SetSize (rule.onp);
-	rule.reused.SetSize (rule.onp);
+	rule.incelsonnode.resize (rule.onp);
+	rule.reused.resize (rule.onp);
 
 	for (int j = 1; j <= rule.onp; j++)
 	  {
@@ -214,14 +214,14 @@ namespace netgen
 	    rule.reused.Elem(j) = 0;
 	  }
 
-	for (int j = 1; j <= rule.oldels.Size(); j++)
+	for (int j = 1; j <= rule.oldels.size(); j++)
 	  {
 	    const Element2d & el = rule.oldels.Elem(j);
 	    for (int k = 1; k <= el.GetNP(); k++)
 	      rule.incelsonnode.Elem(el.PNum(k))--;
 	  }
 
-	for (int j = 1; j <= rule.newels.Size(); j++)
+	for (int j = 1; j <= rule.newels.size(); j++)
 	  {
 	    const Element2d & el = rule.newels.Elem(j);
 	    for (int k = 1; k <= el.GetNP(); k++)
@@ -264,11 +264,11 @@ namespace netgen
 	  {
 	    for (int j = 0; j < el.GetNP(); j++)
 	      {
-		for (int k = 0; k < elonnode[el[j]].Size(); k++)
+		for (int k = 0; k < elonnode[el[j]].size(); k++)
 		  {
 		    int nbel = elonnode[el[j]] [k];
 		    bool inuse = false;
-		    for (int l = 0; l < nbels[sei].Size(); l++)
+		    for (int l = 0; l < nbels[sei].size(); l++)
 		      if (nbels[sei][l] == nbel)
 			inuse = true;
 		    if (!inuse)
@@ -279,14 +279,14 @@ namespace netgen
       }
 
 
-    for (int ri = 0; ri < rules.Size(); ri++)
+    for (int ri = 0; ri < rules.size(); ri++)
       {
 	const ImprovementRule & rule = *rules[ri];
       
-	elmap.SetSize (rule.oldels.Size());
-	elrot.SetSize (rule.oldels.Size());
-	pmap.SetSize (rule.onp);
-	pgi.SetSize (rule.onp);
+	elmap.resize (rule.oldels.size());
+	elrot.resize (rule.oldels.size());
+	pmap.resize (rule.onp);
+	pgi.resize (rule.onp);
 
 
 	for (SurfaceElementIndex sei = 0; sei < ne; sei++)
@@ -317,14 +317,14 @@ namespace netgen
 		  }
 		
 		ok = 1;
-		for (int i = 1; i < elmap.Size(); i++)
+		for (int i = 1; i < elmap.size(); i++)
 		  {
 		    // try to find a mapping for reference-element i
 
 		    const Element2d & rel = rule.oldels[i];
 		    bool possible = 0;
 
-		    for (elmap[i] = 0; elmap[i] < neighbours.Size(); elmap[i]++)
+		    for (elmap[i] = 0; elmap[i] < neighbours.size(); elmap[i]++)
 		      {
 			const Element2d & el = mesh[neighbours[elmap[i]]];
 			if (el.IsDeleted()) continue;
@@ -361,7 +361,7 @@ namespace netgen
 		    elmap[i] = neighbours[elmap[i]];
 		  }
 
-		for(int i=0; ok && i<rule.deledges.Size(); i++)
+		for(int i=0; ok && i<rule.deledges.size(); i++)
 		  {
 		    ok = !mesh.IsSegment(pmap.Elem(rule.deledges[i].I1()),
 					 pmap.Elem(rule.deledges[i].I2()));
@@ -375,12 +375,12 @@ namespace netgen
 		mapped[ri]++;
 
 		olddef = 0;
-		for (int j = 1; j <= pmap.Size(); j++)
+		for (int j = 1; j <= pmap.size(); j++)
 		  olddef += sqr (nelonnode[pmap.Get(j)]);
 		olddef += rule.bonus;
 
 		newdef = 0;
-		for (int j = 1; j <= pmap.Size(); j++)
+		for (int j = 1; j <= pmap.size(); j++)
 		  if (rule.reused.Get(j))
 		    newdef += sqr (nelonnode[pmap.Get(j)] + 
 				   rule.incelsonnode.Get(j));
@@ -395,11 +395,11 @@ namespace netgen
 		SelectSurfaceOfPoint (mesh.Point(pmap.Get(1)), pgi.Get(1));
 		GetNormalVector (surfnr, mesh.Point(pmap.Get(1)), pgi.Elem(1), n);
 		  
-		for (int j = 1; j <= rule.oldels.Size(); j++)
+		for (int j = 1; j <= rule.oldels.size(); j++)
 		  bad1 += mesh.SurfaceElement(elmap.Get(j)).CalcJacobianBadness (mesh.Points(), n);
 		  
 		// check new element:
-		for (int j = 1; j <= rule.newels.Size(); j++)
+		for (int j = 1; j <= rule.newels.size(); j++)
 		  {
 		    const Element2d & rnel = rule.newels.Get(j);
 		    Element2d nel(rnel.GetNP());
@@ -415,7 +415,7 @@ namespace netgen
 		  
 
 		// generate new element:
-		for (int j = 1; j <= rule.newels.Size(); j++)
+		for (int j = 1; j <= rule.newels.size(); j++)
 		  {
 		    const Element2d & rnel = rule.newels.Get(j);
 		    Element2d nel(rnel.GetNP());
@@ -429,10 +429,10 @@ namespace netgen
 		    mesh.AddSurfaceElement(nel);
 		  }
 		  
-		for (int j = 0; j < rule.oldels.Size(); j++)
+		for (int j = 0; j < rule.oldels.size(); j++)
 		  mesh.DeleteSurfaceElement ( elmap[j] );
 
-		for (int j = 1; j <= pmap.Size(); j++)
+		for (int j = 1; j <= pmap.size(); j++)
 		  nelonnode[pmap.Get(j)] += rule.incelsonnode.Get(j);
 
 		used[ri]++;
@@ -442,7 +442,7 @@ namespace netgen
 
     mesh.Compress();
 
-    for (int ri = 0; ri < rules.Size(); ri++)
+    for (int ri = 0; ri < rules.size(); ri++)
       {
 	PrintMessage (5, "rule ", ri+1, " ",
 		      mapped[ri], "/", used[ri], " mapped/used");

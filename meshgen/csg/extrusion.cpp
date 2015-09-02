@@ -13,13 +13,13 @@ namespace netgen
 
   void ExtrusionFace :: Init(void)
   {
-    p0.SetSize(path->GetNSplines());
-    x_dir.SetSize(path->GetNSplines());
-    y_dir.SetSize(path->GetNSplines());
-    z_dir.SetSize(path->GetNSplines());
-    loc_z_dir.SetSize(path->GetNSplines());
-    spline3_path.SetSize(path->GetNSplines());
-    line_path.SetSize(path->GetNSplines());
+    p0.resize(path->GetNSplines());
+    x_dir.resize(path->GetNSplines());
+    y_dir.resize(path->GetNSplines());
+    z_dir.resize(path->GetNSplines());
+    loc_z_dir.resize(path->GetNSplines());
+    spline3_path.resize(path->GetNSplines());
+    line_path.resize(path->GetNSplines());
 
     for(int i=0; i<path->GetNSplines(); i++)
       {
@@ -469,7 +469,7 @@ namespace netgen
 
     //std::cerr << "p2d " << p2d;
 
-    for(int i=0; i<ips.Size(); i++)
+    for(int i=0; i<ips.size(); i++)
       {
 	//std::cerr << " ip " << ips[i];
 
@@ -599,7 +599,7 @@ namespace netgen
     profile->GetRawData(data);
     path->GetRawData(data);
     for(int i=0; i<3; i++)
-      data.Append(glob_z_direction[i]);
+      data.push_back(glob_z_direction[i]);
   }
 
 
@@ -655,17 +655,17 @@ namespace netgen
 			 const Vec<3> & z_dir) :
     path(path_in), profile(profile_in), z_direction(z_dir)
   {
-    surfaceactive.SetSize(0);
-    surfaceids.SetSize(0);
+    surfaceactive.resize(0);
+    surfaceids.resize(0);
 
     for(int j=0; j<profile.GetNSplines(); j++)
       {
 	ExtrusionFace * face = new ExtrusionFace(&(profile.GetSpline(j)),
 						 &path,
 						 z_direction);
-	faces.Append(face);
-	surfaceactive.Append(true);
-	surfaceids.Append(0);
+	faces.push_back(face);
+	surfaceactive.push_back(true);
+	surfaceids.push_back(0);
       }
 
   }
@@ -673,7 +673,7 @@ namespace netgen
 
   Extrusion :: ~Extrusion()
   {
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       delete faces[i];
   }
 
@@ -683,7 +683,7 @@ namespace netgen
 
   INSOLID_TYPE Extrusion :: BoxInSolid (const BoxSphere<3> & box) const
   {
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       {
 	if(faces[i]->BoxIntersectsFace(box))
 	  return DOES_INTERSECT;
@@ -703,7 +703,7 @@ namespace netgen
     bool intersects(false);
     bool does_intersect(false);
 
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       {
 	faces[i]->LineIntersections(p,random_vec,eps,before,after,intersects);
 
@@ -712,7 +712,7 @@ namespace netgen
 	  {
 	    if(facenums)
 	      {
-		facenums->Append(i);
+		facenums->push_back(i);
 		does_intersect = true;
 	      }
 	    else
@@ -750,7 +750,7 @@ namespace netgen
 
     double d(0);
 
-    if(facenums.Size() == 1)
+    if(facenums.size() == 1)
       {
 	Vec<3> normal;
 	faces[facenums[0]]->CalcGradient(p,normal);
@@ -759,7 +759,7 @@ namespace netgen
 	
 	latestfacenum = facenums[0];
       }
-    else if (facenums.Size() == 2)
+    else if (facenums.size() == 2)
       {
 	Vec<3> checkvec;
 
@@ -810,7 +810,7 @@ namespace netgen
 
     else
       {
-	std::cerr << "WHY ARE THERE " << facenums.Size() << " FACES?" <<std::endl;
+	std::cerr << "WHY ARE THERE " << facenums.size() << " FACES?" <<std::endl;
       }
 
     if(d > eps)
@@ -846,7 +846,7 @@ namespace netgen
   
   int Extrusion :: GetNSurfaces() const
   {
-    return faces.Size();
+    return faces.size();
   }
 
   Surface & Extrusion :: GetSurface (int i)
@@ -862,13 +862,13 @@ namespace netgen
 
   void Extrusion :: Reduce (const BoxSphere<3> & box)
   {
-    for(int i = 0; i < faces.Size(); i++)
+    for(int i = 0; i < faces.size(); i++)
       surfaceactive[i] = faces[i]->BoxIntersectsFace(box);
   }
 
   void Extrusion :: UnReduce ()
   {
-    for(int i = 0; i < faces.Size(); i++)
+    for(int i = 0; i < faces.size(); i++)
       surfaceactive[i] = true;
   }
 

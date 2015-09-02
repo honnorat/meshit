@@ -35,7 +35,7 @@ public:
   {
     if (!flags.Test(ind))
       {
-	set.Append (ind);
+	set.push_back (ind);
 	flags.Set (ind);
       }
   }

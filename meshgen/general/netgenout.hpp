@@ -38,13 +38,13 @@ public:
 
 class Procs
 {
-  const netgen::FlatArray<int> procs;
+  const netgen::FlatArray<unsigned> procs;
 
 public:
 
-  Procs ( const netgen::FlatArray<int> & aprocs ) : procs (aprocs) { ; }
+  Procs ( const netgen::FlatArray<unsigned> & aprocs ) : procs (aprocs) { ; }
 
-  const netgen::FlatArray<int> & GetProcs () const { return procs; }
+  const netgen::FlatArray<unsigned> & GetProcs () const { return procs; }
 };
 
 

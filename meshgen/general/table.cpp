@@ -28,10 +28,10 @@ namespace netgen
   }
 
   BASE_TABLE :: BASE_TABLE (const FlatArray<int> & entrysizes, int elemsize)
-    : data(entrysizes.Size())
+    : data(entrysizes.size())
   {
     int i, cnt = 0;
-    int n = entrysizes.Size();
+    int n = entrysizes.size();
 
     for (i = 0; i < n; i++)
       cnt += entrysizes[i];
@@ -55,17 +55,17 @@ namespace netgen
       delete [] oneblock;
     else
       {
-	for (int i = 0; i < data.Size(); i++)
+	for (int i = 0; i < data.size(); i++)
 	  delete [] (char*)data[i].col;
       }
   }
   
   void BASE_TABLE :: SetSize (int size)
   {
-    for (int i = 0; i < data.Size(); i++)
+    for (int i = 0; i < data.size(); i++)
       delete [] (char*)data[i].col;
     
-    data.SetSize(size);
+    data.resize(size);
     for (int i = 0; i < size; i++)
       {
 	data[i].maxsize = 0;
@@ -76,7 +76,7 @@ namespace netgen
   
   void BASE_TABLE :: ChangeSize (int size)
   {
-    int oldsize = data.Size();
+    int oldsize = data.size();
     if (size == oldsize) 
       return;
 
@@ -84,7 +84,7 @@ namespace netgen
       for (int i = size; i < oldsize; i++)
 	delete [] (char*)data[i].col;
     
-    data.SetSize(size);
+    data.resize(size);
 
     for (int i = oldsize; i < size; i++)
       {
@@ -97,7 +97,7 @@ namespace netgen
   void BASE_TABLE :: IncSize2 (int i, int elsize)
   {
 #ifdef DEBUG
-    if (i < 0 || i >= data.Size())
+    if (i < 0 || i >= data.size())
       {
 	MyError ("BASE_TABLE::Inc: Out of range");
 	return;
@@ -172,7 +172,7 @@ namespace netgen
   void BASE_TABLE :: AllocateElementsOneBlock (int elemsize)
   {
     int cnt = 0;
-    int n = data.Size();
+    int n = data.size();
 
     for (int i = 0; i < n; i++)
       cnt += data[i].maxsize;
@@ -192,7 +192,7 @@ namespace netgen
   int BASE_TABLE :: AllocatedElements () const
   {
     int els = 0;
-    for (int i = 0; i < data.Size(); i++)
+    for (int i = 0; i < data.size(); i++)
       els += data[i].maxsize;
     return els;
   }
@@ -200,14 +200,14 @@ namespace netgen
   int BASE_TABLE :: UsedElements () const
   {
     int els = 0;
-    for (int i = 0; i < data.Size(); i++)
+    for (int i = 0; i < data.size(); i++)
       els += data[i].size;
     return els;
   }
 
   void BASE_TABLE :: SetElementSizesToMaxSizes ()
   {
-    for (int i = 0; i < data.Size(); i++)
+    for (int i = 0; i < data.size(); i++)
       data[i].size = data[i].maxsize;
   }
 

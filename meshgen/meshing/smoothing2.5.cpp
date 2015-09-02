@@ -13,7 +13,7 @@ namespace netgen
   void MeshOptimize2d :: ProjectBoundaryPoints(Array<int> & surfaceindex, 
 					       const Array<Point<3>* > & from, Array<Point<3>* > & dest)
   {
-    for(int i=0; i<surfaceindex.Size(); i++)
+    for(int i=0; i<surfaceindex.size(); i++)
       {
 	if(surfaceindex[i] >= 0)
 	  {
@@ -74,7 +74,7 @@ namespace netgen
     Array<int, PointIndex::BASE> nelementsonpoint(mesh.GetNP());
     nelementsonpoint = 0;
 
-    for (i = 0; i < seia.Size(); i++)
+    for (i = 0; i < seia.size(); i++)
       {
 	const Element2d & el = mesh[seia[i]];
 	for (j = 0; j < el.GetNP(); j++)
@@ -83,7 +83,7 @@ namespace netgen
 
 
     TABLE<SurfaceElementIndex,PointIndex::BASE> elementsonpoint(nelementsonpoint);
-    for (i = 0; i < seia.Size(); i++)
+    for (i = 0; i < seia.size(); i++)
       {
 	const Element2d & el = mesh[seia[i]];
 	for (j = 0; j < el.GetNP(); j++)
@@ -148,7 +148,7 @@ namespace netgen
 	
 	int surfi(-1);
 
-	if(elementsonpoint[pi].Size() == 0)
+	if(elementsonpoint[pi].size() == 0)
 	  continue;
 
 	Element2d & hel = mesh[elementsonpoint[pi][0]];
@@ -173,21 +173,21 @@ namespace netgen
 	    }
 	PointGeomInfo gi1 = hel.GeomInfoPi(hpi);
 	
-	locelements.SetSize(0);
-	locrots.SetSize (0);
+	locelements.resize(0);
+	locrots.resize (0);
 	
-	for (j = 0; j < elementsonpoint[pi].Size(); j++)
+	for (j = 0; j < elementsonpoint[pi].size(); j++)
 	  {
 	    sei = elementsonpoint[pi][j];
 	    const Element2d & bel = mesh[sei];
 	    surfi = mesh.GetFaceDescriptor(bel.GetIndex()).SurfNr();
 	    
-	    locelements.Append (sei);
+	    locelements.push_back (sei);
 	    
 	    for (k = 1; k <= bel.GetNP(); k++)
 	      if (bel.PNum(k) == pi)
 		{
-		  locrots.Append (k);
+		  locrots.push_back (k);
 		  break;
 		}
 	  }
@@ -232,7 +232,7 @@ namespace netgen
 		
 		if (moveisok)
 		  {
-		    for (j = 0; j < locelements.Size(); j++)
+		    for (j = 0; j < locelements.size(); j++)
 		      mesh[locelements[j]].GeomInfoPi(locrots[j]) = ngi;
 
 		    //std::cout << "moved " << origp << " to " << mesh[pi] <<std::endl;

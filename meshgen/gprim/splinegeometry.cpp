@@ -16,7 +16,7 @@ namespace netgen
   template<int D>
   SplineGeometry<D> :: ~SplineGeometry()
   {
-    for(int i = 0; i < splines.Size(); i++)
+    for(int i = 0; i < splines.size(); i++)
       delete splines[i];
   }
 
@@ -24,11 +24,11 @@ namespace netgen
   template<int D>
   void SplineGeometry<D> :: GetRawData (Array<double> & raw_data) const
   {
-    raw_data.Append(D);
+    raw_data.push_back(D);
     // raw_data.Append(elto0);
 
-    raw_data.Append(splines.Size()); 
-    for(int i=0; i<splines.Size(); i++)
+    raw_data.push_back(splines.size()); 
+    for(int i=0; i<splines.size(); i++)
       splines[i]->GetRawData(raw_data);
   }
 
@@ -45,12 +45,12 @@ namespace netgen
 
     // elto0 = raw_data[pos]; pos++;
 
-    splines.SetSize(int(raw_data[pos]));
+    splines.resize(int(raw_data[pos]));
     pos++;
 
     Array< Point<D> > pts(3);
 
-    for(int i=0; i<splines.Size(); i++)
+    for(int i=0; i<splines.size(); i++)
       {
 	int type = int(raw_data[pos]);
 	pos++;
@@ -91,7 +91,7 @@ namespace netgen
   template<int D>
   void SplineGeometry<D> :: GetBoundingBox (Box<D> & box) const
   {
-    if (!splines.Size())
+    if (!splines.size())
       {
 	Point<D> auxp = 0.;
 	box.Set (auxp);
@@ -99,12 +99,12 @@ namespace netgen
       }
 
     Array<Point<D> > points;
-    for (int i = 0; i < splines.Size(); i++)
+    for (int i = 0; i < splines.size(); i++)
       {
 	splines[i]->GetPoints (20, points);
 
 	if (i == 0) box.Set(points[0]);
-	for (int j = 0; j < points.Size(); j++)
+	for (int j = 0; j < points.size(); j++)
 	  box.Add (points[j]);
       }
   }
@@ -120,7 +120,7 @@ namespace netgen
   template<int D>
   void SplineGeometry<D> :: AppendPoint (const Point<D> & p, const double reffac, const bool hpref)
   {
-    geompoints.Append (GeomPoint<D>(p, reffac));
+    geompoints.push_back (GeomPoint<D>(p, reffac));
     geompoints.Last().hpref = hpref;
   }
 

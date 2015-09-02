@@ -16,13 +16,13 @@ namespace netgen
   int TriangleApproximation :: 
   AddTriangle (const TATriangle & tri, bool invert)
   { 
-    trigs.Append (tri);
+    trigs.push_back (tri);
     if (invert)
       {
 	trigs.Last()[1] = tri[2];
 	trigs.Last()[2] = tri[1];
       }
-    return trigs.Size()-1;
+    return trigs.size()-1;
   }
 
 
@@ -53,7 +53,7 @@ namespace netgen
 	  normals[map[i]] = normals[i];
 	}
 
-    points.SetSize (cnt);
-    normals.SetSize (cnt);
+    points.resize (cnt);
+    normals.resize (cnt);
   }
 }

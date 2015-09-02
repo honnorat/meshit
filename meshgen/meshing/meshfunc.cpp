@@ -132,7 +132,7 @@ namespace netgen
 		  meshing.AddPoint (mesh3d[pi], pi);
 		
 		mesh3d.GetIdentifications().GetPairs (0, connectednodes);
-		for (int i = 1; i <= connectednodes.Size(); i++)
+		for (int i = 1; i <= connectednodes.size(); i++)
 		  meshing.AddConnectedPair (connectednodes.Get(i));
 		
 		for (int i = 1; i <= mesh3d.GetNOpenElements(); i++)

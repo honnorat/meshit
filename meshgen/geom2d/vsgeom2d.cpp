@@ -25,9 +25,9 @@ namespace netgen
 
   void VisualSceneGeometry2d :: DrawScene ()
   {
-    if (changeval != geometry2d->GetSplines().Size())
+    if (changeval != geometry2d->GetSplines().size())
       BuildScene();
-    changeval = geometry2d->GetSplines().Size();
+    changeval = geometry2d->GetSplines().size();
 
   
     glClearColor(backcolor, backcolor, backcolor, 1.0);
@@ -53,19 +53,19 @@ namespace netgen
 
     Array<Point<2> > points, otherpoints;
 
-    for (int i = 1; i <= geometry2d->GetSplines().Size(); i++)
+    for (int i = 1; i <= geometry2d->GetSplines().size(); i++)
       {
 	geometry2d->GetSplines().Get(i)->GetPoints (200, points);
       
 	glBegin (GL_LINE_STRIP);
-	for (int j = 0; j < points.Size(); j++)
+	for (int j = 0; j < points.size(); j++)
 	  glVertex3d (points[j](0), points[j](1), 0);
 	glEnd(); 
       } 
 
     glColor3f (1, 0, 0);
 
-    for (int i = 1; i <= geometry2d->GetSplines().Size(); i++)
+    for (int i = 1; i <= geometry2d->GetSplines().size(); i++)
       {
 	int other = geometry2d->GetSpline(i-1).copyfrom;
 	if (other != -1)

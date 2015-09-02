@@ -12,27 +12,27 @@ namespace netgen
 
     if(line)
       {
-	checklines_start.Append(new Point<2>(line->StartPI()));
-	checklines_vec.Append(new Vec<2>(line->EndPI() - line->StartPI()));
+	checklines_start.push_back(new Point<2>(line->StartPI()));
+	checklines_vec.push_back(new Vec<2>(line->EndPI() - line->StartPI()));
 	(*checklines_vec.Last()) *= 1./pow(checklines_vec.Last()->Length(),2); //!!
       }
     else if (spline3)
       {
-	checklines_start.Append(new Point<2>(spline3->EndPI()));
-	checklines_start.Append(new Point<2>(spline3->TangentPoint()));
-	checklines_start.Append(new Point<2>(spline3->StartPI()));
-	checklines_vec.Append(new Vec<2>(spline3->StartPI() - spline3->EndPI()));
+	checklines_start.push_back(new Point<2>(spline3->EndPI()));
+	checklines_start.push_back(new Point<2>(spline3->TangentPoint()));
+	checklines_start.push_back(new Point<2>(spline3->StartPI()));
+	checklines_vec.push_back(new Vec<2>(spline3->StartPI() - spline3->EndPI()));
 	(*checklines_vec.Last()) *= 1./pow(checklines_vec.Last()->Length(),2); //!!
-	checklines_vec.Append(new Vec<2>(spline3->EndPI() - spline3->TangentPoint()));
+	checklines_vec.push_back(new Vec<2>(spline3->EndPI() - spline3->TangentPoint()));
 	(*checklines_vec.Last()) *= 1./pow(checklines_vec.Last()->Length(),2); //!!
-	checklines_vec.Append(new Vec<2>(spline3->TangentPoint() - spline3->StartPI()));
+	checklines_vec.push_back(new Vec<2>(spline3->TangentPoint() - spline3->StartPI()));
 	(*checklines_vec.Last()) *= 1./pow(checklines_vec.Last()->Length(),2); //!!
 	
       }
     
-    for(int i=0; i<checklines_vec.Size(); i++)
+    for(int i=0; i<checklines_vec.size(); i++)
       {
-	checklines_normal.Append(new Vec<2>);
+	checklines_normal.push_back(new Vec<2>);
 	(*checklines_normal.Last())(0) = - (*checklines_vec[i])(1);
 	(*checklines_normal.Last())(1) = (*checklines_vec[i])(0);
 	checklines_normal.Last()->Normalize();
@@ -105,7 +105,7 @@ namespace netgen
   
   RevolutionFace :: ~RevolutionFace()
   {
-    for(int i=0; i<checklines_start.Size(); i++)
+    for(int i=0; i<checklines_start.size(); i++)
       {
 	delete checklines_start[i];
 	delete checklines_vec[i];
@@ -300,18 +300,18 @@ namespace netgen
     
     if(ss3)
       {
-	checkpoints.Append(ss3->StartPI());
-	checkpoints.Append(ss3->TangentPoint());
-	checkpoints.Append(ss3->TangentPoint());
-	checkpoints.Append(ss3->EndPI());
+	checkpoints.push_back(ss3->StartPI());
+	checkpoints.push_back(ss3->TangentPoint());
+	checkpoints.push_back(ss3->TangentPoint());
+	checkpoints.push_back(ss3->EndPI());
       }
     else if(ls)
       {
-	checkpoints.Append(ls->StartPI());
-	checkpoints.Append(ls->EndPI());
+	checkpoints.push_back(ls->StartPI());
+	checkpoints.push_back(ls->EndPI());
       }
 
-    for(int i=0; i<checkpoints.Size(); i+=2)
+    for(int i=0; i<checkpoints.size(); i+=2)
       {
 	Vec<2> v = checkpoints[i+1]-checkpoints[i];
 	Vec<2> n(v(1),-v(0)); n.Normalize();
@@ -575,11 +575,11 @@ namespace netgen
     data.DeleteAll();
     spline->GetRawData(data);
     for(int i=0; i<3; i++)
-      data.Append(p0(i));
+      data.push_back(p0(i));
     for(int i=0; i<3; i++)
-      data.Append(v_axis(i));
-    data.Append((isfirst) ? 1. : 0.);
-    data.Append((islast) ? 1. : 0.);
+      data.push_back(v_axis(i));
+    data.push_back((isfirst) ? 1. : 0.);
+    data.push_back((islast) ? 1. : 0.);
   }
 
 
@@ -590,8 +590,8 @@ namespace netgen
     p0(p0_in), p1(p1_in), splinecurve(spline_in),
     nsplines(spline_in.GetNSplines())
   {
-    surfaceactive.SetSize(0);
-    surfaceids.SetSize(0);
+    surfaceactive.resize(0);
+    surfaceids.resize(0);
 
     v_axis = p1-p0;
 
@@ -612,22 +612,22 @@ namespace netgen
 						   p0,v_axis,
 						   type==2 && i==0,
 						   type==2 && i==splinecurve.GetNSplines()-1);
-	faces.Append(face);
-	surfaceactive.Append(1);
-	surfaceids.Append(0);
+	faces.push_back(face);
+	surfaceactive.push_back(1);
+	surfaceids.push_back(0);
       }
   }
   
   Revolution::~Revolution()
   {
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       delete faces[i];
   }
 
 
   INSOLID_TYPE Revolution :: BoxInSolid (const BoxSphere<3> & box) const
   {
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       if(faces[i]->BoxIntersectsFace(box))
 	return DOES_INTERSECT;
     
@@ -721,11 +721,11 @@ namespace netgen
     Array < Point<2> > points;
 
     //std::cerr << "face intersections at: " <<std::endl;
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       {
 	faces[i]->GetSpline().LineIntersections(a,b,c,points,eps);
 	
-	for(int j=0; j<points.Size(); j++)
+	for(int j=0; j<points.size(); j++)
 	  {
 	    double t = (points[j](0)-p2d(0))/randomx;
 
@@ -762,13 +762,13 @@ namespace netgen
 
     Array<int> intersecting_faces;
 
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       if(faces[i]->PointInFace(p,eps) == DOES_INTERSECT)
-	intersecting_faces.Append(i);
+	intersecting_faces.push_back(i);
 
      Vec<3> hv;
 
-    if(intersecting_faces.Size() == 1)
+    if(intersecting_faces.size() == 1)
       {
 	faces[intersecting_faces[0]]->CalcGradient(p,hv);
 
@@ -782,7 +782,7 @@ namespace netgen
 	
 	return DOES_INTERSECT; 
       }
-    else if(intersecting_faces.Size() == 2)
+    else if(intersecting_faces.size() == 2)
       {
 	Point<2> p2d;
 	Vec<2> v2d;
@@ -870,7 +870,7 @@ namespace netgen
   
   int Revolution :: GetNSurfaces() const
   {
-    return faces.Size();
+    return faces.size();
   }
 
   Surface & Revolution :: GetSurface (int i)
@@ -887,14 +887,14 @@ namespace netgen
   void Revolution :: Reduce (const BoxSphere<3> & box)
   { 
     //bool dummy;
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       surfaceactive[i] = (faces[i]->BoxIntersectsFace(box));
     //surfaceactive[i] = (faces[i]->BoxIntersectsFace(box,dummy));
   }
 
   void Revolution :: UnReduce ()
   {
-    for(int i=0; i<faces.Size(); i++)
+    for(int i=0; i<faces.size(); i++)
       surfaceactive[i] = true;
   }
 }

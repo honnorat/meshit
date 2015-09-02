@@ -21,7 +21,7 @@ namespace netgen
   public:
     virtual ~NetgenGeometry () { ; }
 
-    virtual int GenerateMesh (Mesh*& mesh, MeshingParameters & mparam, 
+    virtual int GenerateMesh (Mesh*& mesh, MeshingParameters & mp, 
 			      int perfstepsstart, int perfstepsend);
 
     virtual const Refinement & GetRefinement () const;
@@ -50,7 +50,7 @@ namespace netgen
   public:
     virtual ~GeometryRegisterArray()
     {
-      for (int i = 0; i < Size(); i++)
+      for (int i = 0; i < size(); i++)
         delete (*this)[i];
     }
   };

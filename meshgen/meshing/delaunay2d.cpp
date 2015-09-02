@@ -74,11 +74,11 @@ namespace netgen
 
 	mesh.LocalHFunction().FindInnerBoxes (adfront, NULL);
 	
-	npoints.SetSize(0);
+	npoints.resize(0);
 	mesh.LocalHFunction().GetInnerPoints (npoints);
 
 	changed = false;
-	for (int i = 0; i < npoints.Size(); i++)
+	for (int i = 0; i < npoints.size(); i++)
 	  {
 	    if (mesh.LocalHFunction().GetH(npoints[i]) > 1.5 * maxh)
 	      {
@@ -95,7 +95,7 @@ namespace netgen
     
     std::cerr << "npoints = " << std::endl << npoints << std::endl;
 
-    for (int i = 1; i <= npoints.Size(); i++)
+    for (int i = 1; i <= npoints.size(); i++)
       {
 	if (meshbox.IsIn (npoints.Get(i)))
 	  {
@@ -147,10 +147,10 @@ namespace netgen
     
     loch2.FindInnerBoxes (adfront, NULL);
     
-    npoints.SetSize(0);
+    npoints.resize(0);
     loch2.GetOuterPoints (npoints);
     
-    for (int i = 1; i <= npoints.Size(); i++)
+    for (int i = 1; i <= npoints.size(); i++)
       {
 	if (meshbox.IsIn (npoints.Get(i)))
 	  {

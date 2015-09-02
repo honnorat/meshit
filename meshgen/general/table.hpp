@@ -102,7 +102,7 @@ public:
 
   /// Creates fixed maximal element size table
   inline TABLE (const FlatArray<int,BASE> & entrysizes)
-    : BASE_TABLE (FlatArray<int> (entrysizes.Size(), const_cast<int*>(&entrysizes[BASE])), 
+    : BASE_TABLE (FlatArray<int> (entrysizes.size(), const_cast<int*>(&entrysizes[BASE])), 
 		  sizeof(T))
   { ; }
   
@@ -181,7 +181,7 @@ public:
   /// Returns size of the table.
   inline int Size () const
   {
-    return data.Size();
+    return data.size();
   }
 
   /// Returns size of the i-th row.
@@ -211,8 +211,8 @@ public:
   FlatArray<T> operator[] (int i) const
   { 
 #ifdef DEBUG
-    if (i-BASE < 0 || i-BASE >= data.Size())
-      std::cout << "table out of range, i = " << i << ", s = " << data.Size() << std::endl;
+    if (i-BASE < 0 || i-BASE >= data.size())
+      std::cout << "table out of range, i = " << i << ", s = " << data.size() << std::endl;
 #endif
 
     return FlatArray<T> (data[i-BASE].size, (T*)data[i-BASE].col);
@@ -227,8 +227,8 @@ inline std::ostream & operator<< (std::ostream & ost, const TABLE<T,BASE> & tabl
     {
       ost << i << ": ";
       FlatArray<T> row = table[i];
-      ost << "(" << row.Size() << ") ";
-      for (int j = 0; j < row.Size(); j++)
+      ost << "(" << row.size() << ") ";
+      for (int j = 0; j < row.size(); j++)
 	ost << row[j] << " ";
       ost << std::endl;
     }

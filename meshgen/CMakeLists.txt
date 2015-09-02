@@ -109,7 +109,7 @@ SET(src_MESHING
 	meshing/improve3.cpp
 	meshing/localh.cpp
 	meshing/meshclass.cpp
-	meshing/meshfunc2d.cpp
+#	meshing/meshfunc2d.cpp
 	meshing/meshfunc.cpp
 	meshing/meshing2.cpp
 	meshing/meshing3.cpp

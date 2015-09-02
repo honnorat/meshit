@@ -75,19 +75,19 @@ public:
   ~netrule();
 
   ///
-  int GetNP () const { return points.Size(); }
+  int GetNP () const { return points.size(); }
   ///
-  int GetNL () const { return lines.Size(); }
+  int GetNL () const { return lines.size(); }
   ///
-  int GetNE () const { return elements.Size(); }
+  int GetNE () const { return elements.size(); }
   ///
   int GetNOldP () const { return noldp; }
   ///
   int GetNOldL () const { return noldl; }
   ///
-  int GetNDelL () const { return dellines.Size(); }
+  int GetNDelL () const { return dellines.size(); }
   ///
-  int GetNOrientations () const { return orientations.Size(); }
+  int GetNOrientations () const { return orientations.size(); }
   ///
   int GetQuality () const { return quality; }
   ///
@@ -129,7 +129,7 @@ public:
     if (p.X() < fzminx || p.X() > fzmaxx ||
 	p.Y() < fzminy || p.Y() > fzmaxy) return 0;
 
-    for (int i = 0; i < transfreezone.Size(); i++)
+    for (int i = 0; i < transfreezone.size(); i++)
       {
 	if (freesetinequ(i, 0) * p.X() + 
 	    freesetinequ(i, 1) * p.Y() +

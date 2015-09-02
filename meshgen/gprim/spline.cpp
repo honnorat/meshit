@@ -44,7 +44,7 @@ namespace netgen
   void CircleSeg<2> :: LineIntersections (const double a, const double b, const double c,
 					  Array < Point<2> > & points, const double eps) const
   {
-    points.SetSize(0);
+    points.resize(0);
 
     double px=0,py=0;
 
@@ -65,21 +65,21 @@ namespace netgen
     Array<double> t;
 
     if(fabs(discr) < 1e-20)
-      t.Append(-0.5*c2/c1);
+      t.push_back(-0.5*c2/c1);
     else
       {
-	t.Append((-c2+sqrt(discr))/(2.*c1));
-	t.Append((-c2-sqrt(discr))/(2.*c1));
+	t.push_back((-c2+sqrt(discr))/(2.*c1));
+	t.push_back((-c2-sqrt(discr))/(2.*c1));
       }
 
-    for(int i=0; i<t.Size(); i++)
+    for(int i=0; i<t.size(); i++)
       {
 	Point<2> p (px-t[i]*b,py+t[i]*a);
 
 	double angle = atan2(p(1),p(0))+M_PI;
 
 	if(angle > StartAngle()-eps && angle < EndAngle()+eps)
-	  points.Append(p);
+	  points.push_back(p);
       }
   }
 
@@ -431,7 +431,7 @@ namespace netgen
   void SplineSeg3<D> :: LineIntersections (const double a, const double b, const double c,
 					   Array < Point<D> > & points, const double eps) const
   {
-    points.SetSize(0);
+    points.resize(0);
 
     double t;
 
@@ -448,7 +448,7 @@ namespace netgen
 
 	t = -c3/c2;
 	if((t > -eps) && (t < 1.+eps))
-	  points.Append(GetPoint(t));
+	  points.push_back(GetPoint(t));
 	return;
       }
 
@@ -461,30 +461,30 @@ namespace netgen
       {
 	t = -0.5*c2/c1;
 	if((t > -eps) && (t < 1.+eps))
-	  points.Append(GetPoint(t));
+	  points.push_back(GetPoint(t));
 	return;
       }
 
     t = (-c2 + sqrt(discr))/(2.*c1);
     if((t > -eps) && (t < 1.+eps))
-      points.Append(GetPoint(t));
+      points.push_back(GetPoint(t));
 
     t = (-c2 - sqrt(discr))/(2.*c1);
     if((t > -eps) && (t < 1.+eps))
-      points.Append(GetPoint(t));
+      points.push_back(GetPoint(t));
   }
 
 
   template < int D >
   void SplineSeg3<D> :: GetRawData (Array<double> & data) const
   {
-    data.Append(3);
+    data.push_back(3);
     for(int i=0; i<D; i++)
-      data.Append(p1[i]);
+      data.push_back(p1[i]);
     for(int i=0; i<D; i++)
-      data.Append(p2[i]);
+      data.push_back(p2[i]);
     for(int i=0; i<D; i++)
-      data.Append(p3[i]);
+      data.push_back(p3[i]);
   }
 
 
