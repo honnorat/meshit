@@ -15,7 +15,6 @@
 #include <meshit.hpp>
 #include "writeuser.hpp"
 
-#include "../geom2d/geometry2d.hpp"
 #include "../meshing/meshclass.hpp"
 
 namespace meshit {
@@ -41,7 +40,8 @@ namespace meshit {
      *  2. Supports upto second order elements of each type
      *
      */
-    void WriteGmsh2Format(const Mesh & mesh,
+    void WriteGmsh2Format(
+            const Mesh & mesh,
             const std::string & filename)
     {
         std::ofstream outfile(filename.c_str());
@@ -51,165 +51,66 @@ namespace meshit {
 
         int np = mesh.GetNP(); /// number of points in mesh
         int ne = mesh.GetNE(); /// number of 3D elements in mesh
+        int ns = mesh.GetNSeg(); /// number of segments in mesh
         int nse = mesh.GetNSE(); /// number of surface elements (BC)
-        int i, j, k, l;
+
+        if ((ne > 0) && (
+                (mesh.VolumeElement(1).GetNP() > 10) ||
+                (mesh.SurfaceElement(1).GetNP() > 6))) {
+            std::cerr << " Invalid element type for Gmsh v2.xx Export Format !\n";
+            return;
+        }
+        /// Prepare GMSH 2.2 file (See GMSH 2.2 Documentation)
+        outfile << "$MeshFormat\n";
+        outfile << "2.2 0 "
+                << (int) sizeof (double) << "\n";
+        outfile << "$EndMeshFormat\n";
+
+        /// Write nodes
+        outfile << "$Nodes\n";
+        outfile << np << "\n";
+        for (int i = 1; i <= np; i++) {
+            const Point3d & p = mesh.Point(i);
+            outfile << i << " "; /// node number
+            outfile << p.X() << " ";
+            outfile << p.Y() << " ";
+            outfile << p.Z() << "\n";
+        }
+        outfile << "$EndNodes\n";
 
         /*
-         * 3D section : Volume elements (currently only tetrahedra)
+         * 2D section : available for triangles and quadrangles
+         *              upto 2nd Order
          */
-
-        if ((ne > 0)
-                && (mesh.VolumeElement(1).GetNP() <= 10)
-                && (mesh.SurfaceElement(1).GetNP() <= 6)) {
-            std::cout << "Write GMSH v2.xx Format \n";
-            std::cout << "The GMSH v2.xx export is currently available for elements upto 2nd Order\n" << std::endl;
-
-            /// Prepare GMSH 2.0 file (See GMSH 2.0 Documentation)
-            outfile << "$MeshFormat\n";
-            outfile << (float) 2.0 << " "
-                    << (int) 0 << " "
-                    << (int) sizeof (double) << "\n";
-            outfile << "$EndMeshFormat\n";
-
-            /// Write nodes
-            outfile << "$Nodes\n";
-            outfile << np << "\n";
-
-            for (i = 1; i <= np; i++) {
-                const Point3d & p = mesh.Point(i);
-                outfile << i << " "; /// node number
-                outfile << p.X() << " ";
-                outfile << p.Y() << " ";
-                outfile << p.Z() << "\n";
-            }
-
-            outfile << "$EndNodes\n";
-
-            /// write elements (both, surface elements and volume elements)
-            outfile << "$Elements\n";
-            outfile << ne + nse << "\n"; ////  number of elements + number of surfaces BC
-
-            for (i = 1; i <= nse; i++) {
-                int elType = 0;
-
-                Element2d el = mesh.SurfaceElement(i);
-
-                if (el.GetNP() == 3) elType = GMSH_TRIG; //// GMSH Type for a 3 node triangle
-                if (el.GetNP() == 6) elType = GMSH_TRIG6; //// GMSH Type for a 6 node triangle
-                if (elType == 0) {
-                    std::cout << " Invalid surface element type for Gmsh 2.0 3D-Mesh Export Format !\n";
-                    return;
-                }
-
-                outfile << i;
-                outfile << " ";
-                outfile << elType;
-                outfile << " ";
-                outfile << "2"; //// Number of tags (2 => Physical and elementary entities)
-                outfile << " ";
-                outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
-                /// that means that physical entity = elementary entity (arbitrary approach)
-                outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
-                for (j = 1; j <= el.GetNP(); j++) {
-                    outfile << " ";
-                    outfile << el.PNum(triGmsh[j]);
-                }
-                outfile << "\n";
-            }
-
-
-            for (i = 1; i <= ne; i++) {
-                int elType = 0;
-
-                Element el = mesh.VolumeElement(i);
-
-                if (el.GetNP() == 4) elType = GMSH_TET; //// GMSH Element type for 4 node tetrahedron
-                if (el.GetNP() == 10) elType = GMSH_TET10; //// GMSH Element type for 10 node tetrahedron
-                if (elType == 0) {
-                    std::cout << " Invalid volume element type for Gmsh 2.0 3D-Mesh Export Format !\n";
-                    return;
-                }
-
-                outfile << nse + i; //// element number (Remember to add on surface elements)
-                outfile << " ";
-                outfile << elType;
-                outfile << " ";
-                outfile << "2"; //// Number of tags (2 => Physical and elementary entities)
-                outfile << " ";
-                outfile << 100000 + el.GetIndex();
-                /// that means that physical entity = elementary entity (arbitrary approach)
-                outfile << " ";
-                outfile << 100000 + el.GetIndex(); /// volume number
-                outfile << " ";
-                for (j = 1; j <= el.GetNP(); j++) {
-                    outfile << " ";
-                    outfile << el.PNum(tetGmsh[j]);
-                }
-                outfile << "\n";
-            }
-            outfile << "$EndElements\n";
-        }
-            /*
-             * End of 3D section
-             */
-
-
-            /*
-             * 2D section : available for triangles and quadrangles
-             *              upto 2nd Order
-             */
-        else if (ne == 0) /// means that there's no 3D element
+        if (ne == 0) /// means that there's no 3D element
         {
-            std::cout << "\n Write Gmsh v2.xx Surface Mesh (triangle and/or quadrangles upto 2nd Order)" << std::endl;
-
-            /// Prepare GMSH 2.0 file (See GMSH 2.0 Documentation)
-            outfile << "$MeshFormat\n";
-            outfile << (float) 2.0 << " "
-                    << (int) 0 << " "
-                    << (int) sizeof (double) << "\n";
-            outfile << "$EndMeshFormat\n";
-
-            /// Write nodes
-            outfile << "$Nodes\n";
-            outfile << np << "\n";
-
-            for (i = 1; i <= np; i++) {
-                const Point3d & p = mesh.Point(i);
-                outfile << i << " "; /// node number
-                outfile << p.X() << " ";
-                outfile << p.Y() << " ";
-                outfile << p.Z() << "\n";
-            }
-            outfile << "$EndNodes\n";
-
             /// write triangles & quadrangles
             outfile << "$Elements\n";
-            outfile << nse << "\n";
+            outfile << nse + ns << "\n";
 
-            for (k = 1; k <= nse; k++) {
-                int elType = 0;
-
+            int cnt = 1;
+            for (int i = 1; i <= ns; i++) {
+                const Segment & seg = mesh.LineSegment(i);
+                outfile << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;
+            }
+            //            cnt += ns;
+            for (int k = 1; k <= nse; k++) {
                 const Element2d & el = mesh.SurfaceElement(k);
 
+                int elType = 0;
                 if (el.GetNP() == 3) elType = GMSH_TRIG; //// GMSH Type for a 3 node triangle
                 if (el.GetNP() == 6) elType = GMSH_TRIG6; //// GMSH Type for a 6 node triangle
                 if (el.GetNP() == 4) elType = GMSH_QUAD; //// GMSH Type for a 4 node quadrangle
                 if (el.GetNP() == 8) elType = GMSH_QUAD8; //// GMSH Type for an 8 node quadrangle
                 if (elType == 0) {
-                    std::cout << " Invalid surface element type for Gmsh 2.0 2D-Mesh Export Format !\n";
+                    std::cerr << " Invalid surface element type for Gmsh 2.0 2D-Mesh Export Format !\n";
                     return;
                 }
 
-                outfile << k;
-                outfile << " ";
-                outfile << elType;
-                outfile << " ";
-                outfile << "2";
-                outfile << " ";
+                outfile << cnt++ << " " << elType << " 2 ";
                 outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
-                /// that means that physical entity = elementary entity (arbitrary approach)
-                outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
-                for (l = 1; l <= el.GetNP(); l++) {
+                outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty();
+                for (int l = 1; l <= el.GetNP(); l++) {
                     outfile << " ";
                     if ((elType == GMSH_TRIG) || (elType == GMSH_TRIG6)) {
                         outfile << el.PNum(triGmsh[l]);
@@ -221,15 +122,61 @@ namespace meshit {
                 outfile << "\n";
             }
             outfile << "$EndElements\n";
-        }
             /*
              * End of 2D section
              */
-
-        else {
-            std::cout << " Invalid element type for Gmsh v2.xx Export Format !\n";
         }
-    } // End: WriteGmsh2Format
-} // End: namespace netgen
+        else {
+            /*
+             * 3D section : Volume elements (currently only tetrahedra)
+             */
+            outfile << "$Elements\n";
+            outfile << ne + nse << "\n"; ////  number of elements + number of surfaces BC
 
+            for (int i = 1; i <= nse; i++) {
 
+                Element2d el = mesh.SurfaceElement(i);
+
+                int elType = 0;
+                if (el.GetNP() == 3) elType = GMSH_TRIG; //// GMSH Type for a 3 node triangle
+                if (el.GetNP() == 6) elType = GMSH_TRIG6; //// GMSH Type for a 6 node triangle
+                if (elType == 0) {
+                    std::cerr << " Invalid surface element type for Gmsh 2.0 3D-Mesh Export Format !\n";
+                    return;
+                }
+
+                outfile << i << " " << elType << " 2 "; //// Number of tags (2 => Physical and elementary entities)
+                /// that means that physical entity = elementary entity (arbitrary approach)
+                outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
+                outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
+                for (int j = 1; j <= el.GetNP(); j++) {
+                    outfile << " " << el.PNum(triGmsh[j]);
+                }
+                outfile << "\n";
+            }
+
+            for (int i = 1; i <= ne; i++) {
+
+                Element el = mesh.VolumeElement(i);
+
+                int elType = 0;
+                if (el.GetNP() == 4) elType = GMSH_TET; //// GMSH Element type for 4 node tetrahedron
+                if (el.GetNP() == 10) elType = GMSH_TET10; //// GMSH Element type for 10 node tetrahedron
+                if (elType == 0) {
+                    std::cerr << " Invalid volume element type for Gmsh 2.0 3D-Mesh Export Format !\n";
+                    return;
+                }
+
+                outfile << nse + i; //// element number (Remember to add on surface elements)
+                outfile << " " << elType << " 2 "; //// Number of tags (2 => Physical and elementary entities)
+                outfile << 100000 + el.GetIndex() << " ";
+                outfile << 100000 + el.GetIndex(); /// volume number
+                for (int j = 1; j <= el.GetNP(); j++) {
+                    outfile << " " << el.PNum(tetGmsh[j]);
+                }
+                outfile << "\n";
+            }
+            outfile << "$EndElements\n";
+        }
+    }
+}
