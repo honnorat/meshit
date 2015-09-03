@@ -56,8 +56,6 @@ namespace meshit
       data[i] = 0;
   }
 
-
-
   void BitArray :: Invert ()
   {
     if (!size) return;
@@ -72,23 +70,12 @@ namespace meshit
       data[i] &= ba2.data[i];
   }
 
-
   void BitArray :: Or (const BitArray & ba2)
   {
     if (!size) return;
     for (int i = 0; i <= Addr (size); i++)
       data[i] |= ba2.data[i];
   }
-
-
-
-
-
-
-
-
-
-
 
   template <int BASE>
   void BitArrayChar<BASE> :: Set ()
@@ -101,7 +88,6 @@ namespace meshit
   {
     data = 0;
   }
-
 
   template <int BASE>
   void BitArrayChar<BASE> :: Invert ()
@@ -116,7 +102,6 @@ namespace meshit
     for (int i = BASE; i < data.size()+BASE; i++)
       data[i] &= ba2.data[i];
   }
-  
 
   template <int BASE>
   void BitArrayChar<BASE> :: Or (const BitArrayChar & ba2)
@@ -124,7 +109,6 @@ namespace meshit
     for (int i = BASE; i < data.size()+BASE; i++)
       data[i] |= ba2.data[i];
   }
-  
 
   template class BitArrayChar<0>;
   template class BitArrayChar<1>;

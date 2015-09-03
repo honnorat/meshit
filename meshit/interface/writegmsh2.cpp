@@ -69,9 +69,10 @@ namespace meshit {
         /// Write nodes
         outfile << "$Nodes\n";
         outfile << np << "\n";
+        int cnt = PointIndex::BASE;
         for (int i = 1; i <= np; i++) {
             const Point3d & p = mesh.Point(i);
-            outfile << i << " "; /// node number
+            outfile << cnt++ << " "; /// node number
             outfile << p.X() << " ";
             outfile << p.Y() << " ";
             outfile << p.Z() << "\n";
@@ -88,7 +89,7 @@ namespace meshit {
             outfile << "$Elements\n";
             outfile << nse + ns << "\n";
 
-            int cnt = 1;
+            int cnt = PointIndex::BASE;
             for (int i = 1; i <= ns; i++) {
                 const Segment & seg = mesh.LineSegment(i);
                 outfile << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;

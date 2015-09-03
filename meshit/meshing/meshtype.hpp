@@ -138,6 +138,7 @@ namespace meshit {
     class PointIndex
     {
         int i;
+
       public:
 
         PointIndex() { }
@@ -1006,8 +1007,6 @@ namespace meshit {
 
         ~Segment() { }
 
-        // friend ostream & operator<<(ostream  & s, const Segment & seg);
-
         PointIndex pnums[3]; // p1, p2, pmid
 
         int edgenr;
@@ -1037,13 +1036,6 @@ namespace meshit {
         std::string* bcname;
 
       public:
-        /*
-          PointIndex operator[] (int i) const
-          { return (i == 0) ? p1 : p2; }
-
-          PointIndex & operator[] (int i) 
-          { return (i == 0) ? p1 : p2; }
-         */
 
         Segment& operator=(const Segment & other);
 
