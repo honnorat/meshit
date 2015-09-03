@@ -8,7 +8,6 @@
 #include "geometry2d.hpp"
 #include "../general/flags.hpp"
 #include "../general/ngexception.hpp"
-#include "../meshing/basegeom.hpp"
 
 namespace meshit {
 
@@ -22,11 +21,10 @@ namespace meshit {
 
     void SplineGeometry2d::Load(const char * filename)
     {
-
         std::ifstream infile;
         Point<2> x;
         char buf[50];
-        
+
         infile.open(filename);
 
         if (!infile.good())
@@ -141,9 +139,6 @@ namespace meshit {
             TestComment(infile);
 
             infile >> leftdom >> rightdom;
-
-            // std::cout << "add spline " << i << ", left = " << leftdom << ", right = " << rightdom <<std::endl;
-
             infile >> buf;
             // type of spline segement
             if (strcmp(buf, "2") == 0) { // a line
@@ -175,7 +170,6 @@ namespace meshit {
                 spline = new DiscretePointsSeg<2> (pts);
             }
 
-
             SplineSegExt * spex = new SplineSegExt(*spline);
 
             infile >> spex->reffak;
@@ -183,7 +177,6 @@ namespace meshit {
             spex -> rightdom = rightdom;
             spex -> hmax = 1e99;
             splines.push_back(spex);
-
 
             Flags flags;
             ch = 'a';
@@ -216,13 +209,8 @@ namespace meshit {
 
     void SplineGeometry2d::LoadDataNew(std::istream & infile)
     {
-
-        enum
-        {
-            D = 2
-        };
         int nump, numseg, leftdom, rightdom;
-        Point<D> x;
+        Point<2> x;
         int hi1, hi2, hi3;
         double hd;
         char buf[50], ch;
@@ -242,7 +230,7 @@ namespace meshit {
             if (pointnr > nump) {
                 throw NgException(std::string("Point number greater than total number of points"));
             }
-            for (int j = 0; j < D; j++)
+            for (int j = 0; j < 2; j++)
                 infile >> x(j);
 
 
@@ -284,7 +272,7 @@ namespace meshit {
             if (hd == 1)
                 hd = flags.GetNumFlag("ref", 1.0);
             //       geompoints.Append (GeomPoint<D>(x, hd));
-            geompoints[pointnr - 1] = GeomPoint<D>(x, hd);
+            geompoints[pointnr - 1] = GeomPoint<2>(x, hd);
             geompoints[pointnr - 1].hpref = flags.GetDefineFlag("hpref");
         }
 
@@ -295,7 +283,7 @@ namespace meshit {
         for (int i = 0; i < numseg; i++)
             bcnames[i] = 0; //new"default";
 
-        SplineSeg<D> * spline = 0;
+        SplineSeg<2> * spline = 0;
         for (int i = 0; i < numseg; i++) {
             TestComment(infile);
 
@@ -307,18 +295,18 @@ namespace meshit {
             // type of spline segement
             if (strcmp(buf, "2") == 0) { // a line
                 infile >> hi1 >> hi2;
-                spline = new LineSeg<D> (geompoints[hi1 - 1],
+                spline = new LineSeg<2> (geompoints[hi1 - 1],
                         geompoints[hi2 - 1]);
             }
             else if (strcmp(buf, "3") == 0) { // a rational spline
                 infile >> hi1 >> hi2 >> hi3;
-                spline = new SplineSeg3<D> (geompoints[hi1 - 1],
+                spline = new SplineSeg3<2> (geompoints[hi1 - 1],
                         geompoints[hi2 - 1],
                         geompoints[hi3 - 1]);
             }
             else if (strcmp(buf, "4") == 0) { // an arc
                 infile >> hi1 >> hi2 >> hi3;
-                spline = new CircleSeg<D> (geompoints[hi1 - 1],
+                spline = new CircleSeg<2> (geompoints[hi1 - 1],
                         geompoints[hi2 - 1],
                         geompoints[hi3 - 1]);
                 // 	  break;
@@ -326,12 +314,12 @@ namespace meshit {
             else if (strcmp(buf, "discretepoints") == 0) {
                 int npts;
                 infile >> npts;
-                Array< Point<D> > pts(npts);
+                Array< Point<2> > pts(npts);
                 for (int j = 0; j < npts; j++)
-                    for (int k = 0; k < D; k++)
+                    for (int k = 0; k < 2; k++)
                         infile >> pts[j](k);
 
-                spline = new DiscretePointsSeg<D> (pts);
+                spline = new DiscretePointsSeg<2> (pts);
             }
 
             //      infile >> spline->reffak;

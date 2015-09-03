@@ -1,5 +1,5 @@
-#ifndef FILE_GEOMETRY2D
-#define FILE_GEOMETRY2D
+#ifndef MESHIT_GEOM2D_GEOMETRY2D_HPP
+#define MESHIT_GEOM2D_GEOMETRY2D_HPP
 
 /* *************************************************************************/
 /* File:   geometry2d.hpp                                                  */
@@ -12,13 +12,12 @@
 
 #include "../gprim/spline.hpp"
 #include "../gprim/splinegeometry.hpp"
-#include "../meshing/basegeom.hpp"
 #include "geom2dmesh.hpp"
 
 namespace meshit {
 
-    void Optimize2d (Mesh & mesh, MeshingParameters & mp);
-    
+    void Optimize2d(Mesh & mesh, MeshingParameters & mp);
+
     class SplineSegExt : public SplineSeg<2>
     {
       public:
@@ -113,7 +112,7 @@ namespace meshit {
 
     };
 
-    class SplineGeometry2d : public SplineGeometry<2>, public NetgenGeometry
+    class SplineGeometry2d : public SplineGeometry<2>
     {
       protected:
         Array<char*> materials;
@@ -124,12 +123,10 @@ namespace meshit {
         Array<std::string*> bcnames;
         double elto0;
 
-
       public:
         virtual ~SplineGeometry2d();
 
         void Load(const char * filename);
-
         void LoadData(std::istream & infile);
         void LoadDataNew(std::istream & infile);
         void LoadDataV2(std::istream & infile);
@@ -139,7 +136,6 @@ namespace meshit {
                 bool hole = false,
                 int bc = 1);
         void FakeData();
-
 
         void TestComment(std::istream & infile);
 
@@ -153,7 +149,7 @@ namespace meshit {
             return dynamic_cast<SplineSegExt&> (*splines[i]);
         }
 
-        virtual int GenerateMesh(Mesh*& mesh, MeshingParameters & mp,
+        int GenerateMesh(Mesh*& mesh, MeshingParameters & mp,
                 int perfstepsstart, int perfstepsend);
 
         void PartitionBoundary(MeshingParameters & mp, double h, Mesh & mesh2d);
@@ -191,14 +187,8 @@ namespace meshit {
 
         std::string * BCNamePtr(const int bcnr);
 
-        virtual Refinement & GetRefinement() const;
+        Refinement & GetRefinement() const;
     };
 }
-
-
-
-
-
-
 
 #endif

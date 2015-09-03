@@ -342,7 +342,6 @@ namespace meshit {
             for (SurfaceElementIndex sei = oldnf; sei < GetNSE(); sei++)
                 (*this)[sei].SetIndex(domnr);
 
-
             // astrid
             char * material;
             geometry.GetMaterial(domnr, material);

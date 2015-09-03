@@ -369,28 +369,12 @@ namespace meshit {
         GetDShape(p, dshape);
 
         CalcABt(pmat, dshape, trans);
-
-        /*
-          std::cerr << "p = " << p  <<std::endl
-          << "pmat = " << pmat <<std::endl
-          << "dshape = " << dshape <<std::endl
-          << "tans = " << trans <<std::endl;
-         */
     }
 
     void Element2d::
     GetTransformation(int ip, class DenseMatrix & pmat,
             class DenseMatrix & trans) const
     {
-        //  int np = GetNP();
-
-#ifdef DEBUG
-        if (pmat.Width() != np || pmat.Height() != 2) {
-            std::cerr << "GetTransofrmation: pmat doesn't fit" << std::endl;
-            return;
-        }
-#endif
-
         ComputeIntegrationPointData();
         DenseMatrix * dshapep = NULL;
         switch (typ) {
@@ -454,13 +438,6 @@ namespace meshit {
     void Element2d::
     GetDShape(const Point2d & p, DenseMatrix & dshape) const
     {
-#ifdef DEBUG
-        if (dshape.Height() != 2 || dshape.Width() != np) {
-            PrintSysError("Element::DShape: Sizes don't fit");
-            return;
-        }
-#endif
-
         switch (typ) {
             case TRIG:
                 dshape.Elem(1, 1) = -1;
@@ -523,15 +500,8 @@ namespace meshit {
     {
         int np = GetNP();
 
-#ifdef DEBUG
-        if (pmat.Width() != np || pmat.Height() != 2) {
-            std::cerr << "Element::GetPointMatrix: sizes don't fit" << std::endl;
-            return;
-        }
-#endif
-
         for (int i = 1; i <= np; i++) {
-            const Point2d & p = points.Get(PNum(i));
+            const Point2d & p = points[PNum(i)];
             pmat.Elem(1, i) = p.X();
             pmat.Elem(2, i) = p.Y();
         }
@@ -569,8 +539,6 @@ namespace meshit {
         err /= nip;
         return err;
     }
-
-
 
     static const int qip_table[4][4] = {
         { 0, 1, 0, 3},

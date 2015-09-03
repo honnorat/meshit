@@ -46,7 +46,6 @@ SET(src_LINALG
 SET(src_MESHING
 	meshing/adfront2.cpp
 	meshing/adfront3.cpp
-	meshing/basegeom.cpp
 	meshing/bisect.cpp
 	meshing/clusters.cpp
 	meshing/curvedelems.cpp

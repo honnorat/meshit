@@ -535,9 +535,6 @@ namespace meshit {
 
         pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
 
-        //  meshthis -> ProjectPoint (surfi, pp1);
-        //  meshthis -> GetNormalVector (surfi, pp1, n);
-
         static Array<Point2d> pts2d;
         pts2d.resize(mesh.GetNP());
 
@@ -574,13 +571,6 @@ namespace meshit {
             }
         }
 
-
-        /*
-          vgrad.Add (-(vgrad * n), n);
-
-          grad.Elem(1) = vgrad * t1;
-          grad.Elem(2) = vgrad * t2;
-         */
         return badness;
     }
 
@@ -591,13 +581,10 @@ namespace meshit {
 
         int j, k, lpi, gpi;
         Vec<3> n, vgrad;
-//        Point<3> pp1;
         Vec2d g1, vdir;
         double badness, hbad, hderiv;
 
         ld.meshthis -> GetNormalVector(ld.surfi, ld.sp1, ld.gi1, n);
-
-//        pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
 
         static Array<Point2d> pts2d;
         pts2d.resize(mesh.GetNP());
