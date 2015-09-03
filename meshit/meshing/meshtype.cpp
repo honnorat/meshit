@@ -588,7 +588,7 @@ namespace meshit {
             Mat<2, 4> vmat, pmat;
 
             for (int j = 0; j < 4; j++) {
-                const Point2d & p = points.Get((*this)[j]);
+                const Point2d & p = points[pnum[j]];
                 pmat(0, j) = p.X();
                 pmat(1, j) = p.Y();
             }
@@ -723,7 +723,7 @@ namespace meshit {
         t2 = Cross(n, t1);
 
         for (i = 1; i <= GetNP(); i++) {
-            Point3d p = points.Get(PNum(i));
+            Point3d p = points[PNum(i)];
             pmat.Elem(1, i) = p.X() * t1(0) + p.Y() * t1(1) + p.Z() * t1(2);
             pmat.Elem(2, i) = p.X() * t2(0) + p.Y() * t2(1) + p.Z() * t2(2);
         }

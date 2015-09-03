@@ -48,7 +48,12 @@ namespace meshit {
 
         /// Access array. BASE-based
 
-        T & operator[](TIND i) const
+        T & operator[](TIND i)
+        {
+            return _data[i - BASE];
+        }
+
+        const T & operator[](TIND i) const
         {
             return _data[i - BASE];
         }
@@ -442,166 +447,6 @@ namespace meshit {
             s << i << ": " << ia[i] << std::endl;
         return s;
     }
-
-
-
-    /*
-
-    ///
-    template <class T, int BASE = 0> 
-    class MoveableArray 
-    {
-      int size;
-      int allocsize;
-      DynamicMem<T> data;
-
-    public:
-
-      MoveableArray()
-      { 
-        size = allocsize = 0; 
-        data.SetName ("MoveableArray");
-      }
-
-      MoveableArray(int asize)
-        : size(asize), allocsize(asize), data(asize)
-      { ; }
-  
-      ~MoveableArray () { ; }
-
-      int Size() const { return size; }
-
-      void SetSize(int nsize)
-      {
-        if (nsize > allocsize) 
-      {
-        data.ReAlloc (nsize);
-        allocsize = nsize;
-      }
-        size = nsize;
-      }
-
-      void SetAllocSize (int nallocsize)
-      {
-        data.ReAlloc (nallocsize);
-        allocsize = nallocsize;
-      }
-
-      ///
-      T & operator[] (int i)
-      { return ((T*)data)[i-BASE]; }
-
-      ///
-      const T & operator[] (int i) const
-      { return ((const T*)data)[i-BASE]; }
-
-      ///
-      T & Elem (int i)
-      { return ((T*)data)[i-1]; }
-  
-      ///
-      const T & Get (int i) const 
-      { return ((const T*)data)[i-1]; }
-
-      ///
-      void Set (int i, const T & el)
-      { ((T*)data)[i-1] = el; }
-
-      ///
-      T & Last ()
-      { return ((T*)data)[size-1]; }
-  
-      ///
-      const T & Last () const
-      { return ((const T*)data)[size-1]; }
-  
-      ///
-      int Append (const T & el)
-      {
-        if (size == allocsize) 
-      {
-        SetAllocSize (2*allocsize+1);
-      }
-        ((T*)data)[size] = el;
-        size++;
-        return size;
-      }
-  
-      ///
-      void Delete (int i)
-      {
-        DeleteElement (i+1);
-      }
-
-      ///
-      void DeleteElement (int i)
-      {
-        ((T*)data)[i-1] = ((T*)data)[size-1];
-        size--;
-      }
-  
-      ///
-      void DeleteLast ()
-      { size--; }
-
-      ///
-      void DeleteAll ()
-      {
-        size = allocsize = 0;
-        data.Free();
-      }
-
-      ///
-      void PrintMemInfo (ostream & ost) const
-      {
-        ost << Size() << " elements of size " << sizeof(T) << " = " 
-        << Size() * sizeof(T) <<std::endl;
-      }
-
-      MoveableArray & operator= (const T & el)
-      {
-        for (int i = 0; i < size; i++)
-      ((T*)data)[i] = el;
-        return *this;
-      }
-
-
-      MoveableArray & Copy (const MoveableArray & a2)
-      {
-        SetSize (a2.Size());
-        for (int i = 0; i < this->size; i++)
-      data[i] = a2.data[i];
-        return *this;
-      }
-
-      /// array copy
-      MoveableArray & operator= (const MoveableArray & a2)
-      {
-        return Copy(a2);
-      }
-
-
-      void SetName (const char * aname)
-      {
-        data.SetName(aname);
-      }
-    private:
-      ///
-      //MoveableArray & operator= (MoveableArray &); //???
-      ///
-      //MoveableArray (const MoveableArray &); //???
-    };
-
-
-    template <class T>
-    inline ostream & operator<< (ostream & ost, MoveableArray<T> & a)
-    {
-      for (int i = 0; i < a.Size(); i++)
-        ost << i << ": " << a[i] <<std::endl;
-      return ost;
-    }
-     */
-
 
     /// bubble sort array
 

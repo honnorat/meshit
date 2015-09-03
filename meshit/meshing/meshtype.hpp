@@ -268,15 +268,9 @@ namespace meshit {
         int i;
       public:
 
-        SurfaceElementIndex()
-        {
-            ;
-        }
+        SurfaceElementIndex() { }
 
-        SurfaceElementIndex(int ai) : i(ai)
-        {
-            ;
-        }
+        SurfaceElementIndex(int ai) : i(ai) { }
 
         SurfaceElementIndex & operator=(const SurfaceElementIndex & ai)
         {
@@ -510,11 +504,7 @@ namespace meshit {
             if (typ == TRIG || typ == TRIG6)
                 return 3;
             else {
-#ifdef DEBUG
-                if (typ != QUAD && typ != QUAD6 && typ != QUAD8)
-                    PrintSysError("element2d::GetNV not implemented for typ", typ)
-#endif
-                    return 4;
+                return 4;
             }
         }
 

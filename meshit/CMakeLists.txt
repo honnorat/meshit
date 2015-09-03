@@ -3,7 +3,6 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 PROJECT( meshit )
 
 SET(src_GENERAL
-	general/array.cpp
 	general/bitarray.cpp
 	general/dynamicmem.cpp
 	general/flags.cpp

@@ -81,14 +81,8 @@ namespace meshit {
 
     void SplineGeometry2d::LoadData(std::istream & infile)
     {
-
-        enum
-        {
-            D = 2
-        };
-
         int nump, numseg, leftdom, rightdom;
-        Point<D> x;
+        Point<2> x;
         int hi1, hi2, hi3;
         double hd;
         char buf[50], ch;
@@ -102,7 +96,7 @@ namespace meshit {
         infile >> nump;
         for (int i = 0; i < nump; i++) {
             TestComment(infile);
-            for (int j = 0; j < D; j++)
+            for (int j = 0; j < 2; j++)
                 infile >> x(j);
             infile >> hd;
 
@@ -127,7 +121,7 @@ namespace meshit {
             if (infile.good())
                 infile.putback(ch);
 
-            geompoints.push_back(GeomPoint<D>(x, hd));
+            geompoints.push_back(GeomPoint<2>(x, hd));
             geompoints.Last().hpref = flags.GetDefineFlag("hpref");
             geompoints.Last().hmax = 1e99;
         }
@@ -140,7 +134,7 @@ namespace meshit {
         for (int i = 0; i < numseg; i++)
             bcnames[i] = 0; // "default";
 
-        SplineSeg<D> * spline = 0;
+        SplineSeg<2> * spline = 0;
 
         PrintMessage(3, numseg, " segments loaded");
         for (int i = 0; i < numseg; i++) {
@@ -154,18 +148,18 @@ namespace meshit {
             // type of spline segement
             if (strcmp(buf, "2") == 0) { // a line
                 infile >> hi1 >> hi2;
-                spline = new LineSeg<D>(geompoints[hi1 - 1],
+                spline = new LineSeg<2>(geompoints[hi1 - 1],
                         geompoints[hi2 - 1]);
             }
             else if (strcmp(buf, "3") == 0) { // a rational spline
                 infile >> hi1 >> hi2 >> hi3;
-                spline = new SplineSeg3<D> (geompoints[hi1 - 1],
+                spline = new SplineSeg3<2> (geompoints[hi1 - 1],
                         geompoints[hi2 - 1],
                         geompoints[hi3 - 1]);
             }
             else if (strcmp(buf, "4") == 0) { // an arc
                 infile >> hi1 >> hi2 >> hi3;
-                spline = new CircleSeg<D> (geompoints[hi1 - 1],
+                spline = new CircleSeg<2> (geompoints[hi1 - 1],
                         geompoints[hi2 - 1],
                         geompoints[hi3 - 1]);
                 // 	  break;
@@ -173,12 +167,12 @@ namespace meshit {
             else if (strcmp(buf, "discretepoints") == 0) {
                 int npts;
                 infile >> npts;
-                Array< Point<D> > pts(npts);
+                Array< Point<2> > pts(npts);
                 for (int j = 0; j < npts; j++)
-                    for (int k = 0; k < D; k++)
+                    for (int k = 0; k < 2; k++)
                         infile >> pts[j](k);
 
-                spline = new DiscretePointsSeg<D> (pts);
+                spline = new DiscretePointsSeg<2> (pts);
             }
 
 
@@ -845,16 +839,9 @@ namespace meshit {
             return -1;
     }
 
-
-
-//    extern void MeshFromSpline2D(SplineGeometry2d & geometry,
-//            Mesh *& mesh,
-//            MeshingParameters & mp);
-
     int SplineGeometry2d::GenerateMesh(Mesh*& mesh, MeshingParameters & mp,
             int perfstepsstart, int perfstepsend)
     {
-//        MeshFromSpline2D(*this, mesh, mp);
         mesh->BuildFromSpline2D(*this, mp);
         return 0;
     }
@@ -863,40 +850,5 @@ namespace meshit {
     {
         return * new Refinement2d(*this);
     }
-
-    class SplineGeometryRegister : public GeometryRegister
-    {
-      public:
-        virtual NetgenGeometry * Load(std::string filename) const;
-    };
-
-    NetgenGeometry * SplineGeometryRegister::Load(std::string filename) const
-    {
-        const char * cfilename = filename.c_str();
-        if (strcmp(&cfilename[strlen(cfilename) - 4], "in2d") == 0) {
-            PrintMessage(1, "Load 2D-Spline geometry file ", cfilename);
-
-
-            std::ifstream infile(cfilename);
-
-            SplineGeometry2d * hgeom = new SplineGeometry2d();
-            hgeom -> Load(cfilename);
-            return hgeom;
-        }
-
-        return NULL;
-    }
-
-    class SplineGeoInit
-    {
-      public:
-
-        SplineGeoInit()
-        {
-            geometryregister.push_back(new SplineGeometryRegister);
-        }
-    };
-
-    SplineGeoInit sginit;
 
 }

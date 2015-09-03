@@ -41,8 +41,6 @@ namespace meshit
 	faceindex = 0;
 	return;
       }
-      
-    CheckMeshApproximation (mesh);
 
     int i, j, k;
     SurfaceElementIndex sei;
@@ -253,7 +251,6 @@ namespace meshit
     if (printeddot)
       PrintDot ('\n');
   
-    CheckMeshApproximation (mesh);
     mesh.SetNextTimeStamp();
   }
 

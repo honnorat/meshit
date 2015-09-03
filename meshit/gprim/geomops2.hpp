@@ -34,30 +34,6 @@ operator+ (const VecExpr<TA> & a, const VecExpr<TB> & b)
   return SumExpr<TA,TB> (static_cast <const TA&> (a), static_cast <const TB&> (b));
 }
 
-/*
-template <int D1, int D2>
-inline SumExpr<const Vec<D1>&, const Vec<D2>&>
-operator+ (const Vec<D1> & a, const Vec<D2> & b)
-{
-  return SumExpr<const Vec<D1>&, const Vec<D2>&> (a, b);
-}
-*/
-
-
-
-
-
-/*
-template <int D>
-inline Vec<D> operator+ (const Vec<D> & a, const Vec<D> & b)
-{
-  Vec<D> res;
-  for (int i = 0; i < D; i++)
-    res(i) = a(i) + b(i);
-  return res;
-}
-*/
-
 template <int D>
 inline Point<D> operator+ (const Point<D> & a, const Vec<D> & b)
 {
@@ -66,7 +42,6 @@ inline Point<D> operator+ (const Point<D> & a, const Vec<D> & b)
     res(i) = a(i) + b(i);
   return res;
 }
-
 
 template <int D>
 inline Vec<D> operator- (const Point<D> & a, const Point<D> & b)
@@ -94,7 +69,6 @@ inline Vec<D> operator- (const Vec<D> & a, const Vec<D> & b)
     res(i) = a(i) - b(i);
   return res;
 }
-
 
 template <int D>
 inline Vec<D> operator* (double s, const Vec<D> & b)

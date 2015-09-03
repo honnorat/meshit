@@ -34,11 +34,6 @@ public:
   void SetMetricWeight (double mw) { metricweight = mw; }
   void SetWriteStatus (int ws) { writestatus = ws; }
 
-
-
-  ///
-  virtual void SelectSurfaceOfPoint (const Point<3> & p,
-				     const PointGeomInfo & gi);
   ///
   virtual void ProjectPoint (INDEX /* surfind */, Point<3> & /* p */) const { };
 
