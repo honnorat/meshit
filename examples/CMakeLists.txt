@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 
-SET(MESHGEN_PATH ..)
-INCLUDE_DIRECTORIES(${MESHGEN_PATH})
+SET(MESHIT_PATH ..)
+INCLUDE_DIRECTORIES(${MESHIT_PATH})
 
 MACRO(meshit_add_test examplename)
   SET(targetname test_${examplename})

@@ -1,19 +1,19 @@
 #include <iostream>
 #include <sstream>
 
-#include <meshgen/meshing/meshclass.hpp>
-#include <meshgen/meshing/meshtool.hpp>
-#include <meshgen/geom2d/geometry2d.hpp>
+#include <meshit/meshing/meshclass.hpp>
+#include <meshit/meshing/meshtool.hpp>
+#include <meshit/geom2d/geometry2d.hpp>
 
 int main(int argc, char ** argv) {
 
     std::cout << "MeshIt Square_argv" << std::endl;
 
-    netgen::MeshingParameters mp;
-    netgen::Mesh mesh;
+    meshit::MeshingParameters mp;
+    meshit::Mesh mesh;
 
     // creates geometry structure
-    netgen::SplineGeometry2d geom;
+    meshit::SplineGeometry2d geom;
     geom.Load(argv[1]);
 
     std::cout << "start meshing" << std::endl;

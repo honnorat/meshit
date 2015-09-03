@@ -1,0 +1,101 @@
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+
+PROJECT( meshit )
+
+SET(src_GENERAL
+	general/array.cpp
+	general/bitarray.cpp
+	general/dynamicmem.cpp
+	general/flags.cpp
+	general/gzstream.cpp
+	general/hashtabl.cpp
+	general/mystring.cpp
+	general/ngexception.cpp
+	general/optmem.cpp
+	general/seti.cpp
+	general/sort.cpp
+	general/spbita2d.cpp
+	general/symbolta.cpp
+	general/table.cpp
+)
+SET(src_GEOM2D
+	geom2d/genmesh2d.cpp
+	geom2d/geom2dmesh.cpp
+	geom2d/geometry2d.cpp
+)
+SET(src_GPRIM
+	gprim/adtree.cpp
+	gprim/geom2d.cpp
+	gprim/geom3d.cpp
+	gprim/geomfuncs.cpp
+	gprim/geomtest3d.cpp
+	gprim/spline.cpp
+	gprim/splinegeometry.cpp
+	gprim/transform3d.cpp
+)
+SET(src_INTERFACE
+	interface/writegmsh2.cpp
+	interface/writeuser.cpp
+)
+SET(src_LINALG
+	linalg/bfgs.cpp
+	linalg/densemat.cpp
+	linalg/linopt.cpp
+	linalg/linsearch.cpp
+	linalg/polynomial.cpp
+)
+SET(src_MESHING
+	meshing/adfront2.cpp
+	meshing/adfront3.cpp
+	meshing/basegeom.cpp
+	meshing/bisect.cpp
+	meshing/clusters.cpp
+	meshing/curvedelems.cpp
+	meshing/delaunay2d.cpp
+	meshing/delaunay.cpp
+	meshing/geomsearch.cpp
+	meshing/global.cpp
+	meshing/hprefinement.cpp
+	meshing/improve2.cpp
+	meshing/improve2gen.cpp
+	meshing/improve3.cpp
+	meshing/localh.cpp
+	meshing/meshclass.cpp
+	meshing/meshfunc.cpp
+	meshing/meshing2.cpp
+	meshing/meshing3.cpp
+	meshing/meshtool.cpp
+	meshing/meshtype.cpp
+	meshing/msghandler.cpp
+	meshing/netrule2.cpp
+	meshing/netrule3.cpp
+	meshing/parallelmesh.cpp
+	meshing/paralleltop.cpp
+	meshing/parser2.cpp
+	meshing/parser3.cpp
+	meshing/prism2rls.cpp
+	meshing/pyramid2rls.cpp
+	meshing/pyramidrls.cpp
+	meshing/quadrls.cpp
+	meshing/refine.cpp
+	meshing/ruler2.cpp
+	meshing/ruler3.cpp
+	meshing/secondorder.cpp
+	meshing/smoothing2.5.cpp
+	meshing/smoothing2.cpp
+	meshing/smoothing3.cpp
+	meshing/specials.cpp
+	meshing/tetrarls.cpp
+	meshing/topology.cpp
+	meshing/triarls.cpp
+	meshing/validate.cpp
+)
+ADD_LIBRARY(meshgen STATIC
+	${src_GENERAL}
+	${src_GEOM2D}
+	${src_GPRIM}
+	${src_INTERFACE}
+	${src_LINALG}
+	${src_MESHING}
+)
+TARGET_LINK_LIBRARIES(meshit)

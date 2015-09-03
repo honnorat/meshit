@@ -2,25 +2,25 @@
 #include <sstream>
 #include <vector>
 
-#include <meshgen/meshing/meshclass.hpp>
-#include <meshgen/meshing/meshtool.hpp>
-#include <meshgen/geom2d/geometry2d.hpp>
+#include <meshit/meshing/meshclass.hpp>
+#include <meshit/meshing/meshtool.hpp>
+#include <meshit/geom2d/geometry2d.hpp>
 
 int main(int argc, char ** argv)
 {
     std::cout << "MeshGen Square_hole" << std::endl;
 
-    netgen::MeshingParameters mp;
-    netgen::Mesh mesh;
+    meshit::MeshingParameters mp;
+    meshit::Mesh mesh;
 
     // creates geometry structure
-    netgen::SplineGeometry2d geom;
+    meshit::SplineGeometry2d geom;
 
-    std::vector<netgen::Point2d> list_outer;
-    list_outer.push_back(netgen::Point2d(-1, -1));
-    list_outer.push_back(netgen::Point2d(1, -1));
-    list_outer.push_back(netgen::Point2d(1, 1));
-    list_outer.push_back(netgen::Point2d(-1, 1));
+    std::vector<meshit::Point2d> list_outer;
+    list_outer.push_back(meshit::Point2d(-1, -1));
+    list_outer.push_back(meshit::Point2d(1, -1));
+    list_outer.push_back(meshit::Point2d(1, 1));
+    list_outer.push_back(meshit::Point2d(-1, 1));
     geom.AddLine(list_outer, 0.25);
 
 //    std::vector<meshit::Point2d> line_inner;
@@ -38,11 +38,11 @@ int main(int argc, char ** argv)
     geom.SetGrading(0.02);
     mesh.BuildFromSpline2D(geom, mp);
     std::cout << "meshing done" << std::endl;
-    netgen::MeshQuality2d(mesh);
-    netgen::CheckSurfaceMesh(mesh);
-    netgen::CheckSurfaceMesh2(mesh);
-    netgen::RemoveProblem(mesh, 0);
-    netgen::RemoveProblem(mesh, 1);
+    meshit::MeshQuality2d(mesh);
+    meshit::CheckSurfaceMesh(mesh);
+    meshit::CheckSurfaceMesh2(mesh);
+    meshit::RemoveProblem(mesh, 0);
+    meshit::RemoveProblem(mesh, 1);
     mesh.CheckConsistentBoundary();
     mesh.Export("square_hole.msh", "Gmsh2 Format");
     mesh.Save("square_hole.meshit");
