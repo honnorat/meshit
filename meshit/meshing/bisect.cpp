@@ -487,7 +487,7 @@ namespace meshit {
                 }
 
                 for (SurfaceElementIndex sei = 0; sei < mesh.GetNSE(); sei++) {
-                    const Element2d & el2d = mesh[sei];
+                    const Element2d & el2d = mesh.SurfaceElement(sei);
 
                     for (i = 0; i < el2d.GetNP(); i++) {
                         INDEX_2 e1(el2d[i], el2d[(i + 1) % el2d.GetNP()]);
@@ -1784,7 +1784,7 @@ namespace meshit {
         }
 
         for (SurfaceElementIndex sei = 0; sei < mesh.GetNSE(); sei++) {
-            const Element2d & el = mesh[sei];
+            const Element2d & el = mesh.SurfaceElement(sei);
 
             switch (el.GetType()) {
                 case TRIG:
@@ -1877,13 +1877,16 @@ namespace meshit {
                     if (mesh[ei].TestStrongRefinementFlag())
                         mesh[ei].SetOrder(ox + 2, oy + 2, oz + 2);
                 }
-            for (SurfaceElementIndex sei = 0; sei < nse; sei++)
-                if (mesh[sei].TestRefinementFlag()) {
-                    mesh[sei].GetOrder(ox, oy);
-                    mesh[sei].SetOrder(ox + 1, oy + 1);
-                    if (mesh[sei].TestStrongRefinementFlag())
-                        mesh[sei].SetOrder(ox + 2, oy + 2);
+            for (SurfaceElementIndex sei = 0; sei < nse; sei++) {
+                const Element2d & el = mesh.SurfaceElement(sei);
+                if (el.TestRefinementFlag()) {
+                    el.GetOrder(ox, oy);
+                    el.SetOrder(ox + 1, oy + 1);
+                    if (el.TestStrongRefinementFlag()) {
+                        el.SetOrder(ox + 2, oy + 2);
+                    }
                 }
+            }
 
 #ifndef SABINE //Nachbarelemente mit ordx,ordy,ordz 
 
@@ -1895,20 +1898,30 @@ namespace meshit {
                     if (mesh[ei].GetOrder() > v_order[mesh[ei][j]])
                         v_order[mesh[ei][j]] = mesh[ei].GetOrder();
 
-            for (SurfaceElementIndex sei = 0; sei < nse; sei++)
-                for (int j = 0; j < mesh[sei].GetNP(); j++)
-                    if (mesh[sei].GetOrder() > v_order[mesh[sei][j]])
-                        v_order[mesh[sei][j]] = mesh[sei].GetOrder();
-
-            for (ElementIndex ei = 0; ei < ne; ei++)
-                for (int j = 0; j < mesh[ei].GetNP(); j++)
-                    if (mesh[ei].GetOrder() < v_order[mesh[ei][j]] - 1)
+            for (SurfaceElementIndex sei = 0; sei < nse; sei++) {
+                const Element2d & el = mesh.SurfaceElement(sei);
+                for (int j = 0; j < el.GetNP(); j++) {
+                    if (el.GetOrder() > v_order[el[j]]) {
+                        v_order[el[j]] = el.GetOrder();
+                    }
+                }
+            }
+            for (ElementIndex ei = 0; ei < ne; ei++) {
+                for (int j = 0; j < mesh[ei].GetNP(); j++) {
+                    if (mesh[ei].GetOrder() < v_order[mesh[ei][j]] - 1) {
                         mesh[ei].SetOrder(v_order[mesh[ei][j]] - 1);
+                    }
+                }
+            }
 
-            for (SurfaceElementIndex sei = 0; sei < nse; sei++)
-                for (int j = 0; j < mesh[sei].GetNP(); j++)
-                    if (mesh[sei].GetOrder() < v_order[mesh[sei][j]] - 1)
-                        mesh[sei].SetOrder(v_order[mesh[sei][j]] - 1);
+            for (SurfaceElementIndex sei = 0; sei < nse; sei++) {
+                const Element2d & el = mesh.SurfaceElement(sei);
+                for (int j = 0; j < el.GetNP(); j++) {
+                    if (el.GetOrder() < v_order[el[j]] - 1) {
+                        el.SetOrder(v_order[el[j]] - 1);
+                    }
+                }
+            }
 
 #endif
 

@@ -346,7 +346,7 @@ namespace meshit {
             meshing.GenerateMesh(*this, mp, h, domnr);
 
             for (SurfaceElementIndex sei = oldnf; sei < GetNSE(); sei++) {
-                (*this)[sei].SetIndex(domnr);
+                surfelements[sei].SetIndex(domnr);
             }
 
             // astrid
@@ -542,16 +542,16 @@ namespace meshit {
 
         SurfaceElementIndex sei;
         for (sei = 0; sei < GetNSE(); sei++) {
-            if ((*this)[sei].GetIndex()) {
-                outfile << " " << GetFaceDescriptor((*this)[sei].GetIndex()).SurfNr() + 1;
-                outfile << " " << GetFaceDescriptor((*this)[sei].GetIndex()).BCProperty();
-                outfile << " " << GetFaceDescriptor((*this)[sei].GetIndex()).DomainIn();
-                outfile << " " << GetFaceDescriptor((*this)[sei].GetIndex()).DomainOut();
+            if (surfelements[sei].GetIndex()) {
+                outfile << " " << GetFaceDescriptor(surfelements[sei].GetIndex()).SurfNr() + 1;
+                outfile << " " << GetFaceDescriptor(surfelements[sei].GetIndex()).BCProperty();
+                outfile << " " << GetFaceDescriptor(surfelements[sei].GetIndex()).DomainIn();
+                outfile << " " << GetFaceDescriptor(surfelements[sei].GetIndex()).DomainOut();
             }
             else
                 outfile << " 0 0 0";
 
-            Element2d sel = (*this)[sei];
+            Element2d sel = surfelements[sei];
             if (invertsurf)
                 sel.Invert();
 
@@ -772,30 +772,30 @@ namespace meshit {
 
         cnt_sing = 0;
         for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
-            if (GetFaceDescriptor((*this)[sei].GetIndex()).domin_singular)
+            if (GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular)
                 cnt_sing++;
         }
 
         if (cnt_sing) {
             outfile << "singular_face_inside" << std::endl << cnt_sing << std::endl;
             for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
-                if (GetFaceDescriptor((*this)[sei].GetIndex()).domin_singular) {
+                if (GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular) {
                     outfile << int(sei) << "\t"
-                            << GetFaceDescriptor((*this)[sei].GetIndex()).domin_singular << std::endl;
+                            << GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular << std::endl;
                 }
             }
         }
 
         cnt_sing = 0;
         for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
-            if (GetFaceDescriptor((*this)[sei].GetIndex()).domout_singular) cnt_sing++;
+            if (GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular) cnt_sing++;
         }
         if (cnt_sing) {
             outfile << "singular_face_outside" << std::endl << cnt_sing << std::endl;
             for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
-                if (GetFaceDescriptor((*this)[sei].GetIndex()).domout_singular) {
+                if (GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular) {
                     outfile << int(sei) << "\t"
-                            << GetFaceDescriptor((*this)[sei].GetIndex()).domout_singular << std::endl;
+                            << GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular << std::endl;
                 }
             }
         }
@@ -1067,12 +1067,12 @@ namespace meshit {
                 }
                 else {
                     for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
-                        if ((*this)[sei].GetIndex()) {
-                            int bcp = GetFaceDescriptor((*this)[sei].GetIndex()).BCProperty();
+                        if (surfelements[sei].GetIndex()) {
+                            int bcp = GetFaceDescriptor(surfelements[sei].GetIndex()).BCProperty();
                             if (bcp <= n)
-                                GetFaceDescriptor((*this)[sei].GetIndex()).SetBCName(bcnames[bcp - 1]);
+                                GetFaceDescriptor(surfelements[sei].GetIndex()).SetBCName(bcnames[bcp - 1]);
                             else
-                                GetFaceDescriptor((*this)[sei].GetIndex()).SetBCName(0);
+                                GetFaceDescriptor(surfelements[sei].GetIndex()).SetBCName(0);
 
                         }
                     }
@@ -1121,7 +1121,7 @@ namespace meshit {
                     double s;
                     infile >> sei;
                     infile >> s;
-                    GetFaceDescriptor((*this)[sei].GetIndex()).domin_singular = s;
+                    GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular = s;
                 }
             }
 
@@ -1132,7 +1132,7 @@ namespace meshit {
                     double s;
                     infile >> sei;
                     infile >> s;
-                    GetFaceDescriptor((*this)[sei].GetIndex()).domout_singular = s;
+                    GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular = s;
                 }
             }
 
@@ -1211,8 +1211,8 @@ namespace meshit {
         int oldnd = GetNDomains();
 
         for (SurfaceElementIndex si = 0; si < GetNSE(); si++) {
-            for (int j = 1; j <= (*this)[si].GetNP(); j++) {
-                (*this)[si].GeomInfoPi(j).trignum = -1;
+            for (int j = 1; j <= surfelements[si].GetNP(); j++) {
+                surfelements[si].GeomInfoPi(j).trignum = -1;
             }
         }
 
@@ -2551,7 +2551,7 @@ namespace meshit {
             pmin = Point3d(1e10, 1e10, 1e10);
             pmax = Point3d(-1e10, -1e10, -1e10);
             for (sei = 0; sei < nse; sei++) {
-                const Element2d & el = (*this)[sei];
+                const Element2d & el = surfelements[sei];
                 if (el.IsDeleted()) continue;
 
                 if (dom == -1 || el.GetIndex() == dom) {

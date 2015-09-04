@@ -607,15 +607,15 @@ namespace meshit
 	    
     for(SurfaceElementIndex i = 0; i < mesh.GetNSE(); i++)
       {
-	HPRefElement hpel(mesh[i]);
+	HPRefElement hpel(mesh.SurfaceElement(i));
 	hpel.coarse_elnr = i; 
-	switch(mesh[i].GetType())
+	switch(mesh.SurfaceElement(i).GetType())
 	  { 
 	  case TRIG: hpel.type = HP_TRIG; break; 
 	  case QUAD: hpel.type = HP_QUAD; break; 
 
           default:
-            std::cerr << "HPRefElement: illegal elementtype (1b) " << mesh[i].GetType() << std::endl;
+            std::cerr << "HPRefElement: illegal elementtype (1b) " << mesh.SurfaceElement(i).GetType() << std::endl;
             throw NgException ("HPRefElement: illegal elementtype (1b)");
 	  } 
 	elements.push_back(hpel);
@@ -1383,14 +1383,14 @@ namespace meshit
 	for(SurfaceElementIndex i=0;i<mesh.GetNSE(); i++) 
 	  { 
 	    // Element2d el = mesh[i] ;
-	    HPRefElement & hpel = hpelements[mesh[i].hp_elnr];
-	    const ELEMENT_EDGE * edges = MeshTopology::GetEdges1 (mesh[i].GetType());
+	    HPRefElement & hpel = hpelements[mesh.SurfaceElement(i).hp_elnr];
+	    const ELEMENT_EDGE * edges = MeshTopology::GetEdges1 (mesh.SurfaceElement(i).GetType());
 	    double dist[3] = {0,0,0}; 
 	    int ord_dir[3] = {0,0,0}; 
 	    int  edge_dir[4] = {0,0,0,0} ; 
 	    int ned = 3; 
 	   
-	    if(mesh[i].GetType() == QUAD)
+	    if(mesh.SurfaceElement(i).GetType() == QUAD)
 	      {
 		/*	std::cout << " QUAD " ; 
 		for(int k=0;k<4;k++) std::cout << el[k] << "\t" ; 
@@ -1420,7 +1420,7 @@ namespace meshit
 	      refi[j] = int(std::max(double(floor(log(dist[ord_dir[j]]/sqrt(2.))/log(fac1))),0.)); 	
 	    
 	    if(setorders)
-	      mesh[i].SetOrder(act_ref+1-refi[0],act_ref+1-refi[1],act_ref+1-refi[2]); 
+	      mesh.SurfaceElement(i).SetOrder(act_ref+1-refi[0],act_ref+1-refi[1],act_ref+1-refi[2]); 
 
 	      // std::cout << " ref " << refi[0] << "\t" << refi[1] <<std::endl; 
 	      // std::cout << " order " << act_ref +1 - refi[0] << "\t" << act_ref +1 - refi[1] <<std::endl; 
@@ -1528,7 +1528,7 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 	facepoint = 0;
 	for (SurfaceElementIndex sei = 0; sei < mesh.GetNSE(); sei++)
 	  {
-	    const Element2d & el = mesh[sei];
+	    const Element2d & el = mesh.SurfaceElement(sei);
 	    const FaceDescriptor & fd = mesh.GetFaceDescriptor (el.GetIndex());
 	  
 	    int domnr = 0;

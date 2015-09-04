@@ -48,16 +48,6 @@ namespace meshit
     Array<SurfaceElementIndex> seia;
     mesh.GetSurfaceElementsOfFace (faceindex, seia);
 
-    /*
-    bool mixed = 0;
-    for (i = 0; i < seia.Size(); i++)
-      if (mesh[seia[i]].GetNP() != 3)
-	{
-	  mixed = 1;
-	  break;
-	}
-    */
-
     int loci;
     double fact;
     bool moveisok;
@@ -74,7 +64,7 @@ namespace meshit
 
     for (i = 0; i < seia.size(); i++)
       {
-	const Element2d & el = mesh[seia[i]];
+	const Element2d & el = mesh.SurfaceElement(seia[i]);
 	for (j = 0; j < el.GetNP(); j++)
 	  nelementsonpoint[el[j]]++;
       }
@@ -83,19 +73,13 @@ namespace meshit
     TABLE<SurfaceElementIndex,PointIndex::BASE> elementsonpoint(nelementsonpoint);
     for (i = 0; i < seia.size(); i++)
       {
-	const Element2d & el = mesh[seia[i]];
+	const Element2d & el = mesh.SurfaceElement(seia[i]);
 	for (j = 0; j < el.GetNP(); j++)
 	  elementsonpoint.Add (el[j], seia[i]);
       }
     
 
     JacobianPointFunction pf(mesh.Points(),mesh.VolumeElements());
-
-
-
-//     Opti2SurfaceMinFunction surfminf(mesh);
-//     Opti2EdgeMinFunction edgeminf(mesh);
-//     Opti2SurfaceMinFunctionJacobian surfminfj(mesh);
 
     OptiParameters par;
     par.maxit_linsearch = 8;
@@ -149,7 +133,7 @@ namespace meshit
 	if(elementsonpoint[pi].size() == 0)
 	  continue;
 
-	Element2d & hel = mesh[elementsonpoint[pi][0]];
+	Element2d & hel = mesh.SurfaceElement(elementsonpoint[pi][0]);
 
 	if(hel.GetIndex() != faceindex)
 	  continue;
@@ -177,7 +161,7 @@ namespace meshit
 	for (j = 0; j < elementsonpoint[pi].size(); j++)
 	  {
 	    sei = elementsonpoint[pi][j];
-	    const Element2d & bel = mesh[sei];
+	    const Element2d & bel = mesh.SurfaceElement(sei);
 	    surfi = mesh.GetFaceDescriptor(bel.GetIndex()).SurfNr();
 	    
 	    locelements.push_back (sei);
@@ -231,7 +215,7 @@ namespace meshit
 		if (moveisok)
 		  {
 		    for (j = 0; j < locelements.size(); j++)
-		      mesh[locelements[j]].GeomInfoPi(locrots[j]) = ngi;
+		      mesh.SurfaceElement(locelements[j]).GeomInfoPi(locrots[j]) = ngi;
 
 		    //std::cout << "moved " << origp << " to " << mesh[pi] <<std::endl;
 		  }

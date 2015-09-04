@@ -653,7 +653,7 @@ namespace meshit
 	  for (SurfaceElementIndex i = 0; i < mesh.GetNSE(); i++)
 	    {
 	      top.GetEdges (i, edgenrs);
-	      const Element2d & el = mesh[i];
+	      const Element2d & el = mesh.SurfaceElement(i);
 	      const ELEMENT_EDGE * edges = MeshTopology::GetEdges0 (el.GetType());
 
 	      for (int i2 = 0; i2 < edgenrs.size(); i2++)
@@ -1086,7 +1086,7 @@ namespace meshit
     if (working)
       for (SurfaceElementIndex i = 0; i < mesh.GetNSE(); i++)
 	surfnr[top.GetFace(i)] = 
-	  mesh.GetFaceDescriptor(mesh[i].GetIndex()).SurfNr();
+	  mesh.GetFaceDescriptor(mesh.SurfaceElement(i).GetIndex()).SurfNr();
 
 #ifdef PARALLEL
     TABLE<int> send_surfnr(ntasks), recv_surfnr(ntasks);
@@ -1513,18 +1513,18 @@ namespace meshit
 
   bool CurvedElements :: IsSurfaceElementCurved (SurfaceElementIndex elnr) const
   {
-    if (mesh[elnr].GetType() != TRIG) return true;
+    if (mesh.SurfaceElement(elnr).GetType() != TRIG) return true;
     if (!IsHighOrder()) return false;
 
     if (mesh.coarsemesh)
       {
 	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
+	  (*mesh.hpelements) [mesh.SurfaceElement(elnr).hp_elnr];
 	
 	return mesh.coarsemesh->GetCurvedElements().IsSurfaceElementCurved (hpref_el.coarse_elnr);
       }
 
-    const Element2d & el = mesh[elnr];
+    const Element2d & el = mesh.SurfaceElement(elnr);
     ELEMENT_TYPE type = el.GetType();
     
     SurfaceElementInfo info;
@@ -1566,13 +1566,13 @@ namespace meshit
     if (mesh.coarsemesh)
       {
 	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
+	  (*mesh.hpelements) [mesh.SurfaceElement(elnr).hp_elnr];
 	
 	// xi umrechnen
 	double lami[4];
 	FlatVector vlami(4, lami);
 	vlami = 0;
-	mesh[elnr].GetShapeNew (xi, vlami);
+	mesh.SurfaceElement(elnr).GetShapeNew (xi, vlami);
 	
 	Mat<2,2> trans;
 	Mat<3,2> dxdxic;
@@ -1580,7 +1580,7 @@ namespace meshit
 	  {
 	    MatrixFixWidth<2> dlami(4);
 	    dlami = 0;
-	    mesh[elnr].GetDShapeNew (xi, dlami);	  
+	    mesh.SurfaceElement(elnr).GetDShapeNew (xi, dlami);	  
 	    
 	    trans = 0;
 	    for (int k = 0; k < 2; k++)
@@ -1605,7 +1605,7 @@ namespace meshit
 
 
 
-    const Element2d & el = mesh[elnr];
+    const Element2d & el = mesh.SurfaceElement(elnr);
     ELEMENT_TYPE type = el.GetType();
 
     SurfaceElementInfo info;
@@ -1696,7 +1696,7 @@ namespace meshit
   void CurvedElements :: 
   CalcElementShapes (SurfaceElementInfo & info, const Point<2> & xi, Vector & shapes) const
   {
-    const Element2d & el = mesh[info.elnr];
+    const Element2d & el = mesh.SurfaceElement(info.elnr);
     shapes.SetSize(info.ndof);
 
     if (rational && info.order >= 2)
@@ -1834,7 +1834,7 @@ namespace meshit
   void CurvedElements :: 
   CalcElementDShapes (SurfaceElementInfo & info, const Point<2> & xi, MatrixFixWidth<2> & dshapes) const
   {
-    const Element2d & el = mesh[info.elnr];
+    const Element2d & el = mesh.SurfaceElement(info.elnr);
     ELEMENT_TYPE type = el.GetType();
 
     double lami[4];
@@ -2100,7 +2100,7 @@ namespace meshit
   void CurvedElements :: 
   GetCoefficients (SurfaceElementInfo & info, Array<Vec<DIM_SPACE> > & coefs) const
   {
-    const Element2d & el = mesh[info.elnr];
+    const Element2d & el = mesh.SurfaceElement(info.elnr);
     coefs.resize (info.ndof);
     
     for (int i = 0; i < info.nv; i++)
@@ -3203,7 +3203,7 @@ namespace meshit
     if (mesh.coarsemesh)
       {
 	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
+	  (*mesh.hpelements) [mesh.SurfaceElement(elnr).hp_elnr];
 	
 	// xi umrechnen
 	double lami[4];
@@ -3215,7 +3215,7 @@ namespace meshit
 	  {
 	    vlami = 0;
 	    Point<2> hxi(xi[pi*sxi], xi[pi*sxi+1]);
-	    mesh[elnr].GetShapeNew ( hxi, vlami);
+	    mesh.SurfaceElement(elnr).GetShapeNew ( hxi, vlami);
 	    
 	    Point<2> cxi(0,0);
 	    for (int i = 0; i < hpref_el.np; i++)
@@ -3239,7 +3239,7 @@ namespace meshit
 	    for (int pi = 0; pi < npts; pi++)
 	      {
 		Point<2> hxi(xi[pi*sxi], xi[pi*sxi+1]);
-		mesh[elnr].GetDShapeNew ( hxi, dlami);	  
+		mesh.SurfaceElement(elnr).GetDShapeNew ( hxi, dlami);	  
 		
 		Mat<2,2> trans;
 		trans = 0;
@@ -3266,7 +3266,7 @@ namespace meshit
       }
 
 
-    const Element2d & el = mesh[elnr];
+    const Element2d & el = mesh.SurfaceElement(elnr);
     ELEMENT_TYPE type = el.GetType();
 
     SurfaceElementInfo info;

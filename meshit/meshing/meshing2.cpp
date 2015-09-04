@@ -217,7 +217,7 @@ namespace meshit {
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(facenr, seia);
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & sel = mesh[seia[i]];
+            const Element2d & sel = mesh.SurfaceElement(seia[i]);
 
             if (sel.IsDeleted()) continue;
 
@@ -680,7 +680,7 @@ namespace meshit {
                         // const Element2d & el = mesh.SurfaceElement(j);
 
                         SurfaceElementIndex j = intersecttrias[jj];
-                        const Element2d & el = mesh[j];
+                        const Element2d & el = mesh.SurfaceElement(j);
 
                         int ntrig = (el.GetNP() == 3) ? 1 : 2;
 

@@ -167,14 +167,14 @@ namespace meshit {
         /// parent element of surface element
         Array<int> mlparentsurfaceelement;
 
-        DLL_HEADER Mesh();
-        DLL_HEADER ~Mesh();
+        Mesh();
+        ~Mesh();
 
         Mesh & operator=(const Mesh & mesh2);
 
         void BuildFromSpline2D(SplineGeometry2d & geometry, MeshingParameters & mp);
 
-        DLL_HEADER void DeleteMesh();
+        void DeleteMesh();
 
         void ClearSurfaceElements();
 
@@ -192,8 +192,8 @@ namespace meshit {
 
         void SetAllocSize(int nnodes, int nsegs, int nsel, int nel);
 
-        DLL_HEADER PointIndex AddPoint(const Point3d & p, int layer = 1);
-        DLL_HEADER PointIndex AddPoint(const Point3d & p, int layer, POINTTYPE type);
+        PointIndex AddPoint(const Point3d & p, int layer = 1);
+        PointIndex AddPoint(const Point3d & p, int layer, POINTTYPE type);
 
         int GetNP() const
         {
@@ -240,7 +240,7 @@ namespace meshit {
             return points;
         }
 
-        DLL_HEADER SegmentIndex AddSegment(const Segment & s);
+        SegmentIndex AddSegment(const Segment & s);
 
         void DeleteSegment(int segnr)
         {
@@ -288,7 +288,7 @@ namespace meshit {
             return segments[si];
         }
 
-        DLL_HEADER SurfaceElementIndex AddSurfaceElement(const Element2d & el);
+        SurfaceElementIndex AddSurfaceElement(const Element2d & el);
 
         void DeleteSurfaceElement(int eli)
         {
@@ -329,20 +329,10 @@ namespace meshit {
             return surfelements[i];
         }
 
-        const Element2d & operator[](SurfaceElementIndex ei) const
-        {
-            return surfelements[ei];
-        }
+        void RebuildSurfaceElementLists();
+        void GetSurfaceElementsOfFace(int facenr, Array<SurfaceElementIndex> & sei) const;
 
-        Element2d & operator[](SurfaceElementIndex ei)
-        {
-            return surfelements[ei];
-        }
-
-        DLL_HEADER void RebuildSurfaceElementLists();
-        DLL_HEADER void GetSurfaceElementsOfFace(int facenr, Array<SurfaceElementIndex> & sei) const;
-
-        DLL_HEADER ElementIndex AddVolumeElement(const Element & el);
+        ElementIndex AddVolumeElement(const Element & el);
 
         int GetNE() const
         {
@@ -394,9 +384,9 @@ namespace meshit {
             return volelements;
         }
 
-        DLL_HEADER double ElementError(int eli, const MeshingParameters & mp) const;
+        double ElementError(int eli, const MeshingParameters & mp) const;
 
-        DLL_HEADER void AddLockedPoint(PointIndex pi);
+        void AddLockedPoint(PointIndex pi);
         void ClearLockedPoints();
 
         const Array<PointIndex> & LockedPoints() const
@@ -428,18 +418,18 @@ namespace meshit {
            boundary elements without inner element.
            Results are stored in openelements.
            if dom == 0, all sub-domains, else subdomain dom */
-        DLL_HEADER void FindOpenElements(int dom = 0);
+        void FindOpenElements(int dom = 0);
 
         /**
            finds segments without surface element,
            and surface elements without neighbours.
            store in opensegmentsy
          */
-        DLL_HEADER void FindOpenSegments(int surfnr = 0);
+        void FindOpenSegments(int surfnr = 0);
         /**
            remove one layer of surface elements
          */
-        DLL_HEADER void RemoveOneLayerSurfaceElements();
+        void RemoveOneLayerSurfaceElements();
 
         int GetNOpenSegments()
         {
@@ -455,35 +445,35 @@ namespace meshit {
            Checks overlap of boundary
            return == 1, iff overlap
          */
-        DLL_HEADER int CheckOverlappingBoundary();
+        int CheckOverlappingBoundary();
         /**
            Checks consistent boundary
            return == 0, everything ok
          */
-        DLL_HEADER int CheckConsistentBoundary() const;
+        int CheckConsistentBoundary() const;
 
         /*
           checks element orientation
          */
-        DLL_HEADER int CheckVolumeMesh() const;
+        int CheckVolumeMesh() const;
 
         /**
            finds average h of surface surfnr if surfnr > 0,
            else of all surfaces.
          */
-        DLL_HEADER double AverageH(int surfnr = 0) const;
+        double AverageH(int surfnr = 0) const;
         /// Calculates localh 
-        DLL_HEADER void CalcLocalH(double grading);
-        DLL_HEADER void SetLocalH(const Point3d & pmin, const Point3d & pmax, double grading);
-        DLL_HEADER void RestrictLocalH(const Point3d & p, double hloc);
-        DLL_HEADER void RestrictLocalHLine(const Point3d & p1, const Point3d & p2,
+        void CalcLocalH(double grading);
+        void SetLocalH(const Point3d & pmin, const Point3d & pmax, double grading);
+        void RestrictLocalH(const Point3d & p, double hloc);
+        void RestrictLocalHLine(const Point3d & p1, const Point3d & p2,
                 double hloc);
         /// number of elements per radius
-        DLL_HEADER void CalcLocalHFromSurfaceCurvature(double grading, double elperr);
-        DLL_HEADER void CalcLocalHFromPointDistances(double grading);
-        DLL_HEADER void RestrictLocalH(resthtype rht, int nr, double loch);
-        DLL_HEADER void LoadLocalMeshSize(const char * meshsizefilename);
-        DLL_HEADER void SetGlobalH(double h);
+        void CalcLocalHFromSurfaceCurvature(double grading, double elperr);
+        void CalcLocalHFromPointDistances(double grading);
+        void RestrictLocalH(resthtype rht, int nr, double loch);
+        void LoadLocalMeshSize(const char * meshsizefilename);
+        void SetGlobalH(double h);
         void SetMinimalH(double h);
         double MaxHDomain(int dom) const;
         void SetMaxHDomain(const Array<double> & mhd);
@@ -501,10 +491,10 @@ namespace meshit {
         }
 
         /// Find bounding box
-        DLL_HEADER void GetBox(Point3d & pmin, Point3d & pmax, int dom = -1) const;
+        void GetBox(Point3d & pmin, Point3d & pmax, int dom = -1) const;
 
         /// Find bounding box of points of typ ptyp or less
-        DLL_HEADER void GetBox(Point3d & pmin, Point3d & pmax, POINTTYPE ptyp) const;
+        void GetBox(Point3d & pmin, Point3d & pmax, POINTTYPE ptyp) const;
 
         int GetNOpenElements() const
         {
@@ -553,7 +543,7 @@ namespace meshit {
         /**
            Remove unused points. etc.
          */
-        DLL_HEADER void Compress();
+        void Compress();
 
         void Export(
                 const std::string & filename,
@@ -608,7 +598,7 @@ namespace meshit {
         void Split2Tets();
 
         /// build box-search tree
-        DLL_HEADER void BuildElementSearchTree();
+        void BuildElementSearchTree();
 
         void SetPointSearchStartElement(const int el) const
         {
@@ -651,10 +641,10 @@ namespace meshit {
             return edgedecoding.push_back(fd) - 1;
         }
 
-        DLL_HEADER void SetMaterial(int domnr, const char * mat);
+        void SetMaterial(int domnr, const char * mat);
         const char * GetMaterial(int domnr) const;
-        DLL_HEADER void SetNBCNames(int nbcn);
-        DLL_HEADER void SetBCName(int bcnr, const std::string & abcname);
+        void SetNBCNames(int nbcn);
+        void SetBCName(int bcnr, const std::string & abcname);
 
         const std::string & GetBCName(int bcnr) const;
 
@@ -793,7 +783,7 @@ namespace meshit {
             {
                 area = 0;
                 for (SurfaceElementIndex sei = 0; sei < mesh.GetNSE(); sei++) {
-                    Add(mesh[sei]);
+                    Add(mesh.SurfaceElement(sei));
                 }
                 valid = true;
             }

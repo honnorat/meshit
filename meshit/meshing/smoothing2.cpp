@@ -325,7 +325,7 @@ namespace meshit {
 
         for (j = 0; j < ld.locelements.size(); j++) {
             rot = ld.locrots[j];
-            const Element2d & bel = mesh[ld.locelements[j]];
+            const Element2d & bel = mesh.SurfaceElement(ld.locelements[j]);
 
             v1 = mesh[bel.PNumMod(rot + 1)] - pp1;
             v2 = mesh[bel.PNumMod(rot + 2)] - pp1;
@@ -395,7 +395,7 @@ namespace meshit {
 
         for (int j = 1; j <= ld.locelements.size(); j++) {
 
-            const Element2d & bel = mesh[ld.locelements.Get(j)];
+            const Element2d & bel = mesh.SurfaceElement(ld.locelements.Get(j));
             lpi = ld.locrots.Get(j);
             gpi = bel.PNum(lpi);
 
@@ -439,7 +439,7 @@ namespace meshit {
         for (j = 1; j <= ld.locelements.size(); j++) {
             lpi = ld.locrots.Get(j);
             const Element2d & bel =
-                    mesh[ld.locelements.Get(j)];
+                    mesh.SurfaceElement(ld.locelements.Get(j));
 
             gpi = bel.PNum(lpi);
 
@@ -491,7 +491,7 @@ namespace meshit {
 
         bool mixed = 0;
         for (int i = 0; i < seia.size(); i++) {
-            if (mesh[seia[i]].GetNP() != 3) {
+            if (mesh.SurfaceElement(seia[i]).GetNP() != 3) {
                 mixed = 1;
                 break;
             }
@@ -506,13 +506,13 @@ namespace meshit {
         Array<int, PointIndex::BASE> compress(mesh.GetNP());
         Array<PointIndex> icompress;
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh[seia[i]];
+            const Element2d & el = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < el.GetNP(); j++) {
                 compress[el[j]] = -1;
             }
         }
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh[seia[i]];
+            const Element2d & el = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < el.GetNP(); j++) {
                 if (compress[el[j]] == -1) {
                     compress[el[j]] = icompress.size();
@@ -523,14 +523,14 @@ namespace meshit {
         Array<int> cnta(icompress.size());
         cnta = 0;
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh[seia[i]];
+            const Element2d & el = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < el.GetNP(); j++) {
                 cnta[compress[el[j]]]++;
             }
         }
         TABLE<SurfaceElementIndex> elementsonpoint(cnta);
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh[seia[i]];
+            const Element2d & el = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < el.GetNP(); j++) {
                 elementsonpoint.Add(compress[el[j]], seia[i]);
             }
@@ -583,7 +583,7 @@ namespace meshit {
                 ld.sp1 = mesh[pi];
 
                 // Element2d & hel = mesh[elementsonpoint[pi][0]];
-                Element2d & hel = mesh[elementsonpoint[hi][0]];
+                Element2d & hel = mesh.SurfaceElement(elementsonpoint[hi][0]);
 
                 int hpi = 0;
                 for (int j = 1; j <= hel.GetNP(); j++) {
@@ -602,7 +602,7 @@ namespace meshit {
 
                 for (int j = 0; j < elementsonpoint[hi].size(); j++) {
                     SurfaceElementIndex sei = elementsonpoint[hi][j];
-                    const Element2d & bel = mesh[sei];
+                    const Element2d & bel = mesh.SurfaceElement(sei);
                     ld.surfi = mesh.GetFaceDescriptor(bel.GetIndex()).SurfNr();
 
                     ld.locelements.push_back(sei);
@@ -627,14 +627,14 @@ namespace meshit {
 
                 // save points, and project to tangential plane
                 for (int j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d & el = mesh[ld.locelements[j]];
+                    const Element2d & el = mesh.SurfaceElement(ld.locelements[j]);
                     for (int k = 0; k < el.GetNP(); k++) {
                         savepoints[el[k]] = mesh[el[k]];
                     }
                 }
 
                 for (int j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d & el = mesh[ld.locelements[j]];
+                    const Element2d & el = mesh.SurfaceElement(ld.locelements[j]);
                     for (int k = 0; k < el.GetNP(); k++) {
                         PointIndex hhpi = el[k];
                         double lam = ld.normal * (mesh[hhpi] - ld.sp1);
@@ -659,7 +659,7 @@ namespace meshit {
 
                 // restore other points
                 for (int j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d & el = mesh[ld.locelements[j]];
+                    const Element2d & el = mesh.SurfaceElement(ld.locelements[j]);
                     for (int k = 0; k < el.GetNP(); k++) {
                         PointIndex hhpi = el[k];
                         if (hhpi != pi) mesh[hhpi] = savepoints[hhpi];
@@ -688,7 +688,7 @@ namespace meshit {
 
                     if (moveisok) {
                         for (int j = 0; j < ld.locelements.size(); j++) {
-                            mesh[ld.locelements[j]].GeomInfoPi(ld.locrots[j]) = ngi;
+                            mesh.SurfaceElement(ld.locelements[j]).GeomInfoPi(ld.locrots[j]) = ngi;
                         }
                     }
                     else {
