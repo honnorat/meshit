@@ -647,7 +647,7 @@ namespace meshit {
         double CalcJacobianBadness(const T_POINTS & points,
                 const Vec<3> & n) const;
         double CalcJacobianBadnessDirDeriv(const Array<Point2d> & points,
-                int pi, Vec2d & dir, double & dd) const;
+                int pi, const Vec2d & dir, double & dd) const;
 
         void Delete()
         {

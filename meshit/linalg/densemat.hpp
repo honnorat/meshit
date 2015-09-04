@@ -63,6 +63,7 @@ namespace meshit {
         DLL_HEADER DenseMatrix & operator=(const DenseMatrix & m2);
         DLL_HEADER DenseMatrix & operator+=(const DenseMatrix & m2);
         DLL_HEADER DenseMatrix & operator-=(const DenseMatrix & m2);
+
         DLL_HEADER DenseMatrix & operator=(double v);
         DLL_HEADER DenseMatrix & operator*=(double v);
 
@@ -78,7 +79,6 @@ namespace meshit {
                 sp = &v(0);
 
                 for (int j = 0; j < width; j++) {
-                    //        sum += Get(i,j) * v.Get(j);
                     sum += *mp * *sp;
                     mp++;
                     sp++;
@@ -98,9 +98,7 @@ namespace meshit {
 
         friend void Transpose(const DenseMatrix & m1, DenseMatrix & m2);
         friend void Mult(const DenseMatrix & m1, const DenseMatrix & m2, DenseMatrix & m3);
-        //  friend void CalcInverse (const DenseMatrix & m1, DenseMatrix & m2);
         friend void CalcAAt(const DenseMatrix & a, DenseMatrix & m2);
-        //  friend void CalcAtA (const DenseMatrix & a, DenseMatrix & m2);
         friend void CalcABt(const DenseMatrix & a, const DenseMatrix & b, DenseMatrix & m2);
         friend void CalcAtB(const DenseMatrix & a, const DenseMatrix & b, DenseMatrix & m2);
         DLL_HEADER void Solve(const Vector & b, Vector & x) const;
@@ -132,16 +130,17 @@ namespace meshit {
         }
     };
 
-
     extern std::ostream & operator<<(std::ostream & ost, const DenseMatrix & m);
 
     template <int WIDTH>
     class MatrixFixWidth
     {
       protected:
+
         int height;
         double * data;
         bool ownmem;
+
       public:
 
         MatrixFixWidth()
@@ -202,7 +201,7 @@ namespace meshit {
             double sum;
             const double * mp, * sp;
             double * dp;
-            
+
             mp = data;
             dp = &prod[0];
             for (int i = 0; i < height; i++) {
@@ -274,7 +273,6 @@ namespace meshit {
         }
         return ost;
     };
-
 
     extern DLL_HEADER void CalcAtA(const DenseMatrix & a, DenseMatrix & m2);
     extern DLL_HEADER void CalcInverse(const DenseMatrix & m1, DenseMatrix & m2);

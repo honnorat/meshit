@@ -25,7 +25,7 @@ namespace meshit
 
     for (SurfaceElementIndex sei = 0; sei < mesh.GetNSE(); sei++)
       {
-	const Element2d & el = mesh[sei];
+	const Element2d & el = mesh.SurfaceElement(sei);
 
 	static int betw_trig[3][3] =
 	  { { 1, 2, 3 }, { 0, 2, 4 }, { 0, 1, 5 } };

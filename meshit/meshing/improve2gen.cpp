@@ -214,7 +214,7 @@ namespace meshit {
         nelonnode = -4;
 
         for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
-            const Element2d & el = mesh[sei];
+            const Element2d & el = mesh.SurfaceElement(sei);
 
             if (el.GetIndex() == faceindex && !el.IsDeleted()) {
                 for (int j = 0; j < el.GetNP(); j++)
@@ -227,7 +227,7 @@ namespace meshit {
         }
 
         for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
-            const Element2d & el = mesh[sei];
+            const Element2d & el = mesh.SurfaceElement(sei);
             if (el.GetIndex() == faceindex && !el.IsDeleted()) {
                 for (int j = 0; j < el.GetNP(); j++) {
                     for (int k = 0; k < elonnode[el[j]].size(); k++) {
@@ -254,13 +254,13 @@ namespace meshit {
             for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
                 if (multithread.terminate)
                     break;
-                if (mesh[sei].IsDeleted()) continue;
+                if (mesh.SurfaceElement(sei).IsDeleted()) continue;
 
                 elmap[0] = sei;
                 FlatArray<SurfaceElementIndex> neighbours = nbels[sei];
 
-                for (elrot[0] = 0; elrot[0] < mesh[sei].GetNP(); elrot[0]++) {
-                    const Element2d & el0 = mesh[sei];
+                for (elrot[0] = 0; elrot[0] < mesh.SurfaceElement(sei).GetNP(); elrot[0]++) {
+                    const Element2d & el0 = mesh.SurfaceElement(sei);
                     const Element2d & rel0 = rule.oldels[0];
 
                     if (el0.GetIndex() != faceindex) continue;
@@ -283,7 +283,7 @@ namespace meshit {
                         bool possible = 0;
 
                         for (elmap[i] = 0; elmap[i] < neighbours.size(); elmap[i]++) {
-                            const Element2d & el = mesh[neighbours[elmap[i]]];
+                            const Element2d & el = mesh.SurfaceElement(neighbours[elmap[i]]);
                             if (el.IsDeleted()) continue;
                             if (el.GetNP() != rel.GetNP()) continue;
 

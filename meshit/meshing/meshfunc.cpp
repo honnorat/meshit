@@ -87,7 +87,7 @@ namespace meshit
 	 
 	 for (SurfaceElementIndex sei = 0; sei < mesh3d.GetNSE(); sei++)
 	   {
-	     const Element2d & el = mesh3d[sei];
+	     const Element2d & el = mesh3d.SurfaceElement(sei);
 	     if (el.IsDeleted() ) continue;
 	     
 	     if (mesh3d.GetFaceDescriptor(el.GetIndex()).DomainIn() == k ||

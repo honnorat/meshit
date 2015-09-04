@@ -7,7 +7,8 @@ namespace meshit {
             const Array<Point2d> & points,
             const Element2d & elem)
     {
-        // badness = sqrt(3)/36 * circumference^2 / area - 1 + h/li + li/h - 2
+        // badness = sqrt(3) /36 * circumference^2 / area - 1 +
+        //           h / li + li / h - 2
 
         Vec2d v12, v13, v23;
         double l12, l13, l23, cir, area;
@@ -172,7 +173,6 @@ namespace meshit {
 
                         if (lnearness.Get(locli) > rule->GetLNearness(nlok)) continue;
                         if (lused.Get(locli)) continue;
-
 
                         ok = 1;
 

@@ -111,7 +111,7 @@ namespace meshit
     cnt = 0;
     for (SurfaceElementIndex sei = 0; sei < nse; sei++)
       {
-	const Element2d & el = mesh[sei];
+	const Element2d & el = mesh.SurfaceElement(sei);
 	for (int j = 0; j < el.GetNV(); j++)
 	  cnt[el[j]]++;
       }
@@ -119,7 +119,7 @@ namespace meshit
     vert2surfelement = new TABLE<int,PointIndex::BASE> (cnt);
     for (SurfaceElementIndex sei = 0; sei < nse; sei++)
       {
-	const Element2d & el = mesh[sei];
+	const Element2d & el = mesh.SurfaceElement(sei);
 	for (int j = 0; j < el.GetNV(); j++)
 	  vert2surfelement->AddSave (el[j], sei+1);
       }
@@ -1004,7 +1004,7 @@ namespace meshit
 
   void MeshTopology :: GetEdges (SurfaceElementIndex elnr, Array<int> & eledges) const
   {
-    int ned = GetNEdges (mesh[elnr].GetType());
+    int ned = GetNEdges (mesh.SurfaceElement(elnr).GetType());
     eledges.resize (ned);
     for (int i = 0; i < ned; i++)
       // eledges[i] = abs (surfedges[elnr][i])-1;

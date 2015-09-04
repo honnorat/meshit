@@ -313,7 +313,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
   boundp.Clear();
   for (sei = 0; sei < mesh.GetNSE(); sei++)
     for (j = 0; j < 3; j++)
-      boundp.Set (mesh[sei][j]);
+      boundp.Set (mesh.SurfaceElement(sei)[j]);
 
   if (goal == OPT_QUALITY)
     {
@@ -1507,11 +1507,11 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
       elementsonnode.Add (mesh[ei][j], ei);
 
   for (SurfaceElementIndex sei = 0; sei < nse; sei++)
-    for(int j=0; j<mesh[sei].GetNP(); j++)
+    for(int j=0; j<mesh.SurfaceElement(sei).GetNP(); j++)
       {
-	surfaceelementsonnode.Add(mesh[sei][j], sei);
-	if(!surfaceindicesonnode[mesh[sei][j]].Contains(mesh[sei].GetIndex()))
-	  surfaceindicesonnode.Add(mesh[sei][j],mesh[sei].GetIndex());
+	surfaceelementsonnode.Add(mesh.SurfaceElement(sei)[j], sei);
+	if(!surfaceindicesonnode[mesh.SurfaceElement(sei)[j]].Contains(mesh.SurfaceElement(sei).GetIndex()))
+	  surfaceindicesonnode.Add(mesh.SurfaceElement(sei)[j],mesh.SurfaceElement(sei).GetIndex());
       }
 
   bool periodic;
@@ -1713,7 +1713,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	    {
 	      bool has1 = false, has2 = false;
 	      SurfaceElementIndex elnr = surfaceelementsonnode[pi1][k];
-	      const Element2d & elem = mesh[elnr];
+	      const Element2d & elem = mesh.SurfaceElement(elnr);
 
 	      if (elem.IsDeleted()) continue;
 
@@ -1736,7 +1736,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		{
 		  bool has1 = false, has2 = false;
 		  SurfaceElementIndex elnr = surfaceelementsonnode[pi1other][k];
-		  const Element2d & elem = mesh[elnr];
+		  const Element2d & elem = mesh.SurfaceElement(elnr);
 
 		  if (elem.IsDeleted()) continue;
 
@@ -1758,16 +1758,16 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	      sel1other = sel1; sel2other = sel2;
 	    }
 
-	  //std::cerr << "sel1 " << sel1 << " sel2 " << sel2 << " el " << mesh[sel1] << " resp. " << mesh[sel2] <<std::endl;
+	  //std::cerr << "sel1 " << sel1 << " sel2 " << sel2 << " el " << mesh.SurfaceElement(sel1) << " resp. " << mesh.SurfaceElement(sel2) <<std::endl;
 
 	  PointIndex sp1(0), sp2(0);
 	  PointIndex sp1other, sp2other;
-	  for(int l=0; l<mesh[sel1].GetNP(); l++)
-	    if(mesh[sel1][l] != pi1 && mesh[sel1][l] != pi2)
-	      sp1 = mesh[sel1][l];
-	  for(int l=0; l<mesh[sel2].GetNP(); l++)
-	    if(mesh[sel2][l] != pi1 && mesh[sel2][l] != pi2)
-	      sp2 = mesh[sel2][l];
+	  for(int l=0; l<mesh.SurfaceElement(sel1).GetNP(); l++)
+	    if(mesh.SurfaceElement(sel1)[l] != pi1 && mesh.SurfaceElement(sel1)[l] != pi2)
+	      sp1 = mesh.SurfaceElement(sel1)[l];
+	  for(int l=0; l<mesh.SurfaceElement(sel2).GetNP(); l++)
+	    if(mesh.SurfaceElement(sel2)[l] != pi1 && mesh.SurfaceElement(sel2)[l] != pi2)
+	      sp2 = mesh.SurfaceElement(sel2)[l];
 
 	  if(periodic)
 	    {
@@ -1775,8 +1775,8 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	      sp2other = (*(*used_idmaps)[idnum])[sp2];
 
 	      bool change = false;
-	      for(int l=0; !change && l<mesh[sel1other].GetNP(); l++)
-		change = (sp2other == mesh[sel1other][l]);
+	      for(int l=0; !change && l<mesh.SurfaceElement(sel1other).GetNP(); l++)
+		change = (sp2other == mesh.SurfaceElement(sel1other)[l]);
 	      
 	      if(change)
 		{
@@ -1856,18 +1856,18 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 				 << mesh.mlbetweennodes[mesh[hasbothpoints[ii]][jj]][1] << std::endl;
 		}
 	      std::cerr << "outerpoints: " << outerpoints << std::endl;
-	      std::cerr << "sel1 " << mesh[sel1] << std::endl
-			 << "sel2 " << mesh[sel2] << std::endl;
+	      std::cerr << "sel1 " << mesh.SurfaceElement(sel1) << std::endl
+			 << "sel2 " << mesh.SurfaceElement(sel2) << std::endl;
 	      for(int ii=0; ii<3; ii++)
 		{
-		  if(mesh.mlbetweennodes[mesh[sel1][ii]][0] > 0)
-		    std::cerr << mesh[sel1][ii] << " between "
-			       << mesh.mlbetweennodes[mesh[sel1][ii]][0] << " and "
-			       << mesh.mlbetweennodes[mesh[sel1][ii]][1] << std::endl;
-		  if(mesh.mlbetweennodes[mesh[sel2][ii]][0] > 0)
-		    std::cerr << mesh[sel2][ii] << " between "
-			       << mesh.mlbetweennodes[mesh[sel2][ii]][0] << " and "
-			       << mesh.mlbetweennodes[mesh[sel2][ii]][1] << std::endl;
+		  if(mesh.mlbetweennodes[mesh.SurfaceElement(sel1)[ii]][0] > 0)
+		    std::cerr << mesh.SurfaceElement(sel1)[ii] << " between "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel1)[ii]][0] << " and "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel1)[ii]][1] << std::endl;
+		  if(mesh.mlbetweennodes[mesh.SurfaceElement(sel2)[ii]][0] > 0)
+		    std::cerr << mesh.SurfaceElement(sel2)[ii] << " between "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel2)[ii]][0] << " and "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel2)[ii]][1] << std::endl;
 		}
 	    }
 
@@ -1918,18 +1918,18 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 				 << mesh.mlbetweennodes[mesh[hasbothpoints[ii]][jj]][1] << std::endl;
 		}
 	      std::cerr << "outerpoints: " << outerpoints << std::endl;
-	      std::cerr << "sel1 " << mesh[sel1] << std::endl
-			 << "sel2 " << mesh[sel2] << std::endl;
+	      std::cerr << "sel1 " << mesh.SurfaceElement(sel1) << std::endl
+			 << "sel2 " << mesh.SurfaceElement(sel2) << std::endl;
 	      for(int ii=0; ii<3; ii++)
 		{
-		  if(mesh.mlbetweennodes[mesh[sel1][ii]][0] > 0)
-		    std::cerr << mesh[sel1][ii] << " between "
-			       << mesh.mlbetweennodes[mesh[sel1][ii]][0] << " and "
-			       << mesh.mlbetweennodes[mesh[sel1][ii]][1] << std::endl;
-		  if(mesh.mlbetweennodes[mesh[sel2][ii]][0] > 0)
-		    std::cerr << mesh[sel2][ii] << " between "
-			       << mesh.mlbetweennodes[mesh[sel2][ii]][0] << " and "
-			       << mesh.mlbetweennodes[mesh[sel2][ii]][1] << std::endl;
+		  if(mesh.mlbetweennodes[mesh.SurfaceElement(sel1)[ii]][0] > 0)
+		    std::cerr << mesh.SurfaceElement(sel1)[ii] << " between "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel1)[ii]][0] << " and "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel1)[ii]][1] << std::endl;
+		  if(mesh.mlbetweennodes[mesh.SurfaceElement(sel2)[ii]][0] > 0)
+		    std::cerr << mesh.SurfaceElement(sel2)[ii] << " between "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel2)[ii]][0] << " and "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel2)[ii]][1] << std::endl;
 		}
 		  
 	      std::cerr << "pi1other " << pi1other << " pi2other " << pi2other << " sp1other " << sp1other << " sp2other " << sp2other << std::endl;
@@ -1944,18 +1944,18 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 				 << mesh.mlbetweennodes[mesh[hasbothpointsother[ii]][jj]][1] << std::endl;
 		}
 	      std::cerr << "outerpoints: " << outerpointsother << std::endl;
-	      std::cerr << "sel1other " << mesh[sel1other] << std::endl
-			 << "sel2other " << mesh[sel2other] << std::endl;
+	      std::cerr << "sel1other " << mesh.SurfaceElement(sel1other) << std::endl
+			 << "sel2other " << mesh.SurfaceElement(sel2other) << std::endl;
 	      for(int ii=0; ii<3; ii++)
 		{
-		  if(mesh.mlbetweennodes[mesh[sel1other][ii]][0] > 0)
-		    std::cerr << mesh[sel1other][ii] << " between "
-			       << mesh.mlbetweennodes[mesh[sel1other][ii]][0] << " and "
-			       << mesh.mlbetweennodes[mesh[sel1other][ii]][1] << std::endl;
-		  if(mesh.mlbetweennodes[mesh[sel2other][ii]][0] > 0)
-		    std::cerr << mesh[sel2other][ii] << " between "
-			       << mesh.mlbetweennodes[mesh[sel2other][ii]][0] << " and "
-			       << mesh.mlbetweennodes[mesh[sel2other][ii]][1] << std::endl;
+		  if(mesh.mlbetweennodes[mesh.SurfaceElement(sel1other)[ii]][0] > 0)
+		    std::cerr << mesh.SurfaceElement(sel1other)[ii] << " between "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel1other)[ii]][0] << " and "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel1other)[ii]][1] << std::endl;
+		  if(mesh.mlbetweennodes[mesh.SurfaceElement(sel2other)[ii]][0] > 0)
+		    std::cerr << mesh.SurfaceElement(sel2other)[ii] << " between "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel2other)[ii]][0] << " and "
+			       << mesh.mlbetweennodes[mesh.SurfaceElement(sel2other)[ii]][1] << std::endl;
 		}
 	    }
 
@@ -2154,32 +2154,32 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
 	      int start1 = -1;
 	      for(int l=0; l<3; l++)
-		if(mesh[sel1][l] == pi1)
+		if(mesh.SurfaceElement(sel1)[l] == pi1)
 		  start1 = l;
-	      if(mesh[sel1][(start1+1)%3] == pi2)
+	      if(mesh.SurfaceElement(sel1)[(start1+1)%3] == pi2)
 		{
-		  mesh[sel1][0] = pi1;
-		  mesh[sel1][1] = sp2;
-		  mesh[sel1][2] = sp1;
-		  mesh[sel2][0] = pi2;
-		  mesh[sel2][1] = sp1;
-		  mesh[sel2][2] = sp2;
+		  mesh.SurfaceElement(sel1)[0] = pi1;
+		  mesh.SurfaceElement(sel1)[1] = sp2;
+		  mesh.SurfaceElement(sel1)[2] = sp1;
+		  mesh.SurfaceElement(sel2)[0] = pi2;
+		  mesh.SurfaceElement(sel2)[1] = sp1;
+		  mesh.SurfaceElement(sel2)[2] = sp2;
 		}
 	      else
 		{
-		  mesh[sel1][0] = pi2;
-		  mesh[sel1][1] = sp2;
-		  mesh[sel1][2] = sp1;
-		  mesh[sel2][0] = pi1;
-		  mesh[sel2][1] = sp1;
-		  mesh[sel2][2] = sp2;
+		  mesh.SurfaceElement(sel1)[0] = pi2;
+		  mesh.SurfaceElement(sel1)[1] = sp2;
+		  mesh.SurfaceElement(sel1)[2] = sp1;
+		  mesh.SurfaceElement(sel2)[0] = pi1;
+		  mesh.SurfaceElement(sel2)[1] = sp1;
+		  mesh.SurfaceElement(sel2)[2] = sp2;
 		}
-	      //std::cerr << "changed surface element " << sel1 << " to " << mesh[sel1] << ", " << sel2 << " to " << mesh[sel2] <<std::endl;
+	      //std::cerr << "changed surface element " << sel1 << " to " << mesh.SurfaceElement(sel1) << ", " << sel2 << " to " << mesh.SurfaceElement(sel2) <<std::endl;
 
 	      for(int l=0; l<3; l++)
 		{
-		  surfaceelementsonnode.Add(mesh[sel1][l],sel1);
-		  surfaceelementsonnode.Add(mesh[sel2][l],sel2);
+		  surfaceelementsonnode.Add(mesh.SurfaceElement(sel1)[l],sel1);
+		  surfaceelementsonnode.Add(mesh.SurfaceElement(sel2)[l],sel2);
 		}
 	      
 
@@ -2188,40 +2188,40 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 		{
 		  start1 = -1;
 		  for(int l=0; l<3; l++)
-		    if(mesh[sel1other][l] == pi1other)
+		    if(mesh.SurfaceElement(sel1other)[l] == pi1other)
 		      start1 = l;
 		  
 
 
-		  //std::cerr << "changed surface elements " << mesh[sel1other] << " and " << mesh[sel2other] <<std::endl;
-		  if(mesh[sel1other][(start1+1)%3] == pi2other)
+		  //std::cerr << "changed surface elements " << mesh.SurfaceElement(sel1other) << " and " << mesh.SurfaceElement(sel2other) <<std::endl;
+		  if(mesh.SurfaceElement(sel1other)[(start1+1)%3] == pi2other)
 		    {
-		      mesh[sel1other][0] = pi1other;
-		      mesh[sel1other][1] = sp2other;
-		      mesh[sel1other][2] = sp1other;
-		      mesh[sel2other][0] = pi2other;
-		      mesh[sel2other][1] = sp1other;
-		      mesh[sel2other][2] = sp2other;
+		      mesh.SurfaceElement(sel1other)[0] = pi1other;
+		      mesh.SurfaceElement(sel1other)[1] = sp2other;
+		      mesh.SurfaceElement(sel1other)[2] = sp1other;
+		      mesh.SurfaceElement(sel2other)[0] = pi2other;
+		      mesh.SurfaceElement(sel2other)[1] = sp1other;
+		      mesh.SurfaceElement(sel2other)[2] = sp2other;
 		      //std::cerr << "       with rule 1" <<std::endl;
 		    }
 		  else
 		    {
-		      mesh[sel1other][0] = pi2other;
-		      mesh[sel1other][1] = sp2other;
-		      mesh[sel1other][2] = sp1other;
-		      mesh[sel2other][0] = pi1other;
-		      mesh[sel2other][1] = sp1other;
-		      mesh[sel2other][2] = sp2other;
+		      mesh.SurfaceElement(sel1other)[0] = pi2other;
+		      mesh.SurfaceElement(sel1other)[1] = sp2other;
+		      mesh.SurfaceElement(sel1other)[2] = sp1other;
+		      mesh.SurfaceElement(sel2other)[0] = pi1other;
+		      mesh.SurfaceElement(sel2other)[1] = sp1other;
+		      mesh.SurfaceElement(sel2other)[2] = sp2other;
 		      //std::cerr << "       with rule 2" <<std::endl;
 		    }
-		  //std::cerr << "         to " << mesh[sel1other] << " and " << mesh[sel2other] <<std::endl;
+		  //std::cerr << "         to " << mesh.SurfaceElement(sel1other) << " and " << mesh.SurfaceElement(sel2other) <<std::endl;
 		  
-		  //std::cerr << "  and surface element " << sel1other << " to " << mesh[sel1other] << ", " << sel2other << " to " << mesh[sel2other] <<std::endl;
+		  //std::cerr << "  and surface element " << sel1other << " to " << mesh.SurfaceElement(sel1other) << ", " << sel2other << " to " << mesh.SurfaceElement(sel2other) <<std::endl;
 
 		  for(int l=0; l<3; l++)
 		    {
-		      surfaceelementsonnode.Add(mesh[sel1other][l],sel1other);
-		      surfaceelementsonnode.Add(mesh[sel2other][l],sel2other);
+		      surfaceelementsonnode.Add(mesh.SurfaceElement(sel1other)[l],sel1other);
+		      surfaceelementsonnode.Add(mesh.SurfaceElement(sel2other)[l],sel2other);
 		    }
 		}
 
@@ -2355,7 +2355,7 @@ void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
 
   for (SurfaceElementIndex sei = 0; sei < nse; sei++)
     for (int j = 0; j < 3; j++)
-      belementsonnode.Add (mesh[sei][j], sei);
+      belementsonnode.Add (mesh.SurfaceElement(sei)[j], sei);
 
   for (ElementIndex eli1 = 0; eli1 < ne; eli1++)
     {
@@ -2410,8 +2410,7 @@ void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
 	  bool bface = 0;
 	  for (int k = 0; k < belementsonnode[pi1].size(); k++)
 	    {
-	      const Element2d & bel = 
-		mesh[belementsonnode[pi1][k]];
+	      const Element2d & bel = mesh.SurfaceElement(belementsonnode[pi1][k]);
 
 	      bool bface1 = 1;
 	      for (int l = 0; l < 3; l++)

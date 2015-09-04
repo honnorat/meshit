@@ -7,12 +7,12 @@
 
 namespace meshit {
 
-    int MultiPointGeomInfo::
-    AddPointGeomInfo(const PointGeomInfo & gi)
+    int MultiPointGeomInfo::AddPointGeomInfo(const PointGeomInfo & gi)
     {
-        for (int k = 0; k < cnt; k++)
+        for (int k = 0; k < cnt; k++) {
             if (mgi[k].trignum == gi.trignum)
                 return 0;
+        }
 
         if (cnt < MULTIPOINTGEOMINFO_MAX) {
             mgi[cnt] = gi;
@@ -63,8 +63,9 @@ namespace meshit {
         meshdocval(other.meshdocval),
         hp_elnr(other.hp_elnr)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 3; j++) {
             pnums[j] = other.pnums[j];
+        }
 
         geominfo[0] = other.geominfo[0];
         geominfo[1] = other.geominfo[1];
@@ -182,8 +183,9 @@ namespace meshit {
         pnum[4] = 0;
         pnum[5] = 0;
 
-        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++)
+        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
             geominfo[i].trignum = 0;
+        }
         index = 0;
         badel = 0;
         refflag = 1;
@@ -205,8 +207,9 @@ namespace meshit {
         pnum[4] = 0;
         pnum[5] = 0;
 
-        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++)
+        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
             geominfo[i].trignum = 0;
+        }
         index = 0;
         badel = 0;
         refflag = 1;
@@ -219,15 +222,17 @@ namespace meshit {
     void Element2d::GetBox(const T_POINTS & points, Box3d & box) const
     {
         box.SetPoint(points.Get(pnum[0]));
-        for (unsigned i = 1; i < np; i++)
+        for (unsigned i = 1; i < np; i++) {
             box.AddPoint(points.Get(pnum[i]));
+        }
     }
 
     bool Element2d::operator==(const Element2d & el2) const
     {
         bool retval = (el2.GetNP() == np);
-        for (int i = 0; retval && i < np; i++)
+        for (int i = 0; retval && i < np; i++) {
             retval = (el2[i] == (*this)[i]);
+        }
 
         return retval;
     }
@@ -294,17 +299,16 @@ namespace meshit {
         }
         else {
             int mini = 1;
-            for (int i = 2; i <= GetNP(); i++)
+            for (int i = 2; i <= GetNP(); i++) {
                 if (PNum(i) < PNum(mini)) mini = i;
+            }
 
             Element2d hel = (*this);
-            for (int i = 1; i <= GetNP(); i++)
+            for (int i = 1; i <= GetNP(); i++) {
                 PNum(i) = hel.PNumMod(i + mini - 1);
+            }
         }
     }
-
-
-
 
     Array<IntegrationPointData*> ipdtrig;
     Array<IntegrationPointData*> ipdquad;
@@ -323,8 +327,7 @@ namespace meshit {
         return nip;
     }
 
-    void Element2d::
-    GetIntegrationPoint(int ip, Point2d & p, double & weight) const
+    void Element2d::GetIntegrationPoint(int ip, Point2d & p, double & weight) const
     {
         static double eltriqp[1][3] = {
             { 1.0 / 3.0, 1.0 / 3.0, 0.5}
@@ -352,9 +355,7 @@ namespace meshit {
         weight = pp[2];
     }
 
-    void Element2d::
-    GetTransformation(int ip, const Array<Point2d> & points,
-            DenseMatrix & trans) const
+    void Element2d::GetTransformation(int ip, const Array<Point2d> & points, DenseMatrix & trans) const
     {
         int np = GetNP();
         DenseMatrix pmat(2, np), dshape(2, np);
@@ -371,9 +372,7 @@ namespace meshit {
         CalcABt(pmat, dshape, trans);
     }
 
-    void Element2d::
-    GetTransformation(int ip, class DenseMatrix & pmat,
-            class DenseMatrix & trans) const
+    void Element2d::GetTransformation(int ip, class DenseMatrix & pmat, class DenseMatrix & trans) const
     {
         ComputeIntegrationPointData();
         DenseMatrix * dshapep = NULL;
@@ -435,8 +434,7 @@ namespace meshit {
         }
     }
 
-    void Element2d::
-    GetDShape(const Point2d & p, DenseMatrix & dshape) const
+    void Element2d::GetDShape(const Point2d & p, DenseMatrix & dshape) const
     {
         switch (typ) {
             case TRIG:
@@ -463,8 +461,7 @@ namespace meshit {
         }
     }
 
-    void Element2d::
-    GetDShapeNew(const Point<2> & p, MatrixFixWidth<2> & dshape) const
+    void Element2d::GetDShapeNew(const Point<2> & p, MatrixFixWidth<2> & dshape) const
     {
         switch (typ) {
             case TRIG:
@@ -494,9 +491,7 @@ namespace meshit {
         }
     }
 
-    void Element2d::
-    GetPointMatrix(const Array<Point2d> & points,
-            DenseMatrix & pmat) const
+    void Element2d::GetPointMatrix(const Array<Point2d> & points, DenseMatrix & pmat) const
     {
         int np = GetNP();
 
@@ -523,8 +518,9 @@ namespace meshit {
 
             // Frobenius norm
             double frob = 0;
-            for (j = 1; j <= 4; j++)
+            for (j = 1; j <= 4; j++) {
                 frob += sqr(trans.Get(j));
+            }
             frob = sqrt(frob);
             frob /= 2;
 
@@ -547,9 +543,8 @@ namespace meshit {
         { 3, 2, 1, 2}
     };
 
-    double Element2d::
-    CalcJacobianBadnessDirDeriv(const Array<Point2d> & points,
-            int pi, Vec2d & dir, double & dd) const
+    double Element2d::CalcJacobianBadnessDirDeriv(const Array<Point2d> & points,
+            int pi, const Vec2d & dir, double & dd) const
     {
         if (typ == QUAD) {
             Mat<2, 2> trans, dtrans;
@@ -591,21 +586,21 @@ namespace meshit {
                 dtrans(0, 1) = vmat(0, iy2) - vmat(0, iy1);
                 dtrans(1, 1) = vmat(1, iy2) - vmat(1, iy1);
 
-
                 // Frobenius norm
                 double frob = 0;
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < 4; j++) {
                     frob += sqr(trans(j));
+                }
                 frob = sqrt(frob);
 
                 double dfrob = 0;
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < 4; j++) {
                     dfrob += trans(j) * dtrans(j);
+                }
                 dfrob = dfrob / frob;
 
                 frob /= 2;
                 dfrob /= 2;
-
 
                 // ddet = \sum_j det (m_j)   with m_j = trans, except col j = dtrans
                 double ddet
@@ -634,8 +629,7 @@ namespace meshit {
         vmat.Elem(1, pi) = dir.X();
         vmat.Elem(2, pi) = dir.Y();
 
-
-        double err = 0;
+        double err = 0.0;
         dd = 0;
 
         for (int i = 1; i <= nip; i++) {
@@ -644,13 +638,15 @@ namespace meshit {
 
             // Frobenius norm
             double frob = 0;
-            for (int j = 1; j <= 4; j++)
+            for (int j = 1; j <= 4; j++) {
                 frob += sqr(trans.Get(j));
+            }
             frob = sqrt(frob);
 
             double dfrob = 0;
-            for (int j = 1; j <= 4; j++)
+            for (int j = 1; j <= 4; j++) {
                 dfrob += trans.Get(j) * dtrans.Get(j);
+            }
             dfrob = dfrob / frob;
 
             frob /= 2;
@@ -676,8 +672,7 @@ namespace meshit {
         return err;
     }
 
-    double Element2d::
-    CalcJacobianBadness(const T_POINTS & points, const Vec<3> & n) const
+    double Element2d::CalcJacobianBadness(const T_POINTS & points, const Vec<3> & n) const
     {
         int i, j;
         int nip = GetNIP();
@@ -702,8 +697,9 @@ namespace meshit {
 
             // Frobenius norm
             double frob = 0;
-            for (j = 1; j <= 4; j++)
+            for (j = 1; j <= 4; j++) {
                 frob += sqr(trans.Get(j));
+            }
             frob = sqrt(frob);
             frob /= 2;
 
@@ -753,16 +749,18 @@ namespace meshit {
     std::ostream & operator<<(std::ostream & s, const Element2d & el)
     {
         s << "np = " << el.GetNP();
-        for (int j = 1; j <= el.GetNP(); j++)
+        for (int j = 1; j <= el.GetNP(); j++) {
             s << " " << el.PNum(j);
+        }
         return s;
     }
 
     std::ostream & operator<<(std::ostream & s, const Element & el)
     {
         s << "np = " << el.GetNP();
-        for (int j = 0; j < el.GetNP(); j++)
+        for (int j = 0; j < el.GetNP(); j++) {
             s << " " << int(el[j]);
+        }
         return s;
     }
 
@@ -770,8 +768,9 @@ namespace meshit {
     {
         typ = TET;
         np = 4;
-        for (int i = 0; i < ELEMENT_MAXPOINTS; i++)
+        for (int i = 0; i < ELEMENT_MAXPOINTS; i++) {
             pnum[i] = 0;
+        }
         index = 0;
         flags.marked = 1;
         flags.badel = 0;
@@ -795,8 +794,9 @@ namespace meshit {
     {
         np = anp;
         int i;
-        for (i = 0; i < ELEMENT_MAXPOINTS; i++)
+        for (i = 0; i < ELEMENT_MAXPOINTS; i++) {
             pnum[i] = 0;
+        }
         index = 0;
         flags.marked = 1;
         flags.badel = 0;
@@ -844,8 +844,9 @@ namespace meshit {
         SetType(type);
 
         int i;
-        for (i = 0; i < ELEMENT_MAXPOINTS; i++)
+        for (i = 0; i < ELEMENT_MAXPOINTS; i++) {
             pnum[i] = 0;
+        }
         index = 0;
         flags.marked = 1;
         flags.badel = 0;
@@ -864,8 +865,9 @@ namespace meshit {
     {
         typ = el2.typ;
         np = el2.np;
-        for (int i = 0; i < ELEMENT_MAXPOINTS; i++)
+        for (int i = 0; i < ELEMENT_MAXPOINTS; i++) {
             pnum[i] = el2.pnum[i];
+        }
         index = el2.index;
         flags = el2.flags;
         orderx = el2.orderx;
@@ -945,8 +947,9 @@ namespace meshit {
     void Element::Print(std::ostream & ost) const
     {
         ost << np << " Points: ";
-        for (int i = 1; i <= np; i++)
+        for (int i = 1; i <= np; i++) {
             ost << pnum[i - 1] << " " << std::endl;
+        }
     }
 
     void Element::GetBox(const T_POINTS & points, Box3d & box) const
@@ -1002,16 +1005,18 @@ namespace meshit {
             case 4: // tet
             {
                 face.SetType(TRIG);
-                for (int j = 1; j <= 3; j++)
+                for (int j = 1; j <= 3; j++) {
                     face.PNum(j) = PNum(tetfaces[i - 1][j]);
+                }
                 break;
             }
 
             case 10: // tet10
             {
                 face.SetType(TRIG6);
-                for (int j = 1; j <= 6; j++)
+                for (int j = 1; j <= 6; j++) {
                     face.PNum(j) = PNum(tet10faces[i - 1][j]);
+                }
                 break;
             }
 
@@ -1019,16 +1024,18 @@ namespace meshit {
             {
                 // face.SetNP(pyramidfaces[i-1][0]);
                 face.SetType((i == 1) ? QUAD : TRIG);
-                for (int j = 1; j <= face.GetNP(); j++)
+                for (int j = 1; j <= face.GetNP(); j++) {
                     face.PNum(j) = PNum(pyramidfaces[i - 1][j]);
+                }
                 break;
             }
             case 6: // prism
             {
                 //	face.SetNP(prismfaces[i-1][0]);
                 face.SetType((i >= 3) ? QUAD : TRIG);
-                for (int j = 1; j <= face.GetNP(); j++)
+                for (int j = 1; j <= face.GetNP(); j++) {
                     face.PNum(j) = PNum(prismfaces[i - 1][j]);
+                }
                 break;
             }
         }
@@ -1038,9 +1045,11 @@ namespace meshit {
     {
         GetTetsLocal(locels);
         int i, j;
-        for (i = 1; i <= locels.size(); i++)
-            for (j = 1; j <= 4; j++)
+        for (i = 1; i <= locels.size(); i++) {
+            for (j = 1; j <= 4; j++) {
                 locels.Elem(i).PNum(j) = PNum(locels.Elem(i).PNum(j));
+            }
+        }
     }
 
     void Element::GetTetsLocal(Array<Element> & locels) const
@@ -1055,8 +1064,9 @@ namespace meshit {
                 };
                 for (i = 0; i < 1; i++) {
                     Element tet(4);
-                    for (j = 1; j <= 4; j++)
+                    for (j = 1; j <= 4; j++) {
                         tet.PNum(j) = linels[i][j - 1];
+                    }
                     locels.push_back(tet);
                 }
                 break;
@@ -1075,8 +1085,9 @@ namespace meshit {
                 };
                 for (i = 0; i < 8; i++) {
                     Element tet(4);
-                    for (j = 1; j <= 4; j++)
+                    for (j = 1; j <= 4; j++) {
                         tet.PNum(j) = linels[i][j - 1];
+                    }
                     locels.push_back(tet);
                 }
                 break;
@@ -1089,8 +1100,9 @@ namespace meshit {
                 };
                 for (i = 0; i < 2; i++) {
                     Element tet(4);
-                    for (j = 1; j <= 4; j++)
+                    for (j = 1; j <= 4; j++) {
                         tet.PNum(j) = linels[i][j - 1];
+                    }
                     locels.push_back(tet);
                 }
                 break;
@@ -1105,8 +1117,9 @@ namespace meshit {
                 };
                 for (i = 0; i < 3; i++) {
                     Element tet(4);
-                    for (j = 0; j < 4; j++)
+                    for (j = 0; j < 4; j++) {
                         tet[j] = linels[i][j];
+                    }
                     locels.push_back(tet);
                 }
                 break;
@@ -1123,8 +1136,9 @@ namespace meshit {
                 };
                 for (i = 0; i < 6; i++) {
                     Element tet(4);
-                    for (j = 0; j < 4; j++)
+                    for (j = 0; j < 4; j++) {
                         tet[j] = linels[i][j];
+                    }
                     locels.push_back(tet);
                 }
                 break;
@@ -1139,111 +1153,11 @@ namespace meshit {
     bool Element::operator==(const Element & el2) const
     {
         bool retval = (el2.GetNP() == np);
-        for (int i = 0; retval && i < np; i++)
+        for (int i = 0; retval && i < np; i++) {
             retval = (el2[i] == (*this)[i]);
-
+        }
         return retval;
     }
-
-
-#ifdef OLD
-
-    void Element::GetNodesLocal(Array<Point3d> & points) const
-    {
-        const static double tetpoints[4][3] = {
-            { 0, 0, 0},
-            { 1, 0, 0},
-            { 0, 1, 0},
-            { 0, 0, 1}
-        };
-
-        const static double prismpoints[6][3] = {
-            { 0, 0, 0},
-            { 1, 0, 0},
-            { 0, 1, 0},
-            { 0, 0, 1},
-            { 1, 0, 1},
-            { 0, 1, 1}
-        };
-
-        const static double pyramidpoints[6][3] = {
-            { 0, 0, 0},
-            { 1, 0, 0},
-            { 1, 1, 0},
-            { 0, 1, 0},
-            { 0, 0, 1}
-        };
-
-        const static double tet10points[10][3] = {
-            { 0, 0, 0},
-            { 1, 0, 0},
-            { 0, 1, 0},
-            { 0, 0, 1},
-            { 0.5, 0, 0},
-            { 0, 0.5, 0},
-            { 0, 0, 0.5},
-            { 0.5, 0.5, 0},
-            { 0.5, 0, 0.5},
-            { 0, 0.5, 0.5}
-        };
-
-        const static double hexpoints[8][3] = {
-            { 0, 0, 0},
-            { 1, 0, 0},
-            { 1, 1, 0},
-            { 0, 1, 0},
-            { 0, 0, 1},
-            { 1, 0, 1},
-            { 1, 1, 1},
-            { 0, 1, 1}
-        };
-
-        int np, i;
-        const double (*pp)[3];
-        switch (GetType()) {
-            case TET:
-            {
-                np = 4;
-                pp = tetpoints;
-                break;
-            }
-            case PRISM:
-            case PRISM12:
-            {
-                np = 6;
-                pp = prismpoints;
-                break;
-            }
-            case TET10:
-            {
-                np = 10;
-                pp = tet10points;
-                break;
-            }
-            case PYRAMID:
-            {
-                np = 5;
-                pp = pyramidpoints;
-                break;
-            }
-            case HEX:
-            {
-                np = 8;
-                pp = hexpoints;
-                break;
-            }
-            default:
-            {
-                std::cout << "GetNodesLocal not impelemented for element " << GetType() << std::endl;
-                np = 0;
-            }
-        }
-
-        points.SetSize(0);
-        for (i = 0; i < np; i++)
-            points.Append(Point3d(pp[i][0], pp[i][1], pp[i][2]));
-    }
-#endif
 
     void Element::GetNodesLocalNew(Array<Point<3> > & points) const
     {
@@ -1295,8 +1209,6 @@ namespace meshit {
             { 0, 1, 1}
         };
 
-
-
         int np, i;
         const double (*pp)[3];
         switch (GetType()) {
@@ -1340,8 +1252,9 @@ namespace meshit {
         }
 
         points.resize(0);
-        for (i = 0; i < np; i++)
+        for (i = 0; i < np; i++) {
             points.push_back(Point<3> (pp[i][0], pp[i][1], pp[i][2]));
+        }
     }
 
     void Element::GetSurfaceTriangles(Array<Element2d> & surftrigs) const
@@ -1451,7 +1364,6 @@ namespace meshit {
             }
         }
 
-
         surftrigs.resize(nf);
         for (j = 0; j < nf; j++) {
             surftrigs.Elem(j + 1) = Element2d(TRIG);
@@ -1460,10 +1372,6 @@ namespace meshit {
             surftrigs.Elem(j + 1).PNum(3) = fp[j][2];
         }
     }
-
-
-
-
 
     Array< AutoPtr < IntegrationPointData > > ipdtet;
     Array< AutoPtr < IntegrationPointData > > ipdtet10;
@@ -1482,8 +1390,7 @@ namespace meshit {
         return nip;
     }
 
-    void Element::
-    GetIntegrationPoint(int ip, Point<3> & p, double & weight) const
+    void Element::GetIntegrationPoint(int ip, Point<3> & p, double & weight) const
     {
         static double eltetqp[1][4] = {
             { 0.25, 0.25, 0.25, 1.0 / 6.0}
@@ -1514,8 +1421,7 @@ namespace meshit {
         weight = pp[3];
     }
 
-    void Element::
-    GetTransformation(int ip, const T_POINTS & points,
+    void Element::GetTransformation(int ip, const T_POINTS & points,
             DenseMatrix & trans) const
     {
         int np = GetNP();
@@ -1531,17 +1437,9 @@ namespace meshit {
         GetDShape(p, dshape);
 
         CalcABt(pmat, dshape, trans);
-
-        /*
-          std::cerr << "p = " << p  <<std::endl
-          << "pmat = " << pmat <<std::endl
-          << "dshape = " << dshape <<std::endl
-          << "tans = " << trans <<std::endl;
-         */
     }
 
-    void Element::
-    GetTransformation(int ip, class DenseMatrix & pmat,
+    void Element::GetTransformation(int ip, class DenseMatrix & pmat,
             class DenseMatrix & trans) const
     {
         int np = GetNP();
@@ -1633,14 +1531,6 @@ namespace meshit {
 
     void Element::GetShapeNew(const Point<3> & p, FlatVector & shape) const
     {
-        /*
-          if (shape.Size() < GetNP())
-          {
-          std::cerr << "Element::GetShape: Length not fitting" <<std::endl;
-          return;
-          }
-         */
-
         switch (typ) {
             case TET:
             {
@@ -1672,7 +1562,6 @@ namespace meshit {
 
                 break;
             }
-
 
             case PYRAMID:
             {
@@ -1714,8 +1603,7 @@ namespace meshit {
         }
     }
 
-    void Element::
-    GetDShape(const Point<3> & hp, DenseMatrix & dshape) const
+    void Element::GetDShape(const Point<3> & hp, DenseMatrix & dshape) const
     {
         Point3d p = hp;
 
@@ -1735,13 +1623,13 @@ namespace meshit {
 
             GetShape(pr, shaper);
             GetShape(pl, shapel);
-            for (int j = 0; j < np; j++)
+            for (int j = 0; j < np; j++) {
                 dshape(i - 1, j) = (shaper(j) - shapel(j)) / (2 * eps);
+            }
         }
     }
 
-    void Element::
-    GetDShapeNew(const Point<3> & p, MatrixFixWidth<3> & dshape) const
+    void Element::GetDShapeNew(const Point<3> & p, MatrixFixWidth<3> & dshape) const
     {
         switch (typ) {
             case TET:
@@ -1789,15 +1677,15 @@ namespace meshit {
 
                     GetShapeNew(pr, shaper);
                     GetShapeNew(pl, shapel);
-                    for (int j = 0; j < np; j++)
+                    for (int j = 0; j < np; j++) {
                         dshape(j, i - 1) = (shaper(j) - shapel(j)) / (2 * eps);
+                    }
                 }
             }
         }
     }
 
-    void Element::
-    GetPointMatrix(const T_POINTS & points,
+    void Element::GetPointMatrix(const T_POINTS & points,
             DenseMatrix & pmat) const
     {
         int np = GetNP();
@@ -1824,8 +1712,9 @@ namespace meshit {
 
             // Frobenius norm
             double frob = 0;
-            for (int j = 1; j <= 9; j++)
+            for (int j = 1; j <= 9; j++) {
                 frob += sqr(trans.Get(j));
+            }
             frob = sqrt(frob);
             frob /= 3;
 
@@ -1841,8 +1730,7 @@ namespace meshit {
         return err;
     }
 
-    double Element::
-    CalcJacobianBadnessDirDeriv(const T_POINTS & points,
+    double Element::CalcJacobianBadnessDirDeriv(const T_POINTS & points,
             int pi, Vec<3> & dir, double & dd) const
     {
         int i, j, k;
@@ -1855,13 +1743,14 @@ namespace meshit {
 
         GetPointMatrix(points, pmat);
 
-        for (i = 1; i <= np; i++)
-            for (j = 1; j <= 3; j++)
+        for (i = 1; i <= np; i++) {
+            for (j = 1; j <= 3; j++) {
                 vmat.Elem(j, i) = 0;
-        for (j = 1; j <= 3; j++)
+            }
+        }
+        for (j = 1; j <= 3; j++) {
             vmat.Elem(j, pi) = dir(j - 1);
-
-
+        }
 
         double err = 0;
         dd = 0;
@@ -1870,36 +1759,35 @@ namespace meshit {
             GetTransformation(i, pmat, trans);
             GetTransformation(i, vmat, dtrans);
 
-
             // Frobenius norm
             double frob = 0;
-            for (j = 1; j <= 9; j++)
+            for (j = 1; j <= 9; j++) {
                 frob += sqr(trans.Get(j));
+            }
             frob = sqrt(frob);
 
             double dfrob = 0;
-            for (j = 1; j <= 9; j++)
+            for (j = 1; j <= 9; j++) {
                 dfrob += trans.Get(j) * dtrans.Get(j);
+            }
             dfrob = dfrob / frob;
 
             frob /= 3;
             dfrob /= 3;
-
 
             double det = trans.Det();
             double ddet = 0;
 
             for (j = 1; j <= 3; j++) {
                 hmat = trans;
-                for (k = 1; k <= 3; k++)
+                for (k = 1; k <= 3; k++) {
                     hmat.Elem(k, j) = dtrans.Get(k, j);
+                }
                 ddet += hmat.Det();
             }
 
-
             det *= -1;
             ddet *= -1;
-
 
             if (det <= 0)
                 err += 1e12;
@@ -1914,8 +1802,7 @@ namespace meshit {
         return err;
     }
 
-    double Element::
-    CalcJacobianBadnessGradient(const T_POINTS & points,
+    double Element::CalcJacobianBadnessGradient(const T_POINTS & points,
             int pi, Vec<3> & grad) const
     {
         int nip = GetNIP();
@@ -1927,12 +1814,14 @@ namespace meshit {
 
         GetPointMatrix(points, pmat);
 
-        for (int i = 1; i <= np; i++)
-            for (int j = 1; j <= 3; j++)
+        for (int i = 1; i <= np; i++) {
+            for (int j = 1; j <= 3; j++) {
                 vmat.Elem(j, i) = 0;
-        for (int j = 1; j <= 3; j++)
+            }
+        }
+        for (int j = 1; j <= 3; j++) {
             vmat.Elem(j, pi) = 1.;
-
+        }
 
         double err = 0;
 
@@ -1946,14 +1835,16 @@ namespace meshit {
 
             // Frobenius norm
             double frob = 0;
-            for (int j = 1; j <= 9; j++)
+            for (int j = 1; j <= 9; j++) {
                 frob += sqr(trans.Get(j));
+            }
             frob = sqrt(frob);
 
             for (int k = 0; k < 3; k++) {
                 dfrob[k] = 0;
-                for (int j = 1; j <= 3; j++)
+                for (int j = 1; j <= 3; j++) {
                     dfrob[k] += trans.Get(k + 1, j) * dtrans.Get(k + 1, j);
+                }
                 dfrob[k] = dfrob[k] / (3. * frob);
             }
 
@@ -1975,7 +1866,6 @@ namespace meshit {
                 }
             }
 
-
             det *= -1;
 
             if (det <= 0)
@@ -1983,8 +1873,9 @@ namespace meshit {
             else {
                 err += frob * frob * frob / det;
                 double fac = (frob * frob) / (det * det);
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < 3; j++) {
                     grad(j) += fac * (3 * dfrob[j] * det - frob * ddet[j]);
+                }
             }
         }
 
@@ -2012,7 +1903,6 @@ namespace meshit {
             default:
                 PrintSysError("Element::ComputeIntegrationPoint, illegal type2 ", int(typ));
         }
-
 
         for (int i = 1; i <= GetNIP(); i++) {
             IntegrationPointData * ipd = new IntegrationPointData;
@@ -2055,8 +1945,7 @@ namespace meshit {
         firstelement = -1;
     }
 
-    FaceDescriptor::
-    FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi)
+    FaceDescriptor::FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi)
     {
         surfnr = surfnri;
         domin = domini;
@@ -2101,14 +1990,6 @@ namespace meshit {
         if (bcname) return *bcname;
         return defaultstring;
     }
-
-    /*
-      void FaceDescriptor :: SetBCName (string * bcn)
-      {
-      bcname = bcn;
-      }
-     */
-
 
     std::ostream & operator<<(std::ostream & s, const FaceDescriptor & fd)
     {
@@ -2211,7 +2092,7 @@ namespace meshit {
         else {
             std::cout << "getmap, identnr = " << identnr << std::endl;
 
-            for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++)
+            for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++) {
                 for (int j = 1; j <= identifiedpoints_nr->GetBagSize(i); j++) {
                     INDEX_3 i3;
                     int dummy;
@@ -2223,25 +2104,27 @@ namespace meshit {
                             identmap.Elem(i3.I2()) = i3.I1();
                     }
                 }
+            }
         }
 
     }
 
-    void Identifications::GetPairs(int identnr,
-            Array<INDEX_2> & identpairs) const
+    void Identifications::GetPairs(int identnr, Array<INDEX_2> & identpairs) const
     {
         identpairs.resize(0);
 
-        if (identnr == 0)
-            for (int i = 1; i <= identifiedpoints->GetNBags(); i++)
+        if (identnr == 0) {
+            for (int i = 1; i <= identifiedpoints->GetNBags(); i++) {
                 for (int j = 1; j <= identifiedpoints->GetBagSize(i); j++) {
                     INDEX_2 i2;
                     int nr;
                     identifiedpoints->GetData(i, j, i2, nr);
                     identpairs.push_back(i2);
                 }
-        else
-            for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++)
+            }
+        }
+        else {
+            for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++) {
                 for (int j = 1; j <= identifiedpoints_nr->GetBagSize(i); j++) {
                     INDEX_3 i3;
                     int dummy;
@@ -2250,11 +2133,13 @@ namespace meshit {
                     if (i3.I3() == identnr)
                         identpairs.push_back(INDEX_2(i3.I1(), i3.I2()));
                 }
+            }
+        }
     }
 
     void Identifications::SetMaxPointNr(int maxpnum)
     {
-        for (int i = 1; i <= identifiedpoints->GetNBags(); i++)
+        for (int i = 1; i <= identifiedpoints->GetNBags(); i++) {
             for (int j = 1; j <= identifiedpoints->GetBagSize(i); j++) {
                 INDEX_2 i2;
                 int nr;
@@ -2265,6 +2150,7 @@ namespace meshit {
                     identifiedpoints->SetData(i, j, i2, -1);
                 }
             }
+        }
     }
 
     void Identifications::Print(std::ostream & ost) const
@@ -2278,7 +2164,6 @@ namespace meshit {
     MeshingParameters::MeshingParameters()
     {
         optimize3d = "cmdmustm";
-        //optimize3d = "cmdmstm";
         optsteps3d = 3;
         optimize2d = "smsmsmSmSmSm";
         optsteps2d = 3;
@@ -2309,6 +2194,7 @@ namespace meshit {
         baseelnp = 0;
         sloppy = 1;
 
+        quad = 0;
         badellimit = 175;
         check_impossible = 0;
         secondorder = 0;
@@ -2406,6 +2292,5 @@ namespace meshit {
         haltsegmentp1 = 0;
         haltsegmentp2 = 0;
     };
-
 }
 
