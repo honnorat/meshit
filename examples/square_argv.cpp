@@ -18,7 +18,8 @@ int main(int argc, char ** argv) {
 
     std::cout << "start meshing" << std::endl;
 
-    mp.optsteps2d = 5;
+    mp.optsteps2d = 1;
+    mp.quad = 0;
     geom.SetGrading(2.0);
     mesh.BuildFromSpline2D(geom, mp);
     std::cout << "meshing done" << std::endl;
