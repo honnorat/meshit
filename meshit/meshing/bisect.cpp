@@ -2,7 +2,6 @@
 
 #include <meshit.hpp>
 #include "bisect.hpp"
-#include "../general/netgenout.hpp"
 #include "../general/ngexception.hpp"
 #include "../gprim/geomfuncs.hpp"
 #include "validate.hpp"

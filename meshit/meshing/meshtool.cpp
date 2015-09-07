@@ -36,7 +36,7 @@ namespace meshit {
 
 
         if (cnt1 != cnt2) {
-            PrintUserError("Surface mesh not consistent");
+            PrintError("Surface mesh not consistent");
             //      MyBeep(2);
             //      (*mystd::cout) << "cnt1 = " << cnt1 << " cnt2 = " << cnt2 <<std::endl;
             return 0;

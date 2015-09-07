@@ -294,9 +294,6 @@ namespace meshit
 		   << " perc. " << 95. * max2( min2(facokedge,facokface),
 					       double(cnttrials)/double(maxtrials)) <<std::endl;
 
-	SetThreadPercent(95. * max2( min2(facokedge,facokface),
-				     double(cnttrials)/double(maxtrials)));
-
 	ostrstr.str("");
 	ostrstr << "max. worsening " << max_worsening;
 	PrintMessage(5,ostrstr.str());

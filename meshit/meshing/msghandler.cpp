@@ -5,27 +5,21 @@
 #include "global.hpp"
 
 namespace meshit {
-    
+
     int printmessage_importance = 5;
     int printwarnings = 1;
     int printerrors = 1;
     int printdots = 1;
     int printfnstart = 0;
 
-    void Ng_PrintDest(const char * s)
-    {
-        std::cout << s << std::flush;
-    }
+    std::ostream & MESHIT_COUT = std::cerr;
 
     //the dots for progression of program
 
     void PrintDot(char ch)
     {
         if (printdots) {
-            char st[2];
-            st[0] = ch;
-            st[1] = 0;
-            Ng_PrintDest(st);
+            MESHIT_COUT << ch << '\0' << std::flush;
         }
     }
 
@@ -33,7 +27,7 @@ namespace meshit {
             const MyStr& s1, const MyStr& s2)
     {
         if (importance <= printmessage_importance) {
-            Ng_PrintDest(MyStr(" ") + s1 + s2 + MyStr("\n"));
+            MESHIT_COUT << " " << s1 << s2 << std::endl;
         }
     }
 
@@ -41,7 +35,7 @@ namespace meshit {
             const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4)
     {
         if (importance <= printmessage_importance) {
-            Ng_PrintDest(MyStr(" ") + s1 + s2 + s3 + s4 + MyStr("\n"));
+            MESHIT_COUT << " " << s1 << s2 << s3 << s4 << std::endl;
         }
     }
 
@@ -50,98 +44,40 @@ namespace meshit {
             const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
     {
         if (importance <= printmessage_importance) {
-            Ng_PrintDest(MyStr(" ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
+            MESHIT_COUT << " " << s1 << s2 << s3 << s4 << s5 << s6 << s7 << s8 << std::endl;
         }
-    }
-
-    void PrintMessageCR(int importance,
-            const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
-            const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
-    {
-        if (importance <= printmessage_importance) {
-            Ng_PrintDest(MyStr(" ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\r"));
-        }
-    }
-
-    void PrintFnStart(const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
-            const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
-    {
-        if (printfnstart)
-            Ng_PrintDest(MyStr(" Start Function: ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
     }
 
     void PrintWarning(const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
             const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
     {
         if (printwarnings)
-            Ng_PrintDest(MyStr(" WARNING: ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
+            MESHIT_COUT << " WARNING: " << s1 << s2 << s3 << s4 << s5 << s6 << s7 << s8 << std::endl;
     }
 
     void PrintError(const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
             const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
     {
         if (printerrors)
-            Ng_PrintDest(MyStr(" ERROR: ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
-    }
-
-    void PrintFileError(const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
-            const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
-    {
-        if (printerrors)
-            Ng_PrintDest(MyStr(" FILE ERROR: ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
-    }
-
-    void PrintUserError(const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
-            const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
-    {
-        Ng_PrintDest(MyStr(" USER ERROR: ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
+            MESHIT_COUT << " ERROR: " << s1 << s2 << s3 << s4 << s5 << s6 << s7 << s8 << std::endl;
     }
 
     void PrintSysError(const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
             const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
     {
         if (printerrors)
-            Ng_PrintDest(MyStr(" SYSTEM ERROR: ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
+            MESHIT_COUT << " SYSTEM ERROR: " << s1 << s2 << s3 << s4 << s5 << s6 << s7 << s8 << std::endl;
     }
-
-    void PrintTime(const MyStr& s1, const MyStr& s2, const MyStr& s3, const MyStr& s4,
-            const MyStr& s5, const MyStr& s6, const MyStr& s7, const MyStr& s8)
-    {
-        if (printmessage_importance >= 3)
-            Ng_PrintDest(MyStr(" Time = ") + s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + MyStr("\n"));
-    }
-
 
     static Array<MyStr*> msgstatus_stack(0);
     static Array<double> threadpercent_stack(0);
     static MyStr msgstatus = "";
-
-    void ResetStatus()
-    {
-        SetStatMsg("idle");
-
-        for (int i = 0; i < msgstatus_stack.size(); i++)
-            delete msgstatus_stack[i];
-        msgstatus_stack.resize(0);
-        threadpercent_stack.resize(0);
-
-        // multithread.task = "";
-        multithread.percent = 100.;
-    }
 
     void PushStatus(const MyStr& s)
     {
         msgstatus_stack.push_back(new MyStr(s));
         SetStatMsg(s);
         threadpercent_stack.push_back(0);
-    }
-
-    void PushStatusF(const MyStr& s)
-    {
-        msgstatus_stack.push_back(new MyStr(s));
-        SetStatMsg(s);
-        threadpercent_stack.push_back(0);
-        PrintFnStart(s);
     }
 
     void PopStatus()
@@ -164,14 +100,6 @@ namespace meshit {
             PrintSysError("PopStatus failed");
         }
     }
-
-    /*
-    void SetStatMsgF(const MyStr& s)
-    {
-      PrintFnStart(s);
-      SetStatMsg(s);
-    }
-     */
 
     void SetStatMsg(const MyStr& s)
     {
@@ -198,24 +126,4 @@ namespace meshit {
         else
             s = "idle";
     }
-
-    /*
-    #ifdef SMALLLIB
-    #define SMALLLIBORNOTCL
-    #endif
-    #ifdef NOTCL
-    #define SMALLLIBORNOTCL
-    #endif
-
-    #ifdef SMALLLIBORNOTCL
-    void Ng_PrintDest(const char * s){std::cout << s <<flush;}
-    double GetTime(){return 0;}
-    void MyError(const char * ch)
-    {
-      std::cerr << ch <<std::endl;
-    }
-    #endif
-     */
-
-
 }

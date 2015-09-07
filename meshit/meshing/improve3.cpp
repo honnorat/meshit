@@ -4,6 +4,7 @@
 #include "../general/ngexception.hpp"
 #include "global.hpp"
 #include "../gprim/geomfuncs.hpp"
+
 namespace meshit
 {
 

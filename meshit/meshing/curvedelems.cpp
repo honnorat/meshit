@@ -2,7 +2,6 @@
 
 #include "curvedelems.hpp"
 #include "../general/autodiff.hpp"
-#include "../general/netgenout.hpp"
 #include "../general/ngexception.hpp"
 #include "../gprim/geomfuncs.hpp"
 #include "topology.hpp"
@@ -10,10 +9,6 @@
 
 namespace meshit
 {
-  
-  //   bool rational = true;
-
-  
   static void ComputeGaussRule (int n, Array<double> & xi, Array<double> & wi)
   {
     xi.resize (n);
@@ -675,65 +670,10 @@ namespace meshit
 		}
 	    }
 
-
-#ifdef PARALLEL
-	if (ntasks > 1)
-	  {
-	    // distribute it ...
-	    TABLE<double> senddata(ntasks), recvdata(ntasks);
-	    if (working)
-	      for (int e = 0; e < nedges; e++)
-		{
-		  partop.GetDistantEdgeNums (e+1, procs);
-		  for (int j = 0; j < procs.Size(); j++)
-		    {
-		      senddata.Add (procs[j], surfnr[e]);
-		      if (surfnr[e] != -1)
-			{
-			  senddata.Add (procs[j], gi0[e].trignum);
-			  senddata.Add (procs[j], gi0[e].u);
-			  senddata.Add (procs[j], gi0[e].v);
-			  senddata.Add (procs[j], gi1[e].trignum);
-			  senddata.Add (procs[j], gi1[e].u);
-			  senddata.Add (procs[j], gi1[e].v);
-			}
-		    }
-		}
-	    
-	    MyMPI_ExchangeTable (senddata, recvdata, MPI_TAG_CURVE, curve_comm);
-	    
-
-	    Array<int> cnt(ntasks);
-	    cnt = 0;
-	    if (working)
-	      for (int e = 0; e < nedges; e++)
-		{
-		  partop.GetDistantEdgeNums (e+1, procs);
-		  for (int j = 0; j < procs.Size(); j++)
-		    {
-		      int surfnr1 = recvdata[procs[j]][cnt[procs[j]]++];
-		      if (surfnr1 != -1)
-			{
-			  surfnr[e] = surfnr1; 
-			  gi0[e].trignum = int (recvdata[procs[j]][cnt[procs[j]]++]);
-			  gi0[e].u = recvdata[procs[j]][cnt[procs[j]]++];
-			  gi0[e].v = recvdata[procs[j]][cnt[procs[j]]++];
-			  gi1[e].trignum = int (recvdata[procs[j]][cnt[procs[j]]++]);
-			  gi1[e].u = recvdata[procs[j]][cnt[procs[j]]++];
-			  gi1[e].v = recvdata[procs[j]][cnt[procs[j]]++];
-			}
-		    }
-		}
-	    
-	  }
-#endif    
-
-
 	if (working)
 	  for (int e = 0; e < surfnr.size(); e++)
 	    {
 	      if (surfnr[e] == -1) continue;
-	      SetThreadPercent(double(e)/surfnr.size()*100.);
 
 	      PointIndex pi1, pi2;
 	      top.GetEdgeVertices (e+1, pi1, pi2);
@@ -879,76 +819,11 @@ namespace meshit
 	  swap_edge[edgenr] = int (seg[0] > seg[1]);
 	}
 
-#ifdef PARALLEL
-    if (ntasks > 1)
-      {
-	// distribute it ...
-	TABLE<double> senddata(ntasks), recvdata(ntasks);
-	if (working)
-	  for (int e = 0; e < nedges; e++)
-	    {
-	      partop.GetDistantEdgeNums (e+1, procs);
-	      for (int j = 0; j < procs.Size(); j++)
-		{
-		  senddata.Add (procs[j], use_edge[e]);
-		  if (use_edge[e])
-		    {
-		      senddata.Add (procs[j], edge_surfnr1[e]);
-		      senddata.Add (procs[j], edge_surfnr2[e]);
-		      senddata.Add (procs[j], edge_gi0[e].edgenr);
-		      senddata.Add (procs[j], edge_gi0[e].body);
-		      senddata.Add (procs[j], edge_gi0[e].dist);
-		      senddata.Add (procs[j], edge_gi0[e].u);
-		      senddata.Add (procs[j], edge_gi0[e].v);
-		      senddata.Add (procs[j], edge_gi1[e].edgenr);
-		      senddata.Add (procs[j], edge_gi1[e].body);
-		      senddata.Add (procs[j], edge_gi1[e].dist);
-		      senddata.Add (procs[j], edge_gi1[e].u);
-		      senddata.Add (procs[j], edge_gi1[e].v);
-		      senddata.Add (procs[j], swap_edge[e]);
-		    }
-		}
-	    }
-	MyMPI_ExchangeTable (senddata, recvdata, MPI_TAG_CURVE, curve_comm);
-	Array<int> cnt(ntasks);
-	cnt = 0;
-	if (working)
-	  for (int e = 0; e < edge_surfnr1.size(); e++)
-	    {
-	      partop.GetDistantEdgeNums (e+1, procs);
-	      for (int j = 0; j < procs.Size(); j++)
-		{
-		  int get_edge = int(recvdata[procs[j]][cnt[procs[j]]++]);
-		  if (get_edge)
-		    {
-		      use_edge[e] = 1;
-		      edge_surfnr1[e] = int (recvdata[procs[j]][cnt[procs[j]]++]);
-		      edge_surfnr2[e] = int (recvdata[procs[j]][cnt[procs[j]]++]);
-		      edge_gi0[e].edgenr = int (recvdata[procs[j]][cnt[procs[j]]++]);
-		      edge_gi0[e].body = int (recvdata[procs[j]][cnt[procs[j]]++]);
-		      edge_gi0[e].dist = recvdata[procs[j]][cnt[procs[j]]++];
-		      edge_gi0[e].u = recvdata[procs[j]][cnt[procs[j]]++];
-		      edge_gi0[e].v = recvdata[procs[j]][cnt[procs[j]]++];
-		      edge_gi1[e].edgenr = int (recvdata[procs[j]][cnt[procs[j]]++]);
-		      edge_gi1[e].body = int (recvdata[procs[j]][cnt[procs[j]]++]);
-		      edge_gi1[e].dist = recvdata[procs[j]][cnt[procs[j]]++];
-		      edge_gi1[e].u = recvdata[procs[j]][cnt[procs[j]]++];
-		      edge_gi1[e].v = recvdata[procs[j]][cnt[procs[j]]++];
-		      swap_edge[e] = recvdata[procs[j]][cnt[procs[j]]++];
-		    }
-		}
-	    }
-
-      }
-#endif    
-
     if (working)
       for (int edgenr = 0; edgenr < use_edge.size(); edgenr++)
 	{
 	  int segnr = edgenr;
 	  if (!use_edge[edgenr]) continue;
-
-	  SetThreadPercent(double(edgenr)/edge_surfnr1.size()*100.);
 
 	  PointIndex pi1, pi2;
 	  top.GetEdgeVertices (edgenr+1, pi1, pi2);

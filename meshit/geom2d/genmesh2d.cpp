@@ -1,6 +1,5 @@
 #include <meshit.hpp>
 #include "geometry2d.hpp"
-#include "../general/netgenout.hpp"
 #include "../meshing/meshing2.hpp"
 #include "../meshing/global.hpp"
 

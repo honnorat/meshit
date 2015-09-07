@@ -535,10 +535,10 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	    {
 	      plotstat_oldne = stat.cntelem;
 
-	      PrintMessageCR (5, "El: ", stat.cntelem,
-			      //	    << " trials: " << stat.cnttrials
-			      " faces: ", stat.nff,
-			      " vol = ", float(100 * stat.vol / stat.vol0));
+//	      PrintMessageCR (5, "El: ", stat.cntelem,
+//			      //	    << " trials: " << stat.cnttrials
+//			      " faces: ", stat.nff,
+//			      " vol = ", float(100 * stat.vol / stat.vol0));
   
 	      multithread.percent = 100 -  100.0 * stat.vol / stat.vol0;
 	    }

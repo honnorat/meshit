@@ -4,9 +4,7 @@ PROJECT( meshit )
 
 SET(src_GENERAL
 	general/bitarray.cpp
-	general/dynamicmem.cpp
 	general/flags.cpp
-	general/gzstream.cpp
 	general/hashtabl.cpp
 	general/mystring.cpp
 	general/ngexception.cpp
