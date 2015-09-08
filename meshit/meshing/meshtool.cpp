@@ -116,26 +116,22 @@ namespace meshit {
             incl.Elem(cl)++;
         }
 
-        std::cerr << std::endl << std::endl;
-
-        std::cerr << "Points:           " << mesh.GetNP() << std::endl;
-        std::cerr << "Surface Elements: " << mesh.GetNSE() << std::endl;
-
-        std::cerr << std::endl;
-        std::cerr << "Elements in qualityclasses:" << std::endl;
-        std::cerr << std::setprecision(2);
+        LOG_INFO("\n\n");
+        LOG_INFO("Points:           " << mesh.GetNP());
+        LOG_INFO("Surface Elements: " << mesh.GetNSE());
+        LOG_INFO("\nElements in qualityclasses:");
         for (i = 1; i <= ncl; i++) {
-            std::cerr << std::setw(4) << double (i - 1) / ncl << " - "
-                    << std::setw(4) << double (i) / ncl << ": "
-                    << incl.Get(i) << std::endl;
+            LOG_INFO(std::fixed << std::setprecision(2) <<
+                    std::setw(4) << double (i - 1) / ncl << " - " <<
+                    std::setw(4) << double (i) / ncl << ": " << incl.Get(i));
         }
     }
 
-    static double TetElementQuality(const Point3d & p1, const Point3d & p2,
+    static double TetElementQuality(
+            const Point3d & p1, const Point3d & p2,
             const Point3d & p3, const Point3d & p4)
     {
         double vol, l, l4, l5, l6;
-
 
         Vec3d v1 = p2 - p1;
         Vec3d v2 = p3 - p1;
@@ -153,12 +149,8 @@ namespace meshit {
         return vol / (l * l * l) * 1832.82; // 6^4 * sqrt(2)
     }
 
-
-
-
-    // static double teterrpow = 2;
-
-    double CalcTetBadness(const Point3d & p1, const Point3d & p2,
+    double CalcTetBadness(
+            const Point3d & p1, const Point3d & p2,
             const Point3d & p3, const Point3d & p4, double h,
             const MeshingParameters & mp)
     {
@@ -197,6 +189,7 @@ namespace meshit {
 
         if (teterrpow == 1) return err;
         if (teterrpow == 2) return err * err;
+
         return pow(err, teterrpow);
     }
 
@@ -327,6 +320,7 @@ namespace meshit {
             grad = (2 * err) * graderr;
         }
         else {
+
             errpow = pow(err, teterrpow);
             grad = (teterrpow * errpow / err) * graderr;
         }
@@ -342,6 +336,7 @@ namespace meshit {
 
         vol = 0;
         for (int i = 0; i < elements.size(); i++) {
+
             v1 = points.Get(elements[i][1]) - points.Get(elements[i][0]);
             v2 = points.Get(elements[i][2]) - points.Get(elements[i][0]);
             v3 = points.Get(elements[i][3]) - points.Get(elements[i][0]);
@@ -385,21 +380,19 @@ namespace meshit {
             sum += 1 / qual;
         }
 
-        std::cerr << std::endl << std::endl;
-        std::cerr << "Points:           " << mesh.GetNP() << std::endl;
-        std::cerr << "Volume Elements:  " << mesh.GetNE() << std::endl;
-        if (nontet)
-            std::cerr << nontet << " non tetrahedral elements" << std::endl;
-        std::cerr << std::endl;
-
-        std::cerr << "Volume elements in qualityclasses:" << std::endl;
-        std::cerr << std::setprecision(2);
+        LOG_INFO("\n\n");
+        LOG_INFO("Points:           " << mesh.GetNP());
+        LOG_INFO("Volume Elements:  " << mesh.GetNE());
+        if (nontet > 0)
+            LOG_INFO(nontet << " non tetrahedral elements");
+        LOG_INFO("Surface Elements: " << mesh.GetNSE());
+        LOG_INFO("\nVolume elements in qualityclasses:");
         for (i = 1; i <= ncl; i++) {
-            std::cerr << std::setw(4) << double (i - 1) / ncl << " - "
-                    << std::setw(4) << double (i) / ncl << ": "
-                    << incl.Get(i) << std::endl;
+            LOG_INFO(std::fixed << std::setprecision(2) <<
+                    std::setw(4) << double (i - 1) / ncl << " - " <<
+                    std::setw(4) << double (i) / ncl << ": " << incl.Get(i));
         }
-        std::cerr << "total error: " << sum << std::endl;
+        LOG_INFO("Total error: " << sum);
     }
 
     void SaveEdges(const Mesh & mesh, const char * geomfile, double h, char * filename)
@@ -420,6 +413,7 @@ namespace meshit {
 
         of << 2 * mesh.GetNSeg() << std::endl;
         for (i = 1; i <= mesh.GetNSeg(); i++) {
+
             seg = &mesh.LineSegment(i);
 
             of << (*seg)[1] << " " << (*seg)[0] << " " << seg->si << "\n";
@@ -455,6 +449,7 @@ namespace meshit {
                 outfile << mesh.SurfaceElement(i).PNum(1) << " "
                 << mesh.SurfaceElement(i).PNum(2) << " "
                 << mesh.SurfaceElement(i).PNum(3) << std::endl;
+
             if (mesh.GetFaceDescriptor(el.GetIndex()).DomainIn() == 0)
                 outfile << mesh.SurfaceElement(i).PNum(1) << " "
                 << mesh.SurfaceElement(i).PNum(3) << " "
@@ -496,6 +491,7 @@ namespace meshit {
 
 #ifdef SOLIDGEOM
         outfile << geometry.GetNSurf() << std::endl;
+
         for (i = 1; i <= geometry.GetNSurf(); i++)
             geometry.GetSurface(i) -> Print(outfile);
 #endif
@@ -503,6 +499,7 @@ namespace meshit {
 
     int CheckCode()
     {
+
         return 1;
 
         /*
@@ -638,6 +635,7 @@ namespace meshit {
             }
             std::cerr << "volelements: " << std::endl;
             for (ei = 0; ei < mesh.GetNE(); ei++) {
+
                 const Element & el = mesh[ei];
                 std::cerr << std::setw(5) << i << ":"
                         << std::setw(6) << el.GetIndex()

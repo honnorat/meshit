@@ -785,10 +785,7 @@ namespace meshit {
                 case HEX:
                     return 8;
                 default:
-#ifdef DEBUG
-                    PrintSysError("Element3d::GetNV not implemented for typ ", typ)
-#endif
-                            ;
+                    LOG_ERROR("Element3d::GetNV not implemented for typ " << typ);
             }
             return np;
         }

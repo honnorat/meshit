@@ -3,6 +3,7 @@
 2d Spline curve for Mesh generator
 
  */
+#include <stdexcept>
 
 #include <meshit.hpp>
 #include "geometry2d.hpp"
@@ -13,10 +14,12 @@ namespace meshit {
 
     SplineGeometry2d::~SplineGeometry2d()
     {
-        for (int i = 0; i < bcnames.size(); i++)
+        for (size_t i = 0; i < bcnames.size(); i++) {
             delete bcnames[i];
-        for (int i = 0; i < materials.size(); i++)
+        }
+        for (size_t i = 0; i < materials.size(); i++) {
             delete [] materials[i];
+        }
     }
 
     void SplineGeometry2d::Load(const char * filename)
@@ -40,14 +43,12 @@ namespace meshit {
         quadmeshing.resize(0);
 
         TestComment(infile);
-        if (strcmp(buf, "splinecurves2dnew") == 0) {
-            LoadDataNew(infile);
-        }
-        else if (strcmp(buf, "splinecurves2dv2") == 0) {
-            LoadDataV2(infile);
+        if (strcmp(buf, "splinecurves2dv2") == 0) {
+            LoadData(infile);
         }
         else {
-            LoadData(infile);
+            LOG_FATAL("Unsupported file format : '" << buf << "'");
+            throw std::runtime_error("Unsupported file format");
         }
         infile.close();
     }
@@ -79,361 +80,9 @@ namespace meshit {
 
     void SplineGeometry2d::LoadData(std::istream & infile)
     {
-        int nump, numseg, leftdom, rightdom;
-        Point<2> x;
-        int hi1, hi2, hi3;
-        double hd;
-        char buf[50], ch;
-
-        materials.resize(0);
-        maxh.resize(0);
-        infile >> elto0;
-
-        TestComment(infile);
-
-        infile >> nump;
-        for (int i = 0; i < nump; i++) {
-            TestComment(infile);
-            for (int j = 0; j < 2; j++)
-                infile >> x(j);
-            infile >> hd;
-
-            Flags flags;
-
-            ch = 'a';
-            // infile >> ch;
-            do {
-                infile.get(ch);
-            } while (isspace(ch) && ch != '\n');
-            while (ch == '-') {
-                char flag[100];
-                flag[0] = '-';
-                infile >> (flag + 1);
-                flags.SetCommandLineFlag(flag);
-                ch = 'a';
-                do {
-                    infile.get(ch);
-                } while (isspace(ch) && ch != '\n');
-            }
-
-            if (infile.good())
-                infile.putback(ch);
-
-            geompoints.push_back(GeomPoint<2>(x, hd));
-            geompoints.Last().hpref = flags.GetDefineFlag("hpref");
-            geompoints.Last().hmax = 1e99;
-        }
-
-        PrintMessage(3, nump, " points loaded");
-        TestComment(infile);
-
-        infile >> numseg;
-        bcnames.resize(numseg);
-        for (int i = 0; i < numseg; i++)
-            bcnames[i] = 0; // "default";
-
-        SplineSeg<2> * spline = 0;
-
-        PrintMessage(3, numseg, " segments loaded");
-        for (int i = 0; i < numseg; i++) {
-            TestComment(infile);
-
-            infile >> leftdom >> rightdom;
-            infile >> buf;
-            // type of spline segement
-            if (strcmp(buf, "2") == 0) { // a line
-                infile >> hi1 >> hi2;
-                spline = new LineSeg<2>(geompoints[hi1 - 1],
-                        geompoints[hi2 - 1]);
-            }
-            else if (strcmp(buf, "3") == 0) { // a rational spline
-                infile >> hi1 >> hi2 >> hi3;
-                spline = new SplineSeg3<2> (geompoints[hi1 - 1],
-                        geompoints[hi2 - 1],
-                        geompoints[hi3 - 1]);
-            }
-            else if (strcmp(buf, "4") == 0) { // an arc
-                infile >> hi1 >> hi2 >> hi3;
-                spline = new CircleSeg<2> (geompoints[hi1 - 1],
-                        geompoints[hi2 - 1],
-                        geompoints[hi3 - 1]);
-                // 	  break;
-            }
-            else if (strcmp(buf, "discretepoints") == 0) {
-                int npts;
-                infile >> npts;
-                Array< Point<2> > pts(npts);
-                for (int j = 0; j < npts; j++)
-                    for (int k = 0; k < 2; k++)
-                        infile >> pts[j](k);
-
-                spline = new DiscretePointsSeg<2> (pts);
-            }
-
-            SplineSegExt * spex = new SplineSegExt(*spline);
-
-            infile >> spex->reffak;
-            spex -> leftdom = leftdom;
-            spex -> rightdom = rightdom;
-            spex -> hmax = 1e99;
-            splines.push_back(spex);
-
-            Flags flags;
-            ch = 'a';
-            infile >> ch;
-            while (ch == '-') {
-                char flag[100];
-                flag[0] = '-';
-                infile >> (flag + 1);
-                flags.SetCommandLineFlag(flag);
-                ch = 'a';
-                infile >> ch;
-            }
-
-            if (infile.good())
-                infile.putback(ch);
-
-            spex->bc = int (flags.GetNumFlag("bc", i + 1));
-            spex->hpref_left = int (flags.GetDefineFlag("hpref")) ||
-                    int (flags.GetDefineFlag("hprefleft"));
-            spex->hpref_right = int (flags.GetDefineFlag("hpref")) ||
-                    int (flags.GetDefineFlag("hprefright"));
-            spex->copyfrom = int (flags.GetNumFlag("copy", -1));
-            if (flags.StringFlagDefined("bcname")) {
-                int mybc = spex->bc - 1;
-                delete bcnames[mybc];
-                bcnames[mybc] = new std::string(flags.GetStringFlag("bcname", ""));
-            }
-        }
-    }
-
-    void SplineGeometry2d::LoadDataNew(std::istream & infile)
-    {
-        int nump, numseg, leftdom, rightdom;
-        Point<2> x;
-        int hi1, hi2, hi3;
-        double hd;
-        char buf[50], ch;
-        int pointnr;
-
-
-        TestComment(infile);
-        infile >> elto0;
-        TestComment(infile);
-
-        infile >> nump;
-        geompoints.resize(nump);
-
-        for (int i = 0; i < nump; i++) {
-            TestComment(infile);
-            infile >> pointnr;
-            if (pointnr > nump) {
-                throw NgException(std::string("Point number greater than total number of points"));
-            }
-            for (int j = 0; j < 2; j++)
-                infile >> x(j);
-
-
-            // hd is now optional, default 1
-            //  infile >> hd;
-            hd = 1;
-
-            Flags flags;
-
-
-            // get flags, 
-            ch = 'a';
-            // infile >> ch;
-            do {
-
-                infile.get(ch);
-                // if another int-value, set refinement flag to this value
-                // (corresponding to old files)
-                if (int (ch) >= 48 && int(ch) <= 57) {
-                    infile.putback(ch);
-                    infile >> hd;
-                    infile.get(ch);
-                }
-            } while (isspace(ch) && ch != '\n');
-            while (ch == '-') {
-                char flag[100];
-                flag[0] = '-';
-                infile >> (flag + 1);
-                flags.SetCommandLineFlag(flag);
-                ch = 'a';
-                do {
-                    infile.get(ch);
-                } while (isspace(ch) && ch != '\n');
-            }
-
-            if (infile.good())
-                infile.putback(ch);
-
-            if (hd == 1)
-                hd = flags.GetNumFlag("ref", 1.0);
-            //       geompoints.Append (GeomPoint<D>(x, hd));
-            geompoints[pointnr - 1] = GeomPoint<2>(x, hd);
-            geompoints[pointnr - 1].hpref = flags.GetDefineFlag("hpref");
-        }
-
-        TestComment(infile);
-
-        infile >> numseg;
-        bcnames.resize(numseg);
-        for (int i = 0; i < numseg; i++)
-            bcnames[i] = 0; //new"default";
-
-        SplineSeg<2> * spline = 0;
-        for (int i = 0; i < numseg; i++) {
-            TestComment(infile);
-
-            infile >> leftdom >> rightdom;
-
-            // std::cout << "add spline " << i << ", left = " << leftdom <<std::endl;
-
-            infile >> buf;
-            // type of spline segement
-            if (strcmp(buf, "2") == 0) { // a line
-                infile >> hi1 >> hi2;
-                spline = new LineSeg<2> (geompoints[hi1 - 1],
-                        geompoints[hi2 - 1]);
-            }
-            else if (strcmp(buf, "3") == 0) { // a rational spline
-                infile >> hi1 >> hi2 >> hi3;
-                spline = new SplineSeg3<2> (geompoints[hi1 - 1],
-                        geompoints[hi2 - 1],
-                        geompoints[hi3 - 1]);
-            }
-            else if (strcmp(buf, "4") == 0) { // an arc
-                infile >> hi1 >> hi2 >> hi3;
-                spline = new CircleSeg<2> (geompoints[hi1 - 1],
-                        geompoints[hi2 - 1],
-                        geompoints[hi3 - 1]);
-                // 	  break;
-            }
-            else if (strcmp(buf, "discretepoints") == 0) {
-                int npts;
-                infile >> npts;
-                Array< Point<2> > pts(npts);
-                for (int j = 0; j < npts; j++)
-                    for (int k = 0; k < 2; k++)
-                        infile >> pts[j](k);
-
-                spline = new DiscretePointsSeg<2> (pts);
-            }
-
-            //      infile >> spline->reffak;
-
-            SplineSegExt * spex = new SplineSegExt(*spline);
-
-            spex -> leftdom = leftdom;
-            spex -> rightdom = rightdom;
-            splines.push_back(spex);
-
-            // hd is now optional, default 1
-            //  infile >> hd;
-            hd = 1;
-            infile >> ch;
-
-            // get refinement parameter, if it is there
-            // infile.get (ch);
-            // if another int-value, set refinement flag to this value
-            // (corresponding to old files)
-            if (int (ch) >= 48 && int(ch) <= 57) {
-                infile.putback(ch);
-                infile >> hd;
-                infile >> ch;
-            }
-
-            Flags flags;
-            while (ch == '-') {
-                char flag[100];
-                flag[0] = '-';
-                infile >> (flag + 1);
-                flags.SetCommandLineFlag(flag);
-                ch = 'a';
-                infile >> ch;
-            }
-
-            if (infile.good())
-                infile.putback(ch);
-
-            spex->bc = int (flags.GetNumFlag("bc", i + 1));
-            spex->hpref_left = int (flags.GetDefineFlag("hpref")) ||
-                    int (flags.GetDefineFlag("hprefleft"));
-            spex->hpref_right = int (flags.GetDefineFlag("hpref")) ||
-                    int (flags.GetDefineFlag("hprefright"));
-            spex->copyfrom = int (flags.GetNumFlag("copy", -1));
-            spex->reffak = flags.GetNumFlag("ref", 1);
-            spex->hmax = flags.GetNumFlag("maxh", 1e99);
-
-            if (flags.StringFlagDefined("bcname")) {
-                int mybc = spex->bc - 1;
-                if (bcnames[mybc]) delete bcnames[mybc];
-                bcnames[mybc] = new std::string(flags.GetStringFlag("bcname", ""));
-            }
-
-            if (hd != 1)
-                spex->reffak = hd;
-        }
-        if (!infile.good())
-            return;
-        TestComment(infile);
-        int numdomains;
-        int domainnr;
-        char material[100];
-
-        if (!infile.good())
-            return;
-
-        infile >> numdomains;
-        materials.resize(numdomains);
-        maxh.resize(numdomains);
-        maxh = 1e99;
-
-        TestComment(infile);
-
-        for (int i = 0; i < numdomains; i++)
-            materials [ i ] = new char (100);
-
-        for (int i = 0; i < numdomains && infile.good(); i++) {
-            TestComment(infile);
-            infile >> domainnr;
-            infile >> material;
-            strcpy(materials[domainnr - 1], material);
-
-            Flags flags;
-            ch = 'a';
-            infile >> ch;
-            while (ch == '-') {
-                char flag[100];
-                flag[0] = '-';
-                infile >> (flag + 1);
-                flags.SetCommandLineFlag(flag);
-                ch = 'a';
-                infile >> ch;
-            }
-
-            if (infile.good())
-                infile.putback(ch);
-
-            maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1e99);
-        }
-        return;
-    }
-
-    void SplineGeometry2d::LoadDataV2(std::istream & infile)
-    {
-
-        enum
-        {
-            D = 2
-        };
-        // new parser by Astrid Sinwel
-
-        PrintMessage(1, "Load 2D Geometry V2");
+        LOG_INFO("Load 2D Geometry");
         int nump, leftdom, rightdom;
-        Point<D> x;
+        Point<2> x;
         int hi1, hi2, hi3;
         double hd;
         char buf[50], ch;
@@ -441,7 +90,7 @@ namespace meshit {
 
         std::string keyword;
 
-        Array < GeomPoint<D> > infilepoints(0);
+        Array < GeomPoint<2> > infilepoints(0);
         Array <int> pointnrs(0);
         nump = 0;
         int numdomains = 0;
@@ -462,7 +111,7 @@ namespace meshit {
             ischar = false;
 
             if (keyword == "points") {
-                PrintMessage(3, "load points");
+                LOG_DEBUG("load points");
                 infile.get(ch);
                 infile.putback(ch);
 
@@ -479,14 +128,14 @@ namespace meshit {
                     if (pointnr > nump) nump = pointnr;
                     pointnrs.push_back(pointnr);
 
-                    for (int j = 0; j < D; j++)
+                    for (int j = 0; j < 2; j++) {
                         infile >> x(j);
+                    }
                     // hd is now optional, default 1
                     //  infile >> hd;
                     hd = 1;
 
                     Flags flags;
-
 
                     // get flags, 
                     ch = 'a';
@@ -518,7 +167,7 @@ namespace meshit {
                         hd = flags.GetNumFlag("ref", 1.0);
                     //       geompoints.Append (GeomPoint<D>(x, hd));
 
-                    infilepoints.push_back(GeomPoint<D>(x, hd));
+                    infilepoints.push_back(GeomPoint<2>(x, hd));
                     infilepoints.Last().hpref = flags.GetDefineFlag("hpref");
                     infilepoints.Last().hmax = flags.GetNumFlag("maxh", 1e99);
 
@@ -562,7 +211,7 @@ namespace meshit {
                     i++;
                     TestComment(infile);
 
-                    SplineSeg<D> * spline = 0;
+                    SplineSeg<2> * spline = 0;
                     TestComment(infile);
 
                     infile >> leftdom >> rightdom;
@@ -570,52 +219,51 @@ namespace meshit {
                     if (leftdom > numdomains) numdomains = leftdom;
                     if (rightdom > numdomains) numdomains = rightdom;
 
-
                     infile >> buf;
                     // type of spline segement
                     if (strcmp(buf, "2") == 0) { // a line
                         infile >> hi1 >> hi2;
-                        spline = new LineSeg<D>(geompoints[hi1 - 1],
+                        spline = new LineSeg<2>(geompoints[hi1 - 1],
                                 geompoints[hi2 - 1]);
                     }
                     else if (strcmp(buf, "3") == 0) { // a rational spline
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new SplineSeg3<D> (geompoints[hi1 - 1],
+                        spline = new SplineSeg3<2> (geompoints[hi1 - 1],
                                 geompoints[hi2 - 1],
                                 geompoints[hi3 - 1]);
                     }
                     else if (strcmp(buf, "4") == 0) { // an arc
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new CircleSeg<D> (geompoints[hi1 - 1],
+                        spline = new CircleSeg<2> (geompoints[hi1 - 1],
                                 geompoints[hi2 - 1],
                                 geompoints[hi3 - 1]);
                     }
                     else if (strcmp(buf, "discretepoints") == 0) {
                         int npts;
                         infile >> npts;
-                        Array< Point<D> > pts(npts);
+                        Array< Point<2> > pts(npts);
                         for (int j = 0; j < npts; j++)
-                            for (int k = 0; k < D; k++)
+                            for (int k = 0; k < 2; k++)
                                 infile >> pts[j](k);
 
-                        spline = new DiscretePointsSeg<D> (pts);
+                        spline = new DiscretePointsSeg<2> (pts);
                     }
                     else if (strcmp(buf, "bsplinepoints") == 0) {
                         int npts, order;
                         infile >> npts;
                         infile >> order;
-                        Array< Point<D> > pts(npts);
+                        Array< Point<2> > pts(npts);
                         for (int j = 0; j < npts; j++)
-                            for (int k = 0; k < D; k++)
+                            for (int k = 0; k < 2; k++)
                                 infile >> pts[j](k);
                         if (order < 2)
                             std::cerr << "Minimum order of 2 is required!!" << std::endl;
                         else if (order == 2)
-                            spline = new BSplineSeg<D, 2> (pts);
+                            spline = new BSplineSeg<2, 2> (pts);
                         else if (order == 3)
-                            spline = new BSplineSeg<D, 3> (pts);
+                            spline = new BSplineSeg<2, 3> (pts);
                         else if (order == 4)
-                            spline = new BSplineSeg<D, 4> (pts);
+                            spline = new BSplineSeg<2, 4> (pts);
                         else if (order > 4)
                             std::cerr << "Maximum allowed order is 4!!" << std::endl;
                     }
@@ -627,10 +275,8 @@ namespace meshit {
                     spex -> rightdom = rightdom;
                     splines.push_back(spex);
 
-
                     // hd is now optional, default 1
                     hd = 1;
-
                     infile >> ch;
 
                     // get flags, 
@@ -676,11 +322,8 @@ namespace meshit {
                         ischar = true;
 
                 }
-
                 infile.get(ch);
                 infile.putback(ch);
-
-
             }
             else if (keyword == "materials") {
                 TestComment(infile);
@@ -694,13 +337,9 @@ namespace meshit {
                 maxh.resize(numdomains);
                 for (int i = 0; i < numdomains; i++)
                     maxh[i] = 1000;
-                quadmeshing.resize(numdomains);
-                quadmeshing = false;
-                tensormeshing.resize(numdomains);
-                tensormeshing = false;
-                layer.resize(numdomains);
-                layer = 1;
-
+                quadmeshing.resize(numdomains, false);
+                tensormeshing.resize(numdomains, false);
+                layer.resize(numdomains, 1);
 
                 TestComment(infile);
 
@@ -797,7 +436,7 @@ namespace meshit {
 
     std::string SplineGeometry2d::GetBCName(const int bcnr) const
     {
-        if (bcnames.size() >= bcnr)
+        if ((int)bcnames.size() >= bcnr)
             if (bcnames[bcnr - 1])
                 return *bcnames[bcnr - 1];
         return "default";
@@ -805,7 +444,7 @@ namespace meshit {
 
     std::string * SplineGeometry2d::BCNamePtr(const int bcnr)
     {
-        if (bcnr > bcnames.size())
+        if (bcnr > (int)bcnames.size())
             return 0;
         else
             return bcnames[bcnr - 1];
@@ -813,7 +452,7 @@ namespace meshit {
 
     void SplineGeometry2d::GetMaterial(const int domnr, char* & material)
     {
-        if (materials.size() >= domnr)
+        if ((int)materials.size() >= domnr)
             material = materials[domnr - 1];
         else
             material = 0;
@@ -821,7 +460,7 @@ namespace meshit {
 
     double SplineGeometry2d::GetDomainMaxh(const int domnr)
     {
-        if (maxh.size() >= domnr && domnr > 0)
+        if ((int)maxh.size() >= domnr && domnr > 0)
             return maxh[domnr - 1];
         else
             return -1;

@@ -46,6 +46,7 @@ namespace meshit {
             : seg(hseg)
         {
             layer = 1;
+            copyfrom = -1;
         }
 
         ~SplineSegExt()
@@ -115,12 +116,12 @@ namespace meshit {
     class SplineGeometry2d : public SplineGeometry<2>
     {
       protected:
-        Array<char*> materials;
-        Array<double> maxh;
-        Array<bool> quadmeshing;
-        Array<bool> tensormeshing;
-        Array<int> layer;
-        Array<std::string*> bcnames;
+        std::vector<char*> materials;
+        std::vector<double> maxh;
+        std::vector<bool> quadmeshing;
+        std::vector<bool> tensormeshing;
+        std::vector<int> layer;
+        std::vector<std::string*> bcnames;
         double elto0;
 
       public:
@@ -128,8 +129,6 @@ namespace meshit {
 
         void Load(const char * filename);
         void LoadData(std::istream & infile);
-        void LoadDataNew(std::istream & infile);
-        void LoadDataV2(std::istream & infile);
 
         void AddLine(const std::vector<Point2d>& point_list,
                 double hmax = 1e99,

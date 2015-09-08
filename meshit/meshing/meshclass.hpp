@@ -569,15 +569,15 @@ namespace meshit {
          */
         void FreeOpenElementsEnvironment(int layers);
 
-        bool LegalTet(Element & el) const
+        bool LegalTet(Element & el)
         {
             if (el.IllegalValid())
                 return !el.Illegal();
             return LegalTet2(el);
         }
-        bool LegalTet2(Element & el) const;
+        bool LegalTet2(Element & el);
 
-        bool LegalTrig(const Element2d & el) const;
+        bool LegalTrig(const Element2d & el);
         /**
            if values non-null, return values in 4-double array:
            triangle angles min/max, tetangles min/max
@@ -610,22 +610,22 @@ namespace meshit {
                 double * lami,
                 bool build_searchtree = 0,
                 const int index = -1,
-                const bool allowindex = true) const;
+                const bool allowindex = true);
         int GetElementOfPoint(const meshit::Point<3> & p,
                 double * lami,
                 const Array<int> * const indices,
                 bool build_searchtree = 0,
-                const bool allowindex = true) const;
+                const bool allowindex = true);
         int GetSurfaceElementOfPoint(const meshit::Point<3> & p,
                 double * lami,
                 bool build_searchtree = 0,
                 const int index = -1,
-                const bool allowindex = true) const;
+                const bool allowindex = true);
         int GetSurfaceElementOfPoint(const meshit::Point<3> & p,
                 double * lami,
                 const Array<int> * const indices,
                 bool build_searchtree = 0,
-                const bool allowindex = true) const;
+                const bool allowindex = true);
 
         /// give list of vol elements which are int the box(p1,p2)
         void GetIntersectingVolEls(const Point3d& p1, const Point3d& p2,

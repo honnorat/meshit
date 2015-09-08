@@ -24,13 +24,13 @@ int main(int argc, char ** argv)
     list_outer.push_back(meshit::Point2d(-1, 1));
     geom.AddLine(list_outer, 0.25);
 
-    //    std::vector<meshit::Point2d> line_inner;
-    //    line_inner.push_back(meshit::Point2d(-0.5, -0.5));
-    //    line_inner.push_back(meshit::Point2d(-0.5, 0.5));
-    //    line_inner.push_back(meshit::Point2d(0.5, 0.5));
-    //    line_inner.push_back(meshit::Point2d(0.5, -0.5));
-    //    geom.AddLine(line_inner, 0.05, true, 2);
-    //
+    std::vector<meshit::Point2d> line_inner;
+    line_inner.push_back(meshit::Point2d(-0.5, -0.5));
+    line_inner.push_back(meshit::Point2d(-0.5, 0.5));
+    line_inner.push_back(meshit::Point2d(0.5, 0.5));
+    line_inner.push_back(meshit::Point2d(0.5, -0.5));
+    geom.AddLine(line_inner, 0.05, true, 2);
+
     geom.FakeData();
 
     LOG_INFO("== start meshing");
