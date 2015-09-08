@@ -26,8 +26,6 @@ namespace meshit {
             const class CSGeometry & geometry,
             char * filename);
 
-    int CheckCode();
-
     double CalcTetBadness(
             const Point3d & p1, const Point3d & p2,
             const Point3d & p3, const Point3d & p4,

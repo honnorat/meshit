@@ -458,23 +458,9 @@ namespace meshit
   void CurvedElements :: BuildCurvedElements(const Refinement * ref, int aorder,
                                              bool arational)
   {
-#ifdef PARALLEL
-    bool working = (ntasks == 1) || (id > 0);
-#else
     bool working = true;
-#endif
     ishighorder = 0;
     order = 1;
-
-
-#ifdef PARALLEL
-    enum { MPI_TAG_CURVE = MPI_TAG_MESH+20 };
-
-    const ParallelMeshTopology & partop = mesh.GetParallelTopology ();
-    MPI_Comm curve_comm;
-    MPI_Comm_dup (MPI_COMM_WORLD, &curve_comm);      
-    Array<int> procs;
-#endif
 
     if (working)
       order = aorder;

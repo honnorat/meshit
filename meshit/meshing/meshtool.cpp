@@ -7,23 +7,21 @@ namespace meshit {
 
     int CheckSurfaceMesh(const Mesh & mesh)
     {
-        PrintMessage(3, "Check Surface mesh");
+        LOG_DEBUG("Check Surface mesh");
 
         int nf = mesh.GetNSE();
         INDEX_2_HASHTABLE<int> edges(nf + 2);
-        int i, j;
         INDEX_2 i2;
         int cnt1 = 0, cnt2 = 0;
 
-        for (i = 1; i <= nf; i++)
-            for (j = 1; j <= 3; j++) {
+        for (int i = 1; i <= nf; i++) {
+            for (int j = 1; j <= 3; j++) {
                 i2.I1() = mesh.SurfaceElement(i).PNumMod(j);
                 i2.I2() = mesh.SurfaceElement(i).PNumMod(j + 1);
                 if (edges.Used(i2)) {
-                    int hi;
-                    hi = edges.Get(i2);
+                    int hi = edges.Get(i2);
                     if (hi != 1)
-                        PrintSysError("CheckSurfaceMesh, hi = ", hi);
+                        LOG_ERROR("CheckSurfaceMesh, hi = " << hi);
                     edges.Set(i2, 2);
                     cnt2++;
                 }
@@ -33,12 +31,10 @@ namespace meshit {
                     cnt1++;
                 }
             }
-
+        }
 
         if (cnt1 != cnt2) {
-            PrintError("Surface mesh not consistent");
-            //      MyBeep(2);
-            //      (*mystd::cout) << "cnt1 = " << cnt1 << " cnt2 = " << cnt2 <<std::endl;
+            LOG_ERROR("Surface mesh not consistent : cnt1 = " << cnt1 << " / cnt2 = " << cnt2);
             return 0;
         }
         return 1;
@@ -488,31 +484,7 @@ namespace meshit {
             outfile << mesh.Point(i)(0) << " "
             << mesh.Point(i)(1) << " "
             << mesh.Point(i)(2) << std::endl;
-
-#ifdef SOLIDGEOM
-        outfile << geometry.GetNSurf() << std::endl;
-
-        for (i = 1; i <= geometry.GetNSurf(); i++)
-            geometry.GetSurface(i) -> Print(outfile);
-#endif
     }
-
-    int CheckCode()
-    {
-
-        return 1;
-
-        /*
-          char st[100];
-          ifstream ist("pw");
-
-          if (!ist.good()) return 0;
-          ist >> st;
-          if (strcmp (st, "JKULinz") == 0) return 1;
-          return 0;
-         */
-    }
-
 
 
     /* ******************** CheckMesh ******************************* */
@@ -602,27 +574,6 @@ namespace meshit {
             }
         }
 
-
-
-
-
-        /*
-          for (i = 1; i <= faceused.GetNBags(); i++)
-          for (j = 1; j <= faceused.GetBagSize(i); j++)
-          {
-          faceused.GetData(i, j, i3, k);
-          if (k != 2)
-          {
-          std::cerr << "Face: " << i3.I1() << "-" 
-          << i3.I2() << "-" << i3.I3() << " has " 
-          << k << " Faces " <<std::endl;
-          std::cerr << "Face Error" <<std::endl;
-          ok = 0;
-          }
-          }
-         */
-
-
         if (!ok) {
             std::cerr << "surfelements: " << std::endl;
             for (i = 1; i <= mesh.GetNSE(); i++) {
@@ -644,7 +595,6 @@ namespace meshit {
             }
         }
 
-
         return ok;
     }
 
@@ -657,10 +607,7 @@ namespace meshit {
 
         BitArrayChar<PointIndex::BASE> ppoints(np);
 
-        // int ndom = mesh.GetNDomains();
-
-        PrintMessage(3, "Elements before Remove: ", mesh.GetNE());
-        // for (k = 1; k <= ndom; k++)
+        LOG_DEBUG("Elements before Remove: " << mesh.GetNE());
         k = domainnr;
         {
             ppoints.Clear();
@@ -686,14 +633,13 @@ namespace meshit {
 
                     if (todel) {
                         mesh[ei].Delete();
-                        // ei--;
                     }
                 }
             }
         }
 
         mesh.Compress();
-        PrintMessage(3, "Elements after Remove: ", mesh.GetNE());
+        LOG_DEBUG("Elements after Remove: " << mesh.GetNE());
     }
 
 }

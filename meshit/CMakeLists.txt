@@ -47,7 +47,6 @@ SET(src_MESHING
 	meshing/bisect.cpp
 	meshing/clusters.cpp
 	meshing/curvedelems.cpp
-	meshing/delaunay2d.cpp
 	meshing/delaunay.cpp
 	meshing/geomsearch.cpp
 	meshing/global.cpp
@@ -65,8 +64,6 @@ SET(src_MESHING
 	meshing/msghandler.cpp
 	meshing/netrule2.cpp
 	meshing/netrule3.cpp
-	meshing/parallelmesh.cpp
-	meshing/paralleltop.cpp
 	meshing/parser2.cpp
 	meshing/parser3.cpp
 	meshing/prism2rls.cpp

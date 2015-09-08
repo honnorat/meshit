@@ -382,8 +382,6 @@ int main(int argc, char ** argv)
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);
     meshit::CheckSurfaceMesh2(mesh);
-    meshit::RemoveProblem(mesh, 0);
-    meshit::RemoveProblem(mesh, 1);
     mesh.CheckConsistentBoundary();
     mesh.PrintMemInfo(std::cout);
     mesh.Export("comprehension.msh", "Gmsh2 Format");

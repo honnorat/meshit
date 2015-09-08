@@ -1333,7 +1333,6 @@ namespace meshit {
             }
         }
 
-
         Array<char, 1> hasface(GetNFD());
 
         int i;
@@ -1489,7 +1488,8 @@ namespace meshit {
                 cnt3++;
         }
         int cnt4 = openelements.size() - cnt3;
-        LOG_WARNING(openelements.size() << " (" << cnt3 << " + " << cnt4 << ")" << " open elements");
+        if (openelements.size() > 0)
+            LOG_WARNING(openelements.size() << " (" << cnt3 << " + " << cnt4 << ")" << " open elements");
 
         BuildBoundaryEdges();
 
@@ -1525,11 +1525,6 @@ namespace meshit {
 
     void Mesh::FindOpenSegments(int surfnr)
     {
-        // int i, j, k;
-
-        // new version, general elements
-        // hash index: pnum1-2
-        // hash data : surfnr,  surfel-nr (pos) or segment nr(neg)
         INDEX_2_HASHTABLE<INDEX_2> faceht(4 * GetNSE() + GetNSeg() + 1);
 
         LOG_DEBUG("Test Opensegments");
@@ -1548,7 +1543,6 @@ namespace meshit {
             }
         }
 
-
         for (int i = 1; i <= GetNSeg(); i++) {
             const Segment & seg = LineSegment(i);
 
@@ -1559,9 +1553,6 @@ namespace meshit {
                 }
             }
         }
-
-        // bool buggy = false;
-        // ofstream bout("buggy.out");
 
         for (int i = 1; i <= GetNSE(); i++) {
             const Element2d & el = SurfaceElement(i);
@@ -4160,14 +4151,14 @@ namespace meshit {
                 << GetNE() * sizeof (Element) << std::endl;
 
         ost << "surfs on node:";
-        surfacesonnode.PrintMemInfo(std::cout);
+        surfacesonnode.PrintMemInfo(ost);
 
         ost << "boundaryedges: ";
         if (boundaryedges)
-            boundaryedges->PrintMemInfo(std::cout);
+            boundaryedges->PrintMemInfo(ost);
 
         ost << "surfelementht: ";
         if (surfelementht)
-            surfelementht->PrintMemInfo(std::cout);
+            surfelementht->PrintMemInfo(ost);
     }
 }
