@@ -1,14 +1,12 @@
 /* 
- * File:   meshgen.hpp
+ * File:   meshit.hpp
  * Author: honnorat
  *
  * Created on 31 août 2015, 16:21
  */
 
-#ifndef MESHGEN_HPP
-#define	MESHGEN_HPP
-
-
+#ifndef MESHIT_HPP
+#define	MESHIT_HPP
 
 #ifdef WIN32
    #if NGINTERFACE_EXPORTS || NGLIB_EXPORTS || nglib_EXPORTS
@@ -20,9 +18,6 @@
    #define DLL_HEADER 
 #endif
 
-//#include "../meshing/bisect.hpp"
+#include "../meshing/msghandler.hpp"
 
-//#include "../geom2d/geometry2d.hpp"
-
-#endif	/* MESHGEN_HPP */
-
+#endif	/* MESHIT_HPP */

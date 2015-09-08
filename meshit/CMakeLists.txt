@@ -86,7 +86,7 @@ SET(src_MESHING
 	meshing/triarls.cpp
 	meshing/validate.cpp
 )
-ADD_LIBRARY(meshgen STATIC
+ADD_LIBRARY(meshit STATIC
 	${src_GENERAL}
 	${src_GEOM2D}
 	${src_GPRIM}
@@ -94,4 +94,7 @@ ADD_LIBRARY(meshgen STATIC
 	${src_LINALG}
 	${src_MESHING}
 )
-TARGET_LINK_LIBRARIES(meshit)
+
+ADD_DEPENDENCIES(meshit ${MESHIT_DEPS})
+
+SET(MESHIT_LINK_LIBRARIES ${MESHIT_LINK_LIBRARIES} meshit PARENT_SCOPE)

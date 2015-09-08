@@ -106,24 +106,4 @@ namespace meshit {
         msgstatus = s;
         multithread.task = msgstatus.c_str();
     }
-
-    void SetThreadPercent(double percent)
-    {
-        multithread.percent = percent;
-        if (threadpercent_stack.size() > 0)
-            threadpercent_stack.Last() = percent;
-    }
-
-    void GetStatus(MyStr & s, double & percentage)
-    {
-        if (threadpercent_stack.size() > 0)
-            percentage = threadpercent_stack.Last();
-        else
-            percentage = multithread.percent;
-
-        if (msgstatus_stack.size())
-            s = *msgstatus_stack.Last();
-        else
-            s = "idle";
-    }
 }

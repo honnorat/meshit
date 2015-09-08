@@ -6,6 +6,7 @@
 /* Author: Johannes Gerstmayr                                             */
 /* Date:   20. Nov. 99                                                    */
 /**************************************************************************/
+
 #include "../general/mystring.hpp"
 
 namespace meshit {
