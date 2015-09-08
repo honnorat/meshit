@@ -59,9 +59,9 @@ namespace meshit {
     {
         if (!faceindex) {
             if (usemetric)
-                PrintMessage(3, "Edgeswapping, metric");
+                LOG_DEBUG("Edgeswapping, metric");
             else
-                PrintMessage(3, "Edgeswapping, topological");
+                LOG_DEBUG("Edgeswapping, topological");
 
             for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++) {
                 EdgeSwapping(mesh, usemetric);
@@ -344,7 +344,7 @@ namespace meshit {
     void MeshOptimize2d::CombineImprove(Mesh & mesh)
     {
         if (!faceindex) {
-            PrintMessage(3, "Combine improve");
+            LOG_DEBUG("Combine improve");
 
             for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++) {
                 CombineImprove(mesh);

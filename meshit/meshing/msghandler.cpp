@@ -12,6 +12,18 @@ namespace meshit {
     int printdots = 1;
     int printfnstart = 0;
 
+    static int _meshit_logLevel = INFO_LOG_LEVEL;
+
+    int get_logLevel()
+    {
+        return _meshit_logLevel;
+    }
+
+    void set_log_level(int logLevel)
+    {
+        _meshit_logLevel = logLevel;
+    }
+
     std::ostream & MESHIT_COUT = std::cerr;
 
     //the dots for progression of program

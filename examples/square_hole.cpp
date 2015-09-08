@@ -2,22 +2,14 @@
 #include <sstream>
 #include <vector>
 
+#include <meshit.hpp>
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
 #include <meshit/geom2d/geometry2d.hpp>
 
-#include <log4cplus/logger.h>
-#include <log4cplus/loggingmacros.h>
-#include <log4cplus/consoleappender.h>
-
 int main(int argc, char ** argv)
 {
-    log4cplus::initialize();
-    log4cplus::SharedAppenderPtr console(new log4cplus::ConsoleAppender(false, true));
-    log4cplus::Logger::getRoot().addAppender(console);
-    log4cplus::Logger logger = log4cplus::Logger::getInstance(LOG4CPLUS_TEXT("main"));
-
-    LOG4CPLUS_INFO(logger, "== MeshGen Square_hole");
+    LOG_INFO("== MeshGen Square_hole");
 
     meshit::MeshingParameters mp;
     meshit::Mesh mesh;
@@ -41,18 +33,18 @@ int main(int argc, char ** argv)
     //
     geom.FakeData();
 
-    LOG4CPLUS_INFO(logger, "== start meshing");
+    LOG_INFO("== start meshing");
     mp.optsteps2d = 5;
     geom.SetGrading(0.02);
     mesh.BuildFromSpline2D(geom, mp);
-    LOG4CPLUS_INFO(logger, "== meshing done");
+    LOG_INFO("== meshing done");
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);
     meshit::CheckSurfaceMesh2(mesh);
     meshit::RemoveProblem(mesh, 0);
     meshit::RemoveProblem(mesh, 1);
     mesh.CheckConsistentBoundary();
-    LOG4CPLUS_INFO(logger, "== export mesh");
+    LOG_INFO("== export mesh");
     mesh.Export("square_hole.msh", "Gmsh2 Format");
     mesh.Save("square_hole.meshit");
 

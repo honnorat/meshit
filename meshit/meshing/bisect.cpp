@@ -280,7 +280,7 @@ namespace meshit {
             const Array< Array<int, PointIndex::BASE>* > & idmaps,
             INDEX_2_CLOSED_HASHTABLE<int> & edgenumber)
     {
-        PrintMessage(4, "sorting ... ");
+        LOG_DEBUG("sorting ... ");
 
         //  if (mesh.PureTetMesh())
         if (1) {
@@ -1526,7 +1526,7 @@ namespace meshit {
         bool readok = false;
 
         if (refinfofile != "") {
-            PrintMessage(3, "Reading marked-element information from \"", refinfofile, "\"");
+            LOG_DEBUG("Reading marked-element information from \"" << refinfofile << "\"");
             std::ifstream ist(refinfofile.c_str());
 
             readok = ReadMarkedElements(ist, mesh);
@@ -1535,7 +1535,7 @@ namespace meshit {
         }
 
         if (!readok) {
-            PrintMessage(3, "resetting marked-element information");
+            LOG_DEBUG("resetting marked-element information");
             mtets.resize(0);
             mprisms.resize(0);
             mids.resize(0);
@@ -1689,8 +1689,8 @@ namespace meshit {
             str1 << "copied " << mtets.size() << " tets, " << mprisms.size() << " prisms";
             str2 << "       " << mtris.size() << " trigs, " << mquads.size() << " quads";
 
-            PrintMessage(4, str1.str());
-            PrintMessage(4, str2.str());
+            LOG_DEBUG(str1.str());
+            LOG_DEBUG(str2.str());
         }
     }
 
@@ -1818,7 +1818,7 @@ namespace meshit {
 
     void Refinement::Bisect(Mesh & mesh, BisectionOptions & opt, Array<double> * quality_loss) const
     {
-        PrintMessage(1, "Mesh bisection");
+        LOG_DEBUG("Mesh bisection");
         PushStatus("Mesh bisection");
 
         LocalizeEdgePoints(mesh);
@@ -1936,7 +1936,7 @@ namespace meshit {
             int marked = 0;
             if (opt.refinementfilename) {
                 std::ifstream inf(opt.refinementfilename);
-                PrintMessage(3, "load refinementinfo from file ", opt.refinementfilename);
+                LOG_DEBUG("load refinementinfo from file " << opt.refinementfilename);
 
                 std::string st;
                 inf >> st;
@@ -2024,7 +2024,7 @@ namespace meshit {
                                         << "%"
 #endif
                                         << " of the elements";
-                                PrintMessage(4, strstr.str());
+                                LOG_DEBUG(strstr.str());
 
                                 if (cnt > 0)
                                     marked = 1;
@@ -2090,7 +2090,7 @@ namespace meshit {
                 if (printmessage_importance > 0) {
                     std::ostringstream str;
                     str << "marked elements: " << cntm;
-                    PrintMessage(4, str.str());
+                    LOG_DEBUG(str.str());
                 }
 
                 int cnttrig = 0;
@@ -2119,7 +2119,7 @@ namespace meshit {
                 if (printmessage_importance > 0) {
                     std::ostringstream str;
                     str << "with surface-elements: " << cntm;
-                    PrintMessage(4, str.str());
+                    LOG_DEBUG(str.str());
                 }
 
                 marked = (cntm > 0);
@@ -2131,7 +2131,7 @@ namespace meshit {
             if (!marked) break;
 
             if (opt.refine_p) {
-                PrintMessage(3, "refine p");
+                LOG_DEBUG("refine p");
 
                 for (int i = 1; i <= mtets.size(); i++)
                     mtets.Elem(i).incorder = mtets.Elem(i).marked ? 1 : 0;
@@ -2157,7 +2157,7 @@ namespace meshit {
             }
 
             if (opt.refine_hp) {
-                PrintMessage(3, "refine hp");
+                LOG_DEBUG("refine hp");
                 BitArray singv(np);
                 singv.Clear();
 
@@ -2505,13 +2505,13 @@ namespace meshit {
                 }
             } while (hangingvol || hangingsurf || hangingedge);
 
-            PrintMessage(4, mtets.size(), " tets");
-            PrintMessage(4, mtris.size(), " trigs");
+            LOG_DEBUG(mtets.size() << " tets");
+            LOG_DEBUG(mtris.size() << " trigs");
             if (mprisms.size()) {
-                PrintMessage(4, mprisms.size(), " prisms");
-                PrintMessage(4, mquads.size(), " quads");
+                LOG_DEBUG(mprisms.size() << " prisms");
+                LOG_DEBUG(mquads.size() << " quads");
             }
-            PrintMessage(4, mesh.GetNP(), " points");
+            LOG_DEBUG(mesh.GetNP() << " points");
         }
 
         if (opt.refine_hp) {
@@ -2647,7 +2647,7 @@ namespace meshit {
         np = mesh.GetNP();
         mesh.mlbetweennodes.resize(np);
         if (mesh.mglevels <= 2) {
-            PrintMessage(4, "RESETTING mlbetweennodes");
+            LOG_DEBUG("RESETTING mlbetweennodes");
             for (int i = 1; i <= np; i++) {
                 mesh.mlbetweennodes.Elem(i).I1() = 0;
                 mesh.mlbetweennodes.Elem(i).I2() = 0;
@@ -2739,7 +2739,7 @@ namespace meshit {
                 std::ostringstream strstr;
                 for (int ii = 0; ii < bad_elts.size(); ii++)
                     strstr << "bad element " << bad_elts[ii] << "\n";
-                PrintMessage(1, strstr.str());
+                LOG_DEBUG(strstr.str());
             }
             if (repaired_once || bad_elts.size() > 0) {
                 clock_t t1(clock());
@@ -2763,14 +2763,14 @@ namespace meshit {
                     repaired_once = true;
                 }
                 catch (NgException & ex) {
-                    PrintMessage(1, std::string("Problem: ") + ex.What());
+                    LOG_DEBUG(std::string("Problem: ") + ex.What());
                 }
 
                 if (printmessage_importance > 0) {
                     std::ostringstream strstr;
                     strstr << "Time for Repair: " << double(clock() - t1) / double(CLOCKS_PER_SEC) << std::endl
                             << "bad elements after repair: " << bad_elts << std::endl;
-                    PrintMessage(1, strstr.str());
+                    LOG_DEBUG(strstr.str());
                 }
 
                 if (quality_loss != NULL)
@@ -2791,7 +2791,7 @@ namespace meshit {
         mesh.UpdateTopology();
 
         if (refelementinfofilewrite != "") {
-            PrintMessage(3, "writing marked-elements information to \"", refelementinfofilewrite, "\"");
+            LOG_DEBUG("writing marked-elements information to \"" << refelementinfofilewrite << "\"");
             std::ofstream ofst(refelementinfofilewrite.c_str());
 
             WriteMarkedElements(ofst);
@@ -2801,7 +2801,7 @@ namespace meshit {
 
         mesh.CalcSurfacesOfNode();
 
-        PrintMessage(1, "Bisection done");
+        LOG_DEBUG("Bisection done");
 
         PopStatus();
     }

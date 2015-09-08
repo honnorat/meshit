@@ -30,7 +30,7 @@ namespace meshit
     
     if (!faceindex)
       {
-	PrintMessage (3, "Smoothing");
+	LOG_DEBUG("Smoothing");
 
 	for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++)
 	  {

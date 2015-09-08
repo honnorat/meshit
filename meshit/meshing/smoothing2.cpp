@@ -473,7 +473,7 @@ namespace meshit {
     void MeshOptimize2d::ImproveMesh(Mesh & mesh, const MeshingParameters & mp)
     {
         if (!faceindex) {
-            PrintMessage(3, "Smoothing");
+            LOG_DEBUG("Smoothing");
 
             for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++) {
                 ImproveMesh(mesh, mp);

@@ -2243,12 +2243,9 @@ namespace meshit {
             SetLocalH(pmin, pmax, grading);
         }
 
-        PrintMessage(3,
-                "CalcLocalH: ",
-                GetNP(), " Points ",
-                GetNE(), " Elements ",
-                GetNSE(), " Surface Elements");
-
+        LOG_DEBUG("CalcLocalH: " << GetNP() << " points, "
+                << GetNE() << " elements, "
+                << GetNSE() << " surface elements.");
 
         for (int i = 0; i < GetNSE(); i++) {
             const Element2d & el = surfelements[i];
@@ -2260,20 +2257,11 @@ namespace meshit {
                     const Point3d & p1 = points[el.PNumMod(j)];
                     const Point3d & p2 = points[el.PNumMod(j + 1)];
 
-                    /*
-                      INDEX_2 i21(el.PNumMod(j), el.PNumMod(j+1));
-                      INDEX_2 i22(el.PNumMod(j+1), el.PNumMod(j));
-                      if (! identifiedpoints->Used (i21) &&
-                      ! identifiedpoints->Used (i22) )
-                     */
                     if (!ident -> UsedSymmetric(el.PNumMod(j),
                             el.PNumMod(j + 1))) {
                         double hedge = Dist(p1, p2);
                         if (hedge > hel)
                             hel = hedge;
-                        //		  lochfunc->SetH (Center (p1, p2), 2 * Dist (p1, p2));
-                        //		  std::cerr << "trigseth, p1,2 = " << el.PNumMod(j) << ", " << el.PNumMod(j+1) 
-                        //			     << " h = " << (2 * Dist(p1, p2)) <<std::endl;
                     }
                 }
 
@@ -2332,7 +2320,6 @@ namespace meshit {
                 hl = Dist(p1, p2);
                 RestrictLocalH(p1, hl);
                 RestrictLocalH(p2, hl);
-                //std::cout << "restricted h at " << p1 << " and " << p2 << " to " << hl <<std::endl;
             }
         }
 
@@ -2393,16 +2380,6 @@ namespace meshit {
                             Point(pi4));
 
                     RestrictLocalHLine(Point(i2.I1()), Point(i2.I2()), rad / elperr);
-
-
-                    /*	      
-                      std::cerr << "pi1,2, 3, 4 = " << i2.I1() << ", " << i2.I2() << ", " << pi3 << ", " << pi4
-                      << " p1 = " << Point(i2.I1()) 
-                      << ", p2 = " << Point(i2.I2()) 
-                      //			 << ", p3 = " << Point(pi3) 
-                      //			 << ", p4 = " << Point(pi4) 
-                      << ", rad = " << rad <<std::endl;
-                     */
                 }
                 else
                     edges.Set(i2, i);
@@ -2751,9 +2728,7 @@ namespace meshit {
                 int cnt = 0;
                 edges.GetData(i, j, i2, cnt);
                 if (cnt) {
-                    PrintError("Edge ", i2.I1(), " - ", i2.I2(), " multiple times in surface mesh");
-
-                    std::cerr << "Edge " << i2 << " multiple times in surface mesh" << std::endl;
+                    LOG_ERROR("Edge " << i2.I1() << " - " << i2.I2() << " multiple times in surface mesh");
                     i2s = i2;
                     i2s.Sort();
                     for (int k = 1; k <= nf; k++) {
@@ -2764,7 +2739,7 @@ namespace meshit {
                             edge.Sort();
 
                             if (edge == i2s)
-                                std::cerr << "edge of element " << sel << std::endl;
+                                LOG_ERROR("  edge of element " << sel);
                         }
                     }
                     err = 2;
@@ -2831,7 +2806,7 @@ namespace meshit {
                 if ((*this)[tri[0]].GetLayer() != (*this)[tri[1]].GetLayer() ||
                         (*this)[tri[0]].GetLayer() != (*this)[tri[2]].GetLayer()) {
                     incons_layers = 1;
-                    std::cout << "inconsistent layers in triangle" << std::endl;
+                    LOG_WARNING("inconsistent layers in triangle");
                 }
 
 
@@ -2843,34 +2818,26 @@ namespace meshit {
 
                 if (IntersectTriangleTriangle(&trip1[0], &trip2[0])) {
                     overlap = 1;
-                    PrintWarning("Intersecting elements "
-                            , i, " and ", inters.Get(j));
-
-                    std::cerr << "Intersecting: " << std::endl;
-                    std::cerr << "openelement " << i << " with open element " << inters.Get(j) << std::endl;
-
-                    std::cout << "el1 = " << tri << std::endl;
-                    std::cout << "el2 = " << tri2 << std::endl;
-                    std::cout << "layer1 = " << (*this)[tri[0]].GetLayer() << std::endl;
-                    std::cout << "layer2 = " << (*this)[tri2[0]].GetLayer() << std::endl;
-
+                    LOG_WARNING("Intersecting elements " << i << " and " << inters.Get(j));
+                    LOG_DEBUG(" el1 = " << tri);
+                    LOG_DEBUG(" el2 = " << tri2);
 
                     for (k = 1; k <= 3; k++)
-                        std::cerr << tri.PNum(k) << "  ";
-                    std::cerr << std::endl;
+                        LOG_DEBUG_CONT(tri.PNum(k) << "  ");
+                    LOG_DEBUG("");
                     for (k = 1; k <= 3; k++)
-                        std::cerr << tri2.PNum(k) << "  ";
-                    std::cerr << std::endl;
+                        LOG_DEBUG_CONT(tri2.PNum(k) << "  ");
+                    LOG_DEBUG("");
 
                     for (k = 0; k <= 2; k++)
-                        std::cerr << *trip1[k] << "   ";
-                    std::cerr << std::endl;
+                        LOG_DEBUG_CONT(*trip1[k] << "   ");
+                    LOG_DEBUG("");
                     for (k = 0; k <= 2; k++)
-                        std::cerr << *trip2[k] << "   ";
-                    std::cerr << std::endl;
+                        LOG_DEBUG_CONT(*trip2[k] << "   ");
+                    LOG_DEBUG("");
 
-                    std::cerr << "Face1 = " << GetFaceDescriptor(tri.GetIndex()) << std::endl;
-                    std::cerr << "Face1 = " << GetFaceDescriptor(tri2.GetIndex()) << std::endl;
+                    LOG_DEBUG("Face1 = " << GetFaceDescriptor(tri.GetIndex()));
+                    LOG_DEBUG("Face1 = " << GetFaceDescriptor(tri2.GetIndex()));
 
                     SurfaceElement(i).badel = 1;
                     SurfaceElement(inters.Get(j)).badel = 1;
@@ -3031,7 +2998,6 @@ namespace meshit {
                     }
                 }
                 if (alledges) {
-                    // std::cout << "tet illegal due to unmarked node" <<std::endl;
                     el.SetLegal(0);
                     return 0;
                 }
@@ -3210,14 +3176,11 @@ namespace meshit {
 
                 const int * min2pi;
 
-                if (min2(el.PNum(2), el.PNum(6)) <
-                        min2(el.PNum(3), el.PNum(5))) {
+                if (min2(el.PNum(2), el.PNum(6)) < min2(el.PNum(3), el.PNum(5))) {
                     min2pi = &ntets[0][0];
-                    // std::cerr << "version 1 ";
                 }
                 else {
                     min2pi = &ntets[1][0];
-                    // std::cerr << "version 2 ";
                 }
 
                 int firsttet = 1;
@@ -3245,8 +3208,6 @@ namespace meshit {
                         }
                     }
                 }
-                if (firsttet) std::cout << "no legal";
-                std::cerr << std::endl;
             }
 
             else if (el.GetType() == HEX) {
@@ -3371,7 +3332,6 @@ namespace meshit {
                         }
                     }
                     if (legal) {
-                        std::cerr << nel << " ";
                         if (firsttet)
                             VolumeElement(i) = nel;
                         else
@@ -3380,8 +3340,6 @@ namespace meshit {
                         firsttet = 0;
                     }
                 }
-                if (firsttet) std::cout << "no legal";
-                std::cerr << std::endl;
             }
         }
 
@@ -3389,7 +3347,6 @@ namespace meshit {
         for (int i = 1; i <= oldnse; i++) {
             Element2d el = SurfaceElement(i);
             if (el.GetNP() == 4) {
-                std::cerr << "split el: " << el << " to ";
 
                 static const int ntris[2][6] = {
                     { 1, 2, 3, 1, 3, 4},
@@ -3404,9 +3361,6 @@ namespace meshit {
                 else
                     min2pi = &ntris[1][0];
 
-                for (int j = 0; j < 6; j++) {
-                    std::cerr << min2pi[j] << " ";
-                }
                 int firsttri = 1;
                 for (int j = 1; j <= 2; j++) {
                     Element2d nel(3);
@@ -3423,7 +3377,6 @@ namespace meshit {
                         }
                     }
                     if (legal) {
-                        std::cerr << nel << " ";
                         if (firsttri) {
                             SurfaceElement(i) = nel;
                             firsttri = 0;
@@ -3433,8 +3386,6 @@ namespace meshit {
                         }
                     }
                 }
-                std::cerr << std::endl;
-
             }
         }
 
@@ -3695,12 +3646,8 @@ namespace meshit {
             Jac.Solve(rhs, deltalam);
 
             lam += deltalam;
-
             delta = deltalam.Length2();
-
             i++;
-            //std::cerr << "pcie i " << i << " delta " << delta << " p " << p << " x " << x << " lam " << lam <<std::endl;
-            //<< "Jac " << Jac <<std::endl;
         }
 
         if (i == maxits)
@@ -3913,17 +3860,17 @@ namespace meshit {
 
                 if (PointContainedIn3DElementOld(p, lami, ii)) {
                     ps_startelement = ii;
-                    std::cerr << "WARNING: found element of point " << p << " only for uncurved mesh" << std::endl;
+                    LOG_WARNING("found element of point " << p << " only for uncurved mesh");
                     return ii;
                 }
             }
-
 
             return 0;
         }
     }
 
-    int Mesh::GetSurfaceElementOfPoint(const meshit::Point<3> & p,
+    int Mesh::GetSurfaceElementOfPoint(
+            const meshit::Point<3> & p,
             double lami[3],
             bool build_searchtree,
             const int index,
@@ -3969,8 +3916,6 @@ namespace meshit {
                 }
                 else {
                     if (PointContainedIn2DElement(p, lami, faces[i], true)) {
-                        //std::cerr << "found point " << p << " in sel " << faces[i]
-                        //	       << ", lam " << lami[0] << ", " << lami[1] << ", " << lami[2] <<std::endl;
                         return faces[i];
                     }
                 }
