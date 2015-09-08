@@ -7,7 +7,6 @@ SET(src_GENERAL
 	general/flags.cpp
 	general/hashtabl.cpp
 	general/mystring.cpp
-	general/ngexception.cpp
 	general/optmem.cpp
 	general/seti.cpp
 	general/sort.cpp

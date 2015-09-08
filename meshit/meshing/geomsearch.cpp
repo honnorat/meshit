@@ -1,8 +1,8 @@
+#include <stdexcept>
 #include <meshit.hpp>
 #include "geomsearch.hpp"
 
 #include "adfront3.hpp"
-#include "../general/ngexception.hpp"
 
 namespace meshit
 {
@@ -171,7 +171,7 @@ namespace meshit
               {
                 std::cerr << "Illegal hash-position";
                 std::cerr << "Position: " << ix << "," << iy << "," << iz << std::endl;
-		    throw NgException ("Illegal position in Geomsearch");
+		    throw std::runtime_error ("Illegal position in Geomsearch");
               }
             hashtable.Elem(ind)->push_back(elemnum);		      
           }

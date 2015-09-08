@@ -2,7 +2,6 @@
 #include "improve2.hpp"
 #include "global.hpp"
 
-#include "../general/ngexception.hpp"
 #include "../linalg/opti.hpp"
 
 namespace meshit {

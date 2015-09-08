@@ -1,8 +1,8 @@
+#include <stdexcept>
 #include <meshit.hpp>
 
 #include "curvedelems.hpp"
 #include "../general/autodiff.hpp"
-#include "../general/ngexception.hpp"
 #include "../gprim/geomfuncs.hpp"
 #include "topology.hpp"
 #include "bisect.hpp"
@@ -1513,7 +1513,7 @@ namespace meshit
 	      info.ndof += facecoeffsindex[info.facenr+1] - facecoeffsindex[info.facenr];
 
 	    if(problem && !firsttry)
-	      throw NgException("something wrong with curved elements");
+	      throw std::runtime_error("something wrong with curved elements");
 	    
 	    if(problem)
 	      BuildCurvedElements(NULL,order,rational);
@@ -1687,7 +1687,7 @@ namespace meshit
 	}
         
       default:
-	throw NgException("CurvedElements::CalcShape 2d, element type not handled");
+	throw std::runtime_error("CurvedElements::CalcShape 2d, element type not handled");
       };
   }
 
@@ -1951,7 +1951,7 @@ namespace meshit
 	  break;
 	}
       default:
-	throw NgException("CurvedElements::CalcDShape 2d, element type not handled");
+	throw std::runtime_error("CurvedElements::CalcDShape 2d, element type not handled");
 
       };
   }
@@ -2463,7 +2463,7 @@ namespace meshit
 	}
 
       default:
-	throw NgException("CurvedElements::CalcShape 3d, element type not handled");
+	throw std::runtime_error("CurvedElements::CalcShape 3d, element type not handled");
 
       };
   }
@@ -2900,7 +2900,7 @@ namespace meshit
 	}
 
       default:
-	throw NgException("CurvedElements::CalcDShape 3d, element type not handled");
+	throw std::runtime_error("CurvedElements::CalcDShape 3d, element type not handled");
       }
     
     /*
@@ -3189,7 +3189,7 @@ namespace meshit
 	      info.ndof += facecoeffsindex[info.facenr+1] - facecoeffsindex[info.facenr];
 
 	    if(problem && !firsttry)
-	      throw NgException("something wrong with curved elements");
+	      throw std::runtime_error("something wrong with curved elements");
 	    
 	    if(problem)
 	      BuildCurvedElements(NULL,order,rational);

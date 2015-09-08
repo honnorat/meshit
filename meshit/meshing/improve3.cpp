@@ -1,7 +1,7 @@
 #include <meshit.hpp>
+#include <stdexcept>
 #include "improve3.hpp"
 #include "improve2.hpp"
-#include "../general/ngexception.hpp"
 #include "global.hpp"
 #include "../gprim/geomfuncs.hpp"
 
@@ -720,7 +720,7 @@ void MeshOptimize3d :: SwapImprove (Mesh & mesh, OPTIMIZEGOAL goal,
 		}
 
 	      if(pi5 == 0)
-                throw NgException("Illegal state observed in std::swapImprove");
+                throw std::runtime_error("Illegal state observed in std::swapImprove");
 
 
 	      
@@ -1575,7 +1575,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	    }
 
 	  if(hasbothpointsother.size() > 0 && periodic)
-	    throw NgException("std::swapImproveSurface: Assumption about interface/periodicity wrong!");
+	    throw std::runtime_error("std::swapImproveSurface: Assumption about interface/periodicity wrong!");
 
 	  if(periodic)
 	    {

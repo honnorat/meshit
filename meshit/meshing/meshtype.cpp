@@ -1,8 +1,8 @@
 #include <meshit.hpp>
+#include <stdexcept>
 #include "meshtype.hpp" 
 #include "meshclass.hpp"
 #include "../general/autoptr.hpp"
-#include "../general/ngexception.hpp"
 #include "../gprim/geom3d.hpp"
 
 namespace meshit {
@@ -20,7 +20,7 @@ namespace meshit {
             return 0;
         }
 
-        throw NgException("Please report error: MPGI Size too small\n");
+        throw std::runtime_error("Please report error: MPGI Size too small\n");
     }
 
     Segment::Segment()

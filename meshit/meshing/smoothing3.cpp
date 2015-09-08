@@ -2,7 +2,6 @@
 #include "improve3.hpp"
 #include "findip.hpp"
 #include "global.hpp"
-#include "../general/ngexception.hpp"
 
 namespace meshit
 {

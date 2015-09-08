@@ -1,11 +1,11 @@
 #include <string>
+#include <stdexcept>
 #include <meshit.hpp>
 #include "hprefinement.hpp" 
 #include "topology.hpp"
 #include "meshclass.hpp"
 #include "curvedelems.hpp"
 #include "../general/bitarray.hpp"
-#include "../general/ngexception.hpp"
 
 namespace meshit
 {
@@ -137,7 +137,7 @@ namespace meshit
 
       default:
         std::cerr << "HPRefElement: illegal type " << type << std::endl;
-        throw NgException ("HPRefElement::SetType: illegal type");
+        throw std::runtime_error ("HPRefElement::SetType: illegal type");
       } 
 
     for(int k = 0; k < 8;k++)
@@ -600,7 +600,7 @@ namespace meshit
 
           default:
             std::cerr << "HPRefElement: illegal elementtype (1) " << mesh[i].GetType() << std::endl;
-            throw NgException ("HPRefElement: illegal elementtype (1)");
+            throw std::runtime_error ("HPRefElement: illegal elementtype (1)");
 	  } 
 	elements.push_back(hpel); 
       }
@@ -616,7 +616,7 @@ namespace meshit
 
           default:
             std::cerr << "HPRefElement: illegal elementtype (1b) " << mesh.SurfaceElement(i).GetType() << std::endl;
-            throw NgException ("HPRefElement: illegal elementtype (1b)");
+            throw std::runtime_error ("HPRefElement: illegal elementtype (1b)");
 	  } 
 	elements.push_back(hpel);
       } 
@@ -630,7 +630,7 @@ namespace meshit
 	hpel.index = seg.edgenr + 10000*seg.si; 
 	if(seg.edgenr >= 10000)
 	  {
-	    throw NgException("assumption that seg.edgenr < 10000 is wrong");
+	    throw std::runtime_error("assumption that seg.edgenr < 10000 is wrong");
 	  }
 	elements.push_back(hpel); 
       }
@@ -724,7 +724,7 @@ namespace meshit
             
           default:
             std::cerr << "HPRefElement: illegal type (3) " << hprs->geom << std::endl;
-            throw NgException ("HPRefElement::SetType: illegal type (3)");
+            throw std::runtime_error ("HPRefElement::SetType: illegal type (3)");
 	  }
 
 
@@ -846,7 +846,7 @@ namespace meshit
 	      case HP_TET: newel.np=4; break; 
 	      case HP_PYRAMID: newel.np=5; break; 
               default:
-                throw NgException (std::string("hprefinement.cpp: illegal type"));
+                throw std::runtime_error (std::string("hprefinement.cpp: illegal type"));
 	      }
 
 	    for (int k = 0; k < newel.np; k++)
@@ -935,7 +935,7 @@ namespace meshit
 
               default:
                 std::cerr << "HPRefElement: illegal type (4) " << hprsnew->geom << std::endl;
-                throw NgException ("HPRefElement: illegal type (4)");
+                throw std::runtime_error ("HPRefElement: illegal type (4)");
                 
 	      }
 	    newel.type = hprs->neweltypes[j];
@@ -1350,7 +1350,7 @@ namespace meshit
 
               default:
                 std::cerr << "HPRefElement: illegal elementtype (2) " << mesh[i].GetType() << std::endl;
-                throw NgException ("HPRefElement: illegal elementtype (2)");
+                throw std::runtime_error ("HPRefElement: illegal elementtype (2)");
                 
 	      }
 	
@@ -1777,7 +1777,7 @@ bool CheckSingularities(Mesh & mesh, INDEX_2_HASHTABLE<int> & edges, INDEX_2_HAS
 	  default:
 	    {
 	      std::cout << "illegal element type for hp-prepare elements " << hpel.type << std::endl;
-	      throw NgException ("hprefinement.cpp: don't know how to set parameters");
+	      throw std::runtime_error ("hprefinement.cpp: don't know how to set parameters");
 	    }
 	  }
 	    

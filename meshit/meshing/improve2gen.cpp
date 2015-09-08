@@ -1,7 +1,6 @@
 #include <meshit.hpp>
 #include "improve2.hpp"
 #include "global.hpp"
-#include "../general/ngexception.hpp"
 
 namespace meshit {
 

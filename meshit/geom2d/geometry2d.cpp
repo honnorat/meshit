@@ -8,7 +8,6 @@
 #include <meshit.hpp>
 #include "geometry2d.hpp"
 #include "../general/flags.hpp"
-#include "../general/ngexception.hpp"
 
 namespace meshit {
 
@@ -31,7 +30,7 @@ namespace meshit {
         infile.open(filename);
 
         if (!infile.good())
-            throw NgException(std::string("Input file '") +
+            throw std::runtime_error(std::string("Input file '") +
                 std::string(filename) +
                 std::string("' not available!"));
 

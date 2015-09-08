@@ -1,6 +1,6 @@
 #include <meshit.hpp>
+#include <stdexcept>
 #include "topology.hpp"
-#include "../general/ngexception.hpp"
 
 namespace meshit
 {
@@ -940,7 +940,7 @@ namespace meshit
       }
     else
       {
-	throw NgException("rethink implementation");
+	throw std::runtime_error("rethink implementation");
 	/*
 	  if (orient)
 	  {

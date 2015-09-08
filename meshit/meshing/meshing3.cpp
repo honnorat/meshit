@@ -1,7 +1,6 @@
 #include <meshit.hpp>
 #include "meshing3.hpp"
 #include "meshclass.hpp"
-#include "../general/ngexception.hpp"
 #include "global.hpp"
 #include "findip.hpp"
 

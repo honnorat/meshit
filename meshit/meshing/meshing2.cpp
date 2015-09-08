@@ -2,7 +2,6 @@
 #include "meshing2.hpp"
 #include "global.hpp"
 #include "meshclass.hpp"
-#include "../general/ngexception.hpp"
 #include "../gprim/geomfuncs.hpp"
 #include "../gprim/geomtest3d.hpp"
 

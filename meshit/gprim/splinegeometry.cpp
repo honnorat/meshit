@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <meshit.hpp>
 #include "splinegeometry.hpp"
-#include "../general/ngexception.hpp" 
 
 namespace meshit {
 

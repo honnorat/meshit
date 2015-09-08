@@ -1,8 +1,8 @@
 #include <sstream>
+#include <stdexcept>
 
 #include <meshit.hpp>
 #include "bisect.hpp"
-#include "../general/ngexception.hpp"
 #include "../gprim/geomfuncs.hpp"
 #include "validate.hpp"
 
@@ -349,7 +349,7 @@ namespace meshit {
                         break;
                     }
                     default:
-                        throw NgException("Bisect, element type not handled in switch");
+                        throw std::runtime_error("Bisect, element type not handled in switch");
                 }
 
                 for (j = 0; j < ned; j++) {
@@ -456,7 +456,7 @@ namespace meshit {
                             break;
                         }
                         default:
-                            throw NgException("Bisect, element type not handled in switch, 2");
+                            throw std::runtime_error("Bisect, element type not handled in switch, 2");
                     }
 
                     for (j = 0; j < 3; j++) {
@@ -632,7 +632,7 @@ namespace meshit {
                             break;
                         }
                         default:
-                            throw NgException("Bisect, element type not handled in switch, 3");
+                            throw std::runtime_error("Bisect, element type not handled in switch, 3");
                     }
 
                     for (j = 0; j < ned; j++) {
@@ -686,7 +686,7 @@ namespace meshit {
                                     break;
                                 }
                                 default:
-                                    throw NgException("Bisect, element type not handled in switch, 3a");
+                                    throw std::runtime_error("Bisect, element type not handled in switch, 3a");
                             }
 
                             for (j = 0; j < 3; j++) {
@@ -1652,7 +1652,7 @@ namespace meshit {
                         break;
                     }
                     default:
-                        throw NgException("Bisect, element type not handled in switch, 4");
+                        throw std::runtime_error("Bisect, element type not handled in switch, 4");
                 }
             }
 
@@ -1777,7 +1777,7 @@ namespace meshit {
                     break;
                 }
                 default:
-                    throw NgException("Bisect, element type not handled in switch, 6");
+                    throw std::runtime_error("Bisect, element type not handled in switch, 6");
             }
 
         }
@@ -1804,7 +1804,7 @@ namespace meshit {
                     break;
                 }
                 default:
-                    throw NgException("Bisect, element type not handled in switch, 5");
+                    throw std::runtime_error("Bisect, element type not handled in switch, 5");
             }
 
             MarkedIdentification mi;
@@ -2032,7 +2032,7 @@ namespace meshit {
                                 inf >> st;
                             }
                             else {
-                                throw NgException("something wrong with refinementinfo file");
+                                throw std::runtime_error("something wrong with refinementinfo file");
                             }
                         }
                     }
@@ -2045,7 +2045,7 @@ namespace meshit {
                     for (int i = 1; i <= mtets.size(); i++) {
                         inf >> ch;
                         if (!inf)
-                            throw NgException("something wrong with refinementinfo file (old format)");
+                            throw std::runtime_error("something wrong with refinementinfo file (old format)");
                         mtets.Elem(i).marked = (ch == '1');
                     }
                     marked = 1;
@@ -2762,8 +2762,8 @@ namespace meshit {
                     // repaired = true;
                     repaired_once = true;
                 }
-                catch (NgException & ex) {
-                    LOG_DEBUG(std::string("Problem: ") + ex.What());
+                catch (std::runtime_error & ex) {
+                    LOG_DEBUG(std::string("Problem: ") + ex.what());
                 }
 
                 if (printmessage_importance > 0) {

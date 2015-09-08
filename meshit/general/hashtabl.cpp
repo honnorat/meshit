@@ -9,11 +9,11 @@
 */
 
 #include <algorithm>
+#include <stdexcept>
 #include <meshit.hpp>
 
 #include "hashtabl.hpp"
 #include "template.hpp"
-#include "ngexception.hpp"
 
 namespace meshit
 {
@@ -191,7 +191,7 @@ namespace meshit
 	    return 1;
 	  }
 	if (i == startpos)
-	  throw NgException ("Try to set new element in full closed hashtable");
+	  throw std::runtime_error ("Try to set new element in full closed hashtable");
       }
   }
 
@@ -269,7 +269,7 @@ namespace meshit
 	    return 1;
 	  }
 	if (i == startpos)
-	  throw NgException ("Try to set new element in full closed hashtable");
+	  throw std::runtime_error ("Try to set new element in full closed hashtable");
       }
   }
 
@@ -322,7 +322,7 @@ namespace meshit
 	    return true;
 	  }
 	if (i == startpos)
-	  throw NgException ("Try to set new element in full closed hashtable");
+	  throw std::runtime_error ("Try to set new element in full closed hashtable");
       }
   }
 }
