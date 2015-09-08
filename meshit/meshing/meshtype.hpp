@@ -1181,13 +1181,6 @@ namespace meshit {
         {
             bcname = bcn;
         }
-        // Philippose - 06/07/2009
-        // Set the surface colour
-
-        void SetSurfColour(Vec3d colour)
-        {
-            surfcolour = colour;
-        }
 
         void SetDomainInSingular(double v)
         {

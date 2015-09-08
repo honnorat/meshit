@@ -1146,7 +1146,6 @@ namespace meshit
                   }
               }
           }
-        // std::cout << nwrong << " wrong prisms, " << nright << " right prisms" <<std::endl;
       }
 
     std::cout << nwrong << " wrong prisms, " << nright << " right prisms" << std::endl;
@@ -1176,17 +1175,11 @@ namespace meshit
   {
     PrintMessage (1, "HP Refinement called, levels = ", levels);
 
- 
-    // NgLock mem_lock (mem_mutex,1);
-
     mesh.coarsemesh = new Mesh; 
     *mesh.coarsemesh = mesh;
     
-    // #ifdef CURVEDELEMS_NEW
     const_cast<CurvedElements&> (mesh.coarsemesh->GetCurvedElements() ).
       BuildCurvedElements (ref, mesh.GetCurvedElements().GetOrder());
-    // #endif
-
 
     delete mesh.hpelements;
     mesh.hpelements = new Array<HPRefElement>;

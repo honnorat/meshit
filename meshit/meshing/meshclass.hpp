@@ -14,7 +14,6 @@
 #include "../gprim/adtree.hpp"
 #include "../general/bitarray.hpp"
 #include "../general/symbolta.hpp"
-#include "../general/parthreads.hpp"
 #include "../gprim/geomops.hpp"
 
 #include "hprefinement.hpp"
@@ -122,11 +121,6 @@ namespace meshit {
         /// changed after finishing global algorithm (improve, ...)
         int majortimestamp;
 
-        /// mesh access semaphors.
-        NgMutex mutex;
-        /// mesh access semaphors.
-        NgMutex majormutex;
-
         SYMBOLTABLE< Array<int>* > userdata_int;
         SYMBOLTABLE< Array<double>* > userdata_double;
 
@@ -189,8 +183,6 @@ namespace meshit {
             segments.resize(0);
             timestamp = NextTimeStamp();
         }
-
-        void SetAllocSize(int nnodes, int nsegs, int nsel, int nel);
 
         PointIndex AddPoint(const Point3d & p, int layer = 1);
         PointIndex AddPoint(const Point3d & p, int layer, POINTTYPE type);
@@ -550,13 +542,10 @@ namespace meshit {
                 const std::string & filetype) const;
         void Save(std::ostream & outfile) const;
         void Load(std::istream & infile);
-        void Merge(std::istream & infile, const int surfindex_offset = 0);
         void Save(const std::string & filename) const;
         void Load(const std::string & filename);
-        void Merge(const std::string & filename, const int surfindex_offset = 0);
 
         void ImproveMesh(const MeshingParameters & mp, OPTIMIZEGOAL goal = OPT_QUALITY);
-
         void ImproveMeshJacobian(const MeshingParameters & mp, OPTIMIZEGOAL goal = OPT_QUALITY, const BitArray * usepoint = NULL);
         void ImproveMeshJacobianOnSurface(const MeshingParameters & mp,
                 const BitArray & usepoint,
@@ -677,32 +666,6 @@ namespace meshit {
         {
             return facedecoding.Elem(i);
         }
-
-        // #ifdef NONE
-        //   /*
-        //     Identify points pi1 and pi2, due to
-        //     identification nr identnr
-        //   */
-        //   void AddIdentification (int pi1, int pi2, int identnr);
-
-        //   int GetIdentification (int pi1, int pi2) const;
-        //   int GetIdentificationSym (int pi1, int pi2) const;
-        //   ///
-        //   INDEX_2_HASHTABLE<int> & GetIdentifiedPoints () 
-        //   { 
-        //     return *identifiedpoints; 
-        //   }
-
-        //   ///
-        //   void GetIdentificationMap (int identnr, Array<int> & identmap) const;
-        //   ///
-        //   void GetIdentificationPairs (int identnr, Array<INDEX_2> & identpairs) const;
-        //   ///
-        //   int GetMaxIdentificationNr () const
-        //   { 
-        //     return maxidentnr; 
-        //   }
-        // #endif
 
         /// return periodic, close surface etc. identifications
 
@@ -829,18 +792,6 @@ namespace meshit {
         void SetNextMajorTimeStamp()
         {
             majortimestamp = timestamp = NextTimeStamp();
-        }
-
-        /// return mutex
-
-        NgMutex & Mutex()
-        {
-            return mutex;
-        }
-
-        NgMutex & MajorMutex()
-        {
-            return majormutex;
         }
 
         void SetUserData(const char * id, Array<int> & data);
