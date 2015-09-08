@@ -548,21 +548,6 @@ namespace meshit {
         par.maxit_linsearch = 8;
         par.maxit_bfgs = 5;
 
-        bool printeddot = 0;
-        char plotchar = '.';
-        int modplot = 1;
-        if (mesh.GetNP() > 1000) {
-            plotchar = '+';
-            modplot = 100;
-        }
-        if (mesh.GetNP() > 10000) {
-            plotchar = 'o';
-            modplot = 1000;
-        }
-        if (mesh.GetNP() > 100000) {
-            plotchar = 'O';
-            modplot = 10000;
-        }
         int cnt = 0;
 
         for (int hi = 0; hi < icompress.size(); hi++) {
@@ -572,10 +557,6 @@ namespace meshit {
                     throw NgException("Meshing stopped");
 
                 cnt++;
-                if (cnt % modplot == 0 && writestatus) {
-                    printeddot = 1;
-                    PrintDot(plotchar);
-                }
 
                 // if (elementsonpoint[pi].Size() == 0) continue;
                 if (elementsonpoint[hi].size() == 0) continue;
@@ -698,9 +679,6 @@ namespace meshit {
                 }
             }
         }
-        if (printeddot)
-            PrintDot('\n');
-
         mesh.SetNextTimeStamp();
     }
 

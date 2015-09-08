@@ -302,7 +302,7 @@ namespace meshit {
             if (geometry.GetDomainMaxh(domnr) > 0)
                 h = geometry.GetDomainMaxh(domnr);
 
-            LOG_INFO("Meshing domain " << domnr << " / " << maxdomnr);
+            LOG_DEBUG("Meshing domain " << domnr << " / " << maxdomnr);
 
             int oldnf = GetNSE();
 

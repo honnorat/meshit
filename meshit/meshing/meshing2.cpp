@@ -39,7 +39,7 @@ namespace meshit {
             const PointGeomInfo & gi1, const PointGeomInfo & gi2)
     {
         if (!gi1.trignum || !gi2.trignum) {
-            PrintSysError("addboundaryelement: illegal geominfo");
+            LOG_ERROR("Meshing2::AddBoundaryElement: illegal geominfo");
         }
         adfront -> AddLine(i1 - 1, i2 - 1, gi1, gi2);
     }
@@ -58,8 +58,7 @@ namespace meshit {
     void Meshing2::EndMesh()
     {
         for (int i = 0; i < ruleused.size(); i++) {
-            std::cerr << std::setw(4) << ruleused[i]
-                    << " times used rule " << rules[i] -> Name() << std::endl;
+            LOG_DEBUG(std::setw(5) << ruleused[i] << " times used rule " << rules[i]->Name());
         }
     }
 
@@ -258,10 +257,7 @@ namespace meshit {
 
             // plot statistics
             if (trials > plotnexttrial) {
-                PrintMessage(5,
-                        "faces = ", nfaces,
-                        " trials = ", trials,
-                        " elements = ", mesh.GetNSE());
+                LOG_DEBUG(nfaces << " faces, " << trials << " trials, " << mesh.GetNSE() << " elements.");
                 plotnexttrial += 1000;
             }
 
@@ -273,13 +269,13 @@ namespace meshit {
             trials++;
 
             if (trials % 1000 == 0) {
-                std::cerr << "\n";
-                for (int i = 1; i <= canuse.size(); i++) {
-                    std::cerr << foundmap.Get(i) << "/"
-                            << canuse.Get(i) << "/"
-                            << ruleused.Get(i) << " map/can/use rule " << rules.Get(i)->Name() << "\n";
+                for (int i = 0; i < canuse.size(); i++) {
+                    LOG_DEBUG(" "
+                            << std::setw(4) << foundmap[i] << "/"
+                            << std::setw(4) << canuse[i] << "/"
+                            << std::setw(4) << ruleused[i] <<
+                            " map/can/use rule " << rules[i]->Name());
                 }
-                std::cerr << "\n";
             }
 
             int baselineindex = adfront -> SelectBaseLine(p1, p2, blgeominfo1, blgeominfo2, qualclass);
@@ -300,9 +296,8 @@ namespace meshit {
             adfront ->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
 
             if (qualclass > mp.giveuptol2d) {
-                PrintMessage(3, "give up with qualclass ", qualclass);
-                PrintMessage(3, "number of frontlines = ", adfront->GetNFL());
-                // throw NgException ("Give up 2d meshing");
+                LOG_WARNING("give up with qualclass " << qualclass <<
+                        " : number of frontlines = " << adfront->GetNFL());
                 break;
             }
 
@@ -490,7 +485,7 @@ namespace meshit {
                 if (!rulenr) {
                     found = 0;
                     if (debugflag || debugparam.haltnosuccess)
-                        PrintWarning("no rule found");
+                        LOG_WARNING("no rule found");
                 }
             }
 
@@ -940,7 +935,7 @@ namespace meshit {
             }
         }
 
-        PrintMessage(3, "Surface meshing done");
+        LOG_DEBUG("Surface meshing done");
 
         adfront->PrintOpenSegments(std::cout);
 

@@ -260,7 +260,7 @@ namespace meshit {
         } while (!a1crit || !a3acrit);
 
         if (f0 < f || (ifail == 1)) {
-            std::cerr << "fail, f = " << f << " f0 = " << f0 << std::endl;
+            LOG_DEBUG("fail, f = " << f << " f0 = " << f0 << " diff = " << f0-f << "  ifail = " << ifail);
             f = f0;
             x = x0;
         }

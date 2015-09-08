@@ -324,19 +324,21 @@ inline std::ostream& operator<<(std::ostream& stream, const BoundaryLine& rhs)
 int main(int argc, char ** argv)
 {
     if (argc < 2) {
-        std::cerr << "Usage : " << argv[0] << " NAME_OUTER [NAME_INNER]..." << std::endl;
+        LOG_INFO("Usage : " << argv[0] << " NAME_OUTER [NAME_INNER]...");
         return 1;
     }
 
     std::string name_outer = argv[1];
     BoundaryLine bl_outer;
-    std::cout << "MeshIt Palpo" << std::endl;
+
+    meshit::SetLogLevel(TRACE_LOG_LEVEL);
+    LOG_INFO(" == MeshIt Palpo == ");
     try {
-        std::cout << "Outer boundary name : " << name_outer << std::endl;
+        LOG_INFO("Outer boundary name : " << name_outer);
         bl_outer.read_boundary_file(name_outer);
     }
     catch (const std::runtime_error& e) {
-        std::cerr << "ERROR: " << e.what() << std::endl;
+        LOG_ERROR(e.what());
         return 1;
     }
     BoundaryLine sub_outer = bl_outer;
@@ -354,11 +356,11 @@ int main(int argc, char ** argv)
 
         std::string name_inner = argv[nb_inner + i + 1];
         try {
-            std::cout << "Inner boundary name : " << name_inner << std::endl;
+            LOG_INFO("Inner boundary name : " << name_inner);
             sub_inner.push_back(BoundaryLine(name_inner));
         }
         catch (const std::runtime_error& e) {
-            std::cerr << "ERROR: " << e.what() << std::endl;
+            LOG_ERROR(e.what());
             return 1;
         }
         sub_inner[i].resample(50);
@@ -373,9 +375,9 @@ int main(int argc, char ** argv)
     meshit::MeshingParameters mp;
     mp.optsteps2d = 3;
 
-    std::cout << "start meshing" << std::endl;
+    LOG_INFO("start meshing");
     mesh.BuildFromSpline2D(geom, mp);
-    std::cout << "meshing done" << std::endl;
+    LOG_INFO("meshing done");
 
     mesh.FindOpenElements(0);
     mesh.FindOpenElements(1);

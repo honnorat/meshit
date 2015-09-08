@@ -14,6 +14,7 @@
 #define WARN_LOG_LEVEL 300
 #define INFO_LOG_LEVEL 200
 #define DEBUG_LOG_LEVEL 100
+#define TRACE_LOG_LEVEL 0
 
 #if defined(__GNUC__) || (defined(__ICC) && (__ICC >= 600))
 #define MESHIT_CURRENT_FUNCTION __PRETTY_FUNCTION__
@@ -38,7 +39,7 @@
 
 #define LOG_MACRO_BODY(logEvent, logLevel, retline)                         \
     do {                                                                    \
-        if ( logLevel >= meshit::get_logLevel() ) {                         \
+        if ( logLevel >= meshit::GetLogLevel() ) {                          \
             if ( logLevel >= FATAL_LOG_LEVEL ) {                            \
                 std::cerr << "FATAL: " << logEvent;                         \
                 LOG_POSITION(__FILE__, __LINE__, MESHIT_CURRENT_FUNCTION);  \
@@ -71,8 +72,8 @@ namespace meshit {
     extern int printmessage_importance;
     extern int printdots;
 
-    int get_logLevel();
-    void set_log_level(int logLevel);
+    int GetLogLevel();
+    void SetLogLevel(int logLevel);
 
     //Message Pipeline:
 

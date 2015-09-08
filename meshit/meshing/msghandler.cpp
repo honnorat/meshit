@@ -14,12 +14,12 @@ namespace meshit {
 
     static int _meshit_logLevel = INFO_LOG_LEVEL;
 
-    int get_logLevel()
+    int GetLogLevel()
     {
         return _meshit_logLevel;
     }
 
-    void set_log_level(int logLevel)
+    void SetLogLevel(int logLevel)
     {
         _meshit_logLevel = logLevel;
     }

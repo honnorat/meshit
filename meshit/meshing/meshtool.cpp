@@ -42,23 +42,21 @@ namespace meshit {
 
     int CheckSurfaceMesh2(const Mesh & mesh)
     {
-        int i, j, k;
         const Point<3> *tri1[3], *tri2[3];
 
-        for (i = 1; i <= mesh.GetNOpenElements(); i++) {
-            PrintDot();
-            for (j = 1; j < i; j++) {
-                for (k = 1; k <= 3; k++) {
+        for (int i = 1; i <= mesh.GetNOpenElements(); i++) {
+            for (int j = 1; j < i; j++) {
+                for (int k = 1; k <= 3; k++) {
                     tri1[k - 1] = &mesh.Point(mesh.OpenElement(i).PNum(k));
                     tri2[k - 1] = &mesh.Point(mesh.OpenElement(j).PNum(k));
                 }
                 if (IntersectTriangleTriangle(&tri1[0], &tri2[0])) {
                     PrintSysError("Surface elements are intersecting");
                     std::cerr << "Intersecting: " << std::endl;
-                    for (k = 0; k <= 2; k++)
+                    for (int k = 0; k <= 2; k++)
                         std::cerr << *tri1[k] << "   ";
                     std::cerr << std::endl;
-                    for (k = 0; k <= 2; k++)
+                    for (int k = 0; k <= 2; k++)
                         std::cerr << *tri2[k] << "   ";
                     std::cerr << std::endl;
                 }
