@@ -50,8 +50,6 @@ namespace meshit {
         double globmaxh = mp.maxh;
 
         for (int k = 1; k <= mesh3d.GetNDomains(); k++) {
-            if (multithread.terminate)
-                break;
 
             LOG_DEBUG("Meshing subdomain " << k << " of " << mesh3d.GetNDomains());
 
@@ -159,9 +157,6 @@ namespace meshit {
             int cntsteps = 0;
             if (mesh3d.GetNOpenElements())
                 do {
-                    if (multithread.terminate)
-                        break;
-
                     mesh3d.FindOpenElements(k);
                     LOG_DEBUG(mesh3d.GetNOpenElements() << " open faces");
                     cntsteps++;
@@ -261,15 +256,10 @@ namespace meshit {
 
         mesh3d.CalcSurfacesOfNode();
         for (i = 1; i <= mp.optsteps3d; i++) {
-            if (multithread.terminate)
-                break;
-
             MeshOptimize3d optmesh(mp);
 
             // teterrpow = mp.opterrpow;
             for (size_t j = 1; j <= strlen(mp.optimize3d); j++) {
-                if (multithread.terminate)
-                    break;
 
                 switch (mp.optimize3d[j - 1]) {
                     case 'c': optmesh.CombineImprove(mesh3d, OPT_REST);
@@ -308,8 +298,6 @@ namespace meshit {
         MeshingParameters dummymp;
         MeshOptimize3d optmesh(dummymp);
         while (nillegal && (it--) > 0) {
-            if (multithread.terminate)
-                break;
 
             LOG_DEBUG(nillegal << " illegal tets");
             optmesh.SplitImprove(mesh3d, OPT_LEGAL);

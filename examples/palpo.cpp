@@ -331,7 +331,7 @@ int main(int argc, char ** argv)
     std::string name_outer = argv[1];
     BoundaryLine bl_outer;
 
-    meshit::SetLogLevel(TRACE_LOG_LEVEL);
+    meshit::SetLogLevel(INFO_LOG_LEVEL);
     LOG_INFO(" == MeshIt Palpo == ");
     try {
         LOG_INFO("Outer boundary name : " << name_outer);
@@ -379,13 +379,13 @@ int main(int argc, char ** argv)
     mesh.BuildFromSpline2D(geom, mp);
     LOG_INFO("meshing done");
 
-    mesh.FindOpenElements(0);
-    mesh.FindOpenElements(1);
-    meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh(mesh);
-    meshit::CheckSurfaceMesh2(mesh);
-    mesh.CheckConsistentBoundary();
-    mesh.PrintMemInfo(std::cout);
+    //    mesh.FindOpenElements(0);
+    //    mesh.FindOpenElements(1);
+    //    meshit::MeshQuality2d(mesh);
+    //    meshit::CheckSurfaceMesh(mesh);
+    //    meshit::CheckSurfaceMesh2(mesh);
+    //    mesh.CheckConsistentBoundary();
+    //    mesh.PrintMemInfo(std::cout);
     mesh.Export("comprehension.msh", "Gmsh2 Format");
 
     return 0;

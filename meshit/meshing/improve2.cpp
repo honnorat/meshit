@@ -65,9 +65,6 @@ namespace meshit {
 
             for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++) {
                 EdgeSwapping(mesh, usemetric);
-
-                if (multithread.terminate)
-                    throw NgException("Meshing stopped");
             }
 
             faceindex = 0;
@@ -188,9 +185,6 @@ namespace meshit {
 
                 if (mesh.SurfaceElement(t1).GetIndex() != faceindex)
                     continue;
-
-                if (multithread.terminate)
-                    throw NgException("Meshing stopped");
 
                 for (int o1 = 0; o1 < 3; o1++) {
                     bool should;
@@ -348,9 +342,6 @@ namespace meshit {
 
             for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++) {
                 CombineImprove(mesh);
-
-                if (multithread.terminate)
-                    throw NgException("Meshing stopped");
             }
             faceindex = 0;
             return;

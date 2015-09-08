@@ -31,11 +31,6 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
   PrintMessage (3, "CombineImprove");
   std::cerr  << "Start CombineImprove" << "\n";
 
-  //  mesh.CalcSurfacesOfNode ();
-  const char * savetask = multithread.task;
-  multithread.task = "Combine Improve";
-
-
   double totalbad = 0;
   for (ElementIndex ei = 0; ei < ne; ei++)
     {
@@ -62,11 +57,6 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 
   for (ElementIndex ei = 0; ei < ne; ei++)
     {
-      if (multithread.terminate)
-	break;
-      
-      multithread.percent = 100.0 * (ei+1) / ne;
-
       if (mesh.ElementType(ei) == FIXEDELEMENT)
 	continue;
 
@@ -248,7 +238,6 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
 
       PrintMessage (5, cntill, " illegal tets");
     }
-  multithread.task = savetask;
 } 
 
 
@@ -287,12 +276,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
   BitArray illegaltet(ne);
   illegaltet.Clear();
 
-  const char * savetask = multithread.task;
-  multithread.task = "Split Improve";
-
-
-  PrintMessage (3, "SplitImprove");
-  std::cerr  << "start SplitImprove" << "\n";
+  LOG_DEBUG("SplitImprove");
 
   Array<INDEX_3> locfaces;
 
@@ -346,11 +330,6 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 
   for (ei = 0; ei < ne; ei++)
     {
-      if (multithread.terminate)
-	break;
-
-      multithread.percent = 100.0 * (ei+1) / ne;
-
       bool ltestmode = 0;
 
 
@@ -562,15 +541,9 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 	  if (!mesh.LegalTet (mesh[ei]))
 	    cntill++;
 	}
-      //      std::cout << cntill << " illegal tets" <<std::endl;
     }
 
-  multithread.task = savetask;
 }
-
-
-      
-  
 
 void MeshOptimize3d :: SwapImprove (Mesh & mesh, OPTIMIZEGOAL goal,
 				    const BitArray * working_elements)
@@ -592,14 +565,8 @@ void MeshOptimize3d :: SwapImprove (Mesh & mesh, OPTIMIZEGOAL goal,
 
   Array<ElementIndex> hasbothpoints;
 
-  PrintMessage (3, "SwapImprove ");
-  std::cerr << "\n" << "Start SwapImprove" << std::endl;
+  LOG_DEBUG("SwapImprove ");
 
-  const char * savetask = multithread.task;
-  multithread.task = "Swap Improve";
-  
-  //  mesh.CalcSurfacesOfNode ();
-    
   INDEX_3_HASHTABLE<int> faces(mesh.GetNOpenElements()/3 + 2);
   if (goal == OPT_CONFORM)
     {
@@ -630,11 +597,6 @@ void MeshOptimize3d :: SwapImprove (Mesh & mesh, OPTIMIZEGOAL goal,
   
   for (ElementIndex ei = 0; ei < ne; ei++)
     {
-      if (multithread.terminate)
-	break;
-      
-      multithread.percent = 100.0 * (ei+1) / ne;
-
       if ((mesh.ElementType(ei)) == FIXEDELEMENT)
 	continue;
 
@@ -1393,59 +1355,14 @@ void MeshOptimize3d :: SwapImprove (Mesh & mesh, OPTIMIZEGOAL goal,
 	    }
 	}
 
-      /*
-	if (onlybedges)
-	{
-	std::cerr << "bad tet: " 
-	<< volelements.Get(i)[0] 
-	<< volelements.Get(i)[1] 
-	<< volelements.Get(i)[2] 
-	<< volelements.Get(i)[3] << "\n";
-
-	if (!mesh.LegalTet (volelements.Get(i)))
-	std::cerr << "Illegal tet" << "\n";
-	}
-      */
     }
-  //  (*mystd::cout) <<std::endl;
 
-  /*  
-      std::cout << "edgeused: ";
-      edgeused.PrintMemInfo(std::cout);
-  */
-  PrintMessage (5, cnt, " swaps performed");
-
-
+  LOG_DEBUG(cnt << " swaps performed");
 
 
 
   mesh.Compress ();
-
-  /*
-  if (goal == OPT_QUALITY)
-    {
-      bad1 = CalcTotalBad (mesh.Points(), mesh.VolumeElements());
-      //      std::cerr << "Total badness = " << bad1 <<std::endl;
-    }
-  */
-
-  /*
-    for (i = 1; i <= GetNE(); i++)
-    if (volelements.Get(i)[0])
-    if (!mesh.LegalTet (volelements.Get(i)))
-    {
-    std::cout << "detected illegal tet, 2" <<std::endl;
-    std::cerr << "detected illegal tet1: " << i <<std::endl;
-    }
-  */
-
-  multithread.task = savetask;
 }
-  
-
-
-
-
 
 void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 					   const BitArray * working_elements,
@@ -1494,13 +1411,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
   Array<ElementIndex> hasbothpoints;
   Array<ElementIndex> hasbothpointsother;
 
-  PrintMessage (3, "SwapImproveSurface ");
-  std::cerr << "\n" << "Start SwapImproveSurface" << std::endl;
-
-  const char * savetask = multithread.task;
-  multithread.task = "Swap Improve Surface";
-    
-      
+  LOG_DEBUG("SwapImproveSurface ");
   
   // find elements on node
   for (ElementIndex ei = 0; ei < ne; ei++)
@@ -1523,11 +1434,6 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
   for (ElementIndex ei = 0; ei < ne; ei++)
     {
-      if (multithread.terminate)
-	break;
-      
-      multithread.percent = 100.0 * (ei+1) / ne;
-
       if (mesh.ElementType(ei) == FIXEDELEMENT)
 	continue;
       
@@ -2292,20 +2198,11 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 
   mesh.Compress ();
 
-  multithread.task = savetask;
 }
   
-
-
-
-
-
-
-
 /*
   2 -> 3 conversion
 */
-
 
 void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
 {
@@ -2360,9 +2257,6 @@ void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
 
   for (ElementIndex eli1 = 0; eli1 < ne; eli1++)
     {
-      if (multithread.terminate)
-	break;
-
       if (mesh.ElementType (eli1) == FIXEDELEMENT)
 	continue;
 

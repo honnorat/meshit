@@ -230,9 +230,6 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 
   while (1)
     {
-      if (multithread.terminate)
-	throw NgException ("Meshing stopped");
-
       // break if advancing front is empty
       if (!mp.baseelnp && adfront->Empty())
 	break;
@@ -534,13 +531,6 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	  if (stat.cntelem != plotstat_oldne)
 	    {
 	      plotstat_oldne = stat.cntelem;
-
-//	      PrintMessageCR (5, "El: ", stat.cntelem,
-//			      //	    << " trials: " << stat.cnttrials
-//			      " faces: ", stat.nff,
-//			      " vol = ", float(100 * stat.vol / stat.vol0));
-  
-	      multithread.percent = 100 -  100.0 * stat.vol / stat.vol0;
 	    }
 
 

@@ -286,9 +286,7 @@ namespace meshit
 	return;
       }    
 
-    while ((facokedge < 1.-1e-8 || facokface < 1.-1e-8) && 
-	   cnttrials < maxtrials &&
-	   multithread.terminate != 1)
+    while ((facokedge < 1.-1e-8 || facokface < 1.-1e-8) && cnttrials < maxtrials)
       {
 	std::cerr << "   facokedge " << facokedge << " facokface " << facokface << " cnttrials " << cnttrials <<std::endl
 		   << " perc. " << 95. * max2( min2(facokedge,facokface),
@@ -363,13 +361,10 @@ namespace meshit
 		ostrstr << bad_elements.size() << " bad elements";
 		PrintMessage(5,ostrstr.str());
 	      }
-	    while (bad_elements.size() > 0 && 
-		   cnttrials < maxtrials &&
-		   multithread.terminate != 1);
+	    while (bad_elements.size() > 0 && cnttrials < maxtrials );
 	  }
 
-	if(cnttrials < maxtrials &&
-	   multithread.terminate != 1)
+	if(cnttrials < maxtrials)
 	  {
 	    facokedge = factryedge;
 	    
@@ -393,8 +388,7 @@ namespace meshit
 	  lamface = 2;
 
 
-	if(cnttrials < maxtrials &&
-	   multithread.terminate != 1)
+	if(cnttrials < maxtrials)
 	  {
 
 	    do  // move faces
@@ -433,15 +427,12 @@ namespace meshit
 		ostrstr << bad_elements.size() << " bad elements";
 		PrintMessage(5,ostrstr.str());
 	      }
-	    while (bad_elements.size() > 0 && 
-		   cnttrials < maxtrials &&
-		   multithread.terminate != 1);
+	    while (bad_elements.size() > 0 && cnttrials < maxtrials);
 	  }
 
 
 
-	if(cnttrials < maxtrials &&
-	   multithread.terminate != 1)
+	if(cnttrials < maxtrials)
 	  {
 	    facokface = factryface;
 	    // smooth interior
@@ -459,8 +450,7 @@ namespace meshit
 	  
 	//!
 	if((facokedge < 1.-1e-8 || facokface < 1.-1e-8) && 
-	   cnttrials < maxtrials &&
-	   multithread.terminate != 1)
+	   cnttrials < maxtrials)
 	  {
 	    MeshingParameters dummymp;
 	    MeshOptimize3d optmesh(dummymp);
@@ -512,7 +502,7 @@ namespace meshit
 
     MeshingParameters dummymp;
     MeshOptimize3d optmesh(dummymp);
-    for(int i=0; i<numtopimprove && multithread.terminate != 1; i++)
+    for(int i=0; i<numtopimprove; i++)
       {
 	optmesh.SwapImproveSurface(mesh,OPT_QUALITY,NULL,&idmaps);
 	optmesh.SwapImprove(mesh,OPT_QUALITY);

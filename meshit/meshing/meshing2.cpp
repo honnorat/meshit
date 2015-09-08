@@ -230,22 +230,13 @@ namespace meshit {
         if (totalarea > 0 || maxarea > 0)
             meshedarea = mesh.SurfaceArea();
 
-        const char * savetask = multithread.task;
-        multithread.task = "Surface meshing";
-
         adfront ->SetStartFront();
 
         int plotnexttrial = 999;
 
         double meshedarea_before = meshedarea;
 
-        while (!adfront ->Empty() && !multithread.terminate) {
-            if (multithread.terminate)
-                throw NgException("Meshing stopped");
-
-            // known for STL meshing
-            if (totalarea > 0)
-                multithread.percent = 100 * meshedarea / totalarea;
+        while (!adfront ->Empty()) {
 
             locpoints.resize(0);
             loclines.resize(0);
@@ -870,11 +861,6 @@ namespace meshit {
                 if (debugparam.haltsuccess || debugflag) {
 
                     std::cout << "success of rule" << rules.Get(rulenr)->Name() << std::endl;
-                    multithread.drawing = 1;
-                    multithread.testmode = 1;
-                    multithread.pause = 1;
-
-                    std::cerr << "success of rule" << rules.Get(rulenr)->Name() << std::endl;
                     std::cerr << "trials = " << trials << std::endl;
                     std::cerr << "locpoints " << std::endl;
                     for (int i = 1; i <= pindex.size(); i++) {
@@ -904,15 +890,8 @@ namespace meshit {
                 adfront -> IncrementClass(lindex.Get(1));
 
                 if (debugparam.haltnosuccess || debugflag) {
-                    std::cout << "Problem with seg " << gpi1 << " - " << gpi2
-                            << ", class = " << qualclass << std::endl;
-
                     std::cerr << "Problem with seg " << gpi1 << " - " << gpi2
                             << ", class = " << qualclass << std::endl;
-
-                    multithread.drawing = 1;
-                    multithread.testmode = 1;
-                    multithread.pause = 1;
 
                     for (int i = 1; i <= loclines.size(); i++) {
                         std::cerr << "line ";
@@ -938,8 +917,6 @@ namespace meshit {
         LOG_DEBUG("Surface meshing done");
 
         adfront->PrintOpenSegments(std::cout);
-
-        multithread.task = savetask;
 
         EndMesh();
 

@@ -14,7 +14,7 @@ namespace meshit {
 
         for (int i = 1; i <= optsteps; i++)
             for (size_t j = 1; j <= strlen(optstr); j++) {
-                if (multithread.terminate) break;
+
                 switch (optstr[j - 1]) {
                     case 's':
                     { // topological swap

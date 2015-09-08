@@ -252,8 +252,7 @@ namespace meshit {
             pgi.resize(rule.onp);
 
             for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
-                if (multithread.terminate)
-                    break;
+
                 if (mesh.SurfaceElement(sei).IsDeleted()) continue;
 
                 elmap[0] = sei;

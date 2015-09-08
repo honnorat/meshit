@@ -701,10 +701,6 @@ namespace meshit {
                     PrintDot('.');
             }
 
-            multithread.percent = 100.0 * pi / np;
-            if (multithread.terminate)
-                break;
-
             PointIndex newpi = mixed[pi];
 
             if (!usep.Test(newpi))

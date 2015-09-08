@@ -1256,25 +1256,10 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
       printmod = 100;
       printdot = '*';
     }
-
-
-  const char * savetask = multithread.task;
-  multithread.task = "Smooth Mesh";
   
   for (PointIndex pi = points.Begin(); pi < points.End(); pi++)
     if ( (*this)[pi].Type() == INNERPOINT && perrs[pi] > 0.01 * badmax)
       {
-	if (multithread.terminate)
-	  throw NgException ("Meshing stopped");
-
-	multithread.percent = 100.0 * (pi+1-PointIndex::BASE) / points.size();
-        /*
-	if (points.Size() < 1000)
-	  PrintDot ();
-	else
-	  if ( (i+1-PointIndex::BASE) % 10 == 0)
-	    PrintDot ('+');
-        */
         if (  (pi+1-PointIndex::BASE) % printmod == 0) PrintDot (printdot);
 
 	double lh = pointh[pi];
@@ -1311,18 +1296,12 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
   
   delete pf;
 
-  multithread.task = savetask;
-
   if (goal == OPT_QUALITY)
     {
       bad1 = CalcTotalBad (points, volelements, mp);
-      std::cerr << "Total badness = " << bad1 <<std::endl;
-      PrintMessage (5, "Total badness = ", bad1);
+      LOG_DEBUG("Total badness = " << bad1);
     }
 }
-
-
-
 
 // Improve Condition number of Jacobian, any elements  
 void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
@@ -1379,12 +1358,7 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
 	      pointh[el.PNum(j)] = h;
 	}
     }
- 
-
-
-  const char * savetask = multithread.task;
-  multithread.task = "Smooth Mesh Jacobian";
-  
+   
   for (PointIndex pi = points.Begin(); i < points.End(); pi++)
     {
       if ((*this)[pi].Type() != INNERPOINT)
@@ -1393,20 +1367,8 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
       if(usepoint && !usepoint->Test(i))
 	continue;
 
-      //std::cerr << "improvejac, p = " << i <<std::endl;
-
       if (goal == OPT_WORSTCASE && !badnodes.Test(i))
 	continue;
-      //	std::cerr << "smoot p " << i <<std::endl;
-
-      /*
-	if (multithread.terminate)
-	break;
-      */
-      if (multithread.terminate)
-	throw NgException ("Meshing stopped");
-
-      multithread.percent = 100.0 * i / points.size();
 
       if (points.size() < 1000)
 	PrintDot ();
@@ -1437,9 +1399,6 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
 	}
     }
   PrintDot ('\n');
-  
-
-  multithread.task = savetask;
 }
 
 
@@ -1534,28 +1493,13 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 	      pointh[el.PNum(j)] = h;
 	}
     }
-
-
-  const char * savetask = multithread.task;
-  multithread.task = "Smooth Mesh Jacobian";
   
   for (PointIndex pi = points.Begin(); pi <= points.End(); pi++)
     if ( usepoint.Test(i) )
       {
-	//std::cerr << "improvejac, p = " << i <<std::endl;
 
 	if (goal == OPT_WORSTCASE && !badnodes.Test(i))
 	  continue;
-	//	std::cerr << "smoot p " << i <<std::endl;
-
-	/*
-	if (multithread.terminate)
-	  break;
-	*/
-	if (multithread.terminate)
-	  throw NgException ("Meshing stopped");
-
-	multithread.percent = 100.0 * i / points.size();
 
 	if (points.size() < 1000)
 	  PrintDot ();
@@ -1632,8 +1576,6 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
   delete pf2ptr;
   for(i=0; i<locidmaps.size(); i++)
     delete locidmaps[i];
-
-  multithread.task = savetask;
 }
 
 

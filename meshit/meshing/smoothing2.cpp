@@ -477,8 +477,6 @@ namespace meshit {
 
             for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++) {
                 ImproveMesh(mesh, mp);
-                if (multithread.terminate)
-                    throw NgException("Meshing stopped");
             }
             faceindex = 0;
             return;
@@ -553,8 +551,6 @@ namespace meshit {
         for (int hi = 0; hi < icompress.size(); hi++) {
             PointIndex pi = icompress[hi];
             if (mesh[pi].Type() == SURFACEPOINT) {
-                if (multithread.terminate)
-                    throw NgException("Meshing stopped");
 
                 cnt++;
 

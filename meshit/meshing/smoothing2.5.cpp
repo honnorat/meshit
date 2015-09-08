@@ -35,8 +35,6 @@ namespace meshit
 	for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++)
 	  {
 	    ImproveVolumeMesh (mesh);
-	    if (multithread.terminate)
-	      throw NgException ("Meshing stopped");
 	  }
 	faceindex = 0;
 	return;
@@ -124,9 +122,6 @@ namespace meshit
       {
 	if (mesh[pi].Type() != SURFACEPOINT)
 	  continue;
-
-	if (multithread.terminate)
-	  throw NgException ("Meshing stopped");
 	
 	int surfi(-1);
 

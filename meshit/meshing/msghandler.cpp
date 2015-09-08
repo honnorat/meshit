@@ -102,11 +102,6 @@ namespace meshit {
                 SetStatMsg("");
             delete msgstatus_stack.Last();
             msgstatus_stack.DeleteLast();
-            threadpercent_stack.DeleteLast();
-            if (threadpercent_stack.size() > 0)
-                multithread.percent = threadpercent_stack.Last();
-            else
-                multithread.percent = 100.;
         }
         else {
             PrintSysError("PopStatus failed");
@@ -116,6 +111,5 @@ namespace meshit {
     void SetStatMsg(const MyStr& s)
     {
         msgstatus = s;
-        multithread.task = msgstatus.c_str();
     }
 }
