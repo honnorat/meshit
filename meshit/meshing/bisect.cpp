@@ -1812,7 +1812,28 @@ namespace meshit {
         }
 
     }
+    void ReadEnclString(std::istream & in, std::string & str, const char encl)
+    {
+        char currchar;
+        str = "";
 
+        in.get(currchar);
+        while (in && (currchar == ' ' || currchar == '\t' || currchar == '\n')) {
+            in.get(currchar);
+        }
+        if (currchar == encl) {
+            in.get(currchar);
+            while (in && currchar != encl) {
+                str += currchar;
+                in.get(currchar);
+            }
+        }
+        else {
+            in.putback(currchar);
+            in >> str;
+        }
+    }
+    
     void Refinement::Bisect(Mesh & mesh, BisectionOptions & opt, Array<double> * quality_loss) const
     {
         LOG_DEBUG("Mesh bisection");
@@ -1858,7 +1879,6 @@ namespace meshit {
 
         int np = mesh.GetNV();
         mesh.SetNP(np);
-
         mesh.mglevels++;
 
         if (opt.refine_p) {

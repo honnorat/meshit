@@ -6,7 +6,6 @@ SET(src_GENERAL
 	general/bitarray.cpp
 	general/flags.cpp
 	general/hashtabl.cpp
-	general/mystring.cpp
 	general/optmem.cpp
 	general/seti.cpp
 	general/sort.cpp
