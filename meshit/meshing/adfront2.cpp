@@ -41,7 +41,7 @@ namespace meshit
     allflines = 0;
 
     minval = 0;
-    starti = lines.Begin();
+    starti = 0;
   }
 
   AdFront2 :: ~AdFront2 ()
@@ -55,7 +55,7 @@ namespace meshit
     if (nfl > 0)
       {
 	ost << nfl << " open front segments left:" << std::endl;
-	for (int i = lines.Begin(); i < lines.End(); i++)
+	for (size_t i = 0; i < lines.size(); i++)
 	  if (lines[i].Valid())
 	    ost << i << ": " 
                 << GetGlobalIndex (lines[i].L().I1()) << "-"
@@ -90,7 +90,8 @@ namespace meshit
       }
     else
       {
-	pi = points.push_back (FrontPoint2 (p, globind, mgi, pointonsurface)) - 1;
+	points.push_back(FrontPoint2(p, globind, mgi, pointonsurface));
+    pi = points.size()-1;
       }
 
     if (mgi)
@@ -130,7 +131,8 @@ namespace meshit
       }
     else
       {
-	li = lines.push_back(FrontLine (INDEX_2(pi1, pi2))) - 1;
+	lines.push_back(FrontLine(INDEX_2(pi1, pi2)));
+    li = lines.size() - 1;
       }
 
   
@@ -219,7 +221,7 @@ namespace meshit
   {
     int baselineindex = -1; 
 
-    for (int i = starti; i < lines.End(); i++)
+    for (size_t i = starti; i < lines.size(); i++)
       {
 	if (lines[i].Valid())
 	  {
@@ -239,7 +241,7 @@ namespace meshit
     if (baselineindex == -1)
       {
 	minval = INT_MAX;
-	for (int i = lines.Begin(); i < lines.End(); i++)
+	for (size_t i = 0; i < lines.size(); i++)
 	  if (lines[i].Valid())
 	    {
 	      int hi = lines[i].LineClass() +
@@ -410,42 +412,16 @@ namespace meshit
 	  for (int j = 1; j <= points[pi].mgi->GetNPGI(); j++)
 	    pgeominfo[i].AddPointGeomInfo (points[pi].mgi->GetPGI(j));
       }
-   
-//    if (loclines.Size() == 1)
-//      {
-//	std::cerr << "loclines.Size = 1" << std::endl
-//		   << " h = " << xh << std::endl
-//		   << " nearline.size = " << nearlines.Size() << std::endl
-//		   << " p0 = " << p0 << std::endl;
-//      }
-
     return lines[baselineindex].LineClass();
   }
 
   void AdFront2 :: SetStartFront ()
   {
-    for (int i = lines.Begin(); i < lines.End(); i++)
+    for (size_t i = 0; i < lines.size(); i++)
       if (lines[i].Valid())
 	for (int j = 1; j <= 2; j++)
 	  points[lines[i].L().I(j)].DecFrontNr(0);
   }
-
-
-//  void AdFront2 :: Print (std::ostream & ost) const
-//  {
-//    ost << points.Size() << " Points: " << std::endl;
-//    for (int i = points.Begin(); i < points.End(); i++)
-//      if (points[i].Valid())
-//	ost << i << "  " << points[i].P() << std::endl;
-//
-//    ost << nfl << " Lines: " << std::endl;
-//    for (int i = lines.Begin(); i < lines.End(); i++)
-//      if (lines[i].Valid())
-//	ost << lines[i].L().I1() << " - " << lines[i].L().I2() << std::endl;
-//
-//    ost << flush;
-//  }
-
 
   bool AdFront2 :: Inside (const Point<2> & p) const
   {
@@ -460,7 +436,7 @@ namespace meshit
     n(1) = 0.15432;
     
     cnt = 0;
-    for (int i = 0; i < lines.size(); i++)
+    for (size_t i = 0; i < lines.size(); i++) {
       if (lines[i].Valid())
 	{
 	  const Point<3> & p1 = points[lines[i].L().I1()].P();
@@ -483,7 +459,7 @@ namespace meshit
 	  if (u(0) >= 0 && u(0) <= 1 && u(1) > 0)
 	    cnt++;
 	}
-    
+    } 
     return ((cnt % 2) != 0);
   }
 }
