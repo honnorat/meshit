@@ -5,7 +5,6 @@
 #include "bisect.hpp"
 #include "../gprim/geomfuncs.hpp"
 #include "validate.hpp"
-#include "../general/mystring.hpp"
 
 namespace meshit {
 
