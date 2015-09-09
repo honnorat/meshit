@@ -361,7 +361,7 @@ namespace meshit {
             }
 
             else if (strcmp(buf, "endrule") != 0) {
-                PrintSysError("Parser error, unknown token ", buf);
+                LOG_ERROR("Parser error, unknown token " << buf);
             }
         } while (!ist.eof() && strcmp(buf, "endrule") != 0);
 

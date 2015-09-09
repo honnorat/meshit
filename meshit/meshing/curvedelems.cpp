@@ -475,8 +475,8 @@ namespace meshit
       }
 
 
-    PrintMessage (1, "Curve elements, order = ", aorder);
-    if (rational) PrintMessage (1, "curved elements with rational splines");
+    LOG_DEBUG("Curve elements, order = " << aorder);
+    if (rational) LOG_DEBUG("curved elements with rational splines");
 
     if (working)
       const_cast<Mesh&> (mesh).UpdateTopology();
@@ -621,7 +621,7 @@ namespace meshit
 	  jacpols2[i] = new JacobiRecPol (100, i, 2);
       }
 
-    PrintMessage (3, "Curving edges");
+    LOG_DEBUG("Curving edges");
 
     if (mesh.GetDimension() == 3 || rational)
       {
@@ -939,7 +939,7 @@ namespace meshit
 
    
     
-    PrintMessage (3, "Curving faces");
+    LOG_DEBUG("Curving faces");
 
     Array<int> surfnr(nfaces);
     surfnr = -1;

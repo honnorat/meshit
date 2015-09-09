@@ -51,10 +51,10 @@ namespace meshit {
                     tri2[k - 1] = &mesh.Point(mesh.OpenElement(j).PNum(k));
                 }
                 if (IntersectTriangleTriangle(&tri1[0], &tri2[0])) {
-                    PrintSysError("Surface elements are intersecting");
-                    std::cerr << "Intersecting: " << std::endl;
-                    for (int k = 0; k <= 2; k++)
-                        std::cerr << *tri1[k] << "   ";
+                    LOG_ERROR("Surface elements are intersecting :");
+                    for (int k = 0; k <= 2; k++) {
+                        LOG_ERROR_CONT(*tri1[k] << "  ");
+                    }
                     std::cerr << std::endl;
                     for (int k = 0; k <= 2; k++)
                         std::cerr << *tri2[k] << "   ";

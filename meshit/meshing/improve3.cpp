@@ -28,7 +28,7 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
   Array<double> oneperr;
   Array<double> elerrs (ne);
 
-  PrintMessage (3, "CombineImprove");
+  LOG_DEBUG("CombineImprove");
   std::cerr  << "Start CombineImprove" << "\n";
 
   double totalbad = 0;
@@ -42,8 +42,7 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
   if (goal == OPT_QUALITY)
     {
       totalbad = CalcTotalBad (mesh.Points(), mesh.VolumeElements());
-      std::cerr << "Total badness = " << totalbad << std::endl;
-      PrintMessage (5, "Total badness = ", totalbad);
+      LOG_DEBUG("Total badness = " << totalbad);
     }
 
   for (ElementIndex ei = 0; ei < ne; ei++)
@@ -219,8 +218,8 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
   mesh.Compress();
   mesh.MarkIllegalElements();
 
-  PrintMessage (5, cnt, " elements combined");
-  std::cerr << "CombineImprove done" << "\n";
+  LOG_DEBUG(cnt << " elements combined");
+  LOG_DEBUG("CombineImprove done");
 
   totalbad = 0;
   for (ElementIndex ei = 0; ei < mesh.GetNE(); ei++)
@@ -229,19 +228,16 @@ void MeshOptimize3d :: CombineImprove (Mesh & mesh,
   if (goal == OPT_QUALITY)
     {
       totalbad = CalcTotalBad (mesh.Points(), mesh.VolumeElements());
-      std::cerr << "Total badness = " << totalbad << std::endl;
+      LOG_DEBUG("Total badness = " << totalbad);
 
       int cntill = 0;
       for (ElementIndex ei = 0; ei < ne; ei++)
 	if (!mesh.LegalTet (mesh[ei]))
 	  cntill++;
 
-      PrintMessage (5, cntill, " illegal tets");
+      LOG_DEBUG(cntill << " illegal tets");
     }
 } 
-
-
-
 
 
 /*
@@ -291,7 +287,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
       if (elerrs[ei] > badmax) badmax = elerrs[ei];
     }
 
-  PrintMessage (5, "badmax = ", badmax);
+  LOG_DEBUG("badmax = " << badmax);
   badlimit = 0.5 * badmax;
 
 
@@ -525,7 +521,7 @@ void MeshOptimize3d :: SplitImprove (Mesh & mesh,
 
 
   mesh.Compress();
-  PrintMessage (5, cnt, " splits performed");
+  LOG_DEBUG(cnt << " splits performed");
 
   std::cerr << "Splitt - Improve done" << "\n";
 
@@ -2189,7 +2185,7 @@ void MeshOptimize3d :: SwapImproveSurface (Mesh & mesh, OPTIMIZEGOAL goal,
 	}
     }
 
-  PrintMessage (5, cnt, " swaps performed");
+  LOG_DEBUG(cnt << " swaps performed");
 
 
   for(int i=0; i<locidmaps.size(); i++)
@@ -2222,10 +2218,7 @@ void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
   TABLE<ElementIndex, PointIndex::BASE> elementsonnode(np); 
   TABLE<SurfaceElementIndex, PointIndex::BASE> belementsonnode(np);
 
-  PrintMessage (3, "SwapImprove2 ");
-  std::cerr << "\n" << "Start SwapImprove2" << "\n";
-  //  TestOk();
-
+  LOG_DEBUG("SwapImprove2 ");
 
   /*
     CalcSurfacesOfNode ();
@@ -2440,220 +2433,11 @@ void MeshOptimize3d :: SwapImprove2 (Mesh & mesh, OPTIMIZEGOAL goal)
 	}
     }
 
-
-  PrintMessage (5, cnt, " swaps performed");
-
-
-
-  /*
-    CalcSurfacesOfNode ();
-    for (i = 1; i <= GetNE(); i++)
-    if (volelements.Get(i).PNum(1))
-    if (!LegalTet (volelements.Get(i)))
-    {
-    std::cout << "detected illegal tet, 2" <<std::endl;
-    std::cerr << "detected illegal tet2: " << i <<std::endl;
-    }
-  */
-
+  LOG_DEBUG(cnt << " swaps performed");
 
   bad1 = CalcTotalBad (mesh.Points(), mesh.VolumeElements());
-  std::cerr << "Total badness = " << bad1 << std::endl;
-  std::cerr << "std::swapimprove2 done" << "\n";
-  //  (*mystd::cout) << "Vol = " << CalcVolume (points, volelements) << "\n";
+  LOG_DEBUG("Total badness = " << bad1);
+  LOG_DEBUG("SwapImprove2 done");
 }
 
-
-/*
-  void Mesh :: std::swapImprove2 (OPTIMIZEGOAL goal)
-  {
-  int i, j;
-  int eli1, eli2;
-  int mattyp;
-
-  Element el31(4), el32(4), el33(4);
-  double bad1, bad2;
-
-
-  INDEX_3_HASHTABLE<INDEX_2> elsonface (GetNE());
-
-  (*mystd::cout) << "std::swapImprove2 " <<std::endl;
-  std::cerr << "\n" << "Start std::swapImprove2" << "\n";
-
-  // Calculate total badness
-
-  if (goal == OPT_QUALITY)
-  {
-  double bad1 = CalcTotalBad (points, volelements);
-  std::cerr << "Total badness = " << bad1 <<std::endl;
-  }
-
-  // find elements on node
-
-
-  Element2d face;
-  for (i = 1; i <= GetNE(); i++)
-  if ( (i > eltyps.Size()) || (eltyps.Get(i) != FIXEDELEMENT) )
-  {
-  const Element & el = VolumeElement(i);
-  if (!el.PNum(1)) continue;
-
-  for (j = 1; j <= 4; j++)
-  {
-  el.GetFace (j, face);
-  INDEX_3 i3 (face.PNum(1), face.PNum(2), face.PNum(3));
-  i3.Sort();
-
-
-  int bnr, posnr;
-  if (!elsonface.PositionCreate (i3, bnr, posnr))
-  {
-  INDEX_2 i2;
-  elsonface.GetData (bnr, posnr, i3, i2);
-  i2.I2() = i;
-  elsonface.SetData (bnr, posnr, i3, i2);
-  }
-  else
-  {
-  INDEX_2 i2 (i, 0);
-  elsonface.SetData (bnr, posnr, i3, i2);
-  }
-
-  //  	    if (elsonface.Used (i3))
-  //  	      {
-  //  		INDEX_2 i2 = elsonface.Get(i3);
-  //  		i2.I2() = i;
-  //  		elsonface.Set (i3, i2);
-  //  	      }
-  //  	    else
-  //  	      {
-  //  		INDEX_2 i2 (i, 0);
-  //  		elsonface.Set (i3, i2);
-  //  	      }
-
-  }
-  }
-
-  BitArray original(GetNE());
-  original.Set();
-
-  for (i = 1; i <= GetNSE(); i++)
-  {
-  const Element2d & sface = SurfaceElement(i);
-  INDEX_3 i3 (sface.PNum(1), sface.PNum(2), sface.PNum(3));
-  i3.Sort();
-  INDEX_2 i2(0,0);
-  elsonface.Set (i3, i2);
-  }
-
-
-  for (i = 1; i <= elsonface.GetNBags(); i++)
-  for (j = 1; j <= elsonface.GetBagSize(i); j++)
-  {
-  INDEX_3 i3;
-  INDEX_2 i2;
-  elsonface.GetData (i, j, i3, i2);
-
-
-  int eli1 = i2.I1();
-  int eli2 = i2.I2();
-
-  if (eli1 && eli2 && original.Test(eli1) && original.Test(eli2) )
-  {
-  Element & elem = volelements.Elem(eli1);
-  Element & elem2 = volelements.Elem(eli2);
-
-  int pi1 = i3.I1();
-  int pi2 = i3.I2();
-  int pi3 = i3.I3();
-
-  int pi4 = elem.PNum(1) + elem.PNum(2) + elem.PNum(3) + elem.PNum(4) - pi1 - pi2 - pi3;
-  int pi5 = elem2.PNum(1) + elem2.PNum(2) + elem2.PNum(3) + elem2.PNum(4) - pi1 - pi2 - pi3;
-
-
-
-
-
-
-  el31.PNum(1) = pi1;
-  el31.PNum(2) = pi2;
-  el31.PNum(3) = pi3;
-  el31.PNum(4) = pi4;
-  el31.SetIndex (mattyp);
-	    
-  if (WrongOrientation (points, el31))
-  std::swap (pi1, pi2);
-
-
-  bad1 = CalcBad (points, elem, 0) + 
-  CalcBad (points, elem2, 0); 
-	    
-  //	    if (!LegalTet(elem) || !LegalTet(elem2))
-  //	      bad1 += 1e4;
-
-	    
-  el31.PNum(1) = pi1;
-  el31.PNum(2) = pi2;
-  el31.PNum(3) = pi5;
-  el31.PNum(4) = pi4;
-  el31.SetIndex (mattyp);
-	    
-  el32.PNum(1) = pi2;
-  el32.PNum(2) = pi3;
-  el32.PNum(3) = pi5;
-  el32.PNum(4) = pi4;
-  el32.SetIndex (mattyp);
-		      
-  el33.PNum(1) = pi3;
-  el33.PNum(2) = pi1;
-  el33.PNum(3) = pi5;
-  el33.PNum(4) = pi4;
-  el33.SetIndex (mattyp);
-	    
-  bad2 = CalcBad (points, el31, 0) + 
-  CalcBad (points, el32, 0) +
-  CalcBad (points, el33, 0); 
-	    
-  //	    if (!LegalTet(el31) || !LegalTet(el32) ||
-  //		!LegalTet(el33))
-  //	      bad2 += 1e4;
-	    
-	    
-  int std::swap = (bad2 < bad1);
-
-  INDEX_2 hi2b(pi4, pi5);
-  hi2b.Sort();
-	    
-  if ( ((bad2 < 1e6) || (bad2 < 10 * bad1)) &&
-  boundaryedges->Used (hi2b) )
-  std::swap = 1;
-	    
-  if (std::swap)
-  {
-  (*mystd::cout) << "2->3 " << flush;
-		
-  volelements.Elem(eli1) = el31;
-  volelements.Elem(eli2) = el32;
-  volelements.Append (el33);
-		
-  original.Clear (eli1);
-  original.Clear (eli2);
-  }
-  }
-  }
-  
-  (*mystd::cout) <<std::endl;
-
-  if (goal == OPT_QUALITY)
-  {
-  bad1 = CalcTotalBad (points, volelements);
-  std::cerr << "Total badness = " << bad1 <<std::endl;
-  }
-
-  //  FindOpenElements ();
-
-  std::cerr << "std::swapimprove2 done" << "\n";
-  }
-
-*/
 }

@@ -192,7 +192,7 @@ namespace meshit {
             }
 
             else if (keyword == "segments") {
-                PrintMessage(3, "load segments");
+                LOG_DEBUG("load segments");
 
                 bcnames.resize(0);
                 infile.get(ch);

@@ -1163,7 +1163,7 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
   int typ = 1;
   
   std::cerr << "Improve Mesh" << "\n";
-  PrintMessage (3, "ImproveMesh");
+  LOG_DEBUG("ImproveMesh");
 
   int np = GetNP();
   int ne = GetNE();
@@ -1199,8 +1199,7 @@ void Mesh :: ImproveMesh (const MeshingParameters & mp, OPTIMIZEGOAL goal)
   if (goal == OPT_QUALITY)
     {
       bad1 = CalcTotalBad (points, volelements, mp);
-      std::cerr << "Total badness = " << bad1 <<std::endl;
-      PrintMessage (5, "Total badness = ", bad1);
+      LOG_DEBUG("Total badness = " << bad1);
     }
   
   Vector x(3);
@@ -1308,8 +1307,7 @@ void Mesh :: ImproveMeshJacobian (const MeshingParameters & mp,
 {
   int i, j;
   
-  std::cerr << "Improve Mesh Jacobian" << "\n";
-  PrintMessage (3, "ImproveMesh Jacobian");
+  LOG_DEBUG("ImproveMeshJacobian");
 
   int np = GetNP();
   int ne = GetNE();
@@ -1412,8 +1410,7 @@ void Mesh :: ImproveMeshJacobianOnSurface (const MeshingParameters & mp,
 {
   int i, j;
   
-  std::cerr << "Improve Mesh Jacobian" << "\n";
-  PrintMessage (3, "ImproveMesh Jacobian");
+  LOG_DEBUG("ImproveMesh Jacobian");
 
   int np = GetNP();
   int ne = GetNE();

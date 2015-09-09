@@ -55,9 +55,7 @@ namespace meshit
 		  double max_worsening, const bool uselocalworsening,
 		  Array<double> * quality_loss)
   {
-    PrintMessage(3,"!!!! Validating !!!!");
-    //if(max_worsening > 0)
-    //  std::cerr << "badness " << counter++ <<std::endl;
+    LOG_DEBUG("Validating");
 
     bad_elements.resize(0);
 
@@ -152,8 +150,6 @@ namespace meshit
       }
   }
 
-
-
   void RepairBisection(Mesh & mesh, Array<ElementIndex> & bad_elements, 
 		       const BitArray & isnewpoint, const Refinement & refinement,
 		       const Array<double> & pure_badness, 
@@ -174,9 +170,7 @@ namespace meshit
     int numbadneighbours = 3;
     const int numtopimprove = 3;
 
-    PrintMessage(1,"repairing");
-
-    PushStatus("Repair Bisection");
+    LOG_DEBUG("Repairing Bisection");
 
     Array<Point<3>* > should(np);
     Array<Point<3>* > can(np);
@@ -229,7 +223,7 @@ namespace meshit
     ostrstr.str("");
     ostrstr << "worsening: " <<
       Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
-    PrintMessage(4,ostrstr.str());
+    LOG_DEBUG(ostrstr);
 
     
 
@@ -238,9 +232,7 @@ namespace meshit
       if(working_points.Test(i))
 	auxnum++;
     
-    ostrstr.str("");
-    ostrstr << "Percentage working points: " << 100.*double(auxnum)/np;
-    PrintMessage(5,ostrstr.str());
+    LOG_DEBUG( "Percentage working points: " << 100.*double(auxnum)/np);
     
 
     BitArray isworkingboundary(np);
@@ -292,9 +284,7 @@ namespace meshit
 		   << " perc. " << 95. * max2( min2(facokedge,facokface),
 					       double(cnttrials)/double(maxtrials)) <<std::endl;
 
-	ostrstr.str("");
-	ostrstr << "max. worsening " << max_worsening;
-	PrintMessage(5,ostrstr.str());
+	LOG_DEBUG("max. worsening " << max_worsening);
 	oldlamedge = lamedge;
 	lamedge *= 6;
 	if (lamedge > 2)
@@ -328,10 +318,7 @@ namespace meshit
 		
 		factryedge = lamedge + (1.-lamedge) * facokedge;
 
-		ostrstr.str("");
-		ostrstr << "lamedge = " << lamedge << ", trying: " << factryedge;
-		PrintMessage(5,ostrstr.str());
-		
+		LOG_DEBUG("lamedge = " << lamedge << ", trying: " << factryedge);
 
 		for (int i = 1; i <= np; i++)
 		  {
@@ -351,15 +338,12 @@ namespace meshit
 		    ostrstr << "worsening: " <<
 		      Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
 
-		    PrintMessage(5,ostrstr.str());
+		    LOG_DEBUG(ostrstr);
 		  }
 		else
 		  Validate(mesh,bad_elements,pure_badness,-1,uselocalworsening);
 
-
-		ostrstr.str("");
-		ostrstr << bad_elements.size() << " bad elements";
-		PrintMessage(5,ostrstr.str());
+		LOG_DEBUG(bad_elements.size() << " bad elements");
 	      }
 	    while (bad_elements.size() > 0 && cnttrials < maxtrials );
 	  }
@@ -399,9 +383,7 @@ namespace meshit
 		  max_worsening *= 1.1;
 		factryface = lamface + (1.-lamface) * facokface;
 
-		ostrstr.str("");
-		ostrstr << "lamface = " << lamface << ", trying: " << factryface;
-		PrintMessage(5,ostrstr.str());
+		LOG_DEBUG("lamface = " << lamface << ", trying: " << factryface);
 		
 		
 		for (int i = 1; i <= np; i++)
@@ -420,12 +402,8 @@ namespace meshit
 		ostrstr.str("");
 		ostrstr << "worsening: " <<
 		  Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
-		PrintMessage(5,ostrstr.str());
-	
-
-		ostrstr.str("");
-		ostrstr << bad_elements.size() << " bad elements";
-		PrintMessage(5,ostrstr.str());
+		LOG_DEBUG(ostrstr);
+		LOG_DEBUG(bad_elements.size() << " bad elements");
 	      }
 	    while (bad_elements.size() > 0 && cnttrials < maxtrials);
 	  }
@@ -488,10 +466,7 @@ namespace meshit
 	      if(working_points.Test(i))
 		auxnum++;
 
-	    
-	    ostrstr.str("");
-	    ostrstr << "Percentage working points: " << 100.*double(auxnum)/np;
-	    PrintMessage(5,ostrstr.str());
+	    LOG_DEBUG("Percentage working points: " << 100.*double(auxnum)/np);
 	    
 	    for (int i = 1; i <= np; i++)
 	      mesh.Point(i) = *can.Elem(i);
@@ -563,7 +538,7 @@ namespace meshit
 		    << mesh[bad_elements[i]][1] << ": " << mesh.Point(mesh[bad_elements[i]][1]) <<std::endl
 		    << mesh[bad_elements[i]][2] << ": " << mesh.Point(mesh[bad_elements[i]][2]) <<std::endl
 		    << mesh[bad_elements[i]][3] << ": " << mesh.Point(mesh[bad_elements[i]][3]);
-	    PrintMessage(5,ostrstr.str());
+	    LOG_DEBUG(ostrstr);
 	  }
 	for (int i = 1; i <= np; i++)
 	  mesh.Point(i) = *can.Get(i);
@@ -575,7 +550,5 @@ namespace meshit
 	delete can[i];
 	delete should[i];
       }
-
-    PopStatus();
   }
 }

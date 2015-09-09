@@ -484,7 +484,7 @@ namespace meshit {
                 for (int j = 1; j <= el.GetNP(); j++) {
                     if (el.PNum(j) <= oldnp && pindex.Get(el.PNum(j)) == -1) {
                         found = 0;
-                        PrintSysError("meshing2, index missing");
+                        LOG_ERROR("meshing2, index missing");
                     }
                 }
             }
@@ -502,7 +502,7 @@ namespace meshit {
                         found = 0;
 
                         if (debugflag || debugparam.haltnosuccess)
-                            PrintSysError("meshing2, Backtransformation failed");
+                            LOG_ERROR("meshing2, Backtransformation failed");
 
                         break;
                     }
@@ -558,7 +558,7 @@ namespace meshit {
                     locpoints.resize(oldnp);
 
                     if (debugflag || debugparam.haltnosuccess)
-                        PrintSysError("meshing2, maxh too large");
+                        LOG_ERROR("meshing2, maxh too large");
                 }
             }
 
@@ -573,10 +573,10 @@ namespace meshit {
 
                             if (ChooseChartPointGeomInfo(mpgeominfo.Get(pi), upgeominfo.Elem(pi))) {
                                 // cannot select, compute new one
-                                PrintWarning("calc point geominfo instead of using");
+                                LOG_WARNING("calc point geominfo instead of using");
                                 if (ComputePointGeomInfo(locpoints.Get(pi), upgeominfo.Elem(pi))) {
                                     found = 0;
-                                    PrintSysError("meshing2d, geominfo failed");
+                                    LOG_ERROR("meshing2d, geominfo failed");
                                 }
                             }
                         }
@@ -709,7 +709,7 @@ namespace meshit {
                                 found = 0;
 
                                 if (debugflag || debugparam.haltnosuccess)
-                                    PrintWarning("overlapping");
+                                    LOG_WARNING("overlapping");
 
                                 if (debugparam.haltoverlap) {
                                     debugflag = 1;

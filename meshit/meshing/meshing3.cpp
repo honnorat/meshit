@@ -681,7 +681,7 @@ GenerateMesh (Mesh & mesh, const MeshingParameters & mp)
 	break;
     }
   
-  PrintMessage (5, "");  // line feed after statistics
+  LOG_DEBUG("");  // line feed after statistics
 
   for (i = 1; i <= ruleused.size(); i++)
     std::cerr << std::setw(4) << ruleused.Get(i)
@@ -707,7 +707,7 @@ enum blocktyp { BLOCKUNDEF, BLOCKINNER, BLOCKBOUND, BLOCKOUTER };
 
 void Meshing3 :: BlockFill (Mesh & mesh, double gh)
 {
-  PrintMessage (3, "Block-filling called (obsolete) ");
+  LOG_DEBUG("Block-filling called (obsolete) ");
 
   int i, j(0), i1, i2, i3, j1, j2, j3;
   int n1, n2, n3, n, min1, min2, min3, max1, max2, max3;
@@ -745,7 +745,7 @@ void Meshing3 :: BlockFill (Mesh & mesh, double gh)
   n3 = int ((zmax-zmin) / gh + 5);
   n = n1 * n2 * n3;
   
-  PrintMessage (5, "n1 = ", n1, " n2 = ", n2, " n3 = ", n3);
+  LOG_DEBUG("n1 = " << n1 << " n2 = " << n2 << " n3 = " << n3);
 
   Array<blocktyp> inner(n);
   Array<PointIndex> pointnr(n);
@@ -827,16 +827,12 @@ void Meshing3 :: BlockFill (Mesh & mesh, double gh)
       if (!undefi)
 	break;
 
-      //      PrintMessage (5, "Test point: ", undefp);
-      
       if (adfront -> Inside (undefp))
 	{
-	  //	  (*mystd::cout) << "inner" <<std::endl;
 	  inner.Elem(undefi) = BLOCKINNER;
 	}
       else
 	{
-	  //	  (*mystd::cout) << "outer" <<std::endl;
 	  inner.Elem(undefi) = BLOCKOUTER;
 	}
 
@@ -895,7 +891,7 @@ void Meshing3 :: BlockFill (Mesh & mesh, double gh)
       {
 	filled++;
       }
-  PrintMessage (5, "Filled blocks: ", filled);
+  LOG_DEBUG("Filled blocks: " << filled);
 
   for (i = 1; i <= n; i++)
     {
@@ -1073,10 +1069,8 @@ void Meshing3 :: BlockFillLocalH (Mesh & mesh,
 {
   double filldist = mp.filldist;
 
-  std::cerr << "blockfill local h" << std::endl;
-  std::cerr << "rel filldist = " << filldist << std::endl;
-  PrintMessage (3, "blockfill local h");
-
+  LOG_DEBUG("blockfill local h");
+  LOG_DEBUG(" rel filldist = " << filldist);
 
   Array<Point<3> > npoints;
   

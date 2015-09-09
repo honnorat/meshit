@@ -216,7 +216,7 @@ namespace meshit {
                     break;
                 }
                 default:
-                    PrintSysError("Refine: undefined surface element type ", int(el.GetType()));
+                    LOG_ERROR("Refine: undefined surface element type " << int(el.GetType()));
             }
         }
 
@@ -496,7 +496,7 @@ namespace meshit {
                     break;
                 }
                 default:
-                    PrintSysError("Refine: undefined volume element type ", int(el.GetType()));
+                    LOG_ERROR("Refine: undefined volume element type " << int(el.GetType()));
             }
         }
 

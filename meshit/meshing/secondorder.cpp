@@ -157,7 +157,7 @@ namespace meshit
 	      break;
 	    }
 	  default:
-	    PrintSysError ("Unhandled element in secondorder:", int(el.GetType()));
+	    LOG_ERROR("Unhandled element in secondorder:" << int(el.GetType()));
 	  }
 
 	for (j = 0; j < onp; j++)
@@ -244,7 +244,7 @@ namespace meshit
 	      break;
 	    }
 	  default:
-	    PrintSysError ("MakeSecondOrder, illegal vol type ", el.GetType());
+	    LOG_ERROR("MakeSecondOrder, illegal vol type " << el.GetType());
 	  }
 
 
@@ -351,7 +351,7 @@ namespace meshit
 
   void Refinement :: ValidateSecondOrder (Mesh & mesh)
   {
-    PrintMessage (3, "Validate mesh");
+    LOG_DEBUG("Validate mesh");
     int np = mesh.GetNP();
     int ne = mesh.GetNE();
     // int i, j;

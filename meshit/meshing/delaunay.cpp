@@ -284,42 +284,8 @@ namespace meshit {
             }
         }
 
-
-        /*
-          int i, j, k, l;
-          if (!felind)
-          {
-          std::cerr << "not in any sphere, 1" <<std::endl;
-          // old, non tree search
-
-          double mindist = 1e10;
-          for (j = 1; j <= tempels.Size(); j++)
-          {
-          if (tempels.Get(j).PNum(1))
-          {
-          double toofar = 
-          Dist2 (centers.Get(j), newp) - radi2.Get(j);
-          if (toofar < mindist || toofar < 1e-7) 
-          {
-          mindist = toofar;
-          std::cout << " dist2 = " << Dist2 (centers.Get(j), newp)
-          << " radi2 = " << radi2.Get(j) <<std::endl;
-          }
-          if (toofar < 0)
-          {
-          el = tempels.Get(j);
-          felind = j;
-          std::cout << "sphere found !" <<std::endl;
-          break; 
-          }
-          }
-          }
-          std::cout << "point is too far from sheres: " << mindist <<std::endl;
-          }
-         */
-
         if (cfelind == -1) {
-            PrintWarning("Delaunay, point not in any sphere");
+            LOG_WARNING("Delaunay, point not in any sphere");
             return;
         }
 
@@ -523,9 +489,8 @@ namespace meshit {
                 pp[k] = &mesh.Point(newels.Get(j)[k]);
 
             if (CalcSphereCenter(&pp[0], pc)) {
-                PrintSysError("Delaunay: New tet is flat");
+                LOG_ERROR("Delaunay: New tet is flat");
 
-                std::cerr << "new tet is flat" << std::endl;
                 for (int k = 1; k <= 4; k++)
                     std::cerr << newels.Get(j).PNum(k) << " ";
                 std::cerr << std::endl;
@@ -722,8 +687,8 @@ namespace meshit {
 
         PrintDot('\n');
 
-        PrintMessage(3, "Points: ", cntp);
-        PrintMessage(3, "Elements: ", tempels.size());
+        LOG_DEBUG("Points: " << cntp);
+        LOG_DEBUG("Elements: " << tempels.size());
 
     }
 
@@ -731,10 +696,8 @@ namespace meshit {
     {
         int np, ne;
 
-        PrintMessage(1, "Delaunay meshing");
-        PrintMessage(3, "number of points: ", mesh.GetNP());
-        PushStatus("Delaunay meshing");
-
+        LOG_DEBUG("Delaunay meshing");
+        LOG_DEBUG("  number of points: " << mesh.GetNP());
 
         Array<DelaunayTet> tempels;
         Point3d pmin, pmax;
@@ -744,7 +707,7 @@ namespace meshit {
         int oldnp = mesh.GetNP();
         if (mp.blockfill) {
             BlockFillLocalH(mesh, mp);
-            PrintMessage(3, "number of points: ", mesh.GetNP());
+            LOG_DEBUG("number of points: " << mesh.GetNP());
         }
 
         np = mesh.GetNP();
@@ -817,7 +780,7 @@ namespace meshit {
             for (int i = 1; i <= 2; i++) {
                 tempmesh.FindOpenElements();
 
-                PrintMessage(5, "Num open: ", tempmesh.GetNOpenElements());
+                LOG_DEBUG("Num open: " << tempmesh.GetNOpenElements());
                 tempmesh.CalcSurfacesOfNode();
 
                 tempmesh.FreeOpenElementsEnvironment(1);
@@ -884,7 +847,7 @@ namespace meshit {
         }
 
 
-        PrintMessage(3, ndeg, " degenerated elements removed");
+        LOG_DEBUG(ndeg << " degenerated elements removed");
 
         // find surface triangles which are no face of any tet
 
@@ -1014,7 +977,7 @@ namespace meshit {
         }
 
         // find intersecting:
-        PrintMessage(3, "Remove intersecting");
+        LOG_DEBUG("Remove intersecting");
         if (openels.size()) {
             Box3dTree setree(pmin, pmax);
 
@@ -1111,10 +1074,7 @@ namespace meshit {
             }
         }
 
-
-
-
-        PrintMessage(3, "Remove outer");
+        LOG_DEBUG("Remove outer");
 
         // find connected tets (with no face between, and no hole due
         // to removed intersecting tets.
@@ -1266,7 +1226,7 @@ namespace meshit {
         //  boundaryfaces.PrintMemInfo (std::cout);
 
 
-        PrintMessage(5, "tables filled");
+        LOG_DEBUG("tables filled");
 
 
         ne = tempels.size();
@@ -1523,12 +1483,9 @@ namespace meshit {
             mesh.AddVolumeElement(el);
         }
 
-        PrintMessage(5, "outer removed");
+        LOG_DEBUG("outer removed");
 
         mesh.FindOpenElements(domainnr);
-
         mesh.Compress();
-
-        PopStatus();
     }
 }

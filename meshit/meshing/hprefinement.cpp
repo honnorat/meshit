@@ -571,7 +571,7 @@ namespace meshit
     if (!hps)
       {
 	std::cout << "Attention hps : hp-refinement not implemented for case " << type << std::endl;
-	PrintSysError ("hp-refinement not implemented for case ", type);
+	LOG_ERROR("hp-refinement not implemented for case " << type);
       }
 
     return hps;
@@ -1173,7 +1173,7 @@ namespace meshit
 
   void HPRefinement (Mesh & mesh, Refinement * ref, int levels, double fac1, bool setorders, bool reflevels)
   {
-    PrintMessage (1, "HP Refinement called, levels = ", levels);
+    LOG_DEBUG("HP Refinement called, levels = " << levels);
 
     mesh.coarsemesh = new Mesh; 
     *mesh.coarsemesh = mesh;
@@ -1284,8 +1284,7 @@ namespace meshit
 		  } 
 		      
 		default:
-		  PrintSysError ("hpref, backconversion failed for element ", 
-				 int(Get_HPRef_Struct (hpel.type) -> geom));
+		  LOG_ERROR("hpref, backconversion failed for element " << int(Get_HPRef_Struct(hpel.type)->geom));
 		}
 	  }
 	std::cout << " Start with Update Topology " << std::endl; 

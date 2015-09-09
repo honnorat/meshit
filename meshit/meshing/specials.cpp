@@ -19,9 +19,7 @@ void CutOffAndCombine (Mesh & mesh, const Mesh & othermesh)
 
   int ne = mesh.GetNE();
 
-  PrintMessage (1, "other mesh has ",
-		othermesh.GetNP(), " points, ",
-		othermesh.GetNSE(), " surface elements.");
+  LOG_DEBUG("other mesh has " << othermesh.GetNP() << " points, " << othermesh.GetNSE() << " surface elements.");
 
   Array<Box3d> otherbounds(nse);  
   Box3d otherbox;

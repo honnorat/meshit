@@ -5,6 +5,7 @@
 #include "bisect.hpp"
 #include "../gprim/geomfuncs.hpp"
 #include "validate.hpp"
+#include "../general/mystring.hpp"
 
 namespace meshit {
 
@@ -787,7 +788,7 @@ namespace meshit {
 
         }
         else {
-            PrintSysError("Define marked prism called for non-prism and non-pyramid");
+            LOG_ERROR("Define marked prism called for non-prism and non-pyramid");
         }
 
         mp.marked = 0;
@@ -1678,20 +1679,16 @@ namespace meshit {
         }
 
         mesh.mlparentelement.resize(ne);
-        for (int i = 1; i <= ne; i++)
+        for (int i = 1; i <= ne; i++) {
             mesh.mlparentelement.Elem(i) = 0;
-        mesh.mlparentsurfaceelement.resize(nse);
-        for (int i = 1; i <= nse; i++)
-            mesh.mlparentsurfaceelement.Elem(i) = 0;
-
-        if (printmessage_importance > 0) {
-            std::ostringstream str1, str2;
-            str1 << "copied " << mtets.size() << " tets, " << mprisms.size() << " prisms";
-            str2 << "       " << mtris.size() << " trigs, " << mquads.size() << " quads";
-
-            LOG_DEBUG(str1.str());
-            LOG_DEBUG(str2.str());
         }
+        mesh.mlparentsurfaceelement.resize(nse);
+        for (int i = 1; i <= nse; i++) {
+            mesh.mlparentsurfaceelement.Elem(i) = 0;
+        }
+
+        LOG_DEBUG("copied " << mtets.size() << " tets, " << mprisms.size() << " prisms");
+        LOG_DEBUG("       " << mtris.size() << " trigs, " << mquads.size() << " quads");
     }
 
     void UpdateEdgeMarks(Mesh & mesh,
@@ -1819,7 +1816,6 @@ namespace meshit {
     void Refinement::Bisect(Mesh & mesh, BisectionOptions & opt, Array<double> * quality_loss) const
     {
         LOG_DEBUG("Mesh bisection");
-        PushStatus("Mesh bisection");
 
         LocalizeEdgePoints(mesh);
 
@@ -1921,10 +1917,7 @@ namespace meshit {
                     }
                 }
             }
-
 #endif
-
-            PopStatus();
             return;
         }
 
@@ -2081,17 +2074,12 @@ namespace meshit {
                 }
                 else
                     for (int i = 1; i <= mtets.size(); i++) {
-                        mtets.Elem(i).marked =
-                                3 * mesh.VolumeElement(i).TestRefinementFlag();
+                        mtets.Elem(i).marked = 3 * mesh.VolumeElement(i).TestRefinementFlag();
                         if (mtets.Elem(i).marked)
                             cntm++;
                     }
 
-                if (printmessage_importance > 0) {
-                    std::ostringstream str;
-                    str << "marked elements: " << cntm;
-                    LOG_DEBUG(str.str());
-                }
+                LOG_DEBUG("marked elements: " << cntm);
 
                 int cnttrig = 0;
                 int cntquad = 0;
@@ -2116,11 +2104,7 @@ namespace meshit {
                     }
                 }
 
-                if (printmessage_importance > 0) {
-                    std::ostringstream str;
-                    str << "with surface-elements: " << cntm;
-                    LOG_DEBUG(str.str());
-                }
+                LOG_DEBUG("with surface-elements: " << cntm);
 
                 marked = (cntm > 0);
             }
@@ -2735,12 +2719,10 @@ namespace meshit {
 
             Validate(mesh, bad_elts, pure_badness, max_worsening, uselocalworsening);
 
-            if (printmessage_importance > 0) {
-                std::ostringstream strstr;
-                for (int ii = 0; ii < bad_elts.size(); ii++)
-                    strstr << "bad element " << bad_elts[ii] << "\n";
-                LOG_DEBUG(strstr.str());
+            for (int ii = 0; ii < bad_elts.size(); ii++) {
+                LOG_DEBUG("bad element " << bad_elts[ii]);
             }
+
             if (repaired_once || bad_elts.size() > 0) {
                 clock_t t1(clock());
 
@@ -2766,12 +2748,8 @@ namespace meshit {
                     LOG_DEBUG(std::string("Problem: ") + ex.what());
                 }
 
-                if (printmessage_importance > 0) {
-                    std::ostringstream strstr;
-                    strstr << "Time for Repair: " << double(clock() - t1) / double(CLOCKS_PER_SEC) << std::endl
-                            << "bad elements after repair: " << bad_elts << std::endl;
-                    LOG_DEBUG(strstr.str());
-                }
+                LOG_DEBUG("Time for Repair: " << double(clock() - t1) / double(CLOCKS_PER_SEC));
+                LOG_DEBUG("bad elements after repair: " << bad_elts);
 
                 if (quality_loss != NULL)
                     Validate(mesh, bad_elts, pure_badness, 1e100, uselocalworsening, quality_loss);
@@ -2802,8 +2780,6 @@ namespace meshit {
         mesh.CalcSurfacesOfNode();
 
         LOG_DEBUG("Bisection done");
-
-        PopStatus();
     }
 
     BisectionOptions::BisectionOptions()
@@ -2858,12 +2834,11 @@ namespace meshit {
 
     void Refinement::ProjectToSurface(Point<3> & p, int surfi) const
     {
-        if (printmessage_importance > 0)
-            std::cerr << "Refinement :: ProjectToSurface    ERROR: no geometry set" << std::endl;
+        LOG_ERROR("Refinement::ProjectToSurface: no geometry set");
     };
 
     void Refinement::ProjectToEdge(Point<3> & p, int surfi1, int surfi2, const EdgePointGeomInfo & egi) const
     {
-        std::cerr << "Refinement::ProjectToEdge not overloaded" << std::endl;
+        LOG_ERROR("Refinement::ProjectToEdge not overloaded");
     }
 }

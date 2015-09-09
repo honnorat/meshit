@@ -589,7 +589,7 @@ void vnetrule :: LoadRule (std::istream & ist)
 
       else if (strcmp (buf, "endrule") != 0)
 	{
-	  PrintSysError ("Parser3d, unknown token " , buf);
+	  LOG_ERROR("Parser3d, unknown token " << buf);
 	}
     }
   while (!ist.eof() && strcmp (buf, "endrule") != 0);
@@ -948,13 +948,13 @@ void Meshing3 :: LoadRules (const char * filename, const char ** prules)
 
   if (filename)
     {
-      PrintMessage (3, "rule-filename = ", filename);
+      LOG_DEBUG("rule-filename = " << filename);
       ist = new std::ifstream (filename);
     }
   else 
     {
       /* connect tetrules to one string */
-      PrintMessage (3, "Use internal rules");
+      LOG_DEBUG("Use internal rules");
       if (!prules) prules = tetrules;
 
       const char ** hcp = prules; 
@@ -1007,7 +1007,7 @@ void Meshing3 :: LoadRules (const char * filename, const char ** prules)
 	  rules.push_back (rule);
 	  if (!rule->TestOk())
 	    {
-	      PrintSysError ("Parser3d: Rule ", rules.size(), " not ok");
+	      LOG_ERROR("Parser3d: Rule " << rules.size() << " not ok");
 	      exit (1);
 	    }
 	}

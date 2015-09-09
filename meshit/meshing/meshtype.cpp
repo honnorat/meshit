@@ -347,7 +347,7 @@ namespace meshit {
             case QUAD: pp = &elquadqp[ip - 1][0];
                 break;
             default:
-                PrintSysError("Element2d::GetIntegrationPoint, illegal type ", typ);
+                LOG_ERROR("Element2d::GetIntegrationPoint, illegal type " << typ);
         }
 
         p.X() = pp[0];
@@ -382,7 +382,7 @@ namespace meshit {
             case QUAD: dshapep = &ipdquad.Get(ip)->dshape;
                 break;
             default:
-                PrintSysError("Element2d::GetTransformation, illegal type ", typ);
+                LOG_ERROR("Element2d::GetTransformation, illegal type " << typ);
         }
 
         CalcABt(pmat, *dshapep, trans);
@@ -408,7 +408,7 @@ namespace meshit {
                 shape(3) = (1 - p.X()) * p.Y();
                 break;
             default:
-                PrintSysError("Element2d::GetShape, illegal type ", typ);
+                LOG_ERROR("Element2d::GetShape, illegal type " << typ);
         }
     }
 
@@ -457,7 +457,7 @@ namespace meshit {
                 break;
 
             default:
-                PrintSysError("Element2d::GetDShape, illegal type ", typ);
+                LOG_ERROR("Element2d::GetDShape, illegal type " << typ);
         }
     }
 
@@ -1457,7 +1457,7 @@ namespace meshit {
             case TET10: dshapep = &ipdtet10.Get(ip)->dshape;
                 break;
             default:
-                PrintSysError("Element::GetTransformation, illegal type ", int(typ));
+                LOG_ERROR("Element::GetTransformation, illegal type " << int(typ));
         }
 
         CalcABt(pmat, *dshapep, trans);
@@ -1892,7 +1892,7 @@ namespace meshit {
             case TET10: if (ipdtet10.size()) return;
                 break;
             default:
-                PrintSysError("Element::ComputeIntegrationPoint, illegal type ", int(typ));
+                LOG_ERROR("Element::ComputeIntegrationPoint, illegal type " << int(typ));
         }
 
         switch (GetType()) {
@@ -1901,7 +1901,7 @@ namespace meshit {
             case TET10: ipdtet10.resize(GetNIP());
                 break;
             default:
-                PrintSysError("Element::ComputeIntegrationPoint, illegal type2 ", int(typ));
+                LOG_ERROR("Element::ComputeIntegrationPoint, illegal type2 " << int(typ));
         }
 
         for (int i = 1; i <= GetNIP(); i++) {
@@ -1919,7 +1919,7 @@ namespace meshit {
                 case TET10: ipdtet10.Elem(i).Reset(ipd);
                     break;
                 default:
-                    PrintSysError("Element::ComputeIntegrationPoint(2), illegal type ", int(typ));
+                    LOG_ERROR("Element::ComputeIntegrationPoint(2), illegal type " << int(typ));
             }
         }
     }
