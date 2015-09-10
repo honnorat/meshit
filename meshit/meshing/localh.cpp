@@ -12,8 +12,9 @@ namespace meshit {
         for (int i = 0; i < 3; i++)
             xmid[i] = 0.5 * (ax1[i] + ax2[i]);
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++) {
             childs[i] = NULL;
+        }
         father = NULL;
 
         flags.cutboundary = 0;
@@ -21,7 +22,7 @@ namespace meshit {
         flags.oldcell = 0;
         flags.pinner = 0;
 
-        hopt = 2 * h2;
+        hopt = 2.0 * h2;
     }
 
     BlockAllocator GradingBox::ball(sizeof (GradingBox));
@@ -139,8 +140,9 @@ namespace meshit {
             nbox = box->childs[childnr];
         };
 
+        const double h_half = 0.5 * h;
 
-        while (2 * box->h2 > h) {
+        while (box->h2 > h_half) {
             childnr = 0;
             if (p.X() > box->xmid[0]) childnr += 1;
             if (p.Y() > box->xmid[1]) childnr += 2;
@@ -401,25 +403,6 @@ namespace meshit {
         for (int i = 0; i < 8; i++)
             if (box->childs[i])
                 ClearFlagsRec(box->childs[i]);
-    }
-
-    void LocalH::WidenRefinement()
-    {
-        for (int i = 0; i < boxes.size(); i++) {
-            double h = boxes[i]->hopt;
-            Point3d c = boxes[i]->PMid();
-
-            for (int i1 = -1; i1 <= 1; i1++) {
-                for (int i2 = -1; i2 <= 1; i2++) {
-                    for (int i3 = -1; i3 <= 1; i3++) {
-                        SetH(Point3d(
-                                c.X() + i1 * h,
-                                c.Y() + i2 * h,
-                                c.Z() + i3 * h), 1.001 * h);
-                    }
-                }
-            }
-        }
     }
 
     void LocalH::GetInnerPoints(Array<Point<3> > & points)

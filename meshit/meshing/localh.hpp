@@ -93,8 +93,6 @@ namespace meshit {
             ClearFlagsRec(root);
         }
 
-        void WidenRefinement();
-
         void GetInnerPoints(Array<Point<3> > & points);
         void GetOuterPoints(Array<Point<3> > & points);
 

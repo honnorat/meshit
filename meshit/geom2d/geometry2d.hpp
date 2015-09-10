@@ -107,8 +107,8 @@ namespace meshit {
             Point<2> point;
             Vec<2> first, second;
             GetDerivatives(t, point, first, second);
-            double curv = fabs(first(0) * second(1) - first(1) * second(0)) / pow(first.Length(), 3);
-            return curv;
+            double fl = first.Length();
+            return fabs(first(0) * second(1) - first(1) * second(0)) / (fl*fl*fl);
         }
 
     };
