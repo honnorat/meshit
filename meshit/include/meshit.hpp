@@ -8,7 +8,7 @@
 #ifndef MESHIT_HPP
 #define	MESHIT_HPP
 
-#ifdef WIN32
+#ifdef WIN32_TOREMOVE
    #if NGINTERFACE_EXPORTS || NGLIB_EXPORTS || nglib_EXPORTS
       #define DLL_HEADER   __declspec(dllexport)
    #else
@@ -17,6 +17,8 @@
 #else
    #define DLL_HEADER 
 #endif
+
+#define _USE_MATH_DEFINES 1
 
 #include "../meshing/msghandler.hpp"
 

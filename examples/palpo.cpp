@@ -1,13 +1,9 @@
-#include <iostream>
-#include <sstream>
-#include <algorithm>    // std::reverse
-#include <stdexcept>
-#include <limits>       // std::numeric_limits
-
 #include <meshit.hpp>
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
 #include <meshit/geom2d/geometry2d.hpp>
+
+#include <sstream>
 
 struct CubicPoly
 {

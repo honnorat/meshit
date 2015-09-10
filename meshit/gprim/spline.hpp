@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string>
+#include <cmath>
 
 #include "../linalg/vector.hpp"
 #include "geomfuncs.hpp"

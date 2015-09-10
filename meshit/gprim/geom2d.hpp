@@ -8,6 +8,7 @@
 /* *************************************************************************/
 
 #include <iostream>
+#include <algorithm>
 
 #include "../general/template.hpp"
 #include "geomfuncs.hpp"

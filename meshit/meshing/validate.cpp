@@ -220,12 +220,9 @@ namespace meshit
     //working_elements.Set();
     //working_points.Set();
 
-    ostrstr.str("");
-    ostrstr << "worsening: " <<
-      Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
-    LOG_DEBUG(ostrstr);
-
-    
+    double worsening = Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
+    LOG_DEBUG("worsening: " << worsening);
+	    
 
     int auxnum=0;
     for(int i=1; i<=np; i++)
@@ -334,11 +331,8 @@ namespace meshit
 		  }
 		if(facokedge < 1.-1e-8)
 		  {
-		    ostrstr.str("");
-		    ostrstr << "worsening: " <<
-		      Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
-
-		    LOG_DEBUG(ostrstr);
+			  double worsening = Validate(mesh, bad_elements, pure_badness, max_worsening, uselocalworsening);
+		    LOG_DEBUG("worsening: " << worsening);
 		  }
 		else
 		  Validate(mesh,bad_elements,pure_badness,-1,uselocalworsening);
@@ -399,10 +393,8 @@ namespace meshit
 		      mesh.Point(i) = *can.Get(i);
 		  }
 
-		ostrstr.str("");
-		ostrstr << "worsening: " <<
-		  Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
-		LOG_DEBUG(ostrstr);
+		double worsening = Validate(mesh,bad_elements,pure_badness,max_worsening,uselocalworsening);
+		LOG_DEBUG("worsening: " << worsening);
 		LOG_DEBUG(bad_elements.size() << " bad elements");
 	      }
 	    while (bad_elements.size() > 0 && cnttrials < maxtrials);
@@ -532,13 +524,11 @@ namespace meshit
 	
 	for(int i=0; i<bad_elements.size(); i++)
 	  {
-	    ostrstr.str("");
-	    ostrstr << "bad element:" <<std::endl
-		    << mesh[bad_elements[i]][0] << ": " << mesh.Point(mesh[bad_elements[i]][0]) <<std::endl
-		    << mesh[bad_elements[i]][1] << ": " << mesh.Point(mesh[bad_elements[i]][1]) <<std::endl
-		    << mesh[bad_elements[i]][2] << ": " << mesh.Point(mesh[bad_elements[i]][2]) <<std::endl
-		    << mesh[bad_elements[i]][3] << ": " << mesh.Point(mesh[bad_elements[i]][3]);
-	    LOG_DEBUG(ostrstr);
+	    LOG_DEBUG("bad element:" << std::endl
+			<< mesh[bad_elements[i]][0] << ": " << mesh.Point(mesh[bad_elements[i]][0]) << std::endl
+			<< mesh[bad_elements[i]][1] << ": " << mesh.Point(mesh[bad_elements[i]][1]) << std::endl
+			<< mesh[bad_elements[i]][2] << ": " << mesh.Point(mesh[bad_elements[i]][2]) << std::endl
+			<< mesh[bad_elements[i]][3] << ": " << mesh.Point(mesh[bad_elements[i]][3]));
 	  }
 	for (int i = 1; i <= np; i++)
 	  mesh.Point(i) = *can.Get(i);

@@ -1,6 +1,7 @@
 #ifndef FILE_Array
 #define FILE_Array
 
+#include <algorithm>
 #include <iostream>
 #include <cstring>
 

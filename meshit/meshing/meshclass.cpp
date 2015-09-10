@@ -1,6 +1,7 @@
+#include <meshit.hpp>
+
 #include <stdexcept>
 
-#include <meshit.hpp>
 #include "curvedelems.hpp"
 #include "clusters.hpp"
 #include "meshtool.hpp"
@@ -3791,7 +3792,7 @@ namespace meshit {
         int illegaltets = 0, negativetets = 0, badtets = 0;
 
         for (i = 1; i <= GetNE(); i++) {
-            int badel = 0;
+            bool badel = false;
 
             Element & el = VolumeElement(i);
 
@@ -3801,12 +3802,12 @@ namespace meshit {
             }
 
             if (el.Volume(Points()) < 0) {
-                badel = 1;
+                badel = true;
                 negativetets++;
             }
 
             if (!LegalTet(el)) {
-                badel = 1;
+                badel = true;
                 illegaltets++;
                 std::cerr << "illegal tet: " << i << " ";
                 for (j = 1; j <= el.GetNP(); j++) {
@@ -3842,7 +3843,7 @@ namespace meshit {
                     if (phi < phimin) phimin = phi;
 
                     if ((180 / M_PI) * phi > badellimit)
-                        badel = 1;
+                        badel = true;
                 }
             }
 
@@ -3866,7 +3867,7 @@ namespace meshit {
                     if (phi < facephimin) facephimin = phi;
 
                     if ((180 / M_PI) * phi > badellimit)
-                        badel = 1;
+                        badel = true;
 
                 }
             }
