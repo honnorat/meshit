@@ -20,12 +20,7 @@ IntersectTriangleLine (const Point<3> ** tri, const Point<3> ** line)
   Mat<3,3> a, ainv;
   Vec<3> rs, lami;
   int i;
-
-  /*
-  std::cerr << "Tri-Line inters: " <<std::endl
-	     << "tri = " << *tri[0] << ", " << *tri[1] << ", " << *tri[2] <<std::endl
-	     << "line = " << *line[0] << ", " << *line[1] <<std::endl;
-  */
+  
   for (i = 0; i < 3; i++)
     {
       a(i, 0) = -vl.X(i+1);
@@ -38,68 +33,16 @@ IntersectTriangleLine (const Point<3> ** tri, const Point<3> ** line)
   double det = Det(a); 
 
   double arel = vl.Length() * vt1.Length() * vt2.Length();
-  /*
-  double amax = 0;
-  for (i = 1; i <= 9; i++)
-    if (fabs (a.Get(i)) > amax)
-      amax = fabs(a.Get(i));
-  */
+
   // new !!!!
   if (fabs (det) <= 1e-10 * arel)
     {
-#ifdef DEVELOP      
-      // line parallel to triangle !
-      // std::cout << "ERROR: IntersectTriangleLine degenerated" <<std::endl;
-      //      std::cerr << "WARNING: IntersectTriangleLine degenerated\n";
-      /*
-      std::cerr << "lin-tri intersection: " <<std::endl
-		 << "line = " << *line[0] << " - " << *line[1] <<std::endl
-		 << "tri = " << *tri[0] << " - " << *tri[1] << " - " << *tri[2] <<std::endl
-		 << "lami = " << lami <<std::endl
-		 << "pc = " << ( *line[0] + lami.Get(1) * vl ) <<std::endl
-		 << "   = " << ( *tri[0] + lami.Get(2) * vt1 + lami.Get(3) * vt2) <<std::endl
-		 << " a = " << a <<std::endl
-		 << " ainv = " << ainv <<std::endl
-		 << " det(a) = " << det <<std::endl
-		 << " rs = " << rs <<std::endl;
-      */
-#endif
       return 0;
     }
 
   CalcInverse (a, ainv);
-  // ainv.Mult (rs, lami);
   lami = ainv * rs;
 
-  //  std::cerr << "lami = " << lami <<std::endl;
-
-  double eps = 1e-6;
-  if (
-      (lami(0) >= -eps && lami(0) <= 1+eps && 
-       lami(1) >= -eps && lami(2) >= -eps && 
-       lami(1) + lami(2) <= 1+eps)  && !
-      (lami(0) >= eps && lami(0) <= 1-eps && 
-       lami(1) >= eps && lami(2) >= eps && 
-       lami(1) + lami(2) <= 1-eps) )
-
-
-     {
-#ifdef DEVELOP
-       //      std::cout << "WARNING: IntersectTriangleLine degenerated" <<std::endl;
-      std::cerr << "WARNING: IntersectTriangleLine numerical inexact" << std::endl;
-
-      std::cerr << "lin-tri intersection: " << std::endl
-		 << "line = " << *line[0] << " - " << *line[1] << std::endl
-		 << "tri = " << *tri[0] << " - " << *tri[1] << " - " << *tri[2] << std::endl
-		 << "lami = " << lami << std::endl
-		 << "pc = " << ( *line[0] + lami.Get(1) * vl ) << std::endl
-		 << "   = " << ( *tri[0] + lami.Get(2) * vt1 + lami.Get(3) * vt2) << std::endl
-		 << " a = " << a << std::endl
-		 << " ainv = " << ainv << std::endl
-		 << " det(a) = " << det << std::endl
-		 << " rs = " << rs << std::endl;
-#endif
-    }
       
 
   if (lami(0) >= 0 && lami(0) <= 1 && 

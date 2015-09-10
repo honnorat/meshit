@@ -5,23 +5,6 @@
 
 namespace meshit {
 
-    class BisectionOptions
-    {
-      public:
-        const char * outfilename;
-        const char * mlfilename;
-        const char * refinementfilename;
-        const char * femcode;
-        int maxlevel;
-        int usemarkedelements;
-        bool refine_hp;
-        bool refine_p;
-        BisectionOptions();
-    };
-
-    extern void BisectTetsCopyMesh(Mesh &, const class CSGeometry *,
-            BisectionOptions & opt);
-
     class DLL_HEADER Refinement
     {
         MeshOptimize2d * optimizer2d;
@@ -34,7 +17,6 @@ namespace meshit {
 
         void Refine(Mesh & mesh) const;
         void Refine(Mesh & mesh);
-        void Bisect(Mesh & mesh, class BisectionOptions & opt, Array<double> * quality_loss = NULL) const;
 
         void MakeSecondOrder(Mesh & mesh) const;
         void MakeSecondOrder(Mesh & mesh);

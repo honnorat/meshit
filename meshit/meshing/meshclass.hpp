@@ -16,7 +16,6 @@
 #include "../general/symbolta.hpp"
 #include "../gprim/geomops.hpp"
 
-#include "hprefinement.hpp"
 #include "topology.hpp"
 
 /*
@@ -31,7 +30,6 @@ namespace meshit {
         RESTRICTH_SURFACEELEMENT, RESTRICTH_POINT, RESTRICTH_SEGMENT
     };
 
-    class HPRefElement;
     class SplineGeometry2d;
 
     /// 2d/3d mesh
@@ -147,10 +145,6 @@ namespace meshit {
                 const int element) const;
 
       public:
-
-        // store coarse mesh before hp-refinement
-        Array<HPRefElement> * hpelements;
-        Mesh * coarsemesh;
 
         /// number of refinement levels
         int mglevels;

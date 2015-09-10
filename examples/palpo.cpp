@@ -1,4 +1,7 @@
 #include <meshit.hpp>
+
+#include <stdexcept>
+
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
 #include <meshit/geom2d/geometry2d.hpp>

@@ -467,16 +467,6 @@ namespace meshit
     if (working)
       order = aorder;
 
-    if (mesh.coarsemesh)
-      {
-	mesh.coarsemesh->GetCurvedElements().BuildCurvedElements (ref, aorder, arational);
-        order = aorder;
-        rational = arational;
-        ishighorder = (order > 1);
-	return;
-      }
-
-
     LOG_DEBUG("Curve elements, order = " << aorder);
     if (rational) LOG_DEBUG("curved elements with rational splines");
 
@@ -533,49 +523,6 @@ namespace meshit
         edgeorder = 2;
         faceorder = 1;
       }
-
-
-#ifdef PARALLEL
-    TABLE<int> send_orders(ntasks), recv_orders(ntasks);
-
-    if (ntasks > 1 && working)
-      {
-	for (int e = 0; e < edgeorder.size(); e++)
-	  {
-	    partop.GetDistantEdgeNums (e+1, procs);
-	    for (int j = 0; j < procs.Size(); j++)
-	      send_orders.Add (procs[j], edgeorder[e]);
-	  }
-	for (int f = 0; f < faceorder.size(); f++)
-	  {
-	    partop.GetDistantFaceNums (f+1, procs);
-	    for (int j = 0; j < procs.Size(); j++)
-	      send_orders.Add (procs[j], faceorder[f]);
-	  }
-      }
-
-    
-    MyMPI_ExchangeTable (send_orders, recv_orders, MPI_TAG_CURVE, curve_comm);
-
-    if (ntasks > 1 && working)
-      {
-	Array<int> cnt(ntasks);
-	cnt = 0;
-	for (int e = 0; e < edgeorder.size(); e++)
-	  {
-	    partop.GetDistantEdgeNums (e+1, procs);
-	    for (int j = 0; j < procs.Size(); j++)
-	      edgeorder[e] = std::max(edgeorder[e], recv_orders[procs[j]][cnt[procs[j]]++]);
-	  }
-	for (int f = 0; f < faceorder.size(); f++)
-	  {
-	    partop.GetDistantFaceNums (f+1, procs);
-	    for (int j = 0; j < procs.Size(); j++)
-	      faceorder[f] = std::max(faceorder[f], recv_orders[procs[j]][cnt[procs[j]]++]);
-	  }
-      }
-#endif
-
 
     edgecoeffsindex.resize (nedges+1);
     int nd = 0;
@@ -951,34 +898,6 @@ namespace meshit
 	surfnr[top.GetFace(i)] = 
 	  mesh.GetFaceDescriptor(mesh.SurfaceElement(i).GetIndex()).SurfNr();
 
-#ifdef PARALLEL
-    TABLE<int> send_surfnr(ntasks), recv_surfnr(ntasks);
-
-    if (ntasks > 1 && working)
-      {
-	for (int f = 0; f < nfaces; f++)
-	  {
-	    partop.GetDistantFaceNums (f+1, procs);
-	    for (int j = 0; j < procs.Size(); j++)
-	      send_surfnr.Add (procs[j], surfnr[f]);
-	  }
-      }
-
-    MyMPI_ExchangeTable (send_surfnr, recv_surfnr, MPI_TAG_CURVE, curve_comm);
-
-    if (ntasks > 1 && working)
-      {
-	Array<int> cnt(ntasks);
-	cnt = 0;
-	for (int f = 0; f < nfaces; f++)
-	  {
-	    partop.GetDistantFaceNums (f+1, procs);
-	    for (int j = 0; j < procs.Size(); j++)
-	      surfnr[f] = std::max(surfnr[f], recv_surfnr[procs[j]][cnt[procs[j]]++]);
-	  }
-      }
-#endif
-
     if (mesh.GetDimension() == 3 && working)
       { 
 	for (int f = 0; f < nfaces; f++)
@@ -1142,125 +1061,10 @@ namespace meshit
     
     if (working)
       ishighorder = (order > 1);
-    // std::cerr << "edgecoeffs = " <<std::endl << edgecoeffs <<std::endl;
-    // std::cerr << "facecoeffs = " <<std::endl << facecoeffs <<std::endl;
-
-
-#ifdef PARALLEL
-    MPI_Barrier (curve_comm);
-    MPI_Comm_free (&curve_comm);      
-#endif
   }
-
-
-
-
-
-
-
-
 
 
   // ***********************  Transform edges *****************************
-
-  
-  bool CurvedElements ::  IsSegmentCurved (SegmentIndex elnr) const
-  {
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
-	
-	return mesh.coarsemesh->GetCurvedElements().IsSegmentCurved (hpref_el.coarse_elnr);
-      }
-
-    SegmentInfo info;
-    info.elnr = elnr;
-    info.order = order;
-    info.ndof = info.nv = 2;
-    if (info.order > 1)
-      {
-	const MeshTopology & top = mesh.GetTopology();
-	info.edgenr = top.GetSegmentEdge (elnr+1)-1;	
-	info.ndof += edgeorder[info.edgenr]-1;
-      }
-
-    return (info.ndof > info.nv);
-  }
-
-
- 
-  
-
-  void CurvedElements :: 
-  CalcSegmentTransformation (double xi, SegmentIndex elnr,
-			     Point<3> * x, Vec<3> * dxdxi, bool * curved)
-  {
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
-	
-	// xi umrechnen
-	double lami[2] = { xi, 1-xi };
-	double dlami[2] = { 1, -1 };
-
-	double coarse_xi = 0;
-	double trans = 0;
-	for (int i = 0; i < 2; i++)
-	  {
-	    coarse_xi += hpref_el.param[i][0] * lami[i];
-	    trans += hpref_el.param[i][0] * dlami[i];
-	  }
-
-	mesh.coarsemesh->GetCurvedElements().CalcSegmentTransformation (coarse_xi, hpref_el.coarse_elnr, x, dxdxi, curved);
-	if (dxdxi) *dxdxi *= trans;
-	
-	return;
-      }
-    
-
-    Vector shapes, dshapes;
-    Array<Vec<3> > coefs;
-
-    SegmentInfo info;
-    info.elnr = elnr;
-    info.order = order;
-    info.ndof = info.nv = 2;
-
-    if (info.order > 1)
-      {
-	const MeshTopology & top = mesh.GetTopology();
-	info.edgenr = top.GetSegmentEdge (elnr+1)-1;	
-	info.ndof += edgeorder[info.edgenr]-1;
-      }
-
-    CalcElementShapes (info, xi, shapes);
-    GetCoefficients (info, coefs);
-
-    *x = 0;
-    for (int i = 0; i < shapes.Size(); i++)
-      *x += shapes(i) * coefs[i];
-
-
-    if (dxdxi)
-      {
-	CalcElementDShapes (info, xi, dshapes);
-	
-	*dxdxi = 0;
-	for (int i = 0; i < shapes.Size(); i++)
-	  for (int j = 0; j < 3; j++)
-	    (*dxdxi)(j) += dshapes(i) * coefs[i](j);
-      }
-
-    if (curved)
-      *curved = (info.order > 1);
-
-    // std::cout << "Segment, |x| = " << Abs2(Vec<3> (*x) ) <<std::endl;
-  }
-
-
-
 
   void CurvedElements :: 
   CalcElementShapes (SegmentInfo & info, double xi, Vector & shapes) const
@@ -1379,14 +1183,6 @@ namespace meshit
     if (mesh.SurfaceElement(elnr).GetType() != TRIG) return true;
     if (!IsHighOrder()) return false;
 
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh.SurfaceElement(elnr).hp_elnr];
-	
-	return mesh.coarsemesh->GetCurvedElements().IsSurfaceElementCurved (hpref_el.coarse_elnr);
-      }
-
     const Element2d & el = mesh.SurfaceElement(elnr);
     ELEMENT_TYPE type = el.GetType();
     
@@ -1421,140 +1217,6 @@ namespace meshit
 
     return (info.ndof > info.nv);
   }
-  
-  void CurvedElements :: 
-  CalcSurfaceTransformation (Point<2> xi, SurfaceElementIndex elnr,
-			     Point<3> * x, Mat<3,2> * dxdxi, bool * curved)
-  {
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh.SurfaceElement(elnr).hp_elnr];
-	
-	// xi umrechnen
-	double lami[4];
-	FlatVector vlami(4, lami);
-	vlami = 0;
-	mesh.SurfaceElement(elnr).GetShapeNew (xi, vlami);
-	
-	Mat<2,2> trans;
-	Mat<3,2> dxdxic;
-	if (dxdxi)
-	  {
-	    MatrixFixWidth<2> dlami(4);
-	    dlami = 0;
-	    mesh.SurfaceElement(elnr).GetDShapeNew (xi, dlami);	  
-	    
-	    trans = 0;
-	    for (int k = 0; k < 2; k++)
-	      for (int l = 0; l < 2; l++)
-		for (int i = 0; i < hpref_el.np; i++)
-		  trans(l,k) += hpref_el.param[i][l] * dlami(i, k);
-	  }
-	
-	Point<2> coarse_xi(0,0);
-	for (int i = 0; i < hpref_el.np; i++)
-	  for (int j = 0; j < 2; j++)
-	    coarse_xi(j) += hpref_el.param[i][j] * lami[i];
-	
-	mesh.coarsemesh->GetCurvedElements().CalcSurfaceTransformation (coarse_xi, hpref_el.coarse_elnr, x, &dxdxic, curved);
-	
-	if (dxdxi)
-	  *dxdxi = dxdxic * trans;
-	
-	return;
-      }
-    
-
-
-
-    const Element2d & el = mesh.SurfaceElement(elnr);
-    ELEMENT_TYPE type = el.GetType();
-
-    SurfaceElementInfo info;
-    info.elnr = elnr;
-    info.order = order;
-
-    switch (type)
-      {
-      case TRIG : info.nv = 3; break;
-      case QUAD : info.nv = 4; break;
-      case TRIG6: info.nv = 6; break;
-      default:
-	std::cerr << "undef element in CalcSurfaceTrafo" << std::endl;
-      }
-    info.ndof = info.nv;
-
-    if (info.order > 1)
-      {
-	const MeshTopology & top = mesh.GetTopology();
-	
-	top.GetSurfaceElementEdges (elnr+1, info.edgenrs);
-	for (int i = 0; i < info.edgenrs.size(); i++)
-	  info.edgenrs[i]--;
-	info.facenr = top.GetSurfaceElementFace (elnr+1)-1;
-
-
-	bool firsttry = true;
-	bool problem = false;
-
-	while(firsttry || problem)
-	  {
-	    problem = false;
-
-	    for (int i = 0; !problem && i < info.edgenrs.size(); i++)
-	      {
-		if(info.edgenrs[i]+1 >= edgecoeffsindex.size())
-		  problem = true;
-		else
-		  info.ndof += edgecoeffsindex[info.edgenrs[i]+1] - edgecoeffsindex[info.edgenrs[i]];
-	      }
-	    if(info.facenr+1 >= facecoeffsindex.size())
-	      problem = true;
-	    else
-	      info.ndof += facecoeffsindex[info.facenr+1] - facecoeffsindex[info.facenr];
-
-	    if(problem && !firsttry)
-	      throw std::runtime_error("something wrong with curved elements");
-	    
-	    if(problem)
-	      BuildCurvedElements(NULL,order,rational);
-
-	    firsttry = false;
-	  }
-      }
-
-    ArrayMem<Vec<3>,100> coefs(info.ndof);
-    ArrayMem<double, 100> shapes_mem(info.ndof);
-    Vector shapes(info.ndof, &shapes_mem[0]);
-    ArrayMem<double, 200> dshapes_mem(2*info.ndof);
-    MatrixFixWidth<2> dshapes(info.ndof, &dshapes_mem[0]);
-
-
-    CalcElementShapes (info, xi, shapes);
-    GetCoefficients (info, coefs);
-
-    *x = 0;
-    for (int i = 0; i < coefs.size(); i++)
-      *x += shapes(i) * coefs[i];
-
-    if (dxdxi)
-      {
-	CalcElementDShapes (info, xi, dshapes);
-	
-	*dxdxi = 0;
-	for (int i = 0; i < coefs.size(); i++)
-	  for (int j = 0; j < 3; j++)
-	    for (int k = 0; k < 2; k++)
-	      (*dxdxi)(j,k) += dshapes(i,k) * coefs[i](j);
-      }
-
-    if (curved)
-      *curved = (info.ndof > info.nv);
-  }
-
-
-
 
   void CurvedElements :: 
   CalcElementShapes (SurfaceElementInfo & info, const Point<2> & xi, Vector & shapes) const
@@ -2010,14 +1672,6 @@ namespace meshit
   bool CurvedElements :: IsElementCurved (ElementIndex elnr) const
   {
     if (mesh[elnr].GetType() != TET) return true;
-    
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
-	
-	return mesh.coarsemesh->GetCurvedElements().IsElementCurved (hpref_el.coarse_elnr);
-      }
 
     const Element & el = mesh[elnr];
     ELEMENT_TYPE type = el.GetType();
@@ -2070,13 +1724,6 @@ namespace meshit
 
   bool CurvedElements :: IsElementHighOrder (ElementIndex elnr) const
   {
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
-	
-	return mesh.coarsemesh->GetCurvedElements().IsElementHighOrder (hpref_el.coarse_elnr);
-      }
 
     const Element & el = mesh[elnr];
     ELEMENT_TYPE type = el.GetType();
@@ -2113,45 +1760,6 @@ namespace meshit
 			     Point<3> * x, Mat<3,3> * dxdxi, //  bool * curved,
 			     void * buffer, bool valid)
   {
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
-	  
-	// xi umrechnen
-	double lami[8];
-	FlatVector vlami(8, lami);
-	vlami = 0;
-	mesh[elnr].GetShapeNew (xi, vlami);
-
-	Mat<3,3> trans, dxdxic;
-	if (dxdxi)
-	  {
-	    MatrixFixWidth<3> dlami(8);
-	    dlami = 0;
-	    mesh[elnr].GetDShapeNew (xi, dlami);	  
-	      
-	    trans = 0;
-	    for (int k = 0; k < 3; k++)
-	      for (int l = 0; l < 3; l++)
-		for (int i = 0; i < hpref_el.np; i++)
-		  trans(l,k) += hpref_el.param[i][l] * dlami(i, k);
-	  }
-
-	Point<3> coarse_xi(0,0,0);
-	for (int i = 0; i < hpref_el.np; i++)
-	  for (int j = 0; j < 3; j++)
-	    coarse_xi(j) += hpref_el.param[i][j] * lami[i];
-
-	mesh.coarsemesh->GetCurvedElements().CalcElementTransformation (coarse_xi, hpref_el.coarse_elnr, x, &dxdxic /* , curved */);
-
-	if (dxdxi)
-	  *dxdxi = dxdxic * trans;
-
-	return;
-      }
-
-
     Vector shapes;
     MatrixFixWidth<3> dshapes;
 
@@ -2961,84 +2569,6 @@ namespace meshit
       }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  void CurvedElements :: 
-  CalcMultiPointSegmentTransformation (Array<double> * xi, SegmentIndex segnr,
-				       Array<Point<3> > * x,
-				       Array<Vec<3> > * dxdxi)
-  {
-    ;
-  }
-
-
-  template <int DIM_SPACE>
-  void CurvedElements :: 
-  CalcMultiPointSegmentTransformation (SegmentIndex elnr, int n,
-				       const double * xi, size_t sxi,
-				       double * x, size_t sx,
-				       double * dxdxi, size_t sdxdxi)
-  {
-    for (int ip = 0; ip < n; ip++)
-      {
-	Point<3> xg;
-	Vec<3> dx;
-
-	// mesh->GetCurvedElements().
-	CalcSegmentTransformation (xi[ip*sxi], elnr, xg, dx);
-      
-	if (x)
-	  for (int i = 0; i < DIM_SPACE; i++)
-	    x[ip*sx+i] = xg(i);
-	  
-	if (dxdxi)
-	  for (int i=0; i<DIM_SPACE; i++)
-	    dxdxi[ip*sdxdxi+i] = dx(i);
-      }
-  }
-
-  template void CurvedElements :: 
-  CalcMultiPointSegmentTransformation<2> (SegmentIndex elnr, int npts,
-					  const double * xi, size_t sxi,
-					  double * x, size_t sx,
-					  double * dxdxi, size_t sdxdxi);
-
-  template void CurvedElements :: 
-  CalcMultiPointSegmentTransformation<3> (SegmentIndex elnr, int npts,
-					  const double * xi, size_t sxi,
-					  double * x, size_t sx,
-					  double * dxdxi, size_t sdxdxi);
-
-
-
   void CurvedElements :: 
   CalcMultiPointSurfaceTransformation (Array< Point<2> > * xi, SurfaceElementIndex elnr,
 				       Array< Point<3> > * x,
@@ -3063,72 +2593,6 @@ namespace meshit
 				       double * x, size_t sx,
 				       double * dxdxi, size_t sdxdxi)
   {
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh.SurfaceElement(elnr).hp_elnr];
-	
-	// xi umrechnen
-	double lami[4];
-	FlatVector vlami(4, lami);
-
-	ArrayMem<Point<2>, 50> coarse_xi (npts);
-	
-	for (int pi = 0; pi < npts; pi++)
-	  {
-	    vlami = 0;
-	    Point<2> hxi(xi[pi*sxi], xi[pi*sxi+1]);
-	    mesh.SurfaceElement(elnr).GetShapeNew ( hxi, vlami);
-	    
-	    Point<2> cxi(0,0);
-	    for (int i = 0; i < hpref_el.np; i++)
-	      for (int j = 0; j < 2; j++)
-		cxi(j) += hpref_el.param[i][j] * lami[i];
-
-	    coarse_xi[pi] = cxi;
-	  }
-
-	mesh.coarsemesh->GetCurvedElements().
-	  CalcMultiPointSurfaceTransformation<DIM_SPACE> (hpref_el.coarse_elnr, npts,
-							  &coarse_xi[0](0), &coarse_xi[1](0)-&coarse_xi[0](0), 
-							  x, sx, dxdxi, sdxdxi);
-
-	// Mat<3,2> dxdxic;
-	if (dxdxi)
-	  {
-	    MatrixFixWidth<2> dlami(4);
-	    dlami = 0;
-
-	    for (int pi = 0; pi < npts; pi++)
-	      {
-		Point<2> hxi(xi[pi*sxi], xi[pi*sxi+1]);
-		mesh.SurfaceElement(elnr).GetDShapeNew ( hxi, dlami);	  
-		
-		Mat<2,2> trans;
-		trans = 0;
-		for (int k = 0; k < 2; k++)
-		  for (int l = 0; l < 2; l++)
-		    for (int i = 0; i < hpref_el.np; i++)
-		      trans(l,k) += hpref_el.param[i][l] * dlami(i, k);
-		
-		Mat<DIM_SPACE,2> hdxdxic, hdxdxi;
-		for (int k = 0; k < 2*DIM_SPACE; k++)
-		  hdxdxic(k) = dxdxi[pi*sdxdxi+k];
-
-		hdxdxi = hdxdxic * trans;
-
-		for (int k = 0; k < 2*DIM_SPACE; k++)
-		  dxdxi[pi*sdxdxi+k] = hdxdxi(k);
-                    
-		// dxdxic = (*dxdxi)[pi];
-		// (*dxdxi)[pi] = dxdxic * trans;
-	      }
-	  }	
-
-	return;
-      }
-
-
     const Element2d & el = mesh.SurfaceElement(elnr);
     ELEMENT_TYPE type = el.GetType();
 
@@ -3144,20 +2608,6 @@ namespace meshit
 	std::cerr << "undef element in CalcMultPointSurfaceTrao" << std::endl;
       }
     info.ndof = info.nv;
-
-    // if (info.order > 1)
-    //   {
-    //     const MeshTopology & top = mesh.GetTopology();
-	
-    //     top.GetSurfaceElementEdges (elnr+1, info.edgenrs);
-    //     for (int i = 0; i < info.edgenrs.Size(); i++)
-    //       info.edgenrs[i]--;
-    //     info.facenr = top.GetSurfaceElementFace (elnr+1)-1;
-
-    //     for (int i = 0; i < info.edgenrs.Size(); i++)
-    //       info.ndof += edgecoeffsindex[info.edgenrs[i]+1] - edgecoeffsindex[info.edgenrs[i]];
-    //     info.ndof += facecoeffsindex[info.facenr+1] - facecoeffsindex[info.facenr];
-    //   }
 
 // Michael Woopen: THESE FOLLOWING LINES ARE COPIED FROM CurvedElements::CalcSurfaceTransformation
 
@@ -3325,144 +2775,6 @@ namespace meshit
 					 pdxdxi, 9);
     
     return;
-#ifdef OLD
-
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
-	
-	// xi umrechnen
-	double lami[8];
-	FlatVector vlami(8, lami);
-
-
-	ArrayMem<Point<3>, 50> coarse_xi (xi->size());
-	
-	for (int pi = 0; pi < xi->size(); pi++)
-	  {
-	    vlami = 0;
-	    mesh[elnr].GetShapeNew ( (*xi)[pi], vlami);
-	    
-	    Point<3> cxi(0,0,0);
-	    for (int i = 0; i < hpref_el.np; i++)
-	      for (int j = 0; j < 3; j++)
-		cxi(j) += hpref_el.param[i][j] * lami[i];
-
-	    coarse_xi[pi] = cxi;
-	  }
-
-	mesh.coarsemesh->GetCurvedElements().
-	  CalcMultiPointElementTransformation (&coarse_xi, hpref_el.coarse_elnr, x, dxdxi);
-
-
-	Mat<3,3> trans, dxdxic;
-	if (dxdxi)
-	  {
-	    MatrixFixWidth<3> dlami(8);
-	    dlami = 0;
-
-	    for (int pi = 0; pi < xi->size(); pi++)
-	      {
-		mesh[elnr].GetDShapeNew ( (*xi)[pi], dlami);	  
-		
-		trans = 0;
-		for (int k = 0; k < 3; k++)
-		  for (int l = 0; l < 3; l++)
-		    for (int i = 0; i < hpref_el.np; i++)
-		      trans(l,k) += hpref_el.param[i][l] * dlami(i, k);
-		
-		dxdxic = (*dxdxi)[pi];
-		(*dxdxi)[pi] = dxdxic * trans;
-	      }
-	  }	
-
-	return;
-      }
-
-
-
-
-
-
-
-
-    Vector shapes;
-    MatrixFixWidth<3> dshapes;
-
-
-    const Element & el = mesh[elnr];
-    ELEMENT_TYPE type = el.GetType();
-
-    ElementInfo info;
-    info.elnr = elnr;
-    info.order = order;
-    info.ndof = info.nv = MeshTopology::GetNPoints (type);
-    if (info.order > 1)
-      {
-	const MeshTopology & top = mesh.GetTopology();
-	
-	info.nedges = top.GetElementEdges (elnr+1, info.edgenrs, 0);
-	for (int i = 0; i < info.nedges; i++)
-	  info.edgenrs[i]--;
-
-	info.nfaces = top.GetElementFaces (elnr+1, info.facenrs, 0);
-	for (int i = 0; i < info.nfaces; i++)
-	  info.facenrs[i]--;
-
-	for (int i = 0; i < info.nedges; i++)
-	  info.ndof += edgecoeffsindex[info.edgenrs[i]+1] - edgecoeffsindex[info.edgenrs[i]];
-	for (int i = 0; i < info.nfaces; i++)
-	  info.ndof += facecoeffsindex[info.facenrs[i]+1] - facecoeffsindex[info.facenrs[i]];
-	// info.ndof += facecoeffsindex[info.facenr+1] - facecoeffsindex[info.facenr];
-      }
-
-    Array<Vec<3> > coefs(info.ndof);
-    GetCoefficients (info, &coefs[0]);
-    if (x)
-      {
-	for (int j = 0; j < xi->size(); j++)
-	  {
-	    CalcElementShapes (info, (*xi)[j], shapes);
-	    (*x)[j] = 0;
-	    for (int i = 0; i < coefs.Size(); i++)
-	      (*x)[j] += shapes(i) * coefs[i];
-	  }
-      }
-
-    if (dxdxi)
-      {
-	if (info.order == 1 && type == TET)
-	  {
-	    if (xi->size() > 0)
-	      {
-		CalcElementDShapes (info, (*xi)[0], dshapes);
-		Mat<3,3> ds;
-		ds = 0;
-		for (int i = 0; i < coefs.Size(); i++)
-		  for (int j = 0; j < 3; j++)
-		    for (int k = 0; k < 3; k++)
-		      ds(j,k) += dshapes(i,k) * coefs[i](j);
-	    
-		for (int ip = 0; ip < xi->size(); ip++)
-		  (*dxdxi)[ip] = ds;
-	      }
-	  }
-	else
-	  for (int ip = 0; ip < xi->size(); ip++)
-	    {
-	      CalcElementDShapes (info, (*xi)[ip], dshapes);
-	      
-	      Mat<3,3> ds;
-	      ds = 0;
-	      for (int i = 0; i < coefs.Size(); i++)
-		for (int j = 0; j < 3; j++)
-		  for (int k = 0; k < 3; k++)
-		    ds(j,k) += dshapes(i,k) * coefs[i](j);
-	      (*dxdxi)[ip] = ds;
-	    }
-      }
-#endif
   }
 
 
@@ -3473,89 +2785,7 @@ namespace meshit
 				       double * x, size_t sx,
 				       double * dxdxi, size_t sdxdxi)
   {
-    // static int timer = NgProfiler::CreateTimer ("calcmultipointtrafo, calcshape");
-
-    if (mesh.coarsemesh)
-      {
-	const HPRefElement & hpref_el =
-	  (*mesh.hpelements) [mesh[elnr].hp_elnr];
-	
-	// xi umrechnen
-	double lami[8];
-	FlatVector vlami(8, lami);
-
-
-	ArrayMem<double, 100> coarse_xi (3*n);
-	
-	for (int pi = 0; pi < n; pi++)
-	  {
-	    vlami = 0;
-	    Point<3> pxi;
-	    for (int j = 0; j < 3; j++)
-	      pxi(j) = xi[pi*sxi+j];
-
-	    mesh[elnr].GetShapeNew ( pxi, vlami);
-	    
-	    Point<3> cxi(0,0,0);
-	    for (int i = 0; i < hpref_el.np; i++)
-	      for (int j = 0; j < 3; j++)
-		cxi(j) += hpref_el.param[i][j] * lami[i];
-
-	    for (int j = 0; j < 3; j++)
-	      coarse_xi[3*pi+j] = cxi(j);
-	  }
-
-	mesh.coarsemesh->GetCurvedElements().
-	  CalcMultiPointElementTransformation (hpref_el.coarse_elnr, n, 
-					       &coarse_xi[0], 3, 
-					       x, sx, 
-					       dxdxi, sdxdxi);
-
-	Mat<3,3> trans, dxdxic;
-	if (dxdxi)
-	  {
-	    MatrixFixWidth<3> dlami(8);
-	    dlami = 0;
-
-	    for (int pi = 0; pi < n; pi++)
-	      {
-		Point<3> pxi;
-		for (int j = 0; j < 3; j++)
-		  pxi(j) = xi[pi*sxi+j];
-
-		mesh[elnr].GetDShapeNew (pxi, dlami);	  
-		
-		trans = 0;
-		for (int k = 0; k < 3; k++)
-		  for (int l = 0; l < 3; l++)
-		    for (int i = 0; i < hpref_el.np; i++)
-		      trans(l,k) += hpref_el.param[i][l] * dlami(i, k);
-
-		Mat<3> mat_dxdxic, mat_dxdxi;
-		for (int j = 0; j < 3; j++)
-		  for (int k = 0; k < 3; k++)
-		    mat_dxdxic(j,k) = dxdxi[pi*sdxdxi+3*j+k];
-		
-		mat_dxdxi = mat_dxdxic * trans;
-
-		for (int j = 0; j < 3; j++)
-		  for (int k = 0; k < 3; k++)
-		    dxdxi[pi*sdxdxi+3*j+k] = mat_dxdxi(j,k);
-
-		// dxdxic = (*dxdxi)[pi];
-		// (*dxdxi)[pi] = dxdxic * trans;
-	      }
-	  }	
-	return;
-      }
-
-
-
-
-
-
     MatrixFixWidth<3> dshapes;
-
 
     const Element & el = mesh[elnr];
     ELEMENT_TYPE type = el.GetType();

@@ -9,6 +9,7 @@
 
 #include <climits>
 #include <iostream>
+#include <vector>
 
 #include "../gprim/geomobjects.hpp"
 #include "../gprim/adtree.hpp"
@@ -171,9 +172,8 @@ namespace meshit
 
 class AdFront2
 {
-  ///
-  Array<FrontPoint2> points;  /// front points
-  Array<FrontLine> lines;     /// front lines
+  std::vector<FrontPoint2> points;  /// front points
+  std::vector<FrontLine> lines;     /// front lines
 
   Box3d boundingbox;
   Box3dTree linesearchtree;       /// search tree for lines
@@ -186,36 +186,26 @@ class AdFront2
   int nfl;                  /// number of front lines;
   INDEX_2_HASHTABLE<int> * allflines; /// all front lines ever have been
 
-  Array<int> invpindex;
+  std::vector<int> invpindex;
 
   int minval;
   int starti;
 
 public:
-  ///
-  //  AdFront2 ();
+
   AdFront2 (const Box3d & aboundingbox);
-  ///
   ~AdFront2 ();
 
-  ///
-  // void GetPoints (Array<Point<3> > & apoints) const;
-  ///
-//  void Print (std::ostream & ost) const;
-
-  ///
   bool Empty () const
   {
     return nfl == 0;
   }
-  ///
+  
   int GetNFL () const { return nfl; }
 
   const FrontLine & GetLine (int nr) { return lines[nr]; }
   const FrontPoint2 & GetPoint (int nr) { return points[nr]; }
 
-
-  ///
   int SelectBaseLine (Point<3> & p1, Point<3> & p2, 
 		      const PointGeomInfo *& geominfo1,
 		      const PointGeomInfo *& geominfo2,

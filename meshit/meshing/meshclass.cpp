@@ -1,6 +1,7 @@
 #include <meshit.hpp>
 
 #include <stdexcept>
+#include <cassert>
 
 #include "curvedelems.hpp"
 #include "clusters.hpp"
@@ -34,9 +35,6 @@ namespace meshit {
         clusters = new AnisotropicClusters(*this);
         ident = new Identifications(*this);
 
-        hpelements = NULL;
-        coarsemesh = NULL;
-
         ps_startelement = 0;
 
         geomtype = NO_GEOM;
@@ -55,8 +53,6 @@ namespace meshit {
         delete topology;
         delete ident;
         delete elementsearchtree;
-        delete coarsemesh;
-        delete hpelements;
 
         for (int i = 0; i < materials.size(); i++) {
             delete [] materials[i];
@@ -1771,31 +1767,19 @@ namespace meshit {
         if (hloc < hmin)
             hloc = hmin;
 
-        //std::cout << "restrict h in " << p << " to " << hloc <<std::endl;
-        if (!lochfunc) {
-            LOG_WARNING("RestrictLocalH called, creating mesh-size tree");
-
-            Point3d boxmin, boxmax;
-            GetBox(boxmin, boxmax);
-            SetLocalH(boxmin, boxmax, 0.8);
-        }
-
-        lochfunc -> SetH(p, hloc);
+        assert(lochfunc);
+        lochfunc->SetH(p, hloc);
     }
 
-    void Mesh::RestrictLocalHLine(const Point3d & p1,
-            const Point3d & p2,
-            double hloc)
+    void Mesh::RestrictLocalHLine(const Point3d & p1, const Point3d & p2, double hloc)
     {
         if (hloc < hmin)
             hloc = hmin;
 
-        // std::cout << "restrict h along " << p1 << " - " << p2 << " to " << hloc <<std::endl;
-        int i;
         int steps = int (Dist(p1, p2) / hloc) + 2;
         Vec3d v(p1, p2);
 
-        for (i = 0; i <= steps; i++) {
+        for (int i = 0; i <= steps; i++) {
             Point3d p = p1 + (double(i) / double(steps) * v);
             RestrictLocalH(p, hloc);
         }
@@ -1879,11 +1863,7 @@ namespace meshit {
 
     void Mesh::CalcLocalH(double grading)
     {
-        if (!lochfunc) {
-            Point3d pmin, pmax;
-            GetBox(pmin, pmax);
-            SetLocalH(pmin, pmax, grading);
-        }
+        assert(lochfunc);
 
         LOG_DEBUG("CalcLocalH: " << GetNP() << " points, "
                 << GetNE() << " elements, "
@@ -1943,16 +1923,10 @@ namespace meshit {
     {
         LOG_DEBUG("Calculating local h from point distances");
 
-        if (!lochfunc) {
-            Point3d pmin, pmax;
-            GetBox(pmin, pmax);
-
-            SetLocalH(pmin, pmax, grading);
-        }
+        assert(lochfunc);
 
         PointIndex i, j;
         double hl;
-
 
         for (i = PointIndex::BASE;
                 i < GetNP() + PointIndex::BASE; i++) {
@@ -1972,12 +1946,7 @@ namespace meshit {
     {
         LOG_DEBUG("Calculating local h from surface curvature");
 
-        if (!lochfunc) {
-            Point3d pmin, pmax;
-            GetBox(pmin, pmax);
-
-            SetLocalH(pmin, pmax, grading);
-        }
+        assert(lochfunc);
 
         INDEX_2_HASHTABLE<int> edges(3 * GetNP() + 2);
         INDEX_2_HASHTABLE<int> bedges(GetNSeg() + 2);

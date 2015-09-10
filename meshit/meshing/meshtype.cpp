@@ -783,11 +783,6 @@ namespace meshit {
         flags.deleted = 0;
         flags.fixed = 0;
         orderx = ordery = orderz = 1;
-
-#ifdef PARALLEL
-        partitionNumber = -1;
-#endif
-
     }
 
     Element::Element(int anp)

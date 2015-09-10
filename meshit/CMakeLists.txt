@@ -48,7 +48,6 @@ SET(src_MESHING
 	meshing/delaunay.cpp
 	meshing/geomsearch.cpp
 	meshing/global.cpp
-	meshing/hprefinement.cpp
 	meshing/improve2.cpp
 	meshing/improve2gen.cpp
 	meshing/improve3.cpp
@@ -79,7 +78,6 @@ SET(src_MESHING
 	meshing/tetrarls.cpp
 	meshing/topology.cpp
 	meshing/triarls.cpp
-	meshing/validate.cpp
 )
 ADD_LIBRARY(meshit STATIC
 	${src_GENERAL}

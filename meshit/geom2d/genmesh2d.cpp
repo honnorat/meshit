@@ -233,25 +233,26 @@ namespace meshit {
             const GeomPoint<2> & p2 = spline.EndPI();
 
             double h1 = std::min(p1.hmax, h / p1.refatpoint);
-            mesh2d.RestrictLocalH(Point<3>(p1(0), p1(1), 0), h1);
             double h2 = std::min(p2.hmax, h / p2.refatpoint);
-            mesh2d.RestrictLocalH(Point<3>(p2(0), p2(1), 0), h2);
+            mesh2d.RestrictLocalH(Point3d(p1(0), p1(1), 0), h1);
+            mesh2d.RestrictLocalH(Point3d(p2(0), p2(1), 0), h2);
 
             double len = spline.Length();
-            mesh2d.RestrictLocalHLine(Point<3>(p1(0), p1(1), 0),
-                    Point<3>(p2(0), p2(1), 0), len / mp.segmentsperedge);
+            mesh2d.RestrictLocalHLine(
+                    Point3d(p1(0), p1(1), 0),
+                    Point3d(p2(0), p2(1), 0), len / mp.segmentsperedge);
 
             double hcurve = std::min(spline.hmax, h / spline.reffak);
             double hl = GetDomainMaxh(spline.leftdom);
-            if (hl > 0) hcurve = min2(hcurve, hl);
             double hr = GetDomainMaxh(spline.rightdom);
-            if (hr > 0) hcurve = min2(hcurve, hr);
+            if (hl > 0) hcurve = std::min(hcurve, hl);
+            if (hr > 0) hcurve = std::min(hcurve, hr);
 
             int np = 1000;
             for (double t = 0.5 / np; t < 1; t += 1.0 / np) {
                 Point<2> x = spline.GetPoint(t);
                 double hc = 1.0 / mp.curvaturesafety / (1e-99 + spline.CalcCurvature(t));
-                mesh2d.RestrictLocalH(Point<3> (x(0), x(1), 0), min2(hc, hcurve));
+                mesh2d.RestrictLocalH(Point3d(x(0), x(1), 0), min2(hc, hcurve));
             }
         }
 
