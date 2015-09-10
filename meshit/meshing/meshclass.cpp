@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <cassert>
 
-#include "clusters.hpp"
 #include "meshtool.hpp"
 #include "../gprim/geomtest3d.hpp"
 #include "../geom2d/geometry2d.hpp"
@@ -29,7 +28,6 @@ namespace meshit {
         numvertices = -1;
 
         topology = new MeshTopology(*this);
-        clusters = new AnisotropicClusters(*this);
         ident = new Identifications(*this);
 
         ps_startelement = 0;
@@ -45,7 +43,6 @@ namespace meshit {
         delete boundaryedges;
         delete surfelementht;
         delete segmentht;
-        delete clusters;
         delete topology;
         delete ident;
         delete elementsearchtree;
@@ -102,8 +99,6 @@ namespace meshit {
         ident = new Identifications(*this);
         delete topology;
         topology = new MeshTopology(*this);
-        delete clusters;
-        clusters = new AnisotropicClusters(*this);
 
         for (int i = 0; i < bcnames.size(); i++) {
             if (bcnames[i]) delete bcnames[i];
@@ -1015,7 +1010,6 @@ namespace meshit {
         CalcSurfacesOfNode();
 
         topology->Update();
-        clusters->Update();
 
         SetNextMajorTimeStamp();
     }
@@ -2593,7 +2587,6 @@ namespace meshit {
     void Mesh::UpdateTopology()
     {
         topology->Update();
-        clusters->Update();
     }
 
     void Mesh::SetMaterial(int domnr, const char * mat)

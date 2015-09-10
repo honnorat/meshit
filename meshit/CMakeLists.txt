@@ -42,7 +42,6 @@ SET(src_LINALG
 SET(src_MESHING
 	meshing/adfront2.cpp
 	meshing/bisect.cpp
-	meshing/clusters.cpp
 	meshing/global.cpp
 	meshing/improve2.cpp
 	meshing/improve2gen.cpp

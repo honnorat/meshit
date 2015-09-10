@@ -103,9 +103,6 @@ namespace meshit {
         /// element -> face, element -> edge etc ...
         class MeshTopology * topology;
 
-        /// nodes identified by close points 
-        class AnisotropicClusters * clusters;
-
         /// space dimension (2 or 3)
         int dimension;
 
@@ -599,16 +596,12 @@ namespace meshit {
 
         void UpdateTopology();
 
-        const class AnisotropicClusters & GetClusters() const
-        {
-            return *clusters;
-        }
-
         class CSurfaceArea
         {
             const Mesh & mesh;
             bool valid;
             double area;
+
           public:
 
             CSurfaceArea(const Mesh & amesh)
