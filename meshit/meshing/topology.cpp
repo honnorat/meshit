@@ -671,13 +671,6 @@ namespace meshit
 	face2vert.reserve (face2vert.size());
 
 	// face table complete
-
-
-#ifdef PARALLEL
-	// std::cerr << " RESET Paralleltop" <<std::endl;
-	// paralleltop.Reset ();
-#endif
-
 	Array<short int> face_els(nfa), face_surfels(nfa);
 	face_els = 0;
 	face_surfels = 0;
@@ -697,22 +690,10 @@ namespace meshit
 	    int cnt_err = 0;
 	    for (int i = 0; i < nfa; i++)
 	      {
-		/*
-		  std::cerr << "face " << i << " has " << int(face_els[i]) << " els, " 
-		  << int(face_surfels[i]) << " surfels, tot = "
-		  << face_els[i] + face_surfels[i] <<std::endl; 
-		*/
+
 		if (face_els[i] + face_surfels[i] == 1)
 		  {
 		    cnt_err++;
-#ifdef PARALLEL
-		    if ( ntasks > 1 )
-		      {
-			continue;
-			// if ( !paralleltop.DoCoarseUpdate() ) continue;
-		      }
-		    else
-#endif
 		      {
 			std::cerr << "illegal face : " << i <<std::endl;
 			std::cerr << "points = " << face2vert[i] <<std::endl;
@@ -722,25 +703,6 @@ namespace meshit
 			    std::cerr << mesh[(PointIndex)face2vert[i].I(j+1)] << " ";
 			std::cerr <<std::endl;
 
-			FlatArray<ElementIndex> vertels = GetVertexElements (face2vert[i].I(1));
-			for (int k = 0; k < vertels.size(); k++)
-			  {
-			    int elfaces[10], orient[10];
-			    int nf = GetElementFaces (vertels[k]+1, elfaces, orient);
-			    for (int l = 0; l < nf; l++)
-			      if (elfaces[l] == i)
-				{
-				  // std::cerr << "is face of element " << vertels[k] <<std::endl;
-			    
-				  if (mesh.coarsemesh && mesh.hpelements->size() == mesh.GetNE() )
-				    {
-				      const HPRefElement & hpref_el =
-					(*mesh.hpelements) [ mesh[vertels[k]].hp_elnr];
-				      std::cerr << "coarse eleme = " << hpref_el.coarse_elnr <<std::endl;
-				    }
-
-				}
-			  }
 		      }
 		  }
 	      }

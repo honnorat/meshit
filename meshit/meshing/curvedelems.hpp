@@ -50,49 +50,9 @@ public:
 
   int GetOrder () { return order; }
 
-
-  bool IsSegmentCurved (SegmentIndex segnr) const;
   bool IsSurfaceElementCurved (SurfaceElementIndex sei) const;
   bool IsElementCurved (ElementIndex ei) const;
   bool IsElementHighOrder (ElementIndex ei) const;
-
-
-  void CalcSegmentTransformation (double xi, SegmentIndex segnr,
-				  Point<3> & x)
-  { CalcSegmentTransformation (xi, segnr, &x, NULL); };
-
-  void CalcSegmentTransformation (double xi, SegmentIndex segnr,
-				  Vec<3> & dxdxi)
-  { CalcSegmentTransformation (xi, segnr, NULL, &dxdxi); };
-
-  void CalcSegmentTransformation (double xi, SegmentIndex segnr,
-				  Point<3> & x, Vec<3> & dxdxi)
-  { CalcSegmentTransformation (xi, segnr, &x, &dxdxi, NULL); };
-
-  void CalcSegmentTransformation (double xi, SegmentIndex segnr,
-				  Point<3> & x, Vec<3> & dxdxi, bool & curved)
-  { CalcSegmentTransformation (xi, segnr, &x, &dxdxi, &curved); };
-
-
-
-  void CalcSurfaceTransformation (const Point<2> & xi, SurfaceElementIndex elnr,
-				  Point<3> & x)
-  { CalcSurfaceTransformation (xi, elnr, &x, NULL); };
-
-  void CalcSurfaceTransformation (const Point<2> & xi, SurfaceElementIndex elnr,
-				  Mat<3,2> & dxdxi)
-  { CalcSurfaceTransformation (xi, elnr, NULL, &dxdxi); };
-
-  void CalcSurfaceTransformation (const Point<2> & xi, SurfaceElementIndex elnr,
-				  Point<3> & x, Mat<3,2> & dxdxi)
-  { CalcSurfaceTransformation (xi, elnr, &x, &dxdxi, NULL); };
-
-  void CalcSurfaceTransformation (const Point<2> & xi, SurfaceElementIndex elnr,
-				  Point<3> & x, Mat<3,2> & dxdxi, bool & curved)
-  { CalcSurfaceTransformation (xi, elnr, &x, &dxdxi, &curved); };
-
-
-
 
 
   void CalcElementTransformation (const Point<3> & xi, ElementIndex elnr,
@@ -111,23 +71,6 @@ public:
 				  Point<3> & x, Mat<3,3> & dxdxi,
                                   void * buffer, bool valid)
   { CalcElementTransformation (xi, elnr, &x, &dxdxi, /* NULL, */ buffer, valid ); };
-
-  // void CalcElementTransformation (const Point<3> & xi, ElementIndex elnr,
-  // 				  Point<3> & x, Mat<3,3> & dxdxi) // , bool & curved)
-  //   { CalcElementTransformation (xi, elnr, &x, &dxdxi /* , &curved * ); }
-
-
-
-  void CalcMultiPointSegmentTransformation (Array<double> * xi, SegmentIndex segnr,
-					    Array<Point<3> > * x,
-					    Array<Vec<3> > * dxdxi);
-
-  template <int DIM_SPACE>
-  void CalcMultiPointSegmentTransformation (SegmentIndex elnr, int n,
-                                            const double * xi, size_t sxi,
-                                            double * x, size_t sx,
-                                            double * dxdxi, size_t sdxdxi);
-
 
   void CalcMultiPointSurfaceTransformation (Array< Point<2> > * xi, SurfaceElementIndex elnr,
 					    Array< Point<3> > * x,
@@ -152,12 +95,6 @@ public:
 
 
 private:
-  
-  void CalcSegmentTransformation (double xi, SegmentIndex segnr,
-				  Point<3> * x = NULL, Vec<3> * dxdxi = NULL, bool * curved = NULL);
-
-  void CalcSurfaceTransformation (Point<2> xi, SurfaceElementIndex elnr,
-				  Point<3> * x = NULL, Mat<3,2> * dxdxi = NULL, bool * curved = NULL);
 
   void CalcElementTransformation (Point<3> xi, ElementIndex elnr,
 				  Point<3> * x = NULL, Mat<3,3> * dxdxi = NULL, // bool * curved = NULL,

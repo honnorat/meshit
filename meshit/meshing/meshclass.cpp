@@ -34,9 +34,6 @@ namespace meshit {
         clusters = new AnisotropicClusters(*this);
         ident = new Identifications(*this);
 
-        hpelements = NULL;
-        coarsemesh = NULL;
-
         ps_startelement = 0;
 
         geomtype = NO_GEOM;
@@ -55,8 +52,6 @@ namespace meshit {
         delete topology;
         delete ident;
         delete elementsearchtree;
-        delete coarsemesh;
-        delete hpelements;
 
         for (int i = 0; i < materials.size(); i++) {
             delete [] materials[i];
