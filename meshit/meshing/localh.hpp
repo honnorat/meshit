@@ -84,8 +84,6 @@ namespace meshit {
             CutBoundaryRec(box.PMin(), box.PMax(), root);
         }
 
-        void FindInnerBoxes(class AdFront3 * adfront, int (*testinner)(const Point3d & p1));
-
         void FindInnerBoxes(class AdFront2 * adfront, int (*testinner)(const Point<2> & p1));
 
         void ClearFlags()
@@ -113,14 +111,6 @@ namespace meshit {
         double GetMinHRec(const Point3d & pmin, const Point3d & pmax, const GradingBox * box) const;
 
         void CutBoundaryRec(const Point3d & pmin, const Point3d & pmax, GradingBox * box);
-
-        void FindInnerBoxesRec(int (*inner)(const Point3d & p), GradingBox * box);
-
-        void FindInnerBoxesRec2(
-                GradingBox * box,
-                class AdFront3 * adfront,
-                Array<Box3d> & faceboxes,
-                Array<int> & finds, int nfinbox);
 
         void SetInnerBoxesRec(GradingBox * box);
 

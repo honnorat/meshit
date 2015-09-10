@@ -38,7 +38,6 @@ namespace meshit {
     {
       public:
         typedef ::meshit::T_POINTS T_POINTS;
-        typedef Array<Element> T_VOLELEMENTS;
         typedef Array<Element2d> T_SURFELEMENTS;
 
       private:
@@ -49,8 +48,6 @@ namespace meshit {
         Array<Segment> segments;
         /// surface elements, 2d-inner elements
         T_SURFELEMENTS surfelements;
-        /// volume elements
-        T_VOLELEMENTS volelements;
         /// points will be fixed forever
         Array<PointIndex> lockedpoints;
 
@@ -105,8 +102,6 @@ namespace meshit {
 
         /// element -> face, element -> edge etc ...
         class MeshTopology * topology;
-        /// methods for high order elements
-        class CurvedElements * curvedelems;
 
         /// nodes identified by close points 
         class AnisotropicClusters * clusters;
@@ -133,16 +128,11 @@ namespace meshit {
         void BuildBoundaryEdges(void);
 
       public:
-        bool PointContainedIn2DElement(const Point3d & p,
+        bool PointContainedIn2DElement(
+                const Point3d & p,
                 double lami[3],
                 const int element,
                 bool consider3D = false) const;
-        bool PointContainedIn3DElement(const Point3d & p,
-                double lami[3],
-                const int element) const;
-        bool PointContainedIn3DElementOld(const Point3d & p,
-                double lami[3],
-                const int element) const;
 
       public:
 
@@ -165,12 +155,6 @@ namespace meshit {
         void DeleteMesh();
 
         void ClearSurfaceElements();
-
-        void ClearVolumeElements()
-        {
-            volelements.resize(0);
-            timestamp = NextTimeStamp();
-        }
 
         void ClearSegments()
         {
@@ -317,58 +301,6 @@ namespace meshit {
 
         void RebuildSurfaceElementLists();
         void GetSurfaceElementsOfFace(int facenr, Array<SurfaceElementIndex> & sei) const;
-
-        ElementIndex AddVolumeElement(const Element & el);
-
-        int GetNE() const
-        {
-            return volelements.size();
-        }
-
-        Element & VolumeElement(int i)
-        {
-            return volelements.Elem(i);
-        }
-
-        const Element & VolumeElement(int i) const
-        {
-            return volelements.Get(i);
-        }
-
-        Element & VolumeElement(ElementIndex i)
-        {
-            return volelements[i];
-        }
-
-        const Element & VolumeElement(ElementIndex i) const
-        {
-            return volelements[i];
-        }
-
-        const Element & operator[](ElementIndex ei) const
-        {
-            return volelements[ei];
-        }
-
-        Element & operator[](ElementIndex ei)
-        {
-            return volelements[ei];
-        }
-
-        ELEMENTTYPE ElementType(ElementIndex i) const
-        {
-            return (volelements[i].flags.fixed) ? FIXEDELEMENT : FREEELEMENT;
-        }
-
-        const T_VOLELEMENTS & VolumeElements() const
-        {
-            return volelements;
-        }
-
-        T_VOLELEMENTS & VolumeElements()
-        {
-            return volelements;
-        }
 
         double ElementError(int eli, const MeshingParameters & mp) const;
 
@@ -552,14 +484,6 @@ namespace meshit {
          */
         void FreeOpenElementsEnvironment(int layers);
 
-        bool LegalTet(Element & el)
-        {
-            if (el.IllegalValid())
-                return !el.Illegal();
-            return LegalTet2(el);
-        }
-        bool LegalTet2(Element & el);
-
         bool LegalTrig(const Element2d & el);
         /**
            if values non-null, return values in 4-double array:
@@ -587,28 +511,6 @@ namespace meshit {
         {
             ps_startelement = el;
         }
-
-        /// gives element of point, barycentric coordinates
-        int GetElementOfPoint(const meshit::Point<3> & p,
-                double * lami,
-                bool build_searchtree = 0,
-                const int index = -1,
-                const bool allowindex = true);
-        int GetElementOfPoint(const meshit::Point<3> & p,
-                double * lami,
-                const Array<int> * const indices,
-                bool build_searchtree = 0,
-                const bool allowindex = true);
-        int GetSurfaceElementOfPoint(const meshit::Point<3> & p,
-                double * lami,
-                bool build_searchtree = 0,
-                const int index = -1,
-                const bool allowindex = true);
-        int GetSurfaceElementOfPoint(const meshit::Point<3> & p,
-                double * lami,
-                const Array<int> * const indices,
-                bool build_searchtree = 0,
-                const bool allowindex = true);
 
         /// give list of vol elements which are int the box(p1,p2)
         void GetIntersectingVolEls(const Point3d& p1, const Point3d& p2,
@@ -689,7 +591,6 @@ namespace meshit {
         void SetNP(int np);
 
         bool PureTrigMesh(int faceindex = 0) const;
-        bool PureTetMesh() const;
 
         const class MeshTopology & GetTopology() const
         {
@@ -697,11 +598,6 @@ namespace meshit {
         }
 
         void UpdateTopology();
-
-        class CurvedElements & GetCurvedElements() const
-        {
-            return *curvedelems;
-        }
 
         const class AnisotropicClusters & GetClusters() const
         {
@@ -716,10 +612,7 @@ namespace meshit {
           public:
 
             CSurfaceArea(const Mesh & amesh)
-                : mesh(amesh), valid(false)
-            {
-                ;
-            }
+                : mesh(amesh), valid(false) { }
 
             void Add(const Element2d & sel)
             {
