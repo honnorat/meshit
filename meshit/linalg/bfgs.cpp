@@ -8,6 +8,8 @@
 /*                                                                         */
 /***************************************************************************/
 
+#include <algorithm>
+
 #include <meshit.hpp>
 
 #include "opti.hpp"

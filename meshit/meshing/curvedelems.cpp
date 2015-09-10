@@ -1,5 +1,7 @@
-#include <stdexcept>
 #include <meshit.hpp>
+
+#include <cmath>
+#include <stdexcept>
 
 #include "curvedelems.hpp"
 #include "../general/autodiff.hpp"

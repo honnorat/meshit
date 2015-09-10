@@ -30,10 +30,10 @@ class ADTreeNode
 public:
   ADTreeNode *left, *right, *father;
   int dim;
-  float sep;
-  float *data;
-  float *boxmin;
-  float *boxmax;
+  double sep;
+  double *data;
+  double *boxmin;
+  double *boxmax;
   int pi;
   int nchilds;
 
@@ -56,7 +56,7 @@ class ADTree
 {
   int dim;
   ADTreeNode * root;
-  float *cmin, *cmax;
+  double *cmin, *cmax;
   Array<ADTreeNode*> ela;
   const ADTreeCriterion * criterion; 
 
@@ -65,12 +65,12 @@ class ADTree
   int stackindex;
 
 public:
-  ADTree (int adim, const float * acmin, 
-	   const float * acmax);
+  ADTree (int adim, const double * acmin, 
+	   const double * acmax);
   ~ADTree ();
 
-  void Insert (const float * p, int pi);
-  // void GetIntersecting (const float * bmin, const float * bmax,
+  void Insert (const double * p, int pi);
+  // void GetIntersecting (const double * bmin, const double * bmax,
   //			Array<int> & pis) const;
   void SetCriterion (ADTreeCriterion & acriterion);
   void Reset ();
@@ -92,8 +92,8 @@ class ADTreeNode3
 {
 public:
   ADTreeNode3 *left, *right, *father;
-  float sep;
-  float data[3];
+  double sep;
+  double data[3];
   int pi;
   int nchilds;
 
@@ -110,16 +110,16 @@ public:
 class ADTree3
 {
   ADTreeNode3 * root;
-  float cmin[3], cmax[3];
+  double cmin[3], cmax[3];
   Array<ADTreeNode3*> ela;
 
 public:
-  ADTree3 (const float * acmin, 
-	   const float * acmax);
+  ADTree3 (const double * acmin, 
+	   const double * acmax);
   ~ADTree3 ();
 
-  void Insert (const float * p, int pi);
-  void GetIntersecting (const float * bmin, const float * bmax,
+  void Insert (const double * p, int pi);
+  void GetIntersecting (const double * bmin, const double * bmax,
 			Array<int> & pis) const;
   
   void DeleteElement (int pi);
@@ -132,214 +132,12 @@ public:
 };
 
 
-/*
-
-// divide each direction
-#define ADTN_DIV 10
-class ADTreeNode3Div
-{
-public:
-  ADTreeNode3Div *father;
-  ADTreeNode3Div *childs[ADTN_DIV];
-
-  float minx, dist;
-  float data[3];
-  int pi;
-  int nchilds;
-
-  ADTreeNode3Div ();
-  void DeleteChilds ();
-  friend class ADTree3Div;
-
-  static BlockAllocator ball;
-  void * operator new(size_t);
-  void operator delete (void *);
-};
-
-
-class ADTree3Div
-{
-  ADTreeNode3Div * root;
-  float cmin[3], cmax[3];
-  Array<ADTreeNode3Div*> ela;
-
-public:
-  ADTree3Div (const float * acmin, 
-	   const float * acmax);
-  ~ADTree3Div ();
-
-  void Insert (const float * p, int pi);
-  void GetIntersecting (const float * bmin, const float * bmax,
-			Array<int> & pis) const;
-  
-  void DeleteElement (int pi);
-
-
-  void Print (ostream & ost) const
-    { PrintRec (ost, root); }
-
-  void PrintRec (ostream & ost, const ADTreeNode3Div * node) const;
-};
-
-
-
-
-#define ADTN_SIZE 10
-
-// multiple entries
-class ADTreeNode3M
-{
-public:
-  ADTreeNode3M *left, *right, *father;
-  float sep;
-  float data[ADTN_SIZE][3];
-  int pi[ADTN_SIZE];
-  int nchilds;
-
-  ADTreeNode3M ();
-  void DeleteChilds ();
-  friend class ADTree3M;
-
-  static BlockAllocator ball;
-  void * operator new(size_t);
-  void operator delete (void *);
-};
-
-
-class ADTree3M
-{
-  ADTreeNode3M * root;
-  float cmin[3], cmax[3];
-  Array<ADTreeNode3M*> ela;
-
-public:
-  ADTree3M (const float * acmin, 
-	   const float * acmax);
-  ~ADTree3M ();
-
-  void Insert (const float * p, int pi);
-  void GetIntersecting (const float * bmin, const float * bmax,
-			Array<int> & pis) const;
-  
-  void DeleteElement (int pi);
-
-
-  void Print (ostream & ost) const
-    { PrintRec (ost, root); }
-
-  void PrintRec (ostream & ost, const ADTreeNode3M * node) const;
-};
-
-
-
-
-
-
-class ADTreeNode3F
-{
-public:
-  ADTreeNode3F *father;
-  ADTreeNode3F *childs[8];
-  float sep[3];
-  float data[3];
-  int pi;
-  int nchilds;
-
-  ADTreeNode3F ();
-  void DeleteChilds ();
-  friend class ADTree3F;
-
-  static BlockAllocator ball;
-  void * operator new(size_t);
-  void operator delete (void *);
-};
-
-// fat tree
-class ADTree3F
-{
-  ADTreeNode3F * root;
-  float cmin[3], cmax[3];
-  Array<ADTreeNode3F*> ela;
-
-public:
-  ADTree3F (const float * acmin, 
-	   const float * acmax);
-  ~ADTree3F ();
-
-  void Insert (const float * p, int pi);
-  void GetIntersecting (const float * bmin, const float * bmax,
-			Array<int> & pis) const;
-  
-  void DeleteElement (int pi);
-
-
-  void Print (ostream & ost) const
-    { PrintRec (ost, root); }
-
-  void PrintRec (ostream & ost, const ADTreeNode3F * node) const;
-};
-
-
-
-
-class ADTreeNode3FM
-{
-public:
-  ADTreeNode3FM *father;
-  ADTreeNode3FM *childs[8];
-  float sep[3];
-  float data[ADTN_SIZE][3];
-  int pi[ADTN_SIZE];
-  int nchilds;
-
-  ADTreeNode3FM ();
-  void DeleteChilds ();
-  friend class ADTree3FM;
-
-  static BlockAllocator ball;
-  void * operator new(size_t);
-  void operator delete (void *);
-};
-
-// fat tree
-class ADTree3FM
-{
-  ADTreeNode3FM * root;
-  float cmin[3], cmax[3];
-  Array<ADTreeNode3FM*> ela;
-
-public:
-  ADTree3FM (const float * acmin, 
-	   const float * acmax);
-  ~ADTree3FM ();
-
-  void Insert (const float * p, int pi);
-  void GetIntersecting (const float * bmin, const float * bmax,
-			Array<int> & pis) const;
-  
-  void DeleteElement (int pi);
-
-
-  void Print (ostream & ost) const
-    { PrintRec (ost, root); }
-
-  void PrintRec (ostream & ost, const ADTreeNode3FM * node) const;
-};
-
-
-
-*/
-
-
-
-
-
 class ADTreeNode6
 {
 public:
   ADTreeNode6 *left, *right, *father;
-  float sep;
-  float data[6];
+  double sep;
+  double data[6];
   int pi;
   int nchilds;
 
@@ -356,16 +154,16 @@ public:
 class ADTree6
 {
   ADTreeNode6 * root;
-  float cmin[6], cmax[6];
+  double cmin[6], cmax[6];
   Array<ADTreeNode6*> ela;
 
 public:
-  ADTree6 (const float * acmin, 
-	   const float * acmax);
+  ADTree6 (const double * acmin, 
+	   const double * acmax);
   ~ADTree6 ();
 
-  void Insert (const float * p, int pi);
-  void GetIntersecting (const float * bmin, const float * bmax,
+  void Insert (const double * p, int pi);
+  void GetIntersecting (const double * bmin, const double * bmax,
 			Array<int> & pis) const;
   
   void DeleteElement (int pi);
@@ -384,69 +182,6 @@ public:
 
   void PrintMemInfo (std::ostream & ost) const;
 };
-
-
-
-
-/*
-
-class ADTreeNode6F
-{
-public:
-  ADTreeNode6F * father;
-  ADTreeNode6F * childs[64];
-  
-  float sep[6];
-  float data[6];
-  int pi;
-  int nchilds;
-
-  ADTreeNode6F ();
-  void DeleteChilds ();
-  friend class ADTree6F;
-
-  static BlockAllocator ball;
-  void * operator new(size_t);
-  void operator delete (void *);
-};
-
-
-class ADTree6F
-{
-  ADTreeNode6F * root;
-  float cmin[6], cmax[6];
-  Array<ADTreeNode6F*> ela;
-
-public:
-  ADTree6F (const float * acmin, 
-	   const float * acmax);
-  ~ADTree6F ();
-
-  void Insert (const float * p, int pi);
-  void GetIntersecting (const float * bmin, const float * bmax,
-			Array<int> & pis) const;
-  
-  void DeleteElement (int pi);
-
-
-  void Print (ostream & ost) const
-    { PrintRec (ost, root); }
-  int Depth () const
-    { return DepthRec (root); }
-
-  void PrintRec (ostream & ost, const ADTreeNode6F * node) const;
-  int DepthRec (const ADTreeNode6F * node) const;
-};
-
-
-
-
-
-
-
-*/
-
-
 
 
 

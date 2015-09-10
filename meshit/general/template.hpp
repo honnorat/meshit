@@ -16,12 +16,6 @@ namespace meshit
    templates, global types, defines and variables
 */
 
-///	The following value may be adapted to the hardware !
-#ifndef CLOCKS_PER_SEC
-#define CLOCKS_PER_SEC 1000000
-#endif
-
-
 // #include <iostream>
 /** output stream for testing.
   testout is opened by main */
