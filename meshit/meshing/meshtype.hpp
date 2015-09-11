@@ -325,7 +325,7 @@ namespace meshit {
        Point in the mesh.
        Contains layer (a new feature in 4.3 for overlapping meshes.
      */
-    class MeshPoint : public Point<3>
+    class MeshPoint : public Point3d
     {
         int layer;
         double singular; // singular factor for hp-refinement
@@ -335,12 +335,12 @@ namespace meshit {
 
         MeshPoint() { }
 
-        MeshPoint(const Point<3> & ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
-            : Point<3> (ap), layer(alayer), singular(0.), type(apt) { }
+        MeshPoint(const Point3d & ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
+            : Point3d (ap), layer(alayer), singular(0.), type(apt) { }
 
-        void SetPoint(const Point<3> & ap)
+        void SetPoint(const Point3d & ap)
         {
-            Point<3>::operator=(ap);
+            Point3d::operator=(ap);
             layer = 0;
             singular = 0;
         }
@@ -580,10 +580,9 @@ namespace meshit {
                 class DenseMatrix & trans) const;
 
         void GetShape(const Point2d & p, class Vector & shape) const;
-        void GetShapeNew(const Point<2> & p, class FlatVector & shape) const;
+        void GetShapeNew(const Point2d & p, class FlatVector & shape) const;
         /// matrix 2 * np
         void GetDShape(const Point2d & p, class DenseMatrix & dshape) const;
-        void GetDShapeNew(const Point<2> & p, class MatrixFixWidth<2> & dshape) const;
         /// matrix 2 * np
         void GetPointMatrix(const Array<Point2d> & points,
                 class DenseMatrix & pmat) const;
@@ -591,8 +590,7 @@ namespace meshit {
         void ComputeIntegrationPointData() const;
 
         double CalcJacobianBadness(const Array<Point2d> & points) const;
-        double CalcJacobianBadness(const T_POINTS & points,
-                const Vec<3> & n) const;
+        double CalcJacobianBadness(const T_POINTS & points, const Vec3d & n) const;
         double CalcJacobianBadnessDirDeriv(const Array<Point2d> & points,
                 int pi, const Vec2d & dir, double & dd) const;
 
@@ -657,7 +655,7 @@ namespace meshit {
     class IntegrationPointData
     {
       public:
-        Point<3> p;
+        Point3d p;
         double weight;
         Vector shape;
         DenseMatrix dshape;

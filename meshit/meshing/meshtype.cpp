@@ -412,28 +412,6 @@ namespace meshit {
         }
     }
 
-    void Element2d::GetShapeNew(const Point<2> & p, FlatVector & shape) const
-    {
-        switch (typ) {
-            case TRIG:
-            {
-                shape(0) = p(0);
-                shape(1) = p(1);
-                shape(2) = 1 - p(0) - p(1);
-                break;
-            }
-
-            case QUAD:
-            {
-                shape(0) = (1 - p(0))*(1 - p(1));
-                shape(1) = p(0) *(1 - p(1));
-                shape(2) = p(0) * p(1);
-                shape(3) = (1 - p(0)) * p(1);
-                break;
-            }
-        }
-    }
-
     void Element2d::GetDShape(const Point2d & p, DenseMatrix & dshape) const
     {
         switch (typ) {
@@ -458,36 +436,6 @@ namespace meshit {
 
             default:
                 LOG_ERROR("Element2d::GetDShape, illegal type " << typ);
-        }
-    }
-
-    void Element2d::GetDShapeNew(const Point<2> & p, MatrixFixWidth<2> & dshape) const
-    {
-        switch (typ) {
-            case TRIG:
-            {
-                dshape = 0;
-                dshape(0, 0) = 1;
-                dshape(1, 1) = 1;
-                dshape(2, 0) = -1;
-                dshape(2, 1) = -1;
-                break;
-            }
-            case QUAD:
-            {
-                dshape(0, 0) = -(1 - p(1));
-                dshape(0, 1) = -(1 - p(0));
-
-                dshape(1, 0) = (1 - p(1));
-                dshape(1, 1) = -p(0);
-
-                dshape(2, 0) = p(1);
-                dshape(2, 1) = p(0);
-
-                dshape(3, 0) = -p(1);
-                dshape(3, 1) = (1 - p(0));
-                break;
-            }
         }
     }
 
@@ -672,7 +620,7 @@ namespace meshit {
         return err;
     }
 
-    double Element2d::CalcJacobianBadness(const T_POINTS & points, const Vec<3> & n) const
+    double Element2d::CalcJacobianBadness(const T_POINTS & points, const Vec3d & n) const
     {
         int i, j;
         int nip = GetNIP();
@@ -681,14 +629,14 @@ namespace meshit {
 
         pmat.SetSize(2, GetNP());
 
-        Vec<3> t1, t2;
-        t1 = n.GetNormal();
+        Vec3d t1, t2;
+        n.GetNormal(t1);
         t2 = Cross(n, t1);
 
         for (i = 1; i <= GetNP(); i++) {
             Point3d p = points[PNum(i)];
-            pmat.Elem(1, i) = p.X() * t1(0) + p.Y() * t1(1) + p.Z() * t1(2);
-            pmat.Elem(2, i) = p.X() * t2(0) + p.Y() * t2(1) + p.Z() * t2(2);
+            pmat.Elem(1, i) = p.X() * t1.X() + p.Y() * t1.Y() + p.Z() * t1.Z();
+            pmat.Elem(2, i) = p.X() * t2.X() + p.Y() * t2.Y() + p.Z() * t2.Z();
         }
 
         double err = 0;
@@ -727,9 +675,9 @@ namespace meshit {
             IntegrationPointData * ipd = new IntegrationPointData;
             Point2d hp;
             GetIntegrationPoint(i, hp, ipd->weight);
-            ipd->p(0) = hp.X();
-            ipd->p(1) = hp.Y();
-            ipd->p(2) = 0;
+            ipd->p.X() = hp.X();
+            ipd->p.Y() = hp.Y();
+            ipd->p.Z() = 0;
 
             ipd->shape.SetSize(GetNP());
             ipd->dshape.SetSize(2, GetNP());

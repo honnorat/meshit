@@ -42,7 +42,7 @@ namespace meshit {
 
     int CheckSurfaceMesh2(const Mesh & mesh)
     {
-        const Point<3> *tri1[3], *tri2[3];
+        const Point3d * tri1[3], *tri2[3];
 
         for (int i = 1; i <= mesh.GetNOpenElements(); i++) {
             for (int j = 1; j < i; j++) {
@@ -133,9 +133,9 @@ namespace meshit {
 
         of << mesh.GetNP() << std::endl;
         for (i = 1; i <= mesh.GetNP(); i++)
-            of << mesh.Point(i)(0) << " "
-            << mesh.Point(i)(1) << " "
-            << mesh.Point(i)(2) << "\n";
+            of << mesh.Point(i).X() << " "
+            << mesh.Point(i).Y() << " "
+            << mesh.Point(i).Z() << "\n";
 
         of << 2 * mesh.GetNSeg() << std::endl;
         for (i = 1; i <= mesh.GetNSeg(); i++) {
@@ -147,10 +147,10 @@ namespace meshit {
 
     }
 
-    void SaveSurfaceMesh(const Mesh & mesh,
+    void SaveSurfaceMesh(
+            const Mesh & mesh,
             double h,
             char * filename)
-
     {
         INDEX i;
 
@@ -161,11 +161,9 @@ namespace meshit {
 
         outfile << mesh.GetNP() << std::endl;
         for (i = 1; i <= mesh.GetNP(); i++)
-            outfile << mesh.Point(i)(0) << " "
-            << mesh.Point(i)(1) << " "
-            << mesh.Point(i)(2) << std::endl;
-
-
+            outfile << mesh.Point(i).X() << " "
+            << mesh.Point(i).Y() << " "
+            << mesh.Point(i).Z() << std::endl;
 
         outfile << mesh.GetNSE() << std::endl;
         for (i = 1; i <= mesh.GetNSE(); i++) {

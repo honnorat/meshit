@@ -35,6 +35,7 @@ namespace meshit {
     inline Vec3d operator*(double scal, const Vec3d & v);
     inline double operator*(const Vec3d & v1, const Vec3d & v2);
     inline Vec3d Cross(const Vec3d & v1, const Vec3d & v2);
+    inline Vec3d Cross(const Vec3d & v1, const Vec3d & v2);
     inline void Cross(const Vec3d & v1, const Vec3d & v2, Vec3d & prod);
     double Angle(const Vec3d & v);
     double FastAngle(const Vec3d & v);
@@ -268,11 +269,11 @@ namespace meshit {
                 x[i] = v2(i);
         }
 
-        operator Vec<3> () const
-        {
-            return Vec<3> (x[0], x[1], x[2]);
-        }
-
+//        operator Vec<3> () const
+//        {
+//            return Vec<3> (x[0], x[1], x[2]);
+//        }
+//
         Vec3d & operator=(const Vec3d & v2)
         {
             x[0] = v2.x[0];
@@ -457,17 +458,17 @@ namespace meshit {
 
     inline Vec3d & Vec3d::operator+=(const Vec3d & v2)
     {
-        x[0] += v2.x[0];
-        x[1] += v2.x[1];
-        x[2] += v2.x[2];
+        x[0] += v2.X();
+        x[1] += v2.Y();
+        x[2] += v2.Z();
         return *this;
     }
 
     inline Vec3d & Vec3d::operator-=(const Vec3d & v2)
     {
-        x[0] -= v2.x[0];
-        x[1] -= v2.x[1];
-        x[2] -= v2.x[2];
+        x[0] -= v2.X();
+        x[1] -= v2.Y();
+        x[2] -= v2.Z();
         return *this;
     }
 
@@ -574,12 +575,31 @@ namespace meshit {
         return v1.x[0] * v2.x[0] + v1.x[1] * v2.x[1] + v1.x[2] * v2.x[2];
     }
 
+
+    inline Vec3d operator*(const Mat<3, 3> & m, const Vec3d & v)
+    {
+        Vec3d res;
+        for (int i = 0; i < 3; i++) {
+            res.X(i+1) = 0;
+            for (int j = 0; j < 3; j++)
+                res.X(i+1) += m(i, j) * v.X(j+1);
+        }
+        return res;
+    }
+    
     inline Vec3d Cross(const Vec3d & v1, const Vec3d & v2)
     {
-        return Vec3d
-                (v1.x[1] * v2.x[2] - v1.x[2] * v2.x[1],
-                v1.x[2] * v2.x[0] - v1.x[0] * v2.x[2],
-                v1.x[0] * v2.x[1] - v1.x[1] * v2.x[0]);
+        return Vec3d(
+                v1.Y() * v2.Z() - v1.Z() * v2.Y(),
+                v1.Z() * v2.X() - v1.X() * v2.Z(),
+                v1.X() * v2.Y() - v1.Y() * v2.X());
+    }
+    inline Vec3d Cross(const Vec<3> & v1, const Vec<3> & v2)
+    {
+        return Vec3d(
+                v1[1] * v2[2] - v1[2] * v2[1],
+                v1[2] * v2[0] - v1[0] * v2[2],
+                v1[0] * v2[1] - v1[1] * v2[0]);
     }
 
     inline void Cross(const Vec3d & v1, const Vec3d & v2, Vec3d & prod)
@@ -589,7 +609,8 @@ namespace meshit {
         prod.x[2] = v1.x[0] * v2.x[1] - v1.x[1] * v2.x[0];
     }
 
-    inline double Determinant(const Vec3d & col1,
+    inline double Determinant(
+            const Vec3d & col1,
             const Vec3d & col2,
             const Vec3d & col3)
     {

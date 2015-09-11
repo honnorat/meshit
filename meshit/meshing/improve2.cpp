@@ -102,11 +102,11 @@ namespace meshit {
         for (int i = 0; i < seia.size(); i++) {
             const Element2d & sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++) {
-                POINTTYPE typ = mesh[sel[j]].Type();
+                POINTTYPE typ = mesh.Point(sel[j]).Type();
                 if (typ == FIXEDPOINT || typ == EDGEPOINT) {
-                    pangle[sel[j]] +=
-                            Angle(mesh[sel[(j + 1) % 3]] - mesh[sel[j]],
-                            mesh[sel[(j + 2) % 3]] - mesh[sel[j]]);
+                    pangle[sel[j]] += Angle(
+                            mesh.Point(sel[(j + 1) % 3]) - mesh.Point(sel[j]),
+                            mesh.Point(sel[(j + 2) % 3]) - mesh.Point(sel[j]));
                 }
             }
         }
@@ -115,7 +115,7 @@ namespace meshit {
             const Element2d & sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
-                if (mesh[pi].Type() == INNERPOINT || mesh[pi].Type() == SURFACEPOINT)
+                if (mesh.Point(pi).Type() == INNERPOINT || mesh.Point(pi).Type() == SURFACEPOINT)
                     pdef[pi] = -6;
                 else {
                     for (int j = 0; j < 8; j++) {
@@ -139,7 +139,7 @@ namespace meshit {
                 neighbors[seia[i]].SetOrientation(j, 0);
             }
         }
-        
+
         for (int i = 0; i < seia.size(); i++) {
             const Element2d & sel = mesh.SurfaceElement(seia[i]);
 
@@ -206,8 +206,8 @@ namespace meshit {
 
                     bool allowswap = true;
 
-                    Vec<3> auxvec1 = mesh[pi3] - mesh[pi4];
-                    Vec<3> auxvec2 = mesh[pi1] - mesh[pi4];
+                    Vec3d auxvec1 = mesh.Point(pi3) - mesh.Point(pi4);
+                    Vec3d auxvec2 = mesh.Point(pi1) - mesh.Point(pi4);
 
                     allowswap = allowswap && fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
@@ -215,7 +215,7 @@ namespace meshit {
                         continue;
 
                     // normal of new
-                    Vec<3> nv1 = Cross(auxvec1, auxvec2);
+                    Vec3d nv1 = Cross(auxvec1, auxvec2);
 
                     auxvec1 = mesh.Point(pi4) - mesh.Point(pi3);
                     auxvec2 = mesh.Point(pi2) - mesh.Point(pi3);
@@ -224,11 +224,11 @@ namespace meshit {
                     if (!allowswap)
                         continue;
 
-                    Vec<3> nv2 = Cross(auxvec1, auxvec2);
+                    Vec3d nv2 = Cross(auxvec1, auxvec2);
 
                     // normals of original
-                    Vec<3> nv3 = Cross(mesh[pi1] - mesh[pi4], mesh[pi2] - mesh[pi4]);
-                    Vec<3> nv4 = Cross(mesh[pi2] - mesh[pi3], mesh[pi1] - mesh[pi3]);
+                    Vec3d nv3 = Cross(mesh.Point(pi1) - mesh.Point(pi4), mesh.Point(pi2) - mesh.Point(pi4));
+                    Vec3d nv4 = Cross(mesh.Point(pi2) - mesh.Point(pi3), mesh.Point(pi1) - mesh.Point(pi3));
 
                     nv3 *= -1;
                     nv4 *= -1;
@@ -237,23 +237,13 @@ namespace meshit {
 
                     nv1.Normalize();
                     nv2.Normalize();
-
-//                    Vec<3> nvp3 = Vec<3> (0, 0, 1);
-//                    Vec<3> nvp4 = Vec<3> (0, 0, 1);
-
+                    
                     double critval = cos(M_PI / 6); // 30 degree
-//                    allowswap = allowswap &&
-//                            (nv1 * nvp3 > critval) &&
-//                            (nv1 * nvp4 > critval) &&
-//                            (nv2 * nvp3 > critval) &&
-//                            (nv2 * nvp4 > critval) &&
-//                            (nvp3 * nv3 > critval) &&
-//                            (nvp4 * nv4 > critval);
                     allowswap = allowswap &&
-                            (nv1(2) > critval) &&
-                            (nv2(2) > critval) &&
-                            (nv3(2) > critval) &&
-                            (nv4(2) > critval);
+                            (nv1.Z() > critval) &&
+                            (nv2.Z() > critval) &&
+                            (nv3.Z() > critval) &&
+                            (nv4.Z() > critval);
 
                     double horder = Dist(mesh.Point(pi1), mesh.Point(pi2));
 
@@ -270,16 +260,12 @@ namespace meshit {
                             should = e >= t && (e > 2 || d > 0);
                         }
                         else {
-                            double loch = mesh.GetH(mesh[pi1]);
-                            should =
-                                    CalcTriangleBadness(mesh.Point(pi4), mesh.Point(pi3), mesh.Point(pi1),
-                                    metricweight, loch) +
-                                    CalcTriangleBadness(mesh.Point(pi3), mesh.Point(pi4), mesh.Point(pi2),
-                                    metricweight, loch) <
-                                    CalcTriangleBadness(mesh.Point(pi1), mesh.Point(pi2), mesh.Point(pi3),
-                                    metricweight, loch) +
-                                    CalcTriangleBadness(mesh.Point(pi2), mesh.Point(pi1), mesh.Point(pi4),
-                                    metricweight, loch);
+                            double loch = mesh.GetH(mesh.Point(pi1));
+                            double bad1 = CalcTriangleBadness(mesh.Point(pi4), mesh.Point(pi3), mesh.Point(pi1), metricweight, loch);
+                            double bad2 = CalcTriangleBadness(mesh.Point(pi3), mesh.Point(pi4), mesh.Point(pi2), metricweight, loch);
+                            double bad3 = CalcTriangleBadness(mesh.Point(pi1), mesh.Point(pi2), mesh.Point(pi3), metricweight, loch);
+                            double bad4 = CalcTriangleBadness(mesh.Point(pi2), mesh.Point(pi1), mesh.Point(pi4), metricweight, loch);
+                            should = (bad1 + bad2) < (bad3 + bad4);
                         }
 
                         if (allowswap) {
@@ -361,7 +347,7 @@ namespace meshit {
             surfnr = mesh.GetFaceDescriptor(faceindex).SurfNr();
 
         double bad1, bad2;
-        Vec<3> nv;
+        Vec3d nv;
 
         int np = mesh.GetNP();
         //int nse = mesh.GetNSE();
@@ -393,14 +379,14 @@ namespace meshit {
         for (int i = 0; i < mesh.LockedPoints().size(); i++)
             fixed[mesh.LockedPoints()[i]] = true;
 
-        Array<Vec<3>, PointIndex::BASE> normals(np);
+        Array<Vec3d, PointIndex::BASE> normals(np);
 
         for (PointIndex pi = mesh.Points().Begin(); pi < mesh.Points().End(); pi++) {
             if (elementsonnode[pi].size()) {
                 Element2d & hel = mesh.SurfaceElement(elementsonnode[pi][0]);
                 for (int k = 0; k < 3; k++) {
                     if (hel[k] == pi) {
-                        GetNormalVector(surfnr, mesh[pi], hel.GeomInfoPi(k + 1), normals[pi]);
+                        GetNormalVector(surfnr, mesh.Point(pi), hel.GeomInfoPi(k + 1), normals[pi]);
                         break;
                     }
                 }
@@ -433,7 +419,7 @@ namespace meshit {
                 if (fixed[pi2])
                     continue;
 
-                double loch = mesh.GetH(mesh[pi1]);
+                double loch = mesh.GetH(mesh.Point(pi1));
 
                 INDEX_2 si2(pi1, pi2);
                 si2.Sort();
@@ -448,8 +434,9 @@ namespace meshit {
 
                     if (el2[0] == pi2 || el2[1] == pi2 || el2[2] == pi2) {
                         hasbothpi.push_back(elementsonnode[pi1][k]);
-                        nv = Cross(Vec3d(mesh[el2[0]], mesh[el2[1]]),
-                                Vec3d(mesh[el2[0]], mesh[el2[2]]));
+                        nv = Cross(
+                                Vec3d(mesh.Point(el2[0]), mesh.Point(el2[1])),
+                                Vec3d(mesh.Point(el2[0]), mesh.Point(el2[2])));
                     }
                     else {
                         hasonepi.push_back(elementsonnode[pi1][k]);
@@ -459,7 +446,7 @@ namespace meshit {
                 Element2d & hel = mesh.SurfaceElement(hasbothpi[0]);
                 for (int k = 0; k < 3; k++)
                     if (hel[k] == pi1) {
-                        GetNormalVector(surfnr, mesh[pi1], hel.GeomInfoPi(k + 1), nv);
+                        GetNormalVector(surfnr, mesh.Point(pi1), hel.GeomInfoPi(k + 1), nv);
                         break;
                     }
 
@@ -477,15 +464,15 @@ namespace meshit {
                 int illegal1 = 0, illegal2 = 0;
                 for (int k = 0; k < hasonepi.size(); k++) {
                     const Element2d & el = mesh.SurfaceElement(hasonepi[k]);
-                    bad1 += CalcTriangleBadness(mesh[el[0]], mesh[el[1]], mesh[el[2]],
-                            nv, -1, loch);
+                    bad1 += CalcTriangleBadness(
+                            mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
                     illegal1 += 1 - mesh.LegalTrig(el);
                 }
 
                 for (int k = 0; k < hasbothpi.size(); k++) {
                     const Element2d & el = mesh.SurfaceElement(hasbothpi[k]);
-                    bad1 += CalcTriangleBadness(mesh[el[0]], mesh[el[1]], mesh[el[2]],
-                            nv, -1, loch);
+                    bad1 += CalcTriangleBadness(
+                            mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
                     illegal1 += 1 - mesh.LegalTrig(el);
                 }
                 bad1 /= (hasonepi.size() + hasbothpi.size());
@@ -500,15 +487,13 @@ namespace meshit {
                 bad2 = 0;
                 for (int k = 0; k < hasonepi.size(); k++) {
                     Element2d & el = mesh.SurfaceElement(hasonepi[k]);
-                    double err =
-                            CalcTriangleBadness(mesh[el[0]], mesh[el[1]], mesh[el[2]],
-                            nv, -1, loch);
+                    double err = CalcTriangleBadness(
+                            mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
                     bad2 += err;
 
-                    Vec<3> hnv = Cross(Vec3d(mesh[el[0]],
-                            mesh[el[1]]),
-                            Vec3d(mesh[el[0]],
-                            mesh[el[2]]));
+                    Vec3d hnv = Cross(
+                            mesh.Point(el[1]) - mesh.Point(el[0]),
+                            mesh.Point(el[2]) - mesh.Point(el[0]) );
                     if (hnv * nv < 0)
                         bad2 += 1e10;
 
@@ -534,7 +519,7 @@ namespace meshit {
                 }
 
                 if (should) {
-                    
+
                     mesh[pi1] = pnew;
                     PointGeomInfo gi;
 
@@ -580,7 +565,7 @@ namespace meshit {
             }
         }
 
-          mesh.Compress();
+        mesh.Compress();
         mesh.SetNextTimeStamp();
     }
 }

@@ -470,11 +470,6 @@ namespace meshit {
 
         void ImproveMesh(const MeshingParameters & mp, OPTIMIZEGOAL goal = OPT_QUALITY);
         void ImproveMeshJacobian(const MeshingParameters & mp, OPTIMIZEGOAL goal = OPT_QUALITY, const BitArray * usepoint = NULL);
-        void ImproveMeshJacobianOnSurface(const MeshingParameters & mp,
-                const BitArray & usepoint,
-                const Array< Vec<3>* > & nv,
-                OPTIMIZEGOAL goal = OPT_QUALITY,
-                const Array< Array<int, PointIndex::BASE>* > * idmaps = NULL);
         /**
            free nodes in environment of openelements 
            for optimiztion

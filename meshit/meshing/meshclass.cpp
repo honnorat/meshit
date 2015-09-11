@@ -563,11 +563,11 @@ namespace meshit {
 
         for (PointIndex pi = PointIndex::BASE; pi < GetNP() + PointIndex::BASE; pi++) {
             outfile.width(22);
-            outfile << points[pi](0) / scale << "  ";
+            outfile << points[pi].X() / scale << "  ";
             outfile.width(22);
-            outfile << points[pi](1) / scale << "  ";
+            outfile << points[pi].Y() / scale << "  ";
             outfile.width(22);
-            outfile << points[pi](2) / scale << "\n";
+            outfile << points[pi].Z() / scale << "\n";
         }
 
         if (ident -> GetMaxNr() > 0) {
@@ -2125,7 +2125,7 @@ namespace meshit {
                 }
 
 
-                const meshit::Point<3> *trip1[3], *trip2[3];
+                const meshit::Point3d *trip1[3], *trip2[3];
                 for (k = 1; k <= 3; k++) {
                     trip1[k - 1] = &Point(tri.PNum(k));
                     trip2[k - 1] = &Point(tri2.PNum(k));

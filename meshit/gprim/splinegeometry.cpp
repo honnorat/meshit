@@ -11,25 +11,25 @@
 namespace meshit {
 
     template<int D>
-    SplineGeometry<D> ::~SplineGeometry()
+    SplineGeometry<D>::~SplineGeometry()
     {
-        for (int i = 0; i < splines.size(); i++) {
+        for (size_t i = 0; i < splines.size(); i++) {
             delete splines[i];
         }
     }
 
     template<int D>
-    void SplineGeometry<D> ::GetRawData(Array<double> & raw_data) const
+    void SplineGeometry<D>::GetRawData(Array<double> & raw_data) const
     {
         raw_data.push_back(D);
         raw_data.push_back(splines.size());
-        for (int i = 0; i < splines.size(); i++) {
+        for (size_t i = 0; i < splines.size(); i++) {
             splines[i]->GetRawData(raw_data);
         }
     }
 
     template<int D>
-    int SplineGeometry<D> ::Load(const Array<double> & raw_data, const int startpos)
+    int SplineGeometry<D>::Load(const Array<double> & raw_data, const int startpos)
     {
         int pos = startpos;
         if (raw_data[pos] != D)
@@ -42,7 +42,7 @@ namespace meshit {
 
         Array< Point<D> > pts(3);
 
-        for (int i = 0; i < splines.size(); i++) {
+        for (size_t i = 0; i < splines.size(); i++) {
             int type = int(raw_data[pos]);
             pos++;
 
@@ -70,7 +70,7 @@ namespace meshit {
     }
 
     template<int D>
-    void SplineGeometry<D> ::GetBoundingBox(Box<D> & box) const
+    void SplineGeometry<D>::GetBoundingBox(Box<D> & box) const
     {
         if (!splines.size()) {
             Point<D> auxp = 0.;
@@ -79,7 +79,7 @@ namespace meshit {
         }
 
         Array<Point<D> > points;
-        for (int i = 0; i < splines.size(); i++) {
+        for (size_t i = 0; i < splines.size(); i++) {
             splines[i]->GetPoints(20, points);
 
             if (i == 0) box.Set(points[0]);

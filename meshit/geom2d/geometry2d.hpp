@@ -138,12 +138,12 @@ namespace meshit {
 
         void TestComment(std::istream & infile);
 
-        const SplineSegExt & GetSpline(const int i) const
+        const SplineSegExt & GetSpline(const size_t i) const
         {
             return dynamic_cast<const SplineSegExt&> (*splines[i]);
         }
 
-        SplineSegExt & GetSpline(const int i)
+        SplineSegExt & GetSpline(const size_t i)
         {
             return dynamic_cast<SplineSegExt&> (*splines[i]);
         }

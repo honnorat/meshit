@@ -38,16 +38,11 @@ namespace meshit {
                 const EdgePointGeomInfo & ap2,
                 Point<3> & newp, EdgePointGeomInfo & newgi) const;
 
-        virtual Vec<3> GetTangent(const Point<3> & p, int surfi1, int surfi2,
-                const EdgePointGeomInfo & ap1) const;
-
-        virtual Vec<3> GetNormal(const Point<3> & p, int surfi1,
-                const PointGeomInfo & gi) const;
+        virtual Vec<3> GetTangent(const Point<3> & p, int surfi1, int surfi2, const EdgePointGeomInfo & ap1) const;
+        virtual Vec<3> GetNormal(const Point<3> & p, int surfi1, const PointGeomInfo & gi) const;
 
         virtual void ProjectToSurface(Point<3> & p, int surfi, const PointGeomInfo & /* gi */) const;
-
-        virtual void ProjectToEdge(Point<3> & p, int surfi1, int surfi2,
-                const EdgePointGeomInfo & egi) const;
+        virtual void ProjectToEdge(Point<3> & p, int surfi1, int surfi2, const EdgePointGeomInfo & egi) const;
     };
 
 }

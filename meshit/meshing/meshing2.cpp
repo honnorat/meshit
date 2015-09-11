@@ -283,7 +283,7 @@ namespace meshit {
 
             double hinner = (3 + qualclass) * max2(his, hshould);
 
-            adfront ->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
+            adfront->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
 
             if (qualclass > mp.giveuptol2d) {
                 LOG_WARNING("give up with qualclass " << qualclass <<
@@ -292,8 +292,8 @@ namespace meshit {
             }
 
             morerisc = 0;
-            PointIndex gpi1 = adfront -> GetGlobalIndex(pindex.Get(loclines[0].I1()));
-            PointIndex gpi2 = adfront -> GetGlobalIndex(pindex.Get(loclines[0].I2()));
+            PointIndex gpi1 = adfront->GetGlobalIndex(pindex.Get(loclines[0].I1()));
+            PointIndex gpi2 = adfront->GetGlobalIndex(pindex.Get(loclines[0].I2()));
 
             debugflag =
                     (debugparam.haltsegment &&
