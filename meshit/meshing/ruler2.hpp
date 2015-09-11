@@ -2,6 +2,7 @@
 #define FILE_NETRULE
 
 #include <iostream>
+#include <vector>
 #include "../general/array.hpp"
 #include "../linalg/densemat.hpp"
 #include "../gprim/geom2d.hpp"
