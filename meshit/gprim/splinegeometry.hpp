@@ -22,14 +22,14 @@ namespace meshit {
         // protected:
       public:
         std::vector<GeomPoint<D> > geompoints;
-        Array<SplineSeg<D>*> splines;
+        std::vector<SplineSeg<D>*> splines;
 
         ~SplineGeometry();
 
         int Load(const Array<double> & raw_data, const int startpos = 0);
         void GetRawData(Array<double> & raw_data) const;
 
-        const Array<SplineSeg<D>*> & GetSplines() const
+        const std::vector<SplineSeg<D>*> & GetSplines() const
         {
             return splines;
         }

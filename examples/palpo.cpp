@@ -380,9 +380,9 @@ int main(int argc, char ** argv)
 
     //    mesh.FindOpenElements(0);
     //    mesh.FindOpenElements(1);
-    //    meshit::MeshQuality2d(mesh);
-    //    meshit::CheckSurfaceMesh(mesh);
-    //    meshit::CheckSurfaceMesh2(mesh);
+        meshit::MeshQuality2d(mesh);
+        meshit::CheckSurfaceMesh(mesh);
+        meshit::CheckSurfaceMesh2(mesh);
     //    mesh.CheckConsistentBoundary();
     //    mesh.PrintMemInfo(std::cout);
     mesh.Export("comprehension.msh", "Gmsh2 Format");

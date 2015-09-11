@@ -210,59 +210,6 @@ namespace meshit {
         return (ost << int(pi));
     }
 
-    class ElementIndex
-    {
-        int i;
-
-      public:
-
-        ElementIndex() { }
-
-        ElementIndex(int ai) : i(ai) { }
-
-        ElementIndex & operator=(const ElementIndex & ai)
-        {
-            i = ai.i;
-            return *this;
-        }
-
-        ElementIndex & operator=(int ai)
-        {
-            i = ai;
-            return *this;
-        }
-
-        operator int () const
-        {
-            return i;
-        }
-
-        ElementIndex & operator++(int)
-        {
-            i++;
-            return *this;
-        }
-
-        ElementIndex & operator--(int)
-        {
-            i--;
-            return *this;
-        }
-    };
-
-    inline std::istream & operator>>(std::istream & ist, ElementIndex & pi)
-    {
-        int i;
-        ist >> i;
-        pi = i;
-        return ist;
-    }
-
-    inline std::ostream & operator<<(std::ostream & ost, const ElementIndex & pi)
-    {
-        return (ost << int(pi));
-    }
-
     class SurfaceElementIndex
     {
         int i;
@@ -378,7 +325,7 @@ namespace meshit {
        Point in the mesh.
        Contains layer (a new feature in 4.3 for overlapping meshes.
      */
-    class MeshPoint : public Point<3>
+    class MeshPoint : public Point3d
     {
         int layer;
         double singular; // singular factor for hp-refinement
@@ -388,12 +335,12 @@ namespace meshit {
 
         MeshPoint() { }
 
-        MeshPoint(const Point<3> & ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
-            : Point<3> (ap), layer(alayer), singular(0.), type(apt) { }
+        MeshPoint(const Point3d & ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
+            : Point3d (ap), layer(alayer), singular(0.), type(apt) { }
 
-        void SetPoint(const Point<3> & ap)
+        void SetPoint(const Point3d & ap)
         {
-            Point<3>::operator=(ap);
+            Point3d::operator=(ap);
             layer = 0;
             singular = 0;
         }
@@ -633,10 +580,9 @@ namespace meshit {
                 class DenseMatrix & trans) const;
 
         void GetShape(const Point2d & p, class Vector & shape) const;
-        void GetShapeNew(const Point<2> & p, class FlatVector & shape) const;
+        void GetShapeNew(const Point2d & p, class FlatVector & shape) const;
         /// matrix 2 * np
         void GetDShape(const Point2d & p, class DenseMatrix & dshape) const;
-        void GetDShapeNew(const Point<2> & p, class MatrixFixWidth<2> & dshape) const;
         /// matrix 2 * np
         void GetPointMatrix(const Array<Point2d> & points,
                 class DenseMatrix & pmat) const;
@@ -644,8 +590,7 @@ namespace meshit {
         void ComputeIntegrationPointData() const;
 
         double CalcJacobianBadness(const Array<Point2d> & points) const;
-        double CalcJacobianBadness(const T_POINTS & points,
-                const Vec<3> & n) const;
+        double CalcJacobianBadness(const T_POINTS & points, const Vec3d & n) const;
         double CalcJacobianBadnessDirDeriv(const Array<Point2d> & points,
                 int pi, const Vec2d & dir, double & dd) const;
 
@@ -710,278 +655,11 @@ namespace meshit {
     class IntegrationPointData
     {
       public:
-        Point<3> p;
+        Point3d p;
         double weight;
         Vector shape;
         DenseMatrix dshape;
     };
-
-    /**
-       Volume element
-     */
-    class Element
-    {
-      private:
-        /// point numbers
-        PointIndex pnum[ELEMENT_MAXPOINTS];
-        ELEMENT_TYPE typ : 6;
-        /// number of points (4..tet, 5..pyramid, 6..prism, 8..hex, 10..quad tet, 12..quad prism)
-        int np : 5;
-
-        class flagstruct
-        {
-          public:
-            bool marked : 1; // marked for refinement
-            bool badel : 1; // angles worse then limit
-            bool reverse : 1; // for refinement a la Bey
-            bool illegal : 1; // illegal, will be split or swaped 
-            bool illegal_valid : 1; // is illegal-flag valid ?
-            bool badness_valid : 1; // is badness valid ?
-            bool refflag : 1; // mark element for refinement
-            bool strongrefflag : 1;
-            bool deleted : 1; // element is deleted, will be removed from array
-            bool fixed : 1; // don't change element in optimization
-        };
-
-        /// sub-domain index
-        short int index;
-        /// order for hp-FEM
-        unsigned int orderx : 6;
-        unsigned int ordery : 6;
-        unsigned int orderz : 6;
-        /* unsigned int levelx:6;
-           unsigned int levely:6;
-           unsigned int levelz:6; */
-        /// stored shape-badness of element
-        float badness;
-
-      public:
-        flagstruct flags;
-
-        Element();
-        Element(int anp);
-        Element(ELEMENT_TYPE type);
-        Element & operator=(const Element & el2);
-
-        void SetNP(int anp);
-        void SetType(ELEMENT_TYPE atyp);
-
-        int GetNP() const
-        {
-            return np;
-        }
-
-        int GetNV() const
-        {
-            switch (typ) {
-                case TET:
-                case TET10:
-                    return 4;
-                case PRISM12:
-                case PRISM:
-                    return 6;
-                case PYRAMID:
-                    return 5;
-                case HEX:
-                    return 8;
-                default:
-                    LOG_ERROR("Element3d::GetNV not implemented for typ " << typ);
-            }
-            return np;
-        }
-
-        bool operator==(const Element & el2) const;
-
-        // old style:
-
-        int NP() const
-        {
-            return np;
-        }
-
-        ELEMENT_TYPE GetType() const
-        {
-            return typ;
-        }
-
-        PointIndex & operator[](int i)
-        {
-            return pnum[i];
-        }
-
-        const PointIndex & operator[](int i) const
-        {
-            return pnum[i];
-        }
-
-        FlatArray<const PointIndex> PNums() const
-        {
-            return FlatArray<const PointIndex> (np, &pnum[0]);
-        }
-
-        PointIndex & PNum(int i)
-        {
-            return pnum[i - 1];
-        }
-
-        const PointIndex & PNum(int i) const
-        {
-            return pnum[i - 1];
-        }
-
-        PointIndex & PNumMod(int i)
-        {
-            return pnum[(i - 1) % np];
-        }
-
-        const PointIndex & PNumMod(int i) const
-        {
-            return pnum[(i - 1) % np];
-        }
-
-        void SetIndex(int si)
-        {
-            index = si;
-        }
-
-        int GetIndex() const
-        {
-            return index;
-        }
-
-        int GetOrder() const
-        {
-            return orderx;
-        }
-        void SetOrder(const int aorder);
-
-        void GetOrder(int & ox, int & oy, int & oz) const
-        {
-            ox = orderx;
-            oy = ordery;
-            oz = orderz;
-        }
-        void SetOrder(const int ox, const int oy, const int oz);
-        // void GetLevel (int & ox, int & oy, int & oz) const { ox = levelx; oy = levely; oz = levelz; }
-        // void SetLevel (int ox, int oy, int oz) { levelx = ox; levely = oy; levelz = oz; }
-
-        void GetBox(const T_POINTS & points, Box3d & box) const;
-        /// Calculates Volume of elemenet
-        double Volume(const T_POINTS & points) const;
-        void Print(std::ostream & ost) const;
-
-        int GetNFaces() const
-        {
-            switch (typ) {
-                case TET:
-                case TET10: return 4;
-                case PYRAMID: return 5;
-                case PRISM:
-                case PRISM12: return 5;
-                default:
-                    ;
-            }
-            return 0;
-        }
-        inline void GetFace(int i, Element2d & face) const;
-        void GetFace2(int i, Element2d & face) const;
-        void Invert();
-
-        /// split into 4 node tets
-        void GetTets(Array<Element> & locels) const;
-        /// split into 4 node tets, local point nrs
-        void GetTetsLocal(Array<Element> & locels) const;
-        /// returns coordinates of nodes
-        // void GetNodesLocal (Array<Point<3> > & points) const;
-        void GetNodesLocalNew(Array<Point<3> > & points) const;
-
-        /// split surface into 3 node trigs
-        void GetSurfaceTriangles(Array<Element2d> & surftrigs) const;
-
-        /// get number of 'integration points'
-        int GetNIP() const;
-        void GetIntegrationPoint(int ip, Point<3> & p, double & weight) const;
-
-        void GetTransformation(int ip, const T_POINTS & points,
-                class DenseMatrix & trans) const;
-        void GetTransformation(int ip, class DenseMatrix & pmat,
-                class DenseMatrix & trans) const;
-
-        void GetShape(const Point<3> & p, class Vector & shape) const;
-        void GetShapeNew(const Point<3> & p, class FlatVector & shape) const;
-        /// matrix 2 * np
-        void GetDShape(const Point<3> & p, class DenseMatrix & dshape) const;
-        void GetDShapeNew(const Point<3> & p, class MatrixFixWidth<3> & dshape) const;
-        /// matrix 3 * np
-        void GetPointMatrix(const T_POINTS & points,
-                class DenseMatrix & pmat) const;
-
-        void ComputeIntegrationPointData() const;
-
-        double CalcJacobianBadness(const T_POINTS & points) const;
-        double CalcJacobianBadnessDirDeriv(const T_POINTS & points,
-                int pi, Vec<3> & dir, double & dd) const;
-        double CalcJacobianBadnessGradient(const T_POINTS & points,
-                int pi, Vec<3> & grad) const;
-
-        // friend ostream & operator<<(ostream  & s, const Element & el);
-
-        void SetRefinementFlag(bool rflag = 1)
-        {
-            flags.refflag = rflag;
-        }
-
-        int TestRefinementFlag() const
-        {
-            return flags.refflag;
-        }
-
-        void SetStrongRefinementFlag(bool rflag = 1)
-        {
-            flags.strongrefflag = rflag;
-        }
-
-        int TestStrongRefinementFlag() const
-        {
-            return flags.strongrefflag;
-        }
-
-        int Illegal() const
-        {
-            return flags.illegal;
-        }
-
-        int IllegalValid() const
-        {
-            return flags.illegal_valid;
-        }
-
-        void SetIllegal(int aillegal)
-        {
-            flags.illegal = aillegal ? 1 : 0;
-            flags.illegal_valid = 1;
-        }
-
-        void SetLegal(int alegal)
-        {
-            flags.illegal = alegal ? 0 : 1;
-            flags.illegal_valid = 1;
-        }
-
-        void Delete()
-        {
-            flags.deleted = 1;
-        }
-
-        bool IsDeleted() const
-        {
-            return flags.deleted;
-        }
-
-        int hp_elnr;
-    };
-
-    std::ostream & operator<<(std::ostream & s, const Element & el);
 
     /**
        Edge segment.
@@ -1396,18 +1074,6 @@ namespace meshit {
         { 0, 1, 3},
         { 1, 0, 2}
     };
-
-    inline void Element::GetFace(int i, Element2d & face) const
-    {
-        if (typ == TET) {
-            face.SetType(TRIG);
-            face[0] = pnum[gftetfacesa[i - 1][0]];
-            face[1] = pnum[gftetfacesa[i - 1][1]];
-            face[2] = pnum[gftetfacesa[i - 1][2]];
-        }
-        else
-            GetFace2(i, face);
-    }
 
     /**
        Identification of periodic surfaces, close surfaces, etc. 

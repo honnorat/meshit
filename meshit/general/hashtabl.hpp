@@ -780,16 +780,12 @@ namespace meshit {
     template <class T>
     class INDEX_3_CLOSED_HASHTABLE : public BASE_INDEX_3_CLOSED_HASHTABLE
     {
-        // MoveableArray<T,0> cont;
         Array<T, 0> cont;
 
       public:
 
         INDEX_3_CLOSED_HASHTABLE(int size)
-            : BASE_INDEX_3_CLOSED_HASHTABLE(size), cont(size)
-        {
-            ; //cont.SetName ("i3-hashtable, contents");
-        }
+            : BASE_INDEX_3_CLOSED_HASHTABLE(size), cont(size) { }
 
         void Set(const INDEX_3 & ahash, const T & acont)
         {

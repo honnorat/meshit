@@ -50,7 +50,8 @@ namespace meshit {
             }
     }
 
-    void CalcPartition(const SplineSegExt & spline,
+    void CalcPartition(
+            const SplineSegExt & spline,
             // double l, 
             MeshingParameters & mp, Mesh & mesh,
             // double h, double h1, double h2, double hcurve, 
@@ -58,14 +59,14 @@ namespace meshit {
     {
         double fperel, oldf, f;
 
-        int n = 10000;
+        int n = 1000;
 
         Array<Point<2> > xi(n);
         Array<double> hi(n);
 
         for (int i = 0; i < n; i++) {
             xi[i] = spline.GetPoint((i + 0.5) / n);
-            hi[i] = mesh.GetH(Point<3> (xi[i](0), xi[i](1), 0));
+            hi[i] = mesh.GetH(Point3d(xi[i](0), xi[i](1), 0));
         }
 
         // limit slope
@@ -218,7 +219,7 @@ namespace meshit {
 
         Point3dTree searchtree(pmin, pmax);
 
-        for (int i = 0; i < splines.size(); i++) {
+        for (size_t i = 0; i < splines.size(); i++) {
             for (int side = 0; side <= 1; side++) {
                 int dom = (side == 0) ? GetSpline(i).leftdom : GetSpline(i).rightdom;
                 if (dom != 0) GetSpline(i).layer = GetDomainLayer(dom);
@@ -227,7 +228,7 @@ namespace meshit {
 
         // mesh size restrictions ...
 
-        for (int i = 0; i < splines.size(); i++) {
+        for (size_t i = 0; i < splines.size(); i++) {
             const SplineSegExt & spline = GetSpline(i);
             const GeomPoint<2> & p1 = spline.StartPI();
             const GeomPoint<2> & p2 = spline.EndPI();
@@ -256,7 +257,7 @@ namespace meshit {
             }
         }
 
-        for (int i = 0; i < splines.size(); i++)
+        for (size_t i = 0; i < splines.size(); i++)
             if (GetSpline(i).copyfrom == -1) {
                 // astrid - set boundary meshsize to  domain meshsize h
                 // if no domain mesh size is given, the max h value from the bounding box is used
@@ -300,7 +301,7 @@ namespace meshit {
         bool mapped = false;
         for (int i = 1; i <= mappoints.size(); i++) {
             if (mappoints.Get(i) != -1) {
-                Point<2> newp = splines.Get(to)->GetPoint(param.Get(i));
+                Point<2> newp = splines[to+1]->GetPoint(param.Get(i));
                 Point<3> newp3(newp(0), newp(1), 0);
 
                 int npi = -1;

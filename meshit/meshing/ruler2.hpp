@@ -35,64 +35,64 @@ namespace meshit {
 
         int quality;
         char * name;
-        Array<Point2d> points;
-        Array<INDEX_2> lines;
-        Array<Point2d> freezone, freezonelimit;
-        Array<Array<Point2d>*> freezone_i;
-        Array<Point2d> transfreezone;
+        std::vector<Point2d> points;
+        std::vector<INDEX_2> lines;
+        std::vector<Point2d> freezone, freezonelimit;
+        std::vector<Array<Point2d>*> freezone_i;
+        std::vector<Point2d> transfreezone;
 
-        Array<int> dellines;
-        Array<Element2d> elements;
-        Array<threefloat> tolerances, linetolerances;
-        Array<threeint> orientations;
+        std::vector<int> dellines;
+        std::vector<Element2d> elements;
+        std::vector<threefloat> tolerances, linetolerances;
+        std::vector<threeint> orientations;
         DenseMatrix oldutonewu, oldutofreearea, oldutofreearealimit;
-        Array<DenseMatrix*> oldutofreearea_i;
+        std::vector<DenseMatrix*> oldutofreearea_i;
         MatrixFixWidth<3> freesetinequ;
 
-        Array<Vec2d> linevecs;
+        std::vector<Vec2d> linevecs;
 
-        int noldp, noldl;
+        size_t noldp, noldl;
         float fzminx, fzmaxx, fzminy, fzmaxy;
 
         /// topological distance of line to base element
-        Array<int> lnearness;
+        std::vector<int> lnearness;
 
       public:
 
         netrule();
         ~netrule();
 
-        int GetNP() const
+        size_t GetNP() const
         {
             return points.size();
         }
 
-        int GetNL() const
+        size_t GetNL() const
         {
             return lines.size();
         }
 
-        int GetNE() const
+        size_t GetNE() const
         {
             return elements.size();
         }
 
-        int GetNOldP() const
+        size_t GetNOldP() const
         {
             return noldp;
         }
 
-        int GetNOldL() const
+        size_t GetNOldL() const
         {
             return noldl;
         }
 
-        int GetNDelL() const
+        size_t GetNDelL() const
         {
             return dellines.size();
         }
 
-        int GetNOrientations() const
+        size_t GetNOrientations() const
         {
             return orientations.size();
         }
@@ -104,45 +104,39 @@ namespace meshit {
 
         int GetLNearness(int li) const
         {
-            return lnearness.Get(li);
+            return lnearness[li-1];
         }
 
         const Point2d & GetPoint(int i) const
         {
-            return points.Get(i);
+            return points[i - 1];
         }
 
         const INDEX_2 & GetLine(int i) const
         {
-            return lines.Get(i);
+            return lines[i - 1];
         }
 
         const Element2d & GetElement(int i) const
         {
-            return elements.Get(i);
+            return elements[i - 1];
         }
 
         const threeint & GetOrientation(int i) const
         {
-            return orientations.Get(i);
+            return orientations[i - 1];
         }
 
         int GetDelLine(int i) const
         {
-            return dellines.Get(i);
+            return dellines[i - 1];
         }
-
-        const Array<int> & GetDelLines() const
-        {
-            return dellines;
-        }
-        void GetFreeZone(Array<Point2d> & afreearea);
 
         double CalcPointDist(int pi, const Point2d & p) const
         {
-            double dx = p.X() - points.Get(pi).X();
-            double dy = p.Y() - points.Get(pi).Y();
-            const threefloat * tfp = &tolerances.Get(pi);
+            double dx = p.X() - points[pi - 1].X();
+            double dy = p.Y() - points[pi - 1].Y();
+            const threefloat * tfp = &tolerances[pi - 1];
             return tfp->f1 * dx * dx + tfp->f2 * dx * dy + tfp->f3 * dy * dy;
         }
 
@@ -155,7 +149,7 @@ namespace meshit {
             if (p.X() < fzminx || p.X() > fzmaxx ||
                     p.Y() < fzminy || p.Y() > fzmaxy) return 0;
 
-            for (int i = 0; i < transfreezone.size(); i++) {
+            for (size_t i = 0; i < transfreezone.size(); i++) {
                 if (freesetinequ(i, 0) * p.X() +
                         freesetinequ(i, 1) * p.Y() +
                         freesetinequ(i, 2) > 0) return 0;
@@ -174,14 +168,9 @@ namespace meshit {
         int IsLineInFreeZone2(const Point2d & p1, const Point2d & p2) const;
         int ConvexFreeZone() const;
 
-        const Array<Point2d> & GetTransFreeZone()
-        {
-            return transfreezone;
-        }
-
         int GetPointNr(int ln, int endp) const
         {
-            return lines.Get(ln).I(endp);
+            return lines[ln - 1].I(endp);
         }
 
         const DenseMatrix & GetOldUToNewU() const

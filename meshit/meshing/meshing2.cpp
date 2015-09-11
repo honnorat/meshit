@@ -229,13 +229,13 @@ namespace meshit {
         if (totalarea > 0 || maxarea > 0)
             meshedarea = mesh.SurfaceArea();
 
-        adfront ->SetStartFront();
+        adfront->SetStartFront();
 
         int plotnexttrial = 999;
 
         double meshedarea_before = meshedarea;
 
-        while (!adfront ->Empty()) {
+        while (!adfront->Empty()) {
 
             locpoints.resize(0);
             loclines.resize(0);
@@ -283,7 +283,7 @@ namespace meshit {
 
             double hinner = (3 + qualclass) * max2(his, hshould);
 
-            adfront ->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
+            adfront->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
 
             if (qualclass > mp.giveuptol2d) {
                 LOG_WARNING("give up with qualclass " << qualclass <<
@@ -292,8 +292,8 @@ namespace meshit {
             }
 
             morerisc = 0;
-            PointIndex gpi1 = adfront -> GetGlobalIndex(pindex.Get(loclines[0].I1()));
-            PointIndex gpi2 = adfront -> GetGlobalIndex(pindex.Get(loclines[0].I2()));
+            PointIndex gpi1 = adfront->GetGlobalIndex(pindex.Get(loclines[0].I1()));
+            PointIndex gpi2 = adfront->GetGlobalIndex(pindex.Get(loclines[0].I2()));
 
             debugflag =
                     (debugparam.haltsegment &&
@@ -336,7 +336,7 @@ namespace meshit {
 
                 if (debugflag) {
                     std::cerr << "3d->2d transformation" << std::endl;
-                    std::cerr << "3d points: " << std::endl << locpoints << std::endl;
+//                    std::cerr << "3d points: " << std::endl << locpoints << std::endl;
                 }
 
                 for (int i = 1; i <= locpoints.size(); i++) {
@@ -345,8 +345,8 @@ namespace meshit {
                             plainpoints.Elem(i), h, plainzones.Elem(i));
                 }
 
-                if (debugflag)
-                    std::cerr << "2d points: " << std::endl << plainpoints << std::endl;
+//                if (debugflag)
+//                    std::cerr << "2d points: " << std::endl << plainpoints << std::endl;
 
 
                 p12d = plainpoints.Get(1);

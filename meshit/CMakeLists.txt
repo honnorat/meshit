@@ -41,41 +41,22 @@ SET(src_LINALG
 )
 SET(src_MESHING
 	meshing/adfront2.cpp
-	meshing/adfront3.cpp
 	meshing/bisect.cpp
-	meshing/clusters.cpp
-	meshing/curvedelems.cpp
-	meshing/delaunay.cpp
-	meshing/geomsearch.cpp
 	meshing/global.cpp
 	meshing/improve2.cpp
 	meshing/improve2gen.cpp
-	meshing/improve3.cpp
 	meshing/localh.cpp
 	meshing/meshclass.cpp
-	meshing/meshfunc.cpp
 	meshing/meshing2.cpp
-	meshing/meshing3.cpp
 	meshing/meshtool.cpp
 	meshing/meshtype.cpp
 	meshing/msghandler.cpp
 	meshing/netrule2.cpp
-	meshing/netrule3.cpp
 	meshing/parser2.cpp
-	meshing/parser3.cpp
-	meshing/prism2rls.cpp
-	meshing/pyramid2rls.cpp
-	meshing/pyramidrls.cpp
 	meshing/quadrls.cpp
 	meshing/refine.cpp
 	meshing/ruler2.cpp
-	meshing/ruler3.cpp
-	meshing/secondorder.cpp
-	meshing/smoothing2.5.cpp
 	meshing/smoothing2.cpp
-	meshing/smoothing3.cpp
-	meshing/specials.cpp
-	meshing/tetrarls.cpp
 	meshing/topology.cpp
 	meshing/triarls.cpp
 )

@@ -23,12 +23,12 @@ namespace meshit {
         double * data;
 
       public:
-        DLL_HEADER DenseMatrix();
-        DLL_HEADER DenseMatrix(int h, int w = 0);
-        DLL_HEADER DenseMatrix(const DenseMatrix & m2);
-        DLL_HEADER ~DenseMatrix();
+        DenseMatrix();
+        DenseMatrix(int h, int w = 0);
+        DenseMatrix(const DenseMatrix & m2);
+        ~DenseMatrix();
 
-        DLL_HEADER void SetSize(int h, int w = 0);
+        void SetSize(int h, int w = 0);
 
         int Height() const
         {
@@ -60,14 +60,14 @@ namespace meshit {
             return data[i];
         }
 
-        DLL_HEADER DenseMatrix & operator=(const DenseMatrix & m2);
-        DLL_HEADER DenseMatrix & operator+=(const DenseMatrix & m2);
-        DLL_HEADER DenseMatrix & operator-=(const DenseMatrix & m2);
+        DenseMatrix & operator=(const DenseMatrix & m2);
+        DenseMatrix & operator+=(const DenseMatrix & m2);
+        DenseMatrix & operator-=(const DenseMatrix & m2);
 
-        DLL_HEADER DenseMatrix & operator=(double v);
-        DLL_HEADER DenseMatrix & operator*=(double v);
+        DenseMatrix & operator=(double v);
+        DenseMatrix & operator*=(double v);
 
-        DLL_HEADER void Mult(const FlatVector & v, FlatVector & prod) const
+        void Mult(const FlatVector & v, FlatVector & prod) const
         {
             const double * mp, * sp;
             double * dp;
@@ -89,9 +89,9 @@ namespace meshit {
             }
         }
 
-        DLL_HEADER void MultTrans(const Vector & v, Vector & prod) const;
-        DLL_HEADER void Residuum(const Vector & x, const Vector & b, Vector & res) const;
-        DLL_HEADER double Det() const;
+        void MultTrans(const Vector & v, Vector & prod) const;
+        void Residuum(const Vector & x, const Vector & b, Vector & res) const;
+        double Det() const;
 
         friend DenseMatrix operator*(const DenseMatrix & m1, const DenseMatrix & m2);
         friend DenseMatrix operator+(const DenseMatrix & m1, const DenseMatrix & m2);
@@ -101,7 +101,7 @@ namespace meshit {
         friend void CalcAAt(const DenseMatrix & a, DenseMatrix & m2);
         friend void CalcABt(const DenseMatrix & a, const DenseMatrix & b, DenseMatrix & m2);
         friend void CalcAtB(const DenseMatrix & a, const DenseMatrix & b, DenseMatrix & m2);
-        DLL_HEADER void Solve(const Vector & b, Vector & x) const;
+        void Solve(const Vector & b, Vector & x) const;
         void SolveDestroy(const Vector & b, Vector & x);
 
         const double & Get(int i, int j) const
@@ -274,8 +274,8 @@ namespace meshit {
         return ost;
     };
 
-    extern DLL_HEADER void CalcAtA(const DenseMatrix & a, DenseMatrix & m2);
-    extern DLL_HEADER void CalcInverse(const DenseMatrix & m1, DenseMatrix & m2);
+    extern void CalcAtA(const DenseMatrix & a, DenseMatrix & m2);
+    extern void CalcInverse(const DenseMatrix & m1, DenseMatrix & m2);
 }
 
 #endif

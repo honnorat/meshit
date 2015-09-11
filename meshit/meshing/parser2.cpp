@@ -68,8 +68,7 @@ namespace meshit {
 
             //std::cerr << "buf " << buf <<std::endl;
 
-            if (strcmp(buf, "quality") == 0)
- {
+            if (strcmp(buf, "quality") == 0) {
                 ist >> quality;
             }
 
@@ -86,18 +85,18 @@ namespace meshit {
                     noldp++;
 
                     tolerances.resize(noldp);
-                    tolerances.Elem(noldp).f1 = 1.0;
-                    tolerances.Elem(noldp).f2 = 0;
-                    tolerances.Elem(noldp).f3 = 1.0;
+                    tolerances[noldp - 1].f1 = 1.0;
+                    tolerances[noldp - 1].f2 = 0;
+                    tolerances[noldp - 1].f3 = 1.0;
 
                     ist >> ch;
                     while (ch != ';') {
                         if (ch == '{') {
-                            ist >> tolerances.Elem(noldp).f1;
+                            ist >> tolerances[noldp - 1].f1;
                             ist >> ch; // ','
-                            ist >> tolerances.Elem(noldp).f2;
+                            ist >> tolerances[noldp - 1].f2;
                             ist >> ch; // ','
-                            ist >> tolerances.Elem(noldp).f3;
+                            ist >> tolerances[noldp - 1].f3;
                             ist >> ch; // '}'
                         }
                         else if (ch == 'd') {
@@ -128,40 +127,36 @@ namespace meshit {
 
                     //std::cerr << "read line " << lin.I1() << " " << lin.I2() <<std::endl;
                     lines.push_back(lin);
-                    linevecs.push_back(points.Get(lin.I2()) - points.Get(lin.I1()));
+                    linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
                     noldl++;
                     linetolerances.resize(noldl);
-                    linetolerances.Elem(noldl).f1 = 0;
-                    linetolerances.Elem(noldl).f2 = 0;
-                    linetolerances.Elem(noldl).f3 = 0;
+                    linetolerances[noldl - 1].f1 = 0;
+                    linetolerances[noldl - 1].f2 = 0;
+                    linetolerances[noldl - 1].f3 = 0;
 
                     //std::cerr << "mapl1" <<std::endl; 
                     ist >> ch;
                     while (ch != ';') {
                         //std::cerr << "working on character \""<<ch<<"\""<<std::endl;
                         if (ch == '{') {
-                            ist >> linetolerances.Elem(noldl).f1;
+                            ist >> linetolerances[noldl - 1].f1;
                             ist >> ch; // ','
-                            ist >> linetolerances.Elem(noldl).f2;
+                            ist >> linetolerances[noldl - 1].f2;
                             ist >> ch; // ','
-                            ist >> linetolerances.Elem(noldl).f3;
+                            ist >> linetolerances[noldl - 1].f3;
                             ist >> ch; // '}'
                         }
                         else if (ch == 'd') {
                             dellines.push_back(noldl);
                             ist >> ch; // 'e'
                             ist >> ch; // 'l'
-                            //std::cerr << "read del" <<std::endl;
                         }
 
                         ist >> ch;
-                        //std::cerr << "read character \""<<ch<<"\""<<std::endl;
                     }
 
                     ist >> ch;
-                    //std::cerr << "read next character \""<<ch<<"\""<<std::endl;
                 }
-
 
                 ist.putback(ch);
             }
@@ -207,7 +202,7 @@ namespace meshit {
                     ist >> ch; // ')'
 
                     lines.push_back(lin);
-                    linevecs.push_back(points.Get(lin.I2()) - points.Get(lin.I1()));
+                    linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
 
                     ist >> ch;
                     while (ch != ';') {
@@ -270,7 +265,7 @@ namespace meshit {
                     ist >> p.Y();
                     ist >> ch; // ')'
 
-                    freezonelimit.Elem(freepi) = p;
+                    freezonelimit[freepi - 1] = p;
 
                     ist >> ch;
                     while (ch != ';') {
@@ -297,30 +292,24 @@ namespace meshit {
 
                 while (ch == '(') {
                     elements.push_back(Element2d());
+                    //                    Element2d & last = *elements.end();
+                    Element2d & last = elements[elements.size() - 1];
 
-                    ist >> elements.Last().PNum(1);
+                    ist >> last.PNum(1);
                     ist >> ch; // ','
 
                     if (ch == COMMASIGN) {
-                        ist >> elements.Last().PNum(2);
+                        ist >> last.PNum(2);
                         ist >> ch; // ','
                     }
                     if (ch == COMMASIGN) {
-                        ist >> elements.Last().PNum(3);
+                        ist >> last.PNum(3);
                         ist >> ch; // ','
                     }
                     if (ch == COMMASIGN) {
-                        elements.Last().SetType(QUAD);
-                        ist >> elements.Last().PNum(4);
+                        last.SetType(QUAD);
+                        ist >> last.PNum(4);
                         ist >> ch; // ','
-
-                        // const Element2d & el = elements.Last();
-                        /*
-                        orientations.Append (threeint(el.PNum(1), el.PNum(2), el.PNum(3)));
-                        orientations.Append (threeint(el.PNum(2), el.PNum(3), el.PNum(4)));
-                        orientations.Append (threeint(el.PNum(3), el.PNum(4), el.PNum(1)));
-                        orientations.Append (threeint(el.PNum(4), el.PNum(1), el.PNum(2)));
-                         */
                     }
 
                     ist >> ch;
@@ -334,19 +323,20 @@ namespace meshit {
                 ist.putback(ch);
             }
 
-            else if (strcmp(buf, "orientations") == 0)
- {
+            else if (strcmp(buf, "orientations") == 0) {
                 ist >> ch;
 
                 while (ch == '(') {
                     //        threeint a = threeint();
                     orientations.push_back(threeint());
+                    //                    threeint & last = *orientations.end();
+                    threeint & last = orientations[orientations.size() - 1];
 
-                    ist >> orientations.Last().i1;
+                    ist >> last.i1;
                     ist >> ch; // ','
-                    ist >> orientations.Last().i2;
+                    ist >> last.i2;
                     ist >> ch; // ','
-                    ist >> orientations.Last().i3;
+                    ist >> last.i3;
                     ist >> ch; // ','
 
                     ist >> ch;
@@ -398,7 +388,7 @@ namespace meshit {
             do {
                 ok = 1;
 
-                for (i = 1; i <= noldl; i++) {
+                for (i = 1; i <= (int) noldl; i++) {
                     minn = 1000;
                     for (j = 1; j <= 2; j++)
                         minn = min2(minn, pnearness.Get(GetPointNr(i, j)));
@@ -413,17 +403,18 @@ namespace meshit {
 
             lnearness.resize(noldl);
 
-            for (i = 1; i <= noldl; i++) {
-                lnearness.Elem(i) = 0;
-                for (j = 1; j <= 2; j++)
-                    lnearness.Elem(i) += pnearness.Get(GetPointNr(i, j));
+            for (size_t i = 0; i < noldl; i++) {
+                lnearness[i] = 0;
+                for (j = 1; j <= 2; j++) {
+                    lnearness[i] += pnearness.Get(GetPointNr(i + 1, j));
+                }
             }
         }
 
         oldutofreearea_i.resize(10);
         freezone_i.resize(10);
 
-        for (i = 0; i < oldutofreearea_i.size(); i++) {
+        for (size_t i = 0; i < oldutofreearea_i.size(); i++) {
             double lam1 = 1.0 / (i + 1);
 
             oldutofreearea_i[i] = new DenseMatrix(oldutofreearea.Height(), oldutofreearea.Width());
@@ -434,7 +425,7 @@ namespace meshit {
 
             freezone_i[i] = new Array<Point2d> (freezone.size());
             Array<Point2d> & fzi = *freezone_i[i];
-            for (int j = 0; j < freezone.size(); j++)
+            for (size_t j = 0; j < freezone.size(); j++)
                 fzi[j] = freezonelimit[j] + lam1 * (freezone[j] - freezonelimit[j]);
         }
     }

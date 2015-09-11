@@ -337,7 +337,7 @@ namespace meshit {
 
                     // calc metric badness
                     double bad1 = 0, bad2 = 0;
-                    Vec<3> n;
+                    Vec3d n;
 
                     GetNormalVector(surfnr, mesh.Point(pmap.Get(1)), pgi.Elem(1), n);
 

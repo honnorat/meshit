@@ -5,7 +5,7 @@
 
 namespace meshit {
 
-    class DLL_HEADER Refinement
+    class Refinement
     {
         MeshOptimize2d * optimizer2d;
 

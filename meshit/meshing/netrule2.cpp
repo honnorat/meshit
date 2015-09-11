@@ -13,9 +13,9 @@ namespace meshit {
     netrule::~netrule()
     {
         delete [] name;
-        for (int i = 0; i < oldutofreearea_i.size(); i++)
+        for (size_t i = 0; i < oldutofreearea_i.size(); i++)
             delete oldutofreearea_i[i];
-        for (int i = 0; i < freezone_i.size(); i++)
+        for (size_t i = 0; i < freezone_i.size(); i++)
             delete freezone_i[i];
     }
 
@@ -32,8 +32,8 @@ namespace meshit {
         int fzs = freezone.size();
         transfreezone.resize(fzs);
 
-        if (tolclass <= oldutofreearea_i.size()) {
-            oldutofreearea_i[tolclass - 1] -> Mult(devp, devfree);
+        if (tolclass <= (int) oldutofreearea_i.size()) {
+            oldutofreearea_i[tolclass - 1]->Mult(devp, devfree);
 
             Array<Point2d> & fzi = *freezone_i[tolclass - 1];
             for (int i = 0; i < fzs; i++) {
@@ -99,7 +99,7 @@ namespace meshit {
                 (p1.Y() > fzmaxy && p2.Y() > fzmaxy) ||
                 (p1.Y() < fzminy && p2.Y() < fzminy)) return 0;
 
-        for (int i = 1; i <= transfreezone.size(); i++) {
+        for (size_t i = 1; i <= transfreezone.size(); i++) {
             if (freesetinequ.Get(i, 1) * p1.X() + freesetinequ.Get(i, 2) * p1.Y() +
                     freesetinequ.Get(i, 3) > -1e-8 && // -1e-6
                     freesetinequ.Get(i, 1) * p2.X() + freesetinequ.Get(i, 2) * p2.Y() +
@@ -119,9 +119,9 @@ namespace meshit {
             allleft = 1;
             allright = 1;
 
-            for (int i = 1; i <= transfreezone.size(); i++) {
-                left = transfreezone.Get(i).X() * nx + transfreezone.Get(i).Y() + c < 1e-7;
-                right = transfreezone.Get(i).X() * nx + transfreezone.Get(i).Y() + c > -1e-7;
+            for (size_t i = 0; i < transfreezone.size(); i++) {
+                left = transfreezone[i].X() * nx + transfreezone[i].Y() + c < 1e-7;
+                right = transfreezone[i].X() * nx + transfreezone[i].Y() + c > -1e-7;
 
                 if (!left) allleft = 0;
                 if (!right) allright = 0;
@@ -134,15 +134,12 @@ namespace meshit {
 
     int netrule::ConvexFreeZone() const
     {
-        int n = transfreezone.size();
-        for (int i = 1; i <= n; i++) {
+        size_t n = transfreezone.size();
+        for (size_t i = 0; i < n; i++) {
             const bool counterclockwise = CCW(
-                    transfreezone.Get(i),
-                    transfreezone.Get(i % n + 1),
-                    transfreezone.Get((i + 1) % n + 1),
-                    1e-7);
-            //std::cerr << "ccw " << counterclockwise <<std::endl << " p1 " << transfreezone.Get(i) << " p2 " << transfreezone.Get(i % n + 1)
-            //		 << " p3 " << transfreezone.Get( (i+1) % n + 1 ) <<std::endl;
+                    transfreezone[i],
+                    transfreezone[(i + 1) % n],
+                    transfreezone[(i + 2) % n], 1e-7);
             if (!counterclockwise)
                 return 0;
         }
@@ -151,10 +148,10 @@ namespace meshit {
 
     float netrule::CalcLineError(int li, const Vec2d & v) const
     {
-        float dx = v.X() - linevecs.Get(li).X();
-        float dy = v.Y() - linevecs.Get(li).Y();
+        float dx = v.X() - linevecs[li-1].X();
+        float dy = v.Y() - linevecs[li-1].Y();
 
-        const threefloat * ltf = &linetolerances.Get(li);
+        const threefloat * ltf = &linetolerances[li-1];
         return ltf->f1 * dx * dx + ltf->f2 * dx * dy + ltf->f3 * dy * dy;
     }
 }
