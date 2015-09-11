@@ -26,7 +26,7 @@ namespace meshit {
     {
         Point<2> p2d;
 
-        p2d = geometry.GetSplines().Get(ap1.edgenr) -> GetPoint(((1 - secpoint) * ap1.dist + secpoint * ap2.dist));
+        p2d = geometry.GetSplines()[ap1.edgenr+1] -> GetPoint(((1 - secpoint) * ap1.dist + secpoint * ap2.dist));
 
         newp = Point3d(p2d(0), p2d(1), 0);
         newgi.edgenr = ap1.edgenr;
@@ -36,7 +36,7 @@ namespace meshit {
     Vec<3> Refinement2d::GetTangent(const Point<3> & p, int surfi1, int surfi2,
             const EdgePointGeomInfo & ap1) const
     {
-        Vec<2> t2d = geometry.GetSplines().Get(ap1.edgenr) -> GetTangent(ap1.dist);
+        Vec<2> t2d = geometry.GetSplines()[ap1.edgenr+1] -> GetTangent(ap1.dist);
         return Vec<3> (t2d(0), t2d(1), 0);
     }
 
@@ -56,7 +56,7 @@ namespace meshit {
     {
         Point<2> p2d(p(0), p(1)), pp;
         double t;
-        geometry.GetSplines().Get(egi.edgenr) -> Project(p2d, pp, t);
+        geometry.GetSplines()[egi.edgenr+1] -> Project(p2d, pp, t);
         p = Point<3> (pp(0), pp(1), 0);
     }
 }

@@ -300,7 +300,7 @@ namespace meshit {
         bool mapped = false;
         for (int i = 1; i <= mappoints.size(); i++) {
             if (mappoints.Get(i) != -1) {
-                Point<2> newp = splines.Get(to)->GetPoint(param.Get(i));
+                Point<2> newp = splines[to+1]->GetPoint(param.Get(i));
                 Point<3> newp3(newp(0), newp(1), 0);
 
                 int npi = -1;

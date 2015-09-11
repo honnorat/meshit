@@ -223,18 +223,21 @@ namespace meshit {
                     // type of spline segement
                     if (strcmp(buf, "2") == 0) { // a line
                         infile >> hi1 >> hi2;
-                        spline = new LineSeg<2>(geompoints[hi1 - 1],
+                        spline = new LineSeg<2>(
+                                geompoints[hi1 - 1],
                                 geompoints[hi2 - 1]);
                     }
                     else if (strcmp(buf, "3") == 0) { // a rational spline
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new SplineSeg3<2> (geompoints[hi1 - 1],
+                        spline = new SplineSeg3<2> (
+                                geompoints[hi1 - 1],
                                 geompoints[hi2 - 1],
                                 geompoints[hi3 - 1]);
                     }
                     else if (strcmp(buf, "4") == 0) { // an arc
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new CircleSeg<2> (geompoints[hi1 - 1],
+                        spline = new CircleSeg<2> (
+                                geompoints[hi1 - 1],
                                 geompoints[hi2 - 1],
                                 geompoints[hi3 - 1]);
                     }
@@ -436,7 +439,7 @@ namespace meshit {
 
     std::string SplineGeometry2d::GetBCName(const int bcnr) const
     {
-        if ((int)bcnames.size() >= bcnr)
+        if ((int) bcnames.size() >= bcnr)
             if (bcnames[bcnr - 1])
                 return *bcnames[bcnr - 1];
         return "default";
@@ -444,7 +447,7 @@ namespace meshit {
 
     std::string * SplineGeometry2d::BCNamePtr(const int bcnr)
     {
-        if (bcnr > (int)bcnames.size())
+        if (bcnr > (int) bcnames.size())
             return 0;
         else
             return bcnames[bcnr - 1];
@@ -452,7 +455,7 @@ namespace meshit {
 
     void SplineGeometry2d::GetMaterial(const int domnr, char* & material)
     {
-        if ((int)materials.size() >= domnr)
+        if ((int) materials.size() >= domnr)
             material = materials[domnr - 1];
         else
             material = 0;
@@ -460,7 +463,7 @@ namespace meshit {
 
     double SplineGeometry2d::GetDomainMaxh(const int domnr)
     {
-        if ((int)maxh.size() >= domnr && domnr > 0)
+        if ((int) maxh.size() >= domnr && domnr > 0)
             return maxh[domnr - 1];
         else
             return -1;
