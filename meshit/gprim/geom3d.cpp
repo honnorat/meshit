@@ -99,108 +99,24 @@ namespace meshit {
 
     Box3d::Box3d(const Point3d& p1, const Point3d& p2)
     {
-        minx[0] = min2(p1.X(), p2.X());
-        minx[1] = min2(p1.Y(), p2.Y());
-        minx[2] = min2(p1.Z(), p2.Z());
-        maxx[0] = max2(p1.X(), p2.X());
-        maxx[1] = max2(p1.Y(), p2.Y());
-        maxx[2] = max2(p1.Z(), p2.Z());
+        minx[0] = std::min(p1.X(), p2.X());
+        minx[1] = std::min(p1.Y(), p2.Y());
+        minx[2] = std::min(p1.Z(), p2.Z());
+        maxx[0] = std::max(p1.X(), p2.X());
+        maxx[1] = std::max(p1.Y(), p2.Y());
+        maxx[2] = std::max(p1.Z(), p2.Z());
     }
 
     const Box3d& Box3d::operator+=(const Box3d& b)
     {
-        minx[0] = min2(minx[0], b.minx[0]);
-        minx[1] = min2(minx[1], b.minx[1]);
-        minx[2] = min2(minx[2], b.minx[2]);
-        maxx[0] = max2(maxx[0], b.maxx[0]);
-        maxx[1] = max2(maxx[1], b.maxx[1]);
-        maxx[2] = max2(maxx[2], b.maxx[2]);
+        minx[0] = std::min(minx[0], b.minx[0]);
+        minx[1] = std::min(minx[1], b.minx[1]);
+        minx[2] = std::min(minx[2], b.minx[2]);
+        maxx[0] = std::max(maxx[0], b.maxx[0]);
+        maxx[1] = std::max(maxx[1], b.maxx[1]);
+        maxx[2] = std::max(maxx[2], b.maxx[2]);
 
         return *this;
-    }
-
-    Point3d Box3d::MaxCoords() const
-    {
-        return Point3d(maxx[0], maxx[1], maxx[2]);
-    }
-
-    Point3d Box3d::MinCoords() const
-    {
-        return Point3d(minx[0], minx[1], minx[2]);
-    }
-
-    void Box3d::WriteData(std::ofstream& fout) const
-    {
-        for (int i = 0; i < 3; i++) {
-            fout << minx[i] << " " << maxx[i] << " ";
-        }
-        fout << "\n";
-    }
-
-    void Box3d::ReadData(std::ifstream& fin)
-    {
-        for (int i = 0; i < 3; i++) {
-            fin >> minx[i];
-            fin >> maxx[i];
-        }
-    }
-
-    Box3dSphere::Box3dSphere(double aminx, double amaxx,
-            double aminy, double amaxy,
-            double aminz, double amaxz)
-        : Box3d(aminx, amaxx, aminy, amaxy, aminz, amaxz)
-    {
-        CalcDiamCenter();
-    }
-
-    void Box3dSphere::CalcDiamCenter()
-    {
-        diam = sqrt(sqr(maxx[0] - minx[0]) +
-                sqr(maxx[1] - minx[1]) +
-                sqr(maxx[2] - minx[2]));
-
-        c.X() = 0.5 * (minx[0] + maxx[0]);
-        c.Y() = 0.5 * (minx[1] + maxx[1]);
-        c.Z() = 0.5 * (minx[2] + maxx[2]);
-
-        inner = min2(min2(maxx[0] - minx[0], maxx[1] - minx[1]), maxx[2] - minx[2]) / 2;
-    }
-
-    void Box3dSphere::GetSubBox(int i, Box3dSphere & sbox) const
-    {
-        i--;
-        if (i & 1) {
-            sbox.minx[0] = c.X();
-            sbox.maxx[0] = maxx[0];
-        }
-        else {
-            sbox.minx[0] = minx[0];
-            sbox.maxx[0] = c.X();
-        }
-        if (i & 2) {
-            sbox.minx[1] = c.Y();
-            sbox.maxx[1] = maxx[1];
-        }
-        else {
-            sbox.minx[1] = minx[1];
-            sbox.maxx[1] = c.Y();
-        }
-        if (i & 4) {
-            sbox.minx[2] = c.Z();
-            sbox.maxx[2] = maxx[2];
-        }
-        else {
-            sbox.minx[2] = minx[2];
-            sbox.maxx[2] = c.Z();
-        }
-
-        //  sbox.CalcDiamCenter ();
-
-        sbox.c.X() = 0.5 * (sbox.minx[0] + sbox.maxx[0]);
-        sbox.c.Y() = 0.5 * (sbox.minx[1] + sbox.maxx[1]);
-        sbox.c.Z() = 0.5 * (sbox.minx[2] + sbox.maxx[2]);
-        sbox.diam = 0.5 * diam;
-        sbox.inner = 0.5 * inner;
     }
 
     void Transpose(Vec3d & v1, Vec3d & v2, Vec3d & v3)
@@ -209,14 +125,6 @@ namespace meshit {
         std::swap(v1.Z(), v3.X());
         std::swap(v2.Z(), v3.Y());
     }
-
-    /*
-      gcc4.8.3  warning: array subscript is above array bounds [-Warray-bounds]
-     */
-    //#ifdef __GNUC__
-    //#pragma GCC diagnostic push
-    //#pragma GCC diagnostic ignored "-Warray-bounds"
-    //#endif
 
     int SolveLinearSystem(
             const Vec3d & col1, const Vec3d & col2, const Vec3d & col3,
@@ -278,56 +186,6 @@ namespace meshit {
         }
 
         return 0;
-
-
-
-
-
-        /*
-        double det = Determinant (col1, col2, col3);
-        if (fabs (det) < 1e-40)
-          return 1;
-  
-        sol.X() = Determinant (rhs, col2, col3) / det;
-        sol.Y() = Determinant (col1, rhs, col3) / det;
-        sol.Z() = Determinant (col1, col2, rhs) / det;
-
-        return 0;
-         */
-        /*
-        Vec3d cr;
-        Cross (col1, col2, cr);
-        double det = cr * col3;
-
-        if (fabs (det) < 1e-40)
-          return 1;
-
-        if (fabs(cr.Z()) > 1e-12)
-          {
-            // solve for 3. component
-            sol.Z() = (cr * rhs) / det;
-      
-            // 2x2 system for 1. and 2. component
-            double res1 = rhs.X() - sol.Z() * col3.X();
-            double res2 = rhs.Y() - sol.Z() * col3.Y();
-      
-            sol.X() = (col2.Y() * res1 - col2.X() * res2) / cr.Z();
-            sol.Y() = (col1.X() * res2 - col1.Y() * res1) / cr.Z();
-  
-          }
-        else
-          {
-            det = Determinant (col1, col2, col3);
-            if (fabs (det) < 1e-40)
-          return 1;
-      
-            sol.X() = Determinant (rhs, col2, col3) / det;
-            sol.Y() = Determinant (col1, rhs, col3) / det;
-            sol.Z() = Determinant (col1, col2, rhs) / det;
-          }
-
-        return 0;
-         */
     }
 
 #ifdef __GNUC__
@@ -450,7 +308,7 @@ namespace meshit {
 
         double t1p = t1.X() * p.X() + t1.Y() * p.Y() + t1.Z() * p.Z();
         double t2p = t2.X() * p.X() + t2.Y() * p.Y() + t2.Z() * p.Z();
-        c0 = sqr(t1p) + sqr(t2p);
+        c0 = t1p*t1p + t2p*t2p;
         cx = -2 * (t1p * t1.X() + t2p * t2.X());
         cy = -2 * (t1p * t1.Y() + t2p * t2.Y());
         cz = -2 * (t1p * t1.Z() + t2p * t2.Z());
@@ -462,16 +320,7 @@ namespace meshit {
         cxy = 2 * t1.X() * t1.Y() + 2 * t2.X() * t2.Y();
         cxz = 2 * t1.X() * t1.Z() + 2 * t2.X() * t2.Z();
         cyz = 2 * t1.Y() * t1.Z() + 2 * t2.Y() * t2.Z();
-
-        /*
-        std::cerr << "c0 = " << c0
-               << " clin = " << cx << " " << cy << " " << cz 
-               << " cq = " << cxx << " " << cyy << " " << czz
-               << cxy << " " << cyz << " " << cyz <<std::endl;
-         */
     }
-
-    // QuadraticFunction3d gqf (Point3d (0,0,0), Vec3d (1, 0, 0));
 
     void referencetransform::Set(const Point3d & p1, const Point3d & p2,
             const Point3d & p3, double ah)

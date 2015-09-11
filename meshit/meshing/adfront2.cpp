@@ -9,11 +9,11 @@
 
 namespace meshit {
 
-    FrontPoint2::FrontPoint2(const Point<3> & ap, PointIndex agi,
+    FrontPoint2::FrontPoint2(const Point3d & ap, PointIndex agi,
             MultiPointGeomInfo * amgi, bool aonsurface)
+        : globalindex(agi)
     {
         p = ap;
-        globalindex = agi;
         nlinetopoint = 0;
         frontnr = INT_MAX - 10;
         onsurface = aonsurface;
@@ -58,7 +58,8 @@ namespace meshit {
         }
     }
 
-    int AdFront2::AddPoint(const Point<3> & p, PointIndex globind,
+    int AdFront2::AddPoint(
+            const Point3d & p, PointIndex globind,
             MultiPointGeomInfo * mgi,
             bool pointonsurface)
     {
@@ -99,7 +100,7 @@ namespace meshit {
         p1.AddLine();
         p2.AddLine();
 
-        minfn = min2(p1.FrontNr(), p2.FrontNr());
+        minfn = std::min(p1.FrontNr(), p2.FrontNr());
         p1.DecFrontNr(minfn + 1);
         p2.DecFrontNr(minfn + 1);
 

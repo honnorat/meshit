@@ -77,7 +77,7 @@ namespace meshit {
             for (int i = 0; i < maxlegalline; i++) {
                 const INDEX_2 & hline = llines1[i];
 
-                int minn = min2(pnearness.Get(hline[0]), pnearness.Get(hline[1]));
+                int minn = std::min(pnearness.Get(hline[0]), pnearness.Get(hline[1]));
 
                 for (int j = 0; j < 2; j++) {
                     if (pnearness.Get(hline[j]) > minn + 1) {

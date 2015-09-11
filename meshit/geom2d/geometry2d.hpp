@@ -82,24 +82,9 @@ namespace meshit {
             seg.GetDerivatives(t, point, first, second);
         }
 
-        virtual void GetCoeff(Vector & coeffs) const
-        {
-            seg.GetCoeff(coeffs);
-        }
-
         virtual void GetPoints(int n, Array<Point<2> > & points) const
         {
             seg.GetPoints(n, points);
-        }
-
-        virtual double MaxCurvature() const
-        {
-            return seg.MaxCurvature();
-        }
-
-        virtual std::string GetType() const
-        {
-            return seg.GetType();
         }
 
         virtual double CalcCurvature(double t) const

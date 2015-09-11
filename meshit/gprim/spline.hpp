@@ -34,16 +34,10 @@ namespace meshit {
         /// hp-refinement
         bool hpref;
 
-        GeomPoint()
-        {
-            ;
-        }
+        GeomPoint() { }
 
         GeomPoint(const Point<D> & ap, double aref = 1, bool ahpref = false)
-            : Point<D>(ap), refatpoint(aref), hmax(1e99), hpref(ahpref)
-        {
-            ;
-        }
+            : Point<D>(ap), refatpoint(aref), hmax(1e99), hpref(ahpref) { }
     };
 
 
@@ -54,19 +48,15 @@ namespace meshit {
     {
       public:
 
-        SplineSeg()
-        {
-            ;
-        }
+        SplineSeg() { }
 
-        virtual ~SplineSeg()
-        {
-            ;
-        }
-        /// calculates length of curve
+        virtual ~SplineSeg() { }
+
         virtual double Length() const;
+
         /// returns point at curve, 0 <= t <= 1
         virtual Point<D> GetPoint(double t) const = 0;
+
         /// returns a (not necessarily unit-length) tangent vector for 0 <= t <= 1
 
         virtual Vec<D> GetTangent(const double t) const
@@ -93,14 +83,6 @@ namespace meshit {
         virtual const GeomPoint<D> & StartPI() const = 0;
         /// returns terminal point on curve
         virtual const GeomPoint<D> & EndPI() const = 0;
-        /** writes curve description for fepp:
-        for implicitly given quadratic curves, the 6 coefficients of
-        the polynomial
-        $$ a x^2 + b y^2 + c x y + d x + e y + f = 0 $$
-        are written to ost */
-        void PrintCoeff(std::ostream & ost) const;
-
-        virtual void GetCoeff(Vector & coeffs) const = 0;
 
         virtual void GetPoints(int n, Array<Point<D> > & points) const;
 
@@ -111,13 +93,6 @@ namespace meshit {
                 Array < Point<D> > & points, const double eps) const
         {
             points.resize(0);
-        }
-
-        virtual double MaxCurvature(void) const = 0;
-
-        virtual std::string GetType(void) const
-        {
-            return "splinebase";
         }
 
         virtual void Project(const Point<D> point, Point<D> & point_on_curve, double & t) const
@@ -163,8 +138,6 @@ namespace meshit {
             return p2;
         }
 
-        virtual void GetCoeff(Vector & coeffs) const;
-
         virtual std::string GetType(void) const
         {
             return "line";
@@ -172,11 +145,6 @@ namespace meshit {
 
         virtual void LineIntersections(const double a, const double b, const double c,
                 Array < Point<D> > & points, const double eps) const;
-
-        virtual double MaxCurvature(void) const
-        {
-            return 0;
-        }
 
         virtual void Project(const Point<D> point, Point<D> & point_on_curve, double & t) const;
 
@@ -216,8 +184,6 @@ namespace meshit {
             return p3;
         }
 
-        virtual void GetCoeff(Vector & coeffs) const;
-
         virtual std::string GetType(void) const
         {
             return "spline3";
@@ -230,8 +196,6 @@ namespace meshit {
 
         DLL_HEADER virtual void LineIntersections(const double a, const double b, const double c,
                 Array < Point<D> > & points, const double eps) const;
-
-        DLL_HEADER virtual double MaxCurvature(void) const;
 
         DLL_HEADER virtual void Project(const Point<D> point, Point<D> & point_on_curve, double & t) const;
 
@@ -267,8 +231,6 @@ namespace meshit {
             return p3;
         }
 
-        virtual void GetCoeff(Vector & coeffs) const;
-
         double Radius() const
         {
             return radius;
@@ -296,11 +258,6 @@ namespace meshit {
 
         virtual void LineIntersections(const double a, const double b, const double c,
                 Array < Point<D> > & points, const double eps) const;
-
-        virtual double MaxCurvature(void) const
-        {
-            return 1. / radius;
-        }
     };
 
     template<int D>
@@ -324,16 +281,6 @@ namespace meshit {
         virtual const GeomPoint<D> & EndPI() const
         {
             return p2n;
-        }
-
-        virtual void GetCoeff(Vector & coeffs) const
-        {
-            ;
-        }
-
-        virtual double MaxCurvature(void) const
-        {
-            return 1;
         }
     };
 
@@ -366,18 +313,6 @@ namespace meshit {
         if (n >= 2)
             for (int i = 0; i < n; i++)
                 points[i] = GetPoint(double(i) / (n - 1));
-    }
-
-    template<int D>
-    void SplineSeg<D>::PrintCoeff(std::ostream & ost) const
-    {
-        Vector u(6);
-
-        GetCoeff(u);
-
-        for (int i = 0; i < 6; i++)
-            ost << u[i] << "  ";
-        ost << std::endl;
     }
 
     /* 
@@ -415,20 +350,6 @@ namespace meshit {
     double LineSeg<D>::Length() const
     {
         return Dist(p1, p2);
-    }
-
-    template<int D>
-    void LineSeg<D>::GetCoeff(Vector & coeffs) const
-    {
-        coeffs.SetSize(6);
-
-        double dx = p2(0) - p1(0);
-        double dy = p2(1) - p1(1);
-
-        coeffs[0] = coeffs[1] = coeffs[2] = 0;
-        coeffs[3] = -dy;
-        coeffs[4] = dx;
-        coeffs[5] = -dx * p1(1) + dy * p1(0);
     }
 
     template<int D>
@@ -543,16 +464,6 @@ namespace meshit {
     }
 
     template<int D>
-    void CircleSeg<D>::GetCoeff(Vector & coeff) const
-    {
-        coeff[0] = coeff[1] = 1.0;
-        coeff[2] = 0.0;
-        coeff[3] = -2.0 * pm[0];
-        coeff[4] = -2.0 * pm[1];
-        coeff[5] = sqr(pm[0]) + sqr(pm[1]) - sqr(Radius());
-    }
-
-    template<int D>
     DiscretePointsSeg<D>::DiscretePointsSeg(const Array<Point<D> > & apts)
         : pts(apts)
     {
@@ -613,13 +524,6 @@ namespace meshit {
         virtual const GeomPoint<D> & EndPI() const
         {
             return p2n;
-        }
-
-        virtual void GetCoeff(Vector & coeffs) const { }
-
-        virtual double MaxCurvature(void) const
-        {
-            return 1;
         }
     };
 

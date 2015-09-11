@@ -467,10 +467,10 @@ namespace meshit {
             // Frobenius norm
             double frob = 0;
             for (j = 1; j <= 4; j++) {
-                frob += sqr(trans.Get(j));
+                double d = trans.Get(j);
+                frob += d*d;
             }
-            frob = sqrt(frob);
-            frob /= 2;
+            frob = 0.5 * sqrt(frob);
 
             double det = trans.Det();
 
@@ -537,7 +537,8 @@ namespace meshit {
                 // Frobenius norm
                 double frob = 0;
                 for (int j = 0; j < 4; j++) {
-                    frob += sqr(trans(j));
+                    double d = trans(j);
+                    frob += d*d;
                 }
                 frob = sqrt(frob);
 
@@ -587,7 +588,8 @@ namespace meshit {
             // Frobenius norm
             double frob = 0;
             for (int j = 1; j <= 4; j++) {
-                frob += sqr(trans.Get(j));
+                double d = trans.Get(j);
+                frob += d*d;
             }
             frob = sqrt(frob);
 
@@ -646,10 +648,10 @@ namespace meshit {
             // Frobenius norm
             double frob = 0;
             for (j = 1; j <= 4; j++) {
-                frob += sqr(trans.Get(j));
+                double d = trans.Get(j);
+                frob += d*d;
             }
-            frob = sqrt(frob);
-            frob /= 2;
+            frob = 0.5 * sqrt(frob);
 
             double det = trans.Det();
             if (det <= 0)

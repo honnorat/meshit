@@ -93,48 +93,6 @@ namespace meshit {
     }
 
     template<int D>
-    void SplineSeg3<D>::GetCoeff(Vector & u) const
-    {
-        DenseMatrix a(6, 6);
-        DenseMatrix ata(6, 6);
-        Vector f(6);
-
-        u.SetSize(6);
-
-        //  ata.SetSymmetric(1);
-
-        double t = 0;
-        for (int i = 0; i < 5; i++, t += 0.25) {
-            Point<D> p = GetPoint(t);
-            a(i, 0) = p(0) * p(0);
-            a(i, 1) = p(1) * p(1);
-            a(i, 2) = p(0) * p(1);
-            a(i, 3) = p(0);
-            a(i, 4) = p(1);
-            a(i, 5) = 1;
-        }
-        a(5, 0) = 1;
-
-        CalcAtA(a, ata);
-
-        u = 0;
-        u(5) = 1;
-        a.MultTrans(u, f);
-        ata.Solve(f, u);
-
-        // the sign
-        Point<D> p0 = GetPoint(0);
-        Vec<D> ht = GetTangent(0);
-        Vec<2> tang(ht(0), ht(1));
-
-        double gradx = 2. * u(0) * p0(0) + u(2) * p0(1) + u(3);
-        double grady = 2. * u(1) * p0(1) + u(2) * p0(0) + u(4);
-        Vec<2> gradn(grady, -gradx);
-
-        if (tang * gradn < 0) u *= -1;
-    }
-
-    template<int D>
     void SplineSeg3<D>::Project(const Point<D> point, Point<D> & point_on_curve, double & t) const
     {
         double t_old = -1;
@@ -156,7 +114,7 @@ namespace meshit {
 
             phimp = phi - point;
 
-            //t = min2(max2(t-(phip*phimp)/(phipp*phimp + phip*phip),0.),1.);
+            //t = min2(std::max(t-(phip*phimp)/(phipp*phimp + phip*phip),0.),1.);
             t -= (phip * phimp) / (phipp * phimp + phip * phip);
 
             i++;
@@ -224,17 +182,17 @@ namespace meshit {
 
                     if (auxt1 < t0) {
                         t2 -= 0.4 * (t2 - t0);
-                        t0 = max2(0., t0 - 0.1 * (t2 - t0));
+                        t0 = std::max(0., t0 - 0.1 * (t2 - t0));
                     }
                     else if (auxt1 > t2) {
                         t0 += 0.4 * (t2 - t0);
-                        t2 = min2(1., t2 + 0.1 * (t2 - t0));
+                        t2 = std::min(1., t2 + 0.1 * (t2 - t0));
                     }
                     else {
                         t1 = auxt1;
                         auxt1 = 0.25 * (t2 - t0);
-                        t0 = max2(0., t1 - auxt1);
-                        t2 = min2(1., t1 + auxt1);
+                        t0 = std::max(0., t1 - auxt1);
+                        t2 = std::min(1., t1 + auxt1);
                     }
 
                     t1 = 0.5 * (t2 + t0);
@@ -310,34 +268,6 @@ namespace meshit {
         second = (b1pp / w - 2 * b1p * fac1 - b1 * fac2) * v1 +
                 (b2pp / w - 2 * b2p * fac1 - b2 * fac2) * v2 +
                 (b3pp / w - 2 * b3p * fac1 - b3 * fac2) * v3;
-    }
-
-    template<>
-    double SplineSeg3<2>::MaxCurvature(void) const
-    {
-        Vec<2> v1 = p1 - p2;
-        Vec<2> v2 = p3 - p2;
-        double l1 = v1.Length();
-        double l2 = v2.Length();
-
-        double cosalpha = (v1 * v2) / (l1 * l2);
-
-
-        return sqrt(cosalpha + 1.) / (min2(l1, l2)*(1. - cosalpha));
-    }
-
-    template<>
-    double SplineSeg3<3>::MaxCurvature(void) const
-    {
-        Vec<3> v1 = p1 - p2;
-        Vec<3> v2 = p3 - p2;
-        double l1 = v1.Length();
-        double l2 = v2.Length();
-
-        double cosalpha = v1 * v2 / (l1 * l2);
-
-
-        return sqrt(cosalpha + 1.) / (min2(l1, l2)*(1. - cosalpha));
     }
 
     template<int D>

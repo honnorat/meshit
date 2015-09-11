@@ -360,14 +360,14 @@ namespace meshit {
                                     el.PNum(elfaces[0][3]));
 
                             facedir = 0;
-                            if (min2(face4.I1(), face4.I2()) >
-                                    min2(face4.I4(), face4.I3())) { // z - orientation
+                            if (std::min(face4.I1(), face4.I2()) > std::min(face4.I4(), face4.I3())) {
+                                // z - orientation
                                 facedir += 1;
                                 std::swap(face4.I1(), face4.I4());
                                 std::swap(face4.I2(), face4.I3());
                             }
-                            if (min2(face4.I1(), face4.I4()) >
-                                    min2(face4.I2(), face4.I3())) { // x - orientation
+                            if (std::min(face4.I1(), face4.I4()) > std::min(face4.I2(), face4.I3())) {
+                                // x - orientation
                                 facedir += 2;
                                 std::swap(face4.I1(), face4.I2());
                                 std::swap(face4.I3(), face4.I4());

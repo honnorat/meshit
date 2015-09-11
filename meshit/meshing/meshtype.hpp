@@ -47,8 +47,8 @@ namespace meshit {
         OPT_QUALITY, OPT_CONFORM, OPT_REST, OPT_WORSTCASE, OPT_LEGAL
     };
 
-    extern DLL_HEADER int GetTimeStamp();
-    extern DLL_HEADER int NextTimeStamp();
+    extern int GetTimeStamp();
+    extern int NextTimeStamp();
 
     class PointGeomInfo
     {
@@ -141,7 +141,7 @@ namespace meshit {
 
       public:
 
-        PointIndex() { }
+        PointIndex() : i(-1) { }
 
         PointIndex(int ai) : i(ai) { }
 
@@ -413,7 +413,7 @@ namespace meshit {
       public:
         Element2d();
         Element2d(int anp);
-        DLL_HEADER Element2d(ELEMENT_TYPE type);
+        Element2d(ELEMENT_TYPE type);
         Element2d(int pi1, int pi2, int pi3);
         Element2d(int pi1, int pi2, int pi3, int pi4);
 
@@ -667,8 +667,8 @@ namespace meshit {
     class Segment
     {
       public:
-        DLL_HEADER Segment();
-        DLL_HEADER Segment(const Segment& other);
+        Segment();
+        Segment(const Segment& other);
 
         ~Segment() { }
 
@@ -777,17 +777,17 @@ namespace meshit {
         double domout_singular;
 
       public:
-        DLL_HEADER FaceDescriptor();
-        DLL_HEADER FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi);
-        DLL_HEADER FaceDescriptor(const Segment & seg);
-        DLL_HEADER FaceDescriptor(const FaceDescriptor& other);
+        FaceDescriptor();
+        FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi);
+        FaceDescriptor(const Segment & seg);
+        FaceDescriptor(const FaceDescriptor& other);
 
-        DLL_HEADER ~FaceDescriptor()
+        ~FaceDescriptor()
         {
             ;
         }
 
-        DLL_HEADER int SegmentFits(const Segment & seg);
+        int SegmentFits(const Segment & seg);
 
         int SurfNr() const
         {
@@ -913,7 +913,7 @@ namespace meshit {
         }
     };
 
-    class DLL_HEADER MeshingParameters
+    class MeshingParameters
     {
       public:
         /**
@@ -1105,16 +1105,16 @@ namespace meshit {
         int maxidentnr;
 
       public:
-        DLL_HEADER Identifications(class Mesh & amesh);
-        DLL_HEADER ~Identifications();
+        Identifications(class Mesh & amesh);
+        ~Identifications();
 
-        DLL_HEADER void Delete();
+        void Delete();
 
         /*
           Identify points pi1 and pi2, due to
           identification nr identnr
          */
-        DLL_HEADER void Add(PointIndex pi1, PointIndex pi2, int identnr);
+        void Add(PointIndex pi1, PointIndex pi2, int identnr);
 
         int Get(PointIndex pi1, PointIndex pi2) const;
         int GetSymmetric(PointIndex pi1, PointIndex pi2) const;

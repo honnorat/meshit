@@ -14,9 +14,6 @@
 
 namespace meshit {
 
-
-    extern DLL_HEADER void MyError(const char * ch);
-
     class Point3d;
     class Vec3d;
 
@@ -435,7 +432,8 @@ namespace meshit {
 
     inline Point3d Center(const Point3d & p1, const Point3d & p2)
     {
-        return Point3d(0.5 * (p1.x[0] + p2.x[0]),
+        return Point3d(
+                0.5 * (p1.x[0] + p2.x[0]),
                 0.5 * (p1.x[1] + p2.x[1]),
                 0.5 * (p1.x[2] + p2.x[2]));
     }
@@ -443,7 +441,8 @@ namespace meshit {
     inline Point3d Center(const Point3d & p1, const Point3d & p2,
             const Point3d & p3)
     {
-        return Point3d(1.0 / 3.0 * (p1.x[0] + p2.x[0] + p3.x[0]),
+        return Point3d(
+                1.0 / 3.0 * (p1.x[0] + p2.x[0] + p3.x[0]),
                 1.0 / 3.0 * (p1.x[1] + p2.x[1] + p3.x[1]),
                 1.0 / 3.0 * (p1.x[2] + p2.x[2] + p3.x[2]));
     }
@@ -451,7 +450,8 @@ namespace meshit {
     inline Point3d Center(const Point3d & p1, const Point3d & p2,
             const Point3d & p3, const Point3d & p4)
     {
-        return Point3d(0.25 * (p1.x[0] + p2.x[0] + p3.x[0] + p4.x[0]),
+        return Point3d(
+                0.25 * (p1.x[0] + p2.x[0] + p3.x[0] + p4.x[0]),
                 0.25 * (p1.x[1] + p2.x[1] + p3.x[1] + p4.x[1]),
                 0.25 * (p1.x[2] + p2.x[2] + p3.x[2] + p4.x[2]));
     }
@@ -730,60 +730,13 @@ namespace meshit {
 
         const Box3d& operator+=(const Box3d& b);
 
-        Point3d MaxCoords() const;
-        Point3d MinCoords() const;
-
-        /// Make a negative sized box;
-        //  void CreateNegMinMaxBox();
-
         Point3d CalcCenter() const
         {
-            return Point3d(0.5 * (minx[0] + maxx[0]),
+            return Point3d(
+                    0.5 * (minx[0] + maxx[0]),
                     0.5 * (minx[1] + maxx[1]),
                     0.5 * (minx[2] + maxx[2]));
         }
-
-        double CalcDiam() const
-        {
-            return sqrt(sqr(maxx[0] - minx[0]) +
-                    sqr(maxx[1] - minx[1]) +
-                    sqr(maxx[2] - minx[2]));
-        }
-
-        void WriteData(std::ofstream& fout) const;
-        void ReadData(std::ifstream& fin);
-    };
-
-    class Box3dSphere : public Box3d
-    {
-      protected:
-        double diam, inner;
-        Point3d c;
-      public:
-
-        Box3dSphere() { };
-        Box3dSphere(double aminx, double amaxx,
-                double aminy, double amaxy,
-                double aminz, double amaxz);
-
-        const Point3d & Center() const
-        {
-            return c;
-        }
-
-        double Diam() const
-        {
-            return diam;
-        }
-
-        double Inner() const
-        {
-            return inner;
-        }
-        void GetSubBox(int i, Box3dSphere & sbox) const;
-
-        // private:
-        void CalcDiamCenter();
     };
 
     class referencetransform

@@ -31,7 +31,7 @@ namespace meshit {
             MultiPointGeomInfo * mgi,
             bool pointonsurface)
     {
-        adfront ->AddPoint(p, globind, mgi, pointonsurface);
+        adfront->AddPoint(p, globind, mgi, pointonsurface);
     }
 
     void Meshing2::AddBoundaryElement(int i1, int i2,
@@ -40,7 +40,7 @@ namespace meshit {
         if (!gi1.trignum || !gi2.trignum) {
             LOG_ERROR("Meshing2::AddBoundaryElement: illegal geominfo");
         }
-        adfront -> AddLine(i1 - 1, i2 - 1, gi1, gi2);
+        adfront->AddLine(i1 - 1, i2 - 1, gi1, gi2);
     }
 
     void Meshing2::StartMesh()
@@ -281,7 +281,7 @@ namespace meshit {
 
             h = hshould;
 
-            double hinner = (3 + qualclass) * max2(his, hshould);
+            double hinner = (3 + qualclass) * std::max(his, hshould);
 
             adfront->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
 
@@ -510,7 +510,7 @@ namespace meshit {
             }
 
             if (found) {
-                double violateminh = 3 + 0.1 * sqr(qualclass);
+                double violateminh = 3 + 0.1 * qualclass*qualclass;
                 double minh = 1e8;
                 double newedgemaxh = 0;
                 for (int i = oldnl + 1; i <= loclines.size(); i++) {
@@ -754,7 +754,7 @@ namespace meshit {
 
                 for (int i = oldnp + 1; i <= locpoints.size(); i++) {
                     PointIndex globind = mesh.AddPoint(locpoints.Get(i));
-                    pindex.Elem(i) = adfront -> AddPoint(locpoints.Get(i), globind);
+                    pindex.Elem(i) = adfront->AddPoint(locpoints.Get(i), globind);
                 }
 
                 for (int i = oldnl + 1; i <= loclines.size(); i++) {

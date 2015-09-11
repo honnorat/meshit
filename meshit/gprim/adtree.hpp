@@ -185,15 +185,15 @@ namespace meshit {
         ADTree3 * tree;
 
       public:
-        DLL_HEADER Point3dTree(const Point<3> & pmin, const Point<3> & pmax);
-        DLL_HEADER ~Point3dTree();
-        DLL_HEADER void Insert(const Point<3> & p, int pi);
+        Point3dTree(const Point<3> & pmin, const Point<3> & pmax);
+        ~Point3dTree();
+        void Insert(const Point<3> & p, int pi);
 
         void DeleteElement(int pi)
         {
             tree->DeleteElement(pi);
         }
-        DLL_HEADER void GetIntersecting(const Point<3> & pmin, const Point<3> & pmax,
+        void GetIntersecting(const Point<3> & pmin, const Point<3> & pmax,
                 Array<int> & pis) const;
 
         const ADTree3 & Tree() const

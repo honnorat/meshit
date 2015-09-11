@@ -32,7 +32,7 @@ namespace meshit
 
   void INDEX_4Q :: Sort ()
   {
-    if (min2 (i[1], i[2]) < min2 (i[0], i[3]))
+    if (std::min (i[1], i[2]) < std::min (i[0], i[3]))
       { std::swap (i[0], i[1]); std::swap (i[2], i[3]);}
     if (i[3] < i[0])
       { std::swap (i[0], i[3]); std::swap (i[1], i[2]);}
@@ -69,74 +69,6 @@ namespace meshit
 	return i;
     return 0;
   }
-
-
-
-  /*
-  int BASE_INDEX_2_HASHTABLE :: Position (int bnr, const INDEX_2 & ind) const
-  {
-    int i;
-    for (i = 1; i <= hash.EntrySize (bnr); i++)
-      if (hash.Get(bnr, i) == ind)
-	return i;
-    return 0;
-  }
-  */  
-
-  void BASE_INDEX_2_HASHTABLE :: PrintStat (std::ostream & ost) const
-  {
-    int n = hash.Size();
-    int i;
-    int sumn = 0, sumnn = 0;
-
-    for (i = 1; i <= n; i++)
-      {
-	sumn += hash.EntrySize(i);
-	sumnn += sqr (hash.EntrySize(i));
-      }
-
-    ost << "Hashtable: " << std::endl
-	<< "size             : " << n << std::endl
-	<< "elements per row : " << (double(sumn) / double(n)) << std::endl
-	<< "av. acces time   : " 
-	<< (sumn ? (double (sumnn) / double(sumn)) : 0) << std::endl;
-  }
-
-
-  /*
-    int BASE_INDEX_3_HASHTABLE :: Position (int bnr, const INDEX_3 & ind) const
-    {
-    int i;
-    const INDEX_3 * pi = &hash.Get(bnr, 1);
-    int n = hash.EntrySize(bnr);
-    for (i = 1; i <= n; ++i, ++pi)
-    {
-    if (*pi == ind)
-    return i;
-    }
-
-    return 0;
-    }
-  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   BASE_INDEX_CLOSED_HASHTABLE ::
   BASE_INDEX_CLOSED_HASHTABLE (int size)

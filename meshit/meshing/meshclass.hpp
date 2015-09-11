@@ -211,13 +211,8 @@ namespace meshit {
 
         void DeleteSegment(int segnr)
         {
-            segments.Elem(segnr)[0] = PointIndex::BASE - 1;
-            segments.Elem(segnr)[1] = PointIndex::BASE - 1;
-        }
-
-        void FullDeleteSegment(int segnr) // von wem ist das ???
-        {
-            segments.Delete(segnr - PointIndex::BASE);
+            segments[segnr-1][0] = PointIndex::BASE - 1;
+            segments[segnr-1][1] = PointIndex::BASE - 1;
         }
 
         int GetNSeg() const
@@ -227,12 +222,12 @@ namespace meshit {
 
         Segment & LineSegment(int i)
         {
-            return segments.Elem(i);
+            return segments[i-1];
         }
 
         const Segment & LineSegment(int i) const
         {
-            return segments.Get(i);
+            return segments[i-1];
         }
 
         Segment & LineSegment(SegmentIndex si)

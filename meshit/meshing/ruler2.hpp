@@ -16,7 +16,7 @@ namespace meshit {
 
         typedef struct tf
         {
-            float f1, f2, f3;
+            double f1, f2, f3;
         } threefloat;
 
         class threeint
@@ -53,7 +53,7 @@ namespace meshit {
         std::vector<Vec2d> linevecs;
 
         size_t noldp, noldl;
-        float fzminx, fzmaxx, fzminy, fzmaxy;
+        double fzminx, fzmaxx, fzminy, fzmaxy;
 
         /// topological distance of line to base element
         std::vector<int> lnearness;
@@ -141,7 +141,7 @@ namespace meshit {
             return tfp->f1 * dx * dx + tfp->f2 * dx * dy + tfp->f3 * dy * dy;
         }
 
-        float CalcLineError(int li, const Vec2d & v) const;
+        double CalcLineError(int li, const Vec2d & v) const;
 
         void SetFreeZoneTransformation(const Vector & u, int tolclass);
 

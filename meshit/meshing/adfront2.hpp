@@ -25,7 +25,7 @@ namespace meshit {
     class FrontPoint2
     {
         /// coordinates
-        Point<3> p;
+        Point3d p;
         /// global node index
         PointIndex globalindex;
         /// number of front lines connected to point 
@@ -40,24 +40,23 @@ namespace meshit {
 
         FrontPoint2()
         {
-            globalindex = -1;
             nlinetopoint = 0;
             frontnr = INT_MAX - 10; // attention: overflow on calculating  INT_MAX + 1
             mgi = NULL;
             onsurface = true;
         }
 
-        FrontPoint2(const Point<3> & ap, PointIndex agi,
+        FrontPoint2(const Point3d & ap, PointIndex agi,
                 MultiPointGeomInfo * amgi, bool aonsurface = true);
 
         ~FrontPoint2() { }
 
-        const Point<3> & P() const
+        const Point3d & P() const
         {
             return p;
         }
 
-        operator const Point<3> & () const
+        operator const Point3d & () const
         {
             return p;
         }
@@ -233,10 +232,12 @@ namespace meshit {
                 double xh);
 
         void DeleteLine(int li);
-        int AddPoint(const Point<3> & p, PointIndex globind,
+        int AddPoint(
+                const Point3d & p, PointIndex globind,
                 MultiPointGeomInfo * mgi = NULL,
                 bool pointonsurface = true);
-        int AddLine(int pi1, int pi2,
+        int AddLine(
+                int pi1, int pi2,
                 const PointGeomInfo & gi1, const PointGeomInfo & gi2);
         int ExistsLine(int gpi1, int gpi2);
 

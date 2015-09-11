@@ -36,16 +36,6 @@ namespace meshit {
         GradingBox(const double * ax1, const double * ax2);
         void DeleteChilds();
 
-        Point<3> PMid() const
-        {
-            return Point<3> (xmid[0], xmid[1], xmid[2]);
-        }
-
-        double H2() const
-        {
-            return h2;
-        }
-
         friend class LocalH;
 
         static BlockAllocator ball;

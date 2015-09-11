@@ -60,13 +60,9 @@ namespace meshit {
         delete [] name;
         name = new char[strlen(buf) + 1];
         strcpy(name, buf);
-        //std::cerr << "name " << name <<std::endl;
-        //  (*mystd::cout) << "Rule " << name << " found." <<std::endl;
 
         do {
             ist >> buf;
-
-            //std::cerr << "buf " << buf <<std::endl;
 
             if (strcmp(buf, "quality") == 0) {
                 ist >> quality;
@@ -124,8 +120,6 @@ namespace meshit {
                     ist >> lin.I2();
                     ist >> ch; // ')'
 
-
-                    //std::cerr << "read line " << lin.I1() << " " << lin.I2() <<std::endl;
                     lines.push_back(lin);
                     linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
                     noldl++;
@@ -134,10 +128,8 @@ namespace meshit {
                     linetolerances[noldl - 1].f2 = 0;
                     linetolerances[noldl - 1].f3 = 0;
 
-                    //std::cerr << "mapl1" <<std::endl; 
                     ist >> ch;
                     while (ch != ';') {
-                        //std::cerr << "working on character \""<<ch<<"\""<<std::endl;
                         if (ch == '{') {
                             ist >> linetolerances[noldl - 1].f1;
                             ist >> ch; // ','
@@ -391,7 +383,7 @@ namespace meshit {
                 for (i = 1; i <= (int) noldl; i++) {
                     minn = 1000;
                     for (j = 1; j <= 2; j++)
-                        minn = min2(minn, pnearness.Get(GetPointNr(i, j)));
+                        minn = std::min(minn, pnearness.Get(GetPointNr(i, j)));
 
                     for (j = 1; j <= 2; j++)
                         if (pnearness.Get(GetPointNr(i, j)) > minn + 1) {
@@ -437,11 +429,9 @@ namespace meshit {
     {
         char buf[256];
         std::istream * ist;
-        //char *tr1 = NULL;
         std::string tr1;
 
         if (filename) {
-            //      (*mystd::cout) << "rule-filename = " << filename <<std::endl;
             ist = new std::ifstream(filename);
         }
         else {

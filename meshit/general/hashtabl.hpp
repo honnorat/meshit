@@ -569,12 +569,6 @@ namespace meshit {
         }
     };
 
-
-
-
-
-
-
     /// Closed Hashing HT
 
     class BASE_INDEX_2_CLOSED_HASHTABLE

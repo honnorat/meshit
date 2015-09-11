@@ -34,16 +34,6 @@ namespace meshit {
             return splines;
         }
 
-        int GetNSplines(void) const
-        {
-            return splines.size();
-        }
-
-        std::string GetSplineType(const int i) const
-        {
-            return splines[i]->GetType();
-        }
-
         SplineSeg<D> & GetSpline(const int i)
         {
             return *splines[i];

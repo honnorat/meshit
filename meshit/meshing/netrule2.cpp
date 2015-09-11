@@ -146,10 +146,10 @@ namespace meshit {
         return 1;
     }
 
-    float netrule::CalcLineError(int li, const Vec2d & v) const
+    double netrule::CalcLineError(int li, const Vec2d & v) const
     {
-        float dx = v.X() - linevecs[li-1].X();
-        float dy = v.Y() - linevecs[li-1].Y();
+        double dx = v.X() - linevecs[li-1].X();
+        double dy = v.Y() - linevecs[li-1].Y();
 
         const threefloat * ltf = &linetolerances[li-1];
         return ltf->f1 * dx * dx + ltf->f2 * dx * dy + ltf->f3 * dy * dy;

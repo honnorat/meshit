@@ -7,9 +7,7 @@ SET(src_GENERAL
 	general/flags.cpp
 	general/hashtabl.cpp
 	general/optmem.cpp
-	general/seti.cpp
 	general/sort.cpp
-	general/spbita2d.cpp
 	general/symbolta.cpp
 	general/table.cpp
 )

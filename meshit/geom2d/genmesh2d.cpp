@@ -253,7 +253,7 @@ namespace meshit {
             for (double t = 0.5 / np; t < 1; t += 1.0 / np) {
                 Point<2> x = spline.GetPoint(t);
                 double hc = 1.0 / mp.curvaturesafety / (1e-99 + spline.CalcCurvature(t));
-                mesh2d.RestrictLocalH(Point3d(x(0), x(1), 0), min2(hc, hcurve));
+                mesh2d.RestrictLocalH(Point3d(x(0), x(1), 0), std::min(hc, hcurve));
             }
         }
 
@@ -265,8 +265,8 @@ namespace meshit {
                 double hr = GetDomainMaxh(GetSpline(i).rightdom);
 
                 double useh = h;
-                if (hl > 0) useh = min2(h, hl);
-                if (hr > 0) useh = min2(h, hr);
+                if (hl > 0) useh = std::min(h, hl);
+                if (hr > 0) useh = std::min(h, hr);
                 Partition(GetSpline(i), mp, useh, elto0, mesh2d, searchtree, i + 1);
             }
             else {

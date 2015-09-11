@@ -249,7 +249,7 @@ namespace meshit {
 
         for (int i = 0; i < 8; i++) {
             if (box->childs[i])
-                hmin = min2(hmin, GetMinHRec(pmin, pmax, box->childs[i]));
+                hmin = std::min(hmin, GetMinHRec(pmin, pmax, box->childs[i]));
         }
 
         return hmin;

@@ -370,7 +370,7 @@ namespace meshit {
     {
         timestamp = NextTimeStamp();
 
-        int maxn = max2(s[0], s[1]);
+        int maxn = std::max(s[0], s[1]);
         maxn += 1 - PointIndex::BASE;
 
         if (maxn <= points.size()) {
@@ -1484,13 +1484,12 @@ namespace meshit {
     void Mesh::SetLocalH(const Point3d & pmin, const Point3d & pmax, double grading)
     {
         Point3d c = Center(pmin, pmax);
-        double d = max3(pmax.X() - pmin.X(),
+        double d = 0.5 * std::max(
+                pmax.X() - pmin.X(), std::max(
                 pmax.Y() - pmin.Y(),
-                pmax.Z() - pmin.Z());
-        d /= 2;
+                pmax.Z() - pmin.Z()));
         Point3d pmin2 = c - Vec3d(d, d, d);
         Point3d pmax2 = c + Vec3d(d, d, d);
-
 
         delete lochfunc;
         lochfunc = new LocalH(pmin2, pmax2, grading);

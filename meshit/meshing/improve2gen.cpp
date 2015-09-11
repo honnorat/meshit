@@ -322,15 +322,19 @@ namespace meshit {
                     mapped[ri]++;
 
                     olddef = 0;
-                    for (int j = 1; j <= pmap.size(); j++)
-                        olddef += sqr(nelonnode[pmap.Get(j)]);
+                    for (int j = 1; j <= pmap.size(); j++) {
+                        int ii = nelonnode[pmap.Get(j)];
+                        olddef += ii*ii;
+                    }
                     olddef += rule.bonus;
 
                     newdef = 0;
-                    for (int j = 1; j <= pmap.size(); j++)
-                        if (rule.reused.Get(j))
-                            newdef += sqr(nelonnode[pmap.Get(j)] +
-                                rule.incelsonnode.Get(j));
+                    for (int j = 1; j <= pmap.size(); j++) {
+                        if (rule.reused.Get(j)) {
+                            int ii = nelonnode[pmap.Get(j)] + rule.incelsonnode.Get(j);
+                            newdef += ii*ii;
+                        }
+                    }
 
                     if (newdef > olddef)
                         continue;
