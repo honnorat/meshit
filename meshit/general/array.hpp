@@ -49,7 +49,7 @@ namespace meshit {
 
         /// Access array. BASE-based
 
-        T & operator[](TIND i)
+        inline T & operator[](TIND i)
         {
             return _data[i - BASE];
         }
@@ -130,19 +130,9 @@ namespace meshit {
 
         bool Contains(const T & elem) const
         {
-            return ( Pos(elem) >= 0 );
+            return ( Pos(elem) >= 0);
         }
     };
-
-    // print array
-
-    template <typename T, int BASE, typename TIND>
-    inline std::ostream & operator<<(std::ostream & s, const FlatArray<T, BASE, TIND> & a)
-    {
-        for (TIND i = a.Begin(); i < a.End(); i++)
-            s << i << ": " << a[i] << std::endl;
-        return s;
-    }
 
     /** 
         Dynamic array container.
@@ -159,8 +149,8 @@ namespace meshit {
         using FlatArray<T, BASE, TIND>::_size;
         using FlatArray<T, BASE, TIND>::_data;
 
-        size_t _allocsize;  // physical size of array
-        bool _ownmem;       // memory is responsibility of container
+        size_t _allocsize; // physical size of array
+        bool _ownmem; // memory is responsibility of container
 
       public:
 
@@ -391,21 +381,6 @@ namespace meshit {
 
     };
 
-    /*
-    template <class T, int B1, int B2>
-    class IndirectArray
-    {
-      const FlatArray<T, B1> & array;
-      const FlatArray<int, B2> & ia; 
-    
-    public:
-      IndirectArray (const FlatArray<T,B1> & aa, const FlatArray<int, B2> & aia)
-      : array(aa), ia(aia) { ; }
-      int Size() const { return ia.Size(); }
-      const T & operator[] (int i) const { return array[ia[i]]; }
-    };
-     */
-
     template <class TA1, class TA2>
     class IndirectArray
     {
@@ -415,12 +390,9 @@ namespace meshit {
       public:
 
         IndirectArray(const TA1 & aa, const TA2 & aia)
-            : array(aa), ia(aia)
-        {
-            ;
-        }
+            : array(aa), ia(aia) { }
 
-        int Size() const
+        int size() const
         {
             return ia.Size();
         }
@@ -440,98 +412,6 @@ namespace meshit {
             return array[ia[i]];
         }
     };
-
-    template <typename T1, typename T2>
-    inline std::ostream & operator<<(std::ostream & s, const IndirectArray<T1, T2> & ia)
-    {
-        for (int i = ia.Begin(); i < ia.End(); i++)
-            s << i << ": " << ia[i] << std::endl;
-        return s;
-    }
-
-    /// bubble sort array
-
-    template <class T>
-    inline void BubbleSort(const FlatArray<T> & data)
-    {
-        for (int i = 0; i < data.size(); i++)
-            for (int j = i + 1; j < data.size(); j++)
-                if (data[i] > data[j]) {
-                    T hv = data[i];
-                    data[i] = data[j];
-                    data[j] = hv;
-                }
-    }
-
-    /// bubble sort array
-
-    template <class T, class S>
-    inline void BubbleSort(FlatArray<T> & data, FlatArray<S> & slave)
-    {
-        for (int i = 0; i < data.size(); i++)
-            for (int j = i + 1; j < data.size(); j++)
-                if (data[i] > data[j]) {
-                    T hv = data[i];
-                    data[i] = data[j];
-                    data[j] = hv;
-
-                    S hvs = slave[i];
-                    slave[i] = slave[j];
-                    slave[j] = hvs;
-                }
-    }
-
-    template <class T, class S>
-    void QuickSortRec(FlatArray<T> & data,
-            FlatArray<S> & slave,
-            int left, int right)
-    {
-        int i = left;
-        int j = right;
-        T midval = data[(left + right) / 2];
-
-        do {
-            while (data[i] < midval) i++;
-            while (midval < data[j]) j--;
-
-            if (i <= j) {
-                std::swap(data[i], data[j]);
-                std::swap(slave[i], slave[j]);
-                i++;
-                j--;
-            }
-        } while (i <= j);
-        if (left < j) QuickSortRec(data, slave, left, j);
-        if (i < right) QuickSortRec(data, slave, i, right);
-    }
-
-    template <class T, class S>
-    void QuickSort(FlatArray<T> & data, FlatArray<S> & slave)
-    {
-        QuickSortRec(data, slave, 0, data.size() - 1);
-    }
-
-    template <class T>
-    void Intersection(const FlatArray<T> & in1, const FlatArray<T> & in2,
-            Array<T> & out)
-    {
-        out.resize(0);
-        for (int i = 0; i < in1.size(); i++)
-            if (in2.Contains(in1[i]))
-                out.push_back(in1[i]);
-    }
-
-    template <class T>
-    void Intersection(const FlatArray<T> & in1, const FlatArray<T> & in2, const FlatArray<T> & in3,
-            Array<T> & out)
-    {
-        out.resize(0);
-        for (int i = 0; i < in1.size(); i++)
-            if (in2.Contains(in1[i]) && in3.Contains(in1[i]))
-                out.push_back(in1[i]);
-    }
-
-
 }
 
 #endif
