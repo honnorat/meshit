@@ -1,7 +1,5 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 
-PROJECT( meshit )
-
 SET(src_GENERAL
 	general/bitarray.cpp
 	general/flags.cpp
