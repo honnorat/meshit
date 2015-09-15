@@ -133,8 +133,6 @@ namespace meshit {
 
       public:
 
-        /// number of refinement levels
-        int mglevels;
         /// refinement hierarchy
         Array<INDEX_2, PointIndex::BASE> mlbetweennodes;
         /// parent element of volume element

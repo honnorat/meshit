@@ -400,16 +400,16 @@ namespace meshit {
                         }
                         else {
                             // remove line
-                            loclines.DeleteElement(i);
-                            lindex.DeleteElement(i);
+                            loclines.Delete(i-1);
+                            lindex.Delete(i-1);
                             oldnl--;
                             i--;
                         }
                     }
 
                     else if ((z1 > 0 && z2 > 0 && (z1 != z2)) || ((z1 < 0) && (z2 < 0))) {
-                        loclines.DeleteElement(i);
-                        lindex.DeleteElement(i);
+                        loclines.Delete(i-1);
+                        lindex.Delete(i-1);
                         oldnl--;
                         i--;
                     }

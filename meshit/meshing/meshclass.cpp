@@ -17,9 +17,7 @@ namespace meshit {
         boundaryedges = NULL;
         surfelementht = NULL;
         segmentht = NULL;
-
         lochfunc = NULL;
-        mglevels = 1;
         elementsearchtree = NULL;
         elementsearchtreets = NextTimeStamp();
         majortimestamp = timestamp = NextTimeStamp();
@@ -33,8 +31,6 @@ namespace meshit {
         ps_startelement = 0;
 
         geomtype = NO_GEOM;
-
-        bcnames.resize(0);
     }
 
     Mesh::~Mesh()
@@ -64,7 +60,6 @@ namespace meshit {
     Mesh & Mesh::operator=(const Mesh & mesh2)
     {
         points = mesh2.points;
-        // eltyps = mesh2.eltyps;
         segments = mesh2.segments;
         surfelements = mesh2.surfelements;
         lockedpoints = mesh2.lockedpoints;
@@ -1120,7 +1115,7 @@ namespace meshit {
             surfelementht -> Set(i3, sei); // war das wichtig ???    sel.GetIndex());
         }
 
-        for (int i = 0; i < segments.size(); i++) {
+        for (size_t i = 0; i < segments.size(); i++) {
             const Segment & seg = segments[i];
             for (int j = 1; j <= 2; j++) {
                 PointIndex hi = (j == 1) ? seg[0] : seg[1];
@@ -1927,7 +1922,7 @@ namespace meshit {
                 i--;
             }
         }
-        for (int i = 0; i < segments.size(); i++) {
+        for (size_t i = 0; i < segments.size(); i++) {
             if (segments[i][0] <= PointIndex::BASE - 1) {
                 segments.Delete(i);
                 i--;

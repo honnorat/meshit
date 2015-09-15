@@ -89,11 +89,6 @@ namespace meshit {
             cnt = 0;
         }
 
-        void DeleteAll()
-        {
-            cnt = 0;
-        }
-
         int GetNPGI() const
         {
             return cnt;

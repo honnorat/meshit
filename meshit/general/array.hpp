@@ -258,14 +258,6 @@ namespace meshit {
             _size--;
         }
 
-        /// Delete element i (1-based). Move last element to position i.
-
-        void DeleteElement(TIND i)
-        {
-            _data[i - 1] = _data[_size - 1];
-            _size--;
-        }
-
         /// Delete last element. 
 
         void DeleteLast()

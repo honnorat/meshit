@@ -158,14 +158,18 @@ namespace meshit {
                     Vec<3> v(1e-4 * h, 1e-4 * h, 1e-4 * h);
                     searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
 
-                    for (int k = 0; k < locsearch.size(); k++)
-                        if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer)
+                    for (int k = 0; k < locsearch.size(); k++) {
+                        if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
                             pi1 = locsearch[k];
+                        }
+                    }
 
                     searchtree.GetIntersecting(mark3 - v, mark3 + v, locsearch);
-                    for (int k = 0; k < locsearch.size(); k++)
-                        if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer)
+                    for (int k = 0; k < locsearch.size(); k++) {
+                        if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
                             pi2 = locsearch[k];
+                        }
+                    }
 
                     if (pi1 == -1) {
                         pi1 = mesh.AddPoint(oldmark3, spline.layer);

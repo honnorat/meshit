@@ -344,8 +344,9 @@ int main(int argc, char ** argv)
     sub_outer.resample(100);
 
     // creates geometry structure
+    int bc_num = 1;
     meshit::SplineGeometry2d geom;
-    geom.AddLine(sub_outer.cart());
+    geom.AddLine(sub_outer.cart(), 1e99, false, ++bc_num);
 
     // add holes
     std::vector<BoundaryLine> sub_inner;
@@ -364,7 +365,7 @@ int main(int argc, char ** argv)
         }
         sub_inner[i].resample(50);
         sub_inner[i].reverse();
-        geom.AddLine(sub_inner[i].cart(), 1e99, true);
+        geom.AddLine(sub_inner[i].cart(), 1e99, true, ++bc_num);
     }
 
     geom.FakeData();
