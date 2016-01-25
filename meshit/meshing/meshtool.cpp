@@ -1,5 +1,5 @@
 #include <iomanip>
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "meshtool.hpp"
 #include "../gprim/geomtest3d.hpp"
 

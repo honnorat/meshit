@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 
 #include <stdexcept>
 
@@ -374,6 +374,7 @@ int main(int argc, char ** argv)
     meshit::Mesh mesh;
     meshit::MeshingParameters mp;
     mp.optsteps2d = 3;
+    mp.maxh = 0.1;
 
     LOG_INFO("start meshing");
     mesh.BuildFromSpline2D(geom, mp);

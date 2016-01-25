@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "ruler2.hpp"
 
 namespace meshit {

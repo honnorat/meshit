@@ -12,7 +12,7 @@
  *  2. Supports upto second order elements of each type
  *
  */
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "writeuser.hpp"
 
 #include "../meshing/meshclass.hpp"

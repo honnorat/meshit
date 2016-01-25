@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include <stdexcept>
 #include "meshtype.hpp" 
 #include "meshclass.hpp"

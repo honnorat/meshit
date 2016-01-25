@@ -1,7 +1,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "bisect.hpp"
 #include "../gprim/geomfuncs.hpp"
 

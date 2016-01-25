@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 
 #include "../general/optmem.hpp"
 #include "geomobjects.hpp"

@@ -10,7 +10,7 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 
 #include "hashtabl.hpp"
 #include "template.hpp"

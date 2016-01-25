@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "geometry2d.hpp"
 #include "../meshing/meshing2.hpp"
 #include "../meshing/global.hpp"

@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 
 #include "../general/array.hpp"
 #include "densemat.hpp"

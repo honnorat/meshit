@@ -65,6 +65,8 @@ ADD_LIBRARY(meshit STATIC
 	${src_MESHING}
 )
 
-# ADD_DEPENDENCIES(meshit ${MESHIT_DEPS})
+FILE(COPY meshit.hpp general geom2d gprim interface linalg meshing
+	 DESTINATION ${INCLUDE_OUTPUT_PATH}/meshit
+	 FILES_MATCHING PATTERN "*.hpp")
 
 SET(MESHIT_LINK_LIBRARIES ${MESHIT_LINK_LIBRARIES} meshit PARENT_SCOPE)

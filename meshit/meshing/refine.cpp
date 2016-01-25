@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "bisect.hpp"
 
 namespace meshit {

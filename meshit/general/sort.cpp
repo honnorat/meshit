@@ -10,7 +10,7 @@
 
 
 #include <algorithm>
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "sort.hpp"
 
 namespace meshit

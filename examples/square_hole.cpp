@@ -2,7 +2,7 @@
 #include <sstream>
 #include <vector>
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
 #include <meshit/geom2d/geometry2d.hpp>

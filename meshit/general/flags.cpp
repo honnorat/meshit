@@ -8,7 +8,7 @@
    Datatype Flags
 */
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include <sstream>
 #include <fstream>
 #include "flags.hpp"

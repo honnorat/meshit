@@ -2,7 +2,7 @@
   Advancing front class for surfaces
  */
 #include <iostream>
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "adfront2.hpp"
 #include "../gprim/geom3d.hpp"
 #include "../gprim/geomops.hpp"

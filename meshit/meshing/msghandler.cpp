@@ -1,5 +1,5 @@
 //File for handling warnings, errors, messages
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "msghandler.hpp"
 #include "../general/array.hpp"
 #include "global.hpp"

@@ -9,7 +9,7 @@
 */
 
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "optmem.hpp"
 
 namespace meshit

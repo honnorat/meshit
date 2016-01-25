@@ -8,7 +8,7 @@
    Abstract data type TABLE
 */
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "table.hpp"
 
 namespace meshit

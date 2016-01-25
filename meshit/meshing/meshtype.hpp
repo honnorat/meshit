@@ -7,7 +7,7 @@
 /* Date:   01. Okt. 95                                                    */
 /**************************************************************************/
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include <iostream>
 
 #include "msghandler.hpp"

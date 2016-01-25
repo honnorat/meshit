@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 
 #include "transform3d.hpp"
 #include "../linalg/densemat.hpp"

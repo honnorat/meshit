@@ -4,7 +4,7 @@ Spline curve for Mesh generator
 
  */
 
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "spline.hpp"
 #include "../linalg/densemat.hpp"
 #include "../gprim/geomfuncs.hpp"

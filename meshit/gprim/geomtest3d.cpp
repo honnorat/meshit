@@ -1,4 +1,4 @@
-#include <meshit.hpp>
+#include <meshit/meshit.hpp>
 #include "geomtest3d.hpp"
 #include "geomfuncs.hpp"
 #include "../linalg/densemat.hpp"
