@@ -23,12 +23,15 @@ LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
 INCLUDE_DIRECTORIES(${INCLUDE_OUTPUT_PATH})
 
 ##########
-# Log4Cplus
+# meshit
 ##########
 
-LIST(APPEND MESHIT_LINK_LIBRARIES  ${MESHIT_LIBS})
-
 ADD_SUBDIRECTORY(meshit)
+
+##########
+# examples
+##########
+
 ADD_SUBDIRECTORY(examples)
 
 ##########
