@@ -1,4 +1,4 @@
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "geom2d.hpp"
 
 namespace meshit {

@@ -8,9 +8,9 @@
    Datatype Flags
 */
 
-#include <meshit/meshit.hpp>
 #include <sstream>
 #include <fstream>
+#include "../meshit.hpp"
 #include "flags.hpp"
 
 namespace meshit

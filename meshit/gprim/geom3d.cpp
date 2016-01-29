@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "geom3d.hpp"
 
 namespace meshit {

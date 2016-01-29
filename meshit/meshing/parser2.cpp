@@ -1,5 +1,6 @@
 #include <sstream>
-#include <meshit/meshit.hpp>
+
+#include "../meshit.hpp"
 #include "meshing2.hpp"
 
 #ifdef WIN32

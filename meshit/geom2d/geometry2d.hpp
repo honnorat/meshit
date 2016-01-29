@@ -110,6 +110,7 @@ namespace meshit {
         double elto0;
 
       public:
+        SplineGeometry2d() : elto0(1.0) { }
         virtual ~SplineGeometry2d();
 
         void Load(const char * filename);

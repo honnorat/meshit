@@ -10,8 +10,8 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <meshit/meshit.hpp>
 
+#include "../meshit.hpp"
 #include "hashtabl.hpp"
 #include "template.hpp"
 

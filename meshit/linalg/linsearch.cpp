@@ -14,7 +14,7 @@
 
 
 #include <algorithm>
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "opti.hpp"
 
 

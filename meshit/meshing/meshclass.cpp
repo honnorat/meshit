@@ -1,8 +1,7 @@
-#include <meshit/meshit.hpp>
-
 #include <stdexcept>
 #include <cassert>
 
+#include "../meshit.hpp"
 #include "meshtool.hpp"
 #include "../gprim/geomtest3d.hpp"
 #include "../geom2d/geometry2d.hpp"
@@ -1115,7 +1114,7 @@ namespace meshit {
             surfelementht -> Set(i3, sei); // war das wichtig ???    sel.GetIndex());
         }
 
-        for (size_t i = 0; i < segments.size(); i++) {
+        for (int i = 0; i < segments.size(); i++) {
             const Segment & seg = segments[i];
             for (int j = 1; j <= 2; j++) {
                 PointIndex hi = (j == 1) ? seg[0] : seg[1];
@@ -1922,7 +1921,7 @@ namespace meshit {
                 i--;
             }
         }
-        for (size_t i = 0; i < segments.size(); i++) {
+        for (int i = 0; i < segments.size(); i++) {
             if (segments[i][0] <= PointIndex::BASE - 1) {
                 segments.Delete(i);
                 i--;

@@ -8,8 +8,7 @@
    Abstract data type Array
 */
 
-
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "optmem.hpp"
 
 namespace meshit

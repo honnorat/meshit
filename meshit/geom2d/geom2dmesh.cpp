@@ -1,6 +1,3 @@
-//#include <meshing.hpp>
-//#include <geometry2d.hpp>
-
 #include "../meshing/bisect.hpp"
 #include "geometry2d.hpp"
 

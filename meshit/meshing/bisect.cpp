@@ -1,8 +1,8 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <meshit/meshit.hpp>
 #include "bisect.hpp"
+#include "../meshit.hpp"
 #include "../gprim/geomfuncs.hpp"
 
 namespace meshit {

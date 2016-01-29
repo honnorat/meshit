@@ -1,5 +1,6 @@
-#include <meshit/meshit.hpp>
 #include <stdexcept>
+
+#include "../meshit.hpp"
 #include "meshtype.hpp" 
 #include "meshclass.hpp"
 #include "../general/autoptr.hpp"

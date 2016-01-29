@@ -56,6 +56,11 @@ SET(src_MESHING
 	meshing/topology.cpp
 	meshing/triarls.cpp
 )
+
+#######################
+# Build library
+#######################
+
 ADD_LIBRARY(meshit STATIC
 	${src_GENERAL}
 	${src_GEOM2D}
@@ -65,8 +70,24 @@ ADD_LIBRARY(meshit STATIC
 	${src_MESHING}
 )
 
-FILE(COPY meshit.hpp general geom2d gprim interface linalg meshing
-	 DESTINATION ${INCLUDE_OUTPUT_PATH}/meshit
-	 FILES_MATCHING PATTERN "*.hpp")
+#######################
+# Export header files
+#######################
 
-SET(MESHIT_LINK_LIBRARIES ${MESHIT_LINK_LIBRARIES} meshit PARENT_SCOPE)
+LIST(APPEND cmd_export_headers COMMAND ${CMAKE_COMMAND} -E make_directory ${INCLUDE_OUTPUT_PATH}/meshit/)
+
+FOREACH(hdr_dir . general geom2d gprim interface linalg meshing)
+	MESSAGE("Exporting headers for ${hdr_dir}...")
+	FILE(GLOB headers_list "${CMAKE_CURRENT_SOURCE_DIR}/${hdr_dir}/*.hpp")
+	LIST(APPEND cmd_export_headers COMMAND ${CMAKE_COMMAND} -E make_directory ${INCLUDE_OUTPUT_PATH}/meshit/${hdr_dir})
+	FOREACH(hdr_file ${headers_list})
+		LIST(APPEND cmd_export_headers COMMAND ${CMAKE_COMMAND} -E copy ${hdr_file} ${INCLUDE_OUTPUT_PATH}/meshit/${hdr_dir})
+	ENDFOREACH(hdr_file)
+ENDFOREACH(hdr_dir)
+ADD_CUSTOM_COMMAND(TARGET meshit PRE_LINK ${cmd_export_headers})
+
+#######################
+# Export variables
+#######################
+
+SET(MESHIT_LINK_LIBRARIES meshit PARENT_SCOPE)

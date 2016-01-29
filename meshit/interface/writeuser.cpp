@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "writeuser.hpp"
 
 namespace meshit

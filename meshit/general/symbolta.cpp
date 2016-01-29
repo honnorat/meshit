@@ -8,7 +8,7 @@
    Abstract data type Symbol Table
 */
 
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "symbolta.hpp"
 
 #ifndef FILE_SYMBOLTABLECC

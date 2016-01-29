@@ -5,7 +5,7 @@
  */
 
 #include <stdexcept>
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "splinegeometry.hpp"
 
 namespace meshit {

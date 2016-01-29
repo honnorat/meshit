@@ -8,7 +8,7 @@
    data type BitArray
 */
 
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "bitarray.hpp"
 
 namespace meshit

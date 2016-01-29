@@ -7,9 +7,9 @@
 /* Date:   01. Okt. 95                                                    */
 /**************************************************************************/
 
-#include <meshit/meshit.hpp>
 #include <iostream>
 
+#include "../meshit.hpp"
 #include "msghandler.hpp"
 #include "../linalg/densemat.hpp"
 #include "../gprim/geom3d.hpp"

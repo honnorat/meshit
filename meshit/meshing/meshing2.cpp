@@ -1,4 +1,4 @@
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "meshing2.hpp"
 #include "global.hpp"
 #include "meshclass.hpp"

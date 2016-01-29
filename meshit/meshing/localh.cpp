@@ -1,4 +1,4 @@
-#include <meshit/meshit.hpp>
+#include "../meshit.hpp"
 #include "localh.hpp"
 #include "adfront2.hpp"
 #include "../gprim/geomfuncs.hpp"

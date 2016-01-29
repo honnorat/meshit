@@ -3,10 +3,10 @@
 2d Spline curve for Mesh generator
 
  */
-#include <meshit/meshit.hpp>
 
 #include <stdexcept>
 
+#include "../meshit.hpp"
 #include "geometry2d.hpp"
 #include "../general/flags.hpp"
 

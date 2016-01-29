@@ -1,8 +1,3 @@
-//#include <mystdlib.h>
-
-//#include <myadt.hpp>
-// class DenseMatrix;
-//#include <gprim.hpp>
 #include <cstring>
 #include "adtree.hpp"
 
