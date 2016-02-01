@@ -412,11 +412,24 @@ namespace meshit {
         return si;
     }
 
-    void Mesh::Export(
-            const std::string & filename,
-            const std::string & filetype) const
+    void Mesh::Export(const std::string & filetype, const std::string & filename) const
     {
         WriteUserFormat(filetype, const_cast<const Mesh &> (*this), filename);
+    }
+
+    void Mesh::Export(const std::string & filetype, std::ostream & os) const
+    {
+        WriteUserFormat(filetype, const_cast<const Mesh &> (*this), os);
+    }
+
+    void Mesh::Export(const std::string & filename) const
+    {
+        WriteGmsh2Format(const_cast<const Mesh &> (*this), filename);
+    }
+
+    void Mesh::Export(std::ostream & os) const
+    {
+        WriteGmsh2Format(const_cast<const Mesh &> (*this), os);
     }
 
     void Mesh::Save(const std::string & filename) const

@@ -44,46 +44,53 @@ namespace meshit {
             const Mesh & mesh,
             const std::string & filename)
     {
-        std::ofstream outfile(filename.c_str());
-        outfile.precision(6);
-        outfile.setf(std::ios::fixed, std::ios::floatfield);
-        outfile.setf(std::ios::showpoint);
+        std::ofstream ofs(filename.c_str());
+        WriteGmsh2Format(mesh, ofs);
+    }
+
+    void WriteGmsh2Format(
+            const Mesh & mesh,
+            std::ostream & os)
+    {
+        os.precision(6);
+        os.setf(std::ios::fixed, std::ios::floatfield);
+        os.setf(std::ios::showpoint);
 
         int np = mesh.GetNP(); /// number of points in mesh
         int ns = mesh.GetNSeg(); /// number of segments in mesh
         int nse = mesh.GetNSE(); /// number of surface elements (BC)
 
         /// Prepare GMSH 2.2 file (See GMSH 2.2 Documentation)
-        outfile << "$MeshFormat\n";
-        outfile << "2.2 0 "
+        os << "$MeshFormat\n";
+        os << "2.2 0 "
                 << (int) sizeof (double) << "\n";
-        outfile << "$EndMeshFormat\n";
+        os << "$EndMeshFormat\n";
 
         /// Write nodes
-        outfile << "$Nodes\n";
-        outfile << np << "\n";
+        os << "$Nodes\n";
+        os << np << "\n";
         int cnt = PointIndex::BASE;
         for (int i = 1; i <= np; i++) {
             const Point3d & p = mesh.Point(i);
-            outfile << cnt++ << " "; /// node number
-            outfile << p.X() << " ";
-            outfile << p.Y() << " ";
-            outfile << p.Z() << "\n";
+            os << cnt++ << " "; /// node number
+            os << p.X() << " ";
+            os << p.Y() << " ";
+            os << p.Z() << "\n";
         }
-        outfile << "$EndNodes\n";
+        os << "$EndNodes\n";
 
         /*
          * 2D section : available for triangles and quadrangles
          *              upto 2nd Order
          */
         /// write triangles & quadrangles
-        outfile << "$Elements\n";
-        outfile << nse + ns << "\n";
+        os << "$Elements\n";
+        os << nse + ns << "\n";
 
         cnt = PointIndex::BASE;
         for (int i = 1; i <= ns; i++) {
             const Segment & seg = mesh.LineSegment(i);
-            outfile << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;
+            os << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;
         }
         //            cnt += ns;
         for (int k = 1; k <= nse; k++) {
@@ -99,21 +106,21 @@ namespace meshit {
                 return;
             }
 
-            outfile << cnt++ << " " << elType << " 2 ";
-            outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
-            outfile << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty();
+            os << cnt++ << " " << elType << " 2 ";
+            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
+            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty();
             for (int l = 1; l <= el.GetNP(); l++) {
-                outfile << " ";
+                os << " ";
                 if ((elType == GMSH_TRIG) || (elType == GMSH_TRIG6)) {
-                    outfile << el.PNum(triGmsh[l]);
+                    os << el.PNum(triGmsh[l]);
                 }
                 else if ((elType == GMSH_QUAD) || (elType == GMSH_QUAD8)) {
-                    outfile << el.PNum(quadGmsh[l]);
+                    os << el.PNum(quadGmsh[l]);
                 }
             }
-            outfile << "\n";
+            os << "\n";
         }
-        outfile << "$EndElements\n";
+        os << "$EndElements\n";
         /*
          * End of 2D section
          */

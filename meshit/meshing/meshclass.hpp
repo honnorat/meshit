@@ -453,9 +453,10 @@ namespace meshit {
          */
         void Compress();
 
-        void Export(
-                const std::string & filename,
-                const std::string & filetype) const;
+        void Export(const std::string & filetype, const std::string & filename) const;
+        void Export(const std::string & filetype, std::ostream & os) const;
+        void Export(const std::string & filename) const;
+        void Export(std::ostream & os) const;
         void Save(std::ostream & outfile) const;
         void Load(std::istream & infile);
         void Save(const std::string & filename) const;

@@ -13,10 +13,20 @@ namespace meshit
             const Mesh & mesh,
             const std::string & filename) {
 
-        std::cout << "Export mesh to file '" << filename << "', format is " << format << std::endl;
-
         if (format == "Gmsh2 Format")
             WriteGmsh2Format(mesh, filename);
+        else {
+            return 1;
+        }
+        return 0;
+    }
+    bool WriteUserFormat(
+            const std::string & format,
+            const Mesh & mesh,
+            std::ostream & os) {
+
+        if (format == "Gmsh2 Format")
+            WriteGmsh2Format(mesh, os);
         else {
             return 1;
         }
