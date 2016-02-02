@@ -38,7 +38,7 @@ namespace meshit {
             const PointGeomInfo & gi1, const PointGeomInfo & gi2)
     {
         if (!gi1.trignum || !gi2.trignum) {
-            LOG_ERROR("Meshing2::AddBoundaryElement: illegal geominfo");
+            MESHIT_LOG_ERROR("Meshing2::AddBoundaryElement: illegal geominfo");
         }
         adfront->AddLine(i1 - 1, i2 - 1, gi1, gi2);
     }
@@ -57,7 +57,7 @@ namespace meshit {
     void Meshing2::EndMesh()
     {
         for (int i = 0; i < ruleused.size(); i++) {
-            LOG_DEBUG(std::setw(5) << ruleused[i] << " times used rule " << rules[i]->Name());
+            MESHIT_LOG_DEBUG(std::setw(5) << ruleused[i] << " times used rule " << rules[i]->Name());
         }
     }
 
@@ -247,7 +247,7 @@ namespace meshit {
 
             // plot statistics
             if (trials > plotnexttrial) {
-                LOG_DEBUG(nfaces << " faces, " << trials << " trials, " << mesh.GetNSE() << " elements.");
+                MESHIT_LOG_DEBUG(nfaces << " faces, " << trials << " trials, " << mesh.GetNSE() << " elements.");
                 plotnexttrial += 1000;
             }
 
@@ -260,7 +260,7 @@ namespace meshit {
 
             if (trials % 1000 == 0) {
                 for (int i = 0; i < canuse.size(); i++) {
-                    LOG_DEBUG(" "
+                    MESHIT_LOG_DEBUG(" "
                             << std::setw(4) << foundmap[i] << "/"
                             << std::setw(4) << canuse[i] << "/"
                             << std::setw(4) << ruleused[i] <<
@@ -286,7 +286,7 @@ namespace meshit {
             adfront->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
 
             if (qualclass > mp.giveuptol2d) {
-                LOG_WARNING("give up with qualclass " << qualclass <<
+                MESHIT_LOG_WARNING("give up with qualclass " << qualclass <<
                         " : number of frontlines = " << adfront->GetNFL());
                 break;
             }
@@ -475,7 +475,7 @@ namespace meshit {
                 if (!rulenr) {
                     found = 0;
                     if (debugflag || debugparam.haltnosuccess)
-                        LOG_WARNING("no rule found");
+                        MESHIT_LOG_WARNING("no rule found");
                 }
             }
 
@@ -484,7 +484,7 @@ namespace meshit {
                 for (int j = 1; j <= el.GetNP(); j++) {
                     if (el.PNum(j) <= oldnp && pindex.Get(el.PNum(j)) == -1) {
                         found = 0;
-                        LOG_ERROR("meshing2, index missing");
+                        MESHIT_LOG_ERROR("meshing2, index missing");
                     }
                 }
             }
@@ -502,7 +502,7 @@ namespace meshit {
                         found = 0;
 
                         if (debugflag || debugparam.haltnosuccess)
-                            LOG_ERROR("meshing2, Backtransformation failed");
+                            MESHIT_LOG_ERROR("meshing2, Backtransformation failed");
 
                         break;
                     }
@@ -558,7 +558,7 @@ namespace meshit {
                     locpoints.resize(oldnp);
 
                     if (debugflag || debugparam.haltnosuccess)
-                        LOG_ERROR("meshing2, maxh too large");
+                        MESHIT_LOG_ERROR("meshing2, maxh too large");
                 }
             }
 
@@ -573,10 +573,10 @@ namespace meshit {
 
                             if (ChooseChartPointGeomInfo(mpgeominfo.Get(pi), upgeominfo.Elem(pi))) {
                                 // cannot select, compute new one
-                                LOG_WARNING("calc point geominfo instead of using");
+                                MESHIT_LOG_WARNING("calc point geominfo instead of using");
                                 if (ComputePointGeomInfo(locpoints.Get(pi), upgeominfo.Elem(pi))) {
                                     found = 0;
-                                    LOG_ERROR("meshing2d, geominfo failed");
+                                    MESHIT_LOG_ERROR("meshing2d, geominfo failed");
                                 }
                             }
                         }
@@ -709,7 +709,7 @@ namespace meshit {
                                 found = 0;
 
                                 if (debugflag || debugparam.haltnosuccess)
-                                    LOG_WARNING("overlapping");
+                                    MESHIT_LOG_WARNING("overlapping");
 
                                 if (debugparam.haltoverlap) {
                                     debugflag = 1;
@@ -913,7 +913,7 @@ namespace meshit {
             }
         }
 
-        LOG_DEBUG("Surface meshing done");
+        MESHIT_LOG_DEBUG("Surface meshing done");
 
         adfront->PrintOpenSegments(std::cout);
 

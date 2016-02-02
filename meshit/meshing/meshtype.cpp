@@ -348,7 +348,7 @@ namespace meshit {
             case QUAD: pp = &elquadqp[ip - 1][0];
                 break;
             default:
-                LOG_ERROR("Element2d::GetIntegrationPoint, illegal type " << typ);
+                MESHIT_LOG_ERROR("Element2d::GetIntegrationPoint, illegal type " << typ);
         }
 
         p.X() = pp[0];
@@ -383,7 +383,7 @@ namespace meshit {
             case QUAD: dshapep = &ipdquad.Get(ip)->dshape;
                 break;
             default:
-                LOG_ERROR("Element2d::GetTransformation, illegal type " << typ);
+                MESHIT_LOG_ERROR("Element2d::GetTransformation, illegal type " << typ);
         }
 
         CalcABt(pmat, *dshapep, trans);
@@ -409,7 +409,7 @@ namespace meshit {
                 shape(3) = (1 - p.X()) * p.Y();
                 break;
             default:
-                LOG_ERROR("Element2d::GetShape, illegal type " << typ);
+                MESHIT_LOG_ERROR("Element2d::GetShape, illegal type " << typ);
         }
     }
 
@@ -436,7 +436,7 @@ namespace meshit {
                 break;
 
             default:
-                LOG_ERROR("Element2d::GetDShape, illegal type " << typ);
+                MESHIT_LOG_ERROR("Element2d::GetDShape, illegal type " << typ);
         }
     }
 

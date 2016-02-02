@@ -344,7 +344,7 @@ namespace meshit {
             }
 
             else if (strcmp(buf, "endrule") != 0) {
-                LOG_ERROR("Parser error, unknown token " << buf);
+                MESHIT_LOG_ERROR("Parser error, unknown token " << buf);
             }
         } while (!ist.eof() && strcmp(buf, "endrule") != 0);
 
@@ -441,11 +441,11 @@ namespace meshit {
 
             if (!quad) {
                 hcp = triarules;
-                LOG_DEBUG("load internal triangle rules");
+                MESHIT_LOG_DEBUG("load internal triangle rules");
             }
             else {
                 hcp = quadrules;
-                LOG_DEBUG("load internal quad rules");
+                MESHIT_LOG_DEBUG("load internal quad rules");
             }
 
             size_t len = 0;

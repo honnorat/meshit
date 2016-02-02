@@ -8,7 +8,7 @@ namespace meshit {
 
     int CheckSurfaceMesh(const Mesh & mesh)
     {
-        LOG_DEBUG("Check Surface mesh");
+        MESHIT_LOG_DEBUG("Check Surface mesh");
 
         int nf = mesh.GetNSE();
         INDEX_2_HASHTABLE<int> edges(nf + 2);
@@ -22,7 +22,7 @@ namespace meshit {
                 if (edges.Used(i2)) {
                     int hi = edges.Get(i2);
                     if (hi != 1)
-                        LOG_ERROR("CheckSurfaceMesh, hi = " << hi);
+                        MESHIT_LOG_ERROR("CheckSurfaceMesh, hi = " << hi);
                     edges.Set(i2, 2);
                     cnt2++;
                 }
@@ -35,7 +35,7 @@ namespace meshit {
         }
 
         if (cnt1 != cnt2) {
-            LOG_ERROR("Surface mesh not consistent : cnt1 = " << cnt1 << " / cnt2 = " << cnt2);
+            MESHIT_LOG_ERROR("Surface mesh not consistent : cnt1 = " << cnt1 << " / cnt2 = " << cnt2);
             return 0;
         }
         return 1;
@@ -52,9 +52,9 @@ namespace meshit {
                     tri2[k - 1] = &mesh.Point(mesh.OpenElement(j).PNum(k));
                 }
                 if (IntersectTriangleTriangle(&tri1[0], &tri2[0])) {
-                    LOG_ERROR("Surface elements are intersecting :");
+                    MESHIT_LOG_ERROR("Surface elements are intersecting :");
                     for (int k = 0; k <= 2; k++) {
-                        LOG_ERROR_CONT(*tri1[k] << "  ");
+                        MESHIT_LOG_ERROR_CONT(*tri1[k] << "  ");
                     }
                     std::cerr << std::endl;
                     for (int k = 0; k <= 2; k++)
@@ -111,12 +111,12 @@ namespace meshit {
             incl.Elem(cl)++;
         }
 
-        LOG_INFO("\n\n");
-        LOG_INFO("Points:           " << mesh.GetNP());
-        LOG_INFO("Surface Elements: " << mesh.GetNSE());
-        LOG_INFO("\nElements in qualityclasses:");
+        MESHIT_LOG_INFO("\n\n");
+        MESHIT_LOG_INFO("Points:           " << mesh.GetNP());
+        MESHIT_LOG_INFO("Surface Elements: " << mesh.GetNSE());
+        MESHIT_LOG_INFO("\nElements in qualityclasses:");
         for (i = 1; i <= ncl; i++) {
-            LOG_INFO(std::fixed << std::setprecision(2) <<
+            MESHIT_LOG_INFO(std::fixed << std::setprecision(2) <<
                     std::setw(4) << double (i - 1) / ncl << " - " <<
                     std::setw(4) << double (i) / ncl << ": " << incl.Get(i));
         }

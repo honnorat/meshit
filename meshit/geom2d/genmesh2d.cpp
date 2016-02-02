@@ -45,7 +45,7 @@ namespace meshit {
                         break;
                     }
                     default:
-                        LOG_ERROR("Optimization code " << optstr[j - 1] << " not defined");
+                        MESHIT_LOG_ERROR("Optimization code " << optstr[j - 1] << " not defined");
                 }
             }
     }
@@ -289,7 +289,7 @@ namespace meshit {
         mesh.GetBox(pmin, pmax);
         double diam2 = Dist2(pmin, pmax);
 
-        LOG_DEBUG("copy edge, from = " << from << " to " << to);
+        MESHIT_LOG_DEBUG("copy edge, from = " << from << " to " << to);
 
         for (int i = 1; i <= mesh.GetNSeg(); i++) {
             const Segment & seg = mesh.LineSegment(i);

@@ -217,7 +217,7 @@ namespace meshit {
                     break;
                 }
                 default:
-                    LOG_ERROR("Refine: undefined surface element type " << int(el.GetType()));
+                    MESHIT_LOG_ERROR("Refine: undefined surface element type " << int(el.GetType()));
             }
         }
 

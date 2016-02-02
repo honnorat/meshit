@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "../meshit.hpp"
+#include "../meshing/msghandler.hpp"
 #include "opti.hpp"
 
 namespace meshit {
@@ -261,7 +262,7 @@ namespace meshit {
         } while (!a1crit || !a3acrit);
 
         if (f0 < f || (ifail == 1)) {
-            LOG_DEBUG("fail, f = " << f << " f0 = " << f0 << " diff = " << f0-f << "  ifail = " << ifail);
+            MESHIT_LOG_DEBUG("fail, f = " << f << " f0 = " << f0 << " diff = " << f0-f << "  ifail = " << ifail);
             f = f0;
             x = x0;
         }

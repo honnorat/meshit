@@ -48,11 +48,11 @@ namespace meshit {
 
     void Refinement::ProjectToSurface(Point<3> & p, int surfi) const
     {
-        LOG_ERROR("Refinement::ProjectToSurface: no geometry set");
+        MESHIT_LOG_ERROR("Refinement::ProjectToSurface: no geometry set");
     };
 
     void Refinement::ProjectToEdge(Point<3> & p, int surfi1, int surfi2, const EdgePointGeomInfo & egi) const
     {
-        LOG_ERROR("Refinement::ProjectToEdge not overloaded");
+        MESHIT_LOG_ERROR("Refinement::ProjectToEdge not overloaded");
     }
 }

@@ -47,7 +47,7 @@ namespace meshit {
             LoadData(infile);
         }
         else {
-            LOG_FATAL("Unsupported file format : '" << buf << "'");
+            MESHIT_LOG_FATAL("Unsupported file format : '" << buf << "'");
             throw std::runtime_error("Unsupported file format");
         }
         infile.close();
@@ -80,7 +80,7 @@ namespace meshit {
 
     void SplineGeometry2d::LoadData(std::istream & infile)
     {
-        LOG_INFO("Load 2D Geometry");
+        MESHIT_LOG_INFO("Load 2D Geometry");
         int nump, leftdom, rightdom;
         Point<2> x;
         int hi1, hi2, hi3;
@@ -111,7 +111,7 @@ namespace meshit {
             ischar = false;
 
             if (keyword == "points") {
-                LOG_DEBUG("load points");
+                MESHIT_LOG_DEBUG("load points");
                 infile.get(ch);
                 infile.putback(ch);
 
@@ -193,7 +193,7 @@ namespace meshit {
             }
 
             else if (keyword == "segments") {
-                LOG_DEBUG("load segments");
+                MESHIT_LOG_DEBUG("load segments");
 
                 bcnames.resize(0);
                 infile.get(ch);

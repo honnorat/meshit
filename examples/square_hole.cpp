@@ -9,7 +9,7 @@
 
 int main(int argc, char ** argv)
 {
-    LOG_INFO("== MeshGen Square_hole");
+    MESHIT_LOG_INFO("== MeshGen Square_hole");
 
     meshit::MeshingParameters mp;
     meshit::Mesh mesh;
@@ -33,16 +33,16 @@ int main(int argc, char ** argv)
 
     geom.FakeData();
 
-    LOG_INFO("== start meshing");
+    MESHIT_LOG_INFO("== start meshing");
     mp.optsteps2d = 5;
     geom.SetGrading(0.02);
     mesh.BuildFromSpline2D(geom, mp);
-    LOG_INFO("== meshing done");
+    MESHIT_LOG_INFO("== meshing done");
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);
     meshit::CheckSurfaceMesh2(mesh);
     mesh.CheckConsistentBoundary();
-    LOG_INFO("== export mesh");
+    MESHIT_LOG_INFO("== export mesh");
     mesh.Export("square_hole.msh", "Gmsh2 Format");
     mesh.Save("square_hole.meshit");
 

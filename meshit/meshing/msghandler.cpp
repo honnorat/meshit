@@ -7,7 +7,7 @@ namespace meshit {
 
     bool printdots = true;
 
-    static int _meshit_logLevel = INFO_LOG_LEVEL;
+    static int _meshit_logLevel = MESHIT_INFO_LOG_LEVEL;
 
     int GetLogLevel()
     {
@@ -23,7 +23,7 @@ namespace meshit {
     {
         //the dots for progression of program
         if (printdots) {
-            LOG_INFO_CONT(ch << '\0' << std::flush);
+            MESHIT_LOG_INFO_CONT(ch << '\0' << std::flush);
         }
     }
 }

@@ -20,6 +20,4 @@
 
 #define _USE_MATH_DEFINES 1
 
-#include "meshing/msghandler.hpp"
-
 #endif	/* MESHIT_HPP */

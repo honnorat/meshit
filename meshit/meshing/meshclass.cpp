@@ -113,7 +113,7 @@ namespace meshit {
 
     void Mesh::BuildFromSpline2D(SplineGeometry2d & geometry, MeshingParameters & mp)
     {
-        LOG_DEBUG("Generate Mesh from spline geometry");
+        MESHIT_LOG_DEBUG("Generate Mesh from spline geometry");
 
         double h = mp.maxh;
 
@@ -277,7 +277,7 @@ namespace meshit {
             if (geometry.GetDomainMaxh(domnr) > 0)
                 h = geometry.GetDomainMaxh(domnr);
 
-            LOG_DEBUG("Meshing domain " << domnr << " / " << maxdomnr);
+            MESHIT_LOG_DEBUG("Meshing domain " << domnr << " / " << maxdomnr);
 
             int oldnf = GetNSE();
 
@@ -766,7 +766,7 @@ namespace meshit {
 
             if (strcmp(str, "surfaceelements") == 0 || strcmp(str, "surfaceelementsgi") == 0 || strcmp(str, "surfaceelementsuv") == 0) {
                 infile >> n;
-                LOG_DEBUG(n << " surface elements");
+                MESHIT_LOG_DEBUG(n << " surface elements");
 
                 bool geominfo = strcmp(str, "surfaceelementsgi") == 0;
                 bool uv = strcmp(str, "surfaceelementsuv") == 0;
@@ -849,7 +849,7 @@ namespace meshit {
                 infile >> a;
                 n = a;
 
-                LOG_DEBUG(n << " curve elements");
+                MESHIT_LOG_DEBUG(n << " curve elements");
 
                 for (i = 1; i <= n; i++) {
                     Segment seg;
@@ -877,7 +877,7 @@ namespace meshit {
 
             if (strcmp(str, "points") == 0) {
                 infile >> n;
-                LOG_DEBUG(n << " points");
+                MESHIT_LOG_DEBUG(n << " points");
                 for (i = 1; i <= n; i++) {
                     Point3d p;
                     infile >> p.X() >> p.Y() >> p.Z();
@@ -890,7 +890,7 @@ namespace meshit {
 
             if (strcmp(str, "identifications") == 0) {
                 infile >> n;
-                LOG_DEBUG(n << " identifications");
+                MESHIT_LOG_DEBUG(n << " identifications");
                 for (i = 1; i <= n; i++) {
                     PointIndex pi1, pi2;
                     int ind;
@@ -901,7 +901,7 @@ namespace meshit {
 
             if (strcmp(str, "identificationtypes") == 0) {
                 infile >> n;
-                LOG_DEBUG(n << " identificationtypes");
+                MESHIT_LOG_DEBUG(n << " identificationtypes");
                 for (i = 1; i <= n; i++) {
                     int type;
                     infile >> type;
@@ -911,7 +911,7 @@ namespace meshit {
 
             if (strcmp(str, "materials") == 0) {
                 infile >> n;
-                LOG_DEBUG(n << " materials");
+                MESHIT_LOG_DEBUG(n << " materials");
                 for (i = 1; i <= n; i++) {
                     int nr;
                     std::string mat;
@@ -922,7 +922,7 @@ namespace meshit {
 
             if (strcmp(str, "bcnames") == 0) {
                 infile >> n;
-                LOG_DEBUG(n << " bcnames");
+                MESHIT_LOG_DEBUG(n << " bcnames");
                 Array<int, 0> bcnrs(n);
                 SetNBCNames(n);
                 for (i = 1; i <= n; i++) {
@@ -1286,7 +1286,7 @@ namespace meshit {
         }
         int cnt4 = openelements.size() - cnt3;
         if (openelements.size() > 0)
-            LOG_WARNING(openelements.size() << " (" << cnt3 << " + " << cnt4 << ")" << " open elements");
+            MESHIT_LOG_WARNING(openelements.size() << " (" << cnt3 << " + " << cnt4 << ")" << " open elements");
 
         BuildBoundaryEdges();
 
@@ -1324,7 +1324,7 @@ namespace meshit {
     {
         INDEX_2_HASHTABLE<INDEX_2> faceht(4 * GetNSE() + GetNSeg() + 1);
 
-        LOG_DEBUG("Test Opensegments");
+        MESHIT_LOG_DEBUG("Test Opensegments");
         for (int i = 1; i <= GetNSeg(); i++) {
             const Segment & seg = LineSegment(i);
 
@@ -1370,7 +1370,7 @@ namespace meshit {
                             faceht.Set(seg, data);
                         }
                         else {
-                            LOG_WARNING("hash table si not fitting for segment: " <<
+                            MESHIT_LOG_WARNING("hash table si not fitting for segment: " <<
                                     seg.I1() << "-" << seg.I2() << " other = " << data.I2());
                         }
                     }
@@ -1431,7 +1431,7 @@ namespace meshit {
                 }
             }
         }
-        LOG_DEBUG(opensegments.size() << " open segments found");
+        MESHIT_LOG_DEBUG(opensegments.size() << " open segments found");
 
         for (int i = 1; i <= points.size(); i++) {
             points.Elem(i).SetType(SURFACEPOINT);
@@ -1597,7 +1597,7 @@ namespace meshit {
             }
         }
 
-        LOG_DEBUG("minh = " << minh << " avh = " << (hsum / n) << " maxh = " << maxh);
+        MESHIT_LOG_DEBUG("minh = " << minh << " avh = " << (hsum / n) << " maxh = " << maxh);
         return (hsum / n);
     }
 
@@ -1605,7 +1605,7 @@ namespace meshit {
     {
         assert(lochfunc);
 
-        LOG_DEBUG("CalcLocalH: " << GetNP() << " points, "
+        MESHIT_LOG_DEBUG("CalcLocalH: " << GetNP() << " points, "
                 << GetNSE() << " surface elements.");
 
         for (int i = 0; i < GetNSE(); i++) {
@@ -1660,7 +1660,7 @@ namespace meshit {
 
     void Mesh::CalcLocalHFromPointDistances(double grading)
     {
-        LOG_DEBUG("Calculating local h from point distances");
+        MESHIT_LOG_DEBUG("Calculating local h from point distances");
 
         assert(lochfunc);
 
@@ -1683,7 +1683,7 @@ namespace meshit {
 
     void Mesh::CalcLocalHFromSurfaceCurvature(double grading, double elperr)
     {
-        LOG_DEBUG("Calculating local h from surface curvature");
+        MESHIT_LOG_DEBUG("Calculating local h from surface curvature");
 
         assert(lochfunc);
 
@@ -1807,11 +1807,11 @@ namespace meshit {
         // does not exist, or does not load successfully due to 
         // other reasons such as access rights, etc...
         if (!msf) {
-            LOG_ERROR("Error loading mesh size file: " << meshsizefilename << "....  Skipping!");
+            MESHIT_LOG_ERROR("Error loading mesh size file: " << meshsizefilename << "....  Skipping!");
             return;
         }
 
-        LOG_DEBUG("Load local mesh-size file: " << meshsizefilename);
+        MESHIT_LOG_DEBUG("Load local mesh-size file: " << meshsizefilename);
 
         int nmsp = 0;
         int nmsl = 0;
@@ -1821,7 +1821,7 @@ namespace meshit {
             throw std::runtime_error("Mesh-size file error: No points found\n");
 
         if (nmsp > 0)
-            LOG_DEBUG("Number of mesh-size restriction points: " << nmsp);
+            MESHIT_LOG_DEBUG("Number of mesh-size restriction points: " << nmsp);
 
         for (int i = 0; i < nmsp; i++) {
             Point3d pi;
@@ -1838,7 +1838,7 @@ namespace meshit {
             throw std::runtime_error("Mesh-size file error: No line definitions found\n");
 
         if (nmsl > 0)
-            LOG_DEBUG("Number of mesh-size restriction lines: " << nmsl);
+            MESHIT_LOG_DEBUG("Number of mesh-size restriction lines: " << nmsl);
 
         for (int i = 0; i < nmsl; i++) {
             Point3d p1, p2;
@@ -2049,7 +2049,7 @@ namespace meshit {
                 int cnt = 0;
                 edges.GetData(i, j, i2, cnt);
                 if (cnt) {
-                    LOG_ERROR("Edge " << i2.I1() << " - " << i2.I2() << " multiple times in surface mesh");
+                    MESHIT_LOG_ERROR("Edge " << i2.I1() << " - " << i2.I2() << " multiple times in surface mesh");
                     i2s = i2;
                     i2s.Sort();
                     for (int k = 1; k <= nf; k++) {
@@ -2060,7 +2060,7 @@ namespace meshit {
                             edge.Sort();
 
                             if (edge == i2s)
-                                LOG_ERROR("  edge of element " << sel);
+                                MESHIT_LOG_ERROR("  edge of element " << sel);
                         }
                     }
                     err = 2;
@@ -2127,7 +2127,7 @@ namespace meshit {
                 if (points[tri[0]].GetLayer() != points[tri[1]].GetLayer() ||
                         points[tri[0]].GetLayer() != points[tri[2]].GetLayer()) {
                     incons_layers = 1;
-                    LOG_WARNING("inconsistent layers in triangle");
+                    MESHIT_LOG_WARNING("inconsistent layers in triangle");
                 }
 
 
@@ -2139,26 +2139,26 @@ namespace meshit {
 
                 if (IntersectTriangleTriangle(&trip1[0], &trip2[0])) {
                     overlap = 1;
-                    LOG_WARNING("Intersecting elements " << i << " and " << inters.Get(j));
-                    LOG_DEBUG(" el1 = " << tri);
-                    LOG_DEBUG(" el2 = " << tri2);
+                    MESHIT_LOG_WARNING("Intersecting elements " << i << " and " << inters.Get(j));
+                    MESHIT_LOG_DEBUG(" el1 = " << tri);
+                    MESHIT_LOG_DEBUG(" el2 = " << tri2);
 
                     for (k = 1; k <= 3; k++)
-                        LOG_DEBUG_CONT(tri.PNum(k) << "  ");
-                    LOG_DEBUG("");
+                        MESHIT_LOG_DEBUG_CONT(tri.PNum(k) << "  ");
+                    MESHIT_LOG_DEBUG("");
                     for (k = 1; k <= 3; k++)
-                        LOG_DEBUG_CONT(tri2.PNum(k) << "  ");
-                    LOG_DEBUG("");
+                        MESHIT_LOG_DEBUG_CONT(tri2.PNum(k) << "  ");
+                    MESHIT_LOG_DEBUG("");
 
                     for (k = 0; k <= 2; k++)
-                        LOG_DEBUG_CONT(*trip1[k] << "   ");
-                    LOG_DEBUG("");
+                        MESHIT_LOG_DEBUG_CONT(*trip1[k] << "   ");
+                    MESHIT_LOG_DEBUG("");
                     for (k = 0; k <= 2; k++)
-                        LOG_DEBUG_CONT(*trip2[k] << "   ");
-                    LOG_DEBUG("");
+                        MESHIT_LOG_DEBUG_CONT(*trip2[k] << "   ");
+                    MESHIT_LOG_DEBUG("");
 
-                    LOG_DEBUG("Face1 = " << GetFaceDescriptor(tri.GetIndex()));
-                    LOG_DEBUG("Face1 = " << GetFaceDescriptor(tri2.GetIndex()));
+                    MESHIT_LOG_DEBUG("Face1 = " << GetFaceDescriptor(tri.GetIndex()));
+                    MESHIT_LOG_DEBUG("Face1 = " << GetFaceDescriptor(tri2.GetIndex()));
 
                     SurfaceElement(i).badel = 1;
                     SurfaceElement(inters.Get(j)).badel = 1;
@@ -2294,7 +2294,7 @@ namespace meshit {
         {
             if (elementsearchtreets != GetTimeStamp()) {
 
-                LOG_DEBUG("Rebuild element searchtree");
+                MESHIT_LOG_DEBUG("Rebuild element searchtree");
 
                 delete elementsearchtree;
                 elementsearchtree = NULL;

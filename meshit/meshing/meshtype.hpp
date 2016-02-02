@@ -432,7 +432,7 @@ namespace meshit {
                 case QUAD8: np = 8;
                     break;
                 default:
-                    LOG_ERROR("Element2d::SetType, illegal type " << typ);
+                    MESHIT_LOG_ERROR("Element2d::SetType, illegal type " << typ);
             }
         }
 

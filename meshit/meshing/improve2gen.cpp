@@ -20,7 +20,7 @@ namespace meshit {
     {
         if (!faceindex) {
             if (writestatus)
-                LOG_DEBUG("Generic Improve");
+                MESHIT_LOG_DEBUG("Generic Improve");
 
             for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++)
                 GenericImprove(mesh);
@@ -389,7 +389,7 @@ namespace meshit {
         mesh.Compress();
 
         for (int ri = 0; ri < rules.size(); ri++) {
-            LOG_DEBUG("rule " << ri + 1 << " " << mapped[ri] << "/" << used[ri] << " mapped/used");
+            MESHIT_LOG_DEBUG("rule " << ri + 1 << " " << mapped[ri] << "/" << used[ri] << " mapped/used");
         }
     }
 }
