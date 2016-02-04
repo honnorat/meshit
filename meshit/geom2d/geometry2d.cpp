@@ -32,8 +32,8 @@ namespace meshit {
 
         if (!infile.good())
             throw std::runtime_error(std::string("Input file '") +
-                std::string(filename) +
-                std::string("' not available!"));
+                                     std::string(filename) +
+                                     std::string("' not available!"));
 
         TestComment(infile);
 
@@ -381,11 +381,10 @@ namespace meshit {
         return;
     }
 
-    void SplineGeometry2d::AddLine(
-            const std::vector<Point2d>& point_list,
-            double hmax,
-            bool hole,
-            int bc)
+    void SplineGeometry2d::AddLine(const std::vector<Point2d>& point_list,
+                                   double hmax,
+                                   bool hole,
+                                   int bc)
     {
 
         size_t nold_points = geompoints.size();
@@ -418,6 +417,39 @@ namespace meshit {
             seg->hpref_left = false;
             seg->hpref_right = false;
             seg->reffak = 1; // Refinement factor
+            seg->hmax = hmax;
+            splines.push_back(seg);
+        }
+    }
+
+    void SplineGeometry2d::AddStructureLine(const std::vector<Point2d>& point_list,
+                                            double hmax,
+                                            int bc)
+    {
+
+        size_t nold_points = geompoints.size();
+        size_t nnew_points = point_list.size();
+
+        std::vector<GeomPoint<2> > gpts;
+
+        gpts.reserve(nnew_points);
+        geompoints.reserve(nold_points + nnew_points);
+
+        for (size_t i = 0; i < nnew_points; i++) {
+            gpts.push_back(GeomPoint<2>(point_list[i]));
+            geompoints.push_back(gpts[i]);
+        }
+        for (size_t i = 0; i < nnew_points; i++) {
+            size_t i0 = i;
+            size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
+            SplineSeg<2> * spline = new LineSeg<2>(gpts[i0], gpts[i1]);
+            SplineSegExt * seg = new SplineSegExt(*spline);
+            seg->leftdom = 1;
+            seg->rightdom = 1;
+            seg->bc = bc;
+            seg->hpref_left = false;
+            seg->hpref_right = false;
+            seg->reffak = 2; // Refinement factor
             seg->hmax = hmax;
             splines.push_back(seg);
         }
@@ -470,7 +502,7 @@ namespace meshit {
     }
 
     int SplineGeometry2d::GenerateMesh(Mesh*& mesh, MeshingParameters & mp,
-            int perfstepsstart, int perfstepsend)
+                                       int perfstepsstart, int perfstepsend)
     {
         mesh->BuildFromSpline2D(*this, mp);
         return 0;
