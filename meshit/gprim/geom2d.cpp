@@ -1,19 +1,18 @@
-#include "../meshit.hpp"
 #include "geom2d.hpp"
 
 namespace meshit {
 
-    std::ostream & operator<<(std::ostream  & s, const Point2d & p)
+    std::ostream& operator<<(std::ostream& s, const Point2d& p)
     {
-      return s << "(" << p.px << ", " << p.py << ")";
-    }
-    
-    std::ostream & operator<<(std::ostream  & s, const Vec2d & v)
-    {
-      return s << "(" << v.vx << ", " << v.vy << ")";
+        return s << "(" << p.px << ", " << p.py << ")";
     }
 
-    double Angle(const Vec2d & v)
+    std::ostream& operator<<(std::ostream& s, const Vec2d& v)
+    {
+        return s << "(" << v.vx << ", " << v.vy << ")";
+    }
+
+    double Angle(const Vec2d& v)
     {
         if (v.X() == 0 && v.Y() == 0)
             return 0;
@@ -23,23 +22,23 @@ namespace meshit {
         return ang;
     }
 
-    double Angle(const Vec2d & v1, const Vec2d & v2)
+    double Angle(const Vec2d& v1, const Vec2d& v2)
     {
         double ang = Angle(v2) - Angle(v1);
         if (ang < 0) ang += 2 * M_PI;
         return ang;
     }
 
-    double Dist2(const Line2d & g, const Line2d & h)
+    double Dist2(const Line2d& g, const Line2d& h)
     {
-        double dd = 0.0, d1, d2, d3, d4;
+        double dd = 0.0;
         Point2d cp = CrossPoint(g, h);
 
         if (Parallel(g, h) || !IsOnLine(g, cp) || !IsOnLine(h, cp)) {
-            d1 = Dist2(g.P1(), h.P1());
-            d2 = Dist2(g.P1(), h.P2());
-            d3 = Dist2(g.P2(), h.P1());
-            d4 = Dist2(g.P2(), h.P2());
+            double d1 = Dist2(g.P1(), h.P1());
+            double d2 = Dist2(g.P1(), h.P2());
+            double d3 = Dist2(g.P2(), h.P1());
+            double d4 = Dist2(g.P2(), h.P2());
             if (d1 < d2) d2 = d1;
             if (d3 < d4) d4 = d3;
             dd = (d2 < d4) ? d2 : d4;
@@ -47,7 +46,7 @@ namespace meshit {
         return dd;
     }
 
-    Point2d CrossPoint(const Line2d & l1, const Line2d & l2)
+    Point2d CrossPoint(const Line2d& l1, const Line2d& l2)
     {
         double den = Cross(l1.Delta(), l2.Delta());
         double num = Cross((l2.P1() - l1.P1()), l2.Delta());
@@ -58,8 +57,8 @@ namespace meshit {
             return l1.P1() + (num / den) * l1.Delta();
     }
 
-    int CrossPointBarycentric(const Line2d & l1, const Line2d & l2,
-            double & lam1, double & lam2)
+    int CrossPointBarycentric(const Line2d& l1, const Line2d& l2,
+                              double& lam1, double& lam2)
     {
         // p = l1.1 + lam1 (l1.2-l1.1) = l2.1 + lam2 (l2.2-l2.1)
         double a11 = l1.p2.X() - l1.p1.X();
@@ -79,13 +78,13 @@ namespace meshit {
         return 0;
     }
 
-    int Parallel(const Line2d & l1, const Line2d & l2, double peps)
+    int Parallel(const Line2d& l1, const Line2d& l2, double peps)
     {
         double p = fabs(Cross(l1.Delta(), l2.Delta()));
         return p <= peps * l1.Length() * l2.Length();
     }
 
-    int IsOnLine(const Line2d & l, const Point2d & p, double heps)
+    int IsOnLine(const Line2d& l, const Point2d& p, double heps)
     {
         double c1 = (p - l.P1()) * l.Delta();
         double c2 = (p - l.P2()) * l.Delta();

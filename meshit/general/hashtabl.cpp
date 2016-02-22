@@ -14,7 +14,6 @@
 #include "hashtabl.hpp"
 
 namespace meshit {
-    //using namespace netgen;
 
     void INDEX_4::Sort()
     {
@@ -64,8 +63,6 @@ namespace meshit {
     BASE_INDEX_2_CLOSED_HASHTABLE(int size)
             : hash(size)
     {
-        // hash.SetName ("i2-hashtable, hash");
-
         invalid = -1;
         for (int i = 1; i <= size; i++)
             hash.Elem(i).I1() = invalid;
@@ -144,5 +141,5 @@ namespace meshit {
                 throw std::runtime_error("Try to set new element in full closed hashtable");
         }
     }
-}
 
+}  // namespace meshit

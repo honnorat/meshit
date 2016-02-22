@@ -11,22 +11,26 @@
 #include "../general/array.hpp"
 
 namespace meshit {
-    template <int D> class Vec;
-    template <int D> class Point;
+    template<int D>
+    class Vec;
 
-    template <int D>
+    template<int D>
+    class Point;
+
+    template<int D>
     class Point
     {
-      protected:
+     protected:
         double x[D];
 
-      public:
-
+     public:
         Point() { }
 
         Point(double ax)
         {
-            for (int i = 0; i < D; i++) x[i] = ax;
+            for (int i = 0; i < D; i++) {
+                x[i] = ax;
+            }
         }
 
         Point(double ax, double ay)
@@ -52,65 +56,65 @@ namespace meshit {
             x[3] = au;
         }
 
-        Point(const Point<D> & p2)
+        Point(const Point<D>& p2)
         {
             for (int i = 0; i < D; i++) x[i] = p2.x[i];
         }
 
-        explicit Point(const Vec<D> & v)
+        explicit Point(const Vec<D>& v)
         {
             for (int i = 0; i < D; i++) x[i] = v(i);
         }
 
-        Point & operator=(const Point<D> & p2)
+        Point& operator=(const Point<D>& p2)
         {
             for (int i = 0; i < D; i++) x[i] = p2.x[i];
             return *this;
         }
 
-        Point & operator=(double val)
+        Point& operator=(double val)
         {
             for (int i = 0; i < D; i++) x[i] = val;
             return *this;
         }
 
-        double & operator()(int i)
+        double& operator()(int i)
         {
             return x[i];
         }
 
-        const double & operator()(int i) const
+        const double& operator()(int i) const
         {
             return x[i];
         }
 
-        double & operator[](int i)
+        double& operator[](int i)
         {
             return x[i];
         }
 
-        const double & operator[](int i) const
+        const double& operator[](int i) const
         {
             return x[i];
         }
 
-        operator const double* () const
+        operator const double*() const
         {
             return x;
         }
     };
 
-    template <int D>
+    template<int D>
     class Vec
     {
-      protected:
+     protected:
         double x[D];
 
-      public:
+     public:
 
         Vec() { }
 
-        Vec(double ax)
+        explicit Vec(double ax)
         {
             for (int i = 0; i < D; i++) {
                 x[i] = ax;
@@ -140,54 +144,54 @@ namespace meshit {
             x[3] = au;
         }
 
-        Vec(const Vec<D> & p2)
+        Vec(const Vec<D>& p2)
         {
             for (int i = 0; i < D; i++) x[i] = p2.x[i];
         }
 
-        explicit Vec(const Point<D> & p)
+        explicit Vec(const Point<D>& p)
         {
             for (int i = 0; i < D; i++) x[i] = p(i);
         }
 
-        Vec(const Vec<D> & p1, const Vec<D> & p2)
+        Vec(const Vec<D>& p1, const Vec<D>& p2)
         {
             for (int i = 0; i < D; i++) x[i] = p2(i) - p1(1);
         }
 
-        Vec & operator=(const Vec<D> & p2)
+        Vec& operator=(const Vec<D>& p2)
         {
             for (int i = 0; i < D; i++) x[i] = p2.x[i];
             return *this;
         }
 
-        Vec & operator=(double s)
+        Vec& operator=(double s)
         {
             for (int i = 0; i < D; i++) x[i] = s;
             return *this;
         }
 
-        double & operator()(int i)
+        double& operator()(int i)
         {
             return x[i];
         }
 
-        const double & operator()(int i) const
+        const double& operator()(int i) const
         {
             return x[i];
         }
 
-        double & operator[](int i)
+        double& operator[](int i)
         {
             return x[i];
         }
 
-        const double & operator[](int i) const
+        const double& operator[](int i) const
         {
             return x[i];
         }
 
-        operator const double* () const
+        operator const double*() const
         {
             return x;
         }
@@ -208,7 +212,7 @@ namespace meshit {
             return l;
         }
 
-        const Vec<D> & Normalize()
+        const Vec<D>& Normalize()
         {
             double l = Length();
             if (l != 0)
@@ -220,49 +224,49 @@ namespace meshit {
         Vec<D> GetNormal() const;
     };
 
-    template <int H, int W = H>
+    template<int H, int W = H>
     class Mat
     {
-      protected:
-        double x[H*W];
+     protected:
+        double x[H * W];
 
-      public:
+     public:
 
         Mat() { }
 
-        Mat(const Mat & b)
+        Mat(const Mat& b)
         {
             for (int i = 0; i < H * W; i++) x[i] = b.x[i];
         }
 
-        Mat & operator=(double s)
+        Mat& operator=(double s)
         {
             for (int i = 0; i < H * W; i++) x[i] = s;
             return *this;
         }
 
-        Mat & operator=(const Mat & b)
+        Mat& operator=(const Mat& b)
         {
             for (int i = 0; i < H * W; i++) x[i] = b.x[i];
             return *this;
         }
 
-        double & operator()(int i, int j)
+        double& operator()(int i, int j)
         {
             return x[i * W + j];
         }
 
-        const double & operator()(int i, int j) const
+        const double& operator()(int i, int j) const
         {
             return x[i * W + j];
         }
 
-        double & operator()(int i)
+        double& operator()(int i)
         {
             return x[i];
         }
 
-        const double & operator()(int i) const
+        const double& operator()(int i) const
         {
             return x[i];
         }
@@ -283,7 +287,7 @@ namespace meshit {
             return hv;
         }
 
-        void Solve(const Vec<H> & rhs, Vec<W> & sol) const
+        void Solve(const Vec<H>& rhs, Vec<W>& sol) const
         {
             Mat<W, H> inv;
             CalcInverse(*this, inv);
@@ -291,23 +295,23 @@ namespace meshit {
         }
     };
 
-    template <int D>
+    template<int D>
     class Box
     {
-      protected:
+     protected:
         Point<D> pmin, pmax;
-      public:
 
+     public:
         Box() { }
 
-        Box(const Point<D> & p1)
+        explicit Box(const Point<D>& p1)
         {
             for (int i = 0; i < D; i++) {
                 pmin(i) = pmax(i) = p1(i);
             }
         }
 
-        Box(const Point<D> & p1, const Point<D> & p2)
+        Box(const Point<D>& p1, const Point<D>& p2)
         {
             for (int i = 0; i < D; i++) {
                 pmin(i) = std::min(p1(i), p2(i));
@@ -320,28 +324,26 @@ namespace meshit {
             EMPTY_BOX = 1
         };
 
-        Box(EB_TYPE et)
-        {
-            pmin = Point<3> (1e99, 1e99, 1e99);
-            pmax = Point<3> (-1e99, -1e99, -1e99);
-        }
+        explicit Box(EB_TYPE et)
+                : pmin(Point<3>(1e99, 1e99, 1e99)),
+                  pmax(Point<3>(-1e99, -1e99, -1e99)) { }
 
-        const Point<D> & PMin() const
+        const Point<D>& PMin() const
         {
             return pmin;
         }
 
-        const Point<D> & PMax() const
+        const Point<D>& PMax() const
         {
             return pmax;
         }
 
-        void Set(const Point<D> & p)
+        void Set(const Point<D>& p)
         {
             pmin = pmax = p;
         }
 
-        void Add(const Point<D> & p)
+        void Add(const Point<D>& p)
         {
             for (int i = 0; i < D; i++) {
                 if (p(i) < pmin(i)) pmin(i) = p(i);
@@ -349,16 +351,16 @@ namespace meshit {
             }
         }
 
-        template <typename T1, typename T2>
-        void Set(const IndirectArray<T1, T2> & points)
+        template<typename T1, typename T2>
+        void Set(const IndirectArray<T1, T2>& points)
         {
             Set(points[points.Begin()]);
             for (int i = points.Begin() + 1; i < points.End(); i++)
                 Add(points[i]);
         }
 
-        template <typename T1, typename T2>
-        void Add(const IndirectArray<T1, T2> & points)
+        template<typename T1, typename T2>
+        void Add(const IndirectArray<T1, T2>& points)
         {
             for (int i = points.Begin(); i < points.End(); i++)
                 Add(points[i]);
@@ -387,15 +389,16 @@ namespace meshit {
             return p;
         }
 
-        bool Intersect(const Box<D> & box2) const
+        bool Intersect(const Box<D>& box2) const
         {
             for (int i = 0; i < D; i++)
                 if (pmin(i) > box2.pmax(i) ||
-                        pmax(i) < box2.pmin(i)) return 0;
+                    pmax(i) < box2.pmin(i))
+                    return 0;
             return 1;
         }
 
-        bool IsIn(const Point<D> & p) const
+        bool IsIn(const Point<D>& p) const
         {
             for (int i = 0; i < D; i++)
                 if (p(i) < pmin(i) || p(i) > pmax(i)) return 0;
@@ -411,32 +414,32 @@ namespace meshit {
         }
     };
 
-    template <int D>
+    template<int D>
     class BoxSphere : public Box<D>
     {
-      protected:
+     protected:
 
         Point<D> c;
         double diam;
         double inner;
 
-      public:
+     public:
 
         BoxSphere() { }
 
-        BoxSphere(const Box<D> & box)
-            : Box<D> (box)
+        explicit BoxSphere(const Box<D>& box)
+                : Box<D>(box)
         {
             CalcDiamCenter();
         }
 
         BoxSphere(Point<D> apmin, Point<D> apmax)
-            : Box<D> (apmin, apmax)
+                : Box<D>(apmin, apmax)
         {
             CalcDiamCenter();
         }
 
-        const Point<D> & Center() const
+        const Point<D>& Center() const
         {
             return c;
         }
@@ -451,7 +454,7 @@ namespace meshit {
             return inner;
         }
 
-        void GetSubBox(int nr, BoxSphere & sbox) const
+        void GetSubBox(int nr, BoxSphere& sbox) const
         {
             for (int i = 0; i < D; i++) {
                 if (nr & 1) {

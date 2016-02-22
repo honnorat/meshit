@@ -11,7 +11,6 @@
 #include "bitarray.hpp"
 
 namespace meshit {
-    //using namespace netgen;
 
     BitArray::BitArray()
     {
@@ -71,4 +70,5 @@ namespace meshit {
 
     template
     class BitArrayChar<1>;
-}
+
+}  // namespace meshit

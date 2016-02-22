@@ -1,5 +1,5 @@
-#ifndef FILE_TABLE
-#define FILE_TABLE
+#ifndef FILE_TABLE_H
+#define FILE_TABLE_H
 
 /**************************************************************************/
 /* File:   table.hpp                                                      */
@@ -17,34 +17,23 @@ namespace meshit {
     class BASE_TABLE
     {
      protected:
-
-        ///
-
         class linestruct
         {
          public:
-            ///
             int size;
-            /// 
             int maxsize;
-            ///
             void* col;
         };
 
-        ///
         Array<linestruct> data;
         char* oneblock;
 
      public:
-        ///
-        BASE_TABLE(int size);
-        ///
+        explicit BASE_TABLE(int size);
         BASE_TABLE(const FlatArray<int>& entrysizes, int elemsize);
-        ///
         ~BASE_TABLE();
-        ///
+
         void SetSize(int size);
-        ///
         void ChangeSize(int size);
 
         /// increment size of entry i by one, i is 0-based
@@ -57,11 +46,9 @@ namespace meshit {
                 IncSize2(i, elsize);
         }
 
-        ///
         void IncSize2(int i, int elsize);
         void SetEntrySize2(int i, int newsize, int elsize);
 
-        ///
         void AllocateElementsOneBlock(int elemsize);
 
         int AllocatedElements() const;
@@ -79,17 +66,16 @@ namespace meshit {
     {
      public:
         /// Creates table.
-        inline TABLE() : BASE_TABLE(0) { }
+        TABLE() : BASE_TABLE(0) { }
 
         /// Creates table of size size
-        inline TABLE(int size) : BASE_TABLE(size) { }
+        explicit TABLE(int size) : BASE_TABLE(size) { }
 
         /// Creates fixed maximal element size table
-        inline TABLE(const FlatArray<int, BASE>& entrysizes)
+        explicit TABLE(const FlatArray<int, BASE>& entrysizes)
                 : BASE_TABLE(FlatArray<int>(entrysizes.size(), const_cast<int*> (&entrysizes[BASE])),
                              sizeof(T))
         {
-            ;
         }
 
         /// Changes Size of table to size, deletes data
@@ -203,7 +189,6 @@ namespace meshit {
         return ost;
     }
 
-}
+}  // namespace meshit
 
 #endif
-

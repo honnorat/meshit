@@ -1,5 +1,5 @@
-#ifndef FILE_SYMBOLTA
-#define FILE_SYMBOLTA
+#ifndef FILE_SYMBOLTA_H
+#define FILE_SYMBOLTA_H
 
 #include "array.hpp"
 #include "template.hpp"
@@ -24,7 +24,7 @@ namespace meshit {
 
      public:
         /// Constructor
-        BASE_SYMBOLTABLE();
+        BASE_SYMBOLTABLE() {}
         ~BASE_SYMBOLTABLE();
 
         void DelNames();
@@ -73,7 +73,7 @@ namespace meshit {
 
      private:
         /// Prevents from copying symboltable by pointer assignment
-        SYMBOLTABLE<T>& operator=(SYMBOLTABLE<T>&);
+        SYMBOLTABLE<T>& operator=(SYMBOLTABLE<T>&) { return *this; }
     };
 
 
@@ -141,7 +141,7 @@ namespace meshit {
     template<class T>
     inline bool SYMBOLTABLE<T>::Used(const char* name) const
     {
-        return Index(name);
+        return static_cast<bool>(Index(name));
     }
 
     template<class T>
@@ -151,5 +151,6 @@ namespace meshit {
         data.DeleteAll();
     }
 
-}
+}  // namespace meshit
+
 #endif

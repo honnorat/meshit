@@ -21,14 +21,14 @@ namespace meshit {
     typedef int INDEX;
 
     class INDEX_2;
-    std::ostream & operator<<(std::ostream & s, const INDEX_2 & i2);
+
+    std::ostream& operator<<(std::ostream& s, const INDEX_2& i2);
 
     class INDEX_2
     {
         INDEX i[2];
 
-      public:
-
+     public:
         INDEX_2() { }
 
         INDEX_2(INDEX ai1, INDEX ai2)
@@ -37,13 +37,13 @@ namespace meshit {
             i[1] = ai2;
         }
 
-        INDEX_2(const INDEX_2 & in2)
+        INDEX_2(const INDEX_2& in2)
         {
             i[0] = in2.i[0];
             i[1] = in2.i[1];
         }
 
-        int operator==(const INDEX_2 & in2) const
+        int operator==(const INDEX_2& in2) const
         {
             return i[0] == in2.i[0] && i[1] == in2.i[1];
         }
@@ -66,49 +66,50 @@ namespace meshit {
                 return INDEX_2(i1, i2);
         }
 
-        INDEX & I1()
+        INDEX& I1()
         {
             return i[0];
         }
 
-        INDEX & I2()
+        INDEX& I2()
         {
             return i[1];
         }
 
-        INDEX & I(int j)
+        INDEX& I(int j)
         {
             return i[j - 1];
         }
 
-        const INDEX & I1() const
+        const INDEX& I1() const
         {
             return i[0];
         }
 
-        const INDEX & I2() const
+        const INDEX& I2() const
         {
             return i[1];
         }
 
-        const INDEX & I(int j) const
+        const INDEX& I(int j) const
         {
             return i[j - 1];
         }
 
-        int & operator[](int j)
+        int& operator[](int j)
         {
             return i[j];
         }
 
-        const int & operator[](int j) const
+        const int& operator[](int j) const
         {
             return i[j];
         }
-        friend std::ostream & operator<<(std::ostream & s, const INDEX_2 & i2);
+
+        friend std::ostream& operator<<(std::ostream& s, const INDEX_2& i2);
     };
 
-    inline INDEX_2 Sort(const INDEX_2 & i2)
+    inline INDEX_2 Sort(const INDEX_2& i2)
     {
         INDEX_2 tmp = i2;
         tmp.Sort();
@@ -119,8 +120,7 @@ namespace meshit {
     {
         INDEX i[3];
 
-      public:
-
+     public:
         INDEX_3() { }
 
         INDEX_3(INDEX ai1, INDEX ai2, INDEX ai3)
@@ -130,7 +130,7 @@ namespace meshit {
             i[2] = ai3;
         }
 
-        INDEX_3(const INDEX_3 & in2)
+        INDEX_3(const INDEX_3& in2)
         {
             i[0] = in2.i[0];
             i[1] = in2.i[1];
@@ -158,70 +158,69 @@ namespace meshit {
             return *this;
         }
 
-        int operator==(const INDEX_3 & in2) const
+        int operator==(const INDEX_3& in2) const
         {
             return i[0] == in2.i[0] && i[1] == in2.i[1] && i[2] == in2.i[2];
         }
 
-        INDEX & I1()
+        INDEX& I1()
         {
             return i[0];
         }
 
-        INDEX & I2()
+        INDEX& I2()
         {
             return i[1];
         }
 
-        INDEX & I3()
+        INDEX& I3()
         {
             return i[2];
         }
 
-        INDEX & I(int j)
+        INDEX& I(int j)
         {
             return i[j - 1];
         }
 
-        const INDEX & I1() const
+        const INDEX& I1() const
         {
             return i[0];
         }
 
-        const INDEX & I2() const
+        const INDEX& I2() const
         {
             return i[1];
         }
 
-        const INDEX & I3() const
+        const INDEX& I3() const
         {
             return i[2];
         }
 
-        const INDEX & I(int j) const
+        const INDEX& I(int j) const
         {
             return i[j - 1];
         }
 
-        int & operator[](int j)
+        int& operator[](int j)
         {
             return i[j];
         }
 
-        const int & operator[](int j) const
+        const int& operator[](int j) const
         {
             return i[j];
         }
 
-        friend std::ostream & operator<<(std::ostream & s, const INDEX_3 & i3);
+        friend std::ostream& operator<<(std::ostream& s, const INDEX_3& i3);
     };
 
     class INDEX_4
     {
         INDEX i[4];
 
-      public:
-
+     public:
         INDEX_4() { }
 
         INDEX_4(INDEX ai1, INDEX ai2, INDEX ai3, INDEX ai4)
@@ -232,7 +231,7 @@ namespace meshit {
             i[3] = ai4;
         }
 
-        INDEX_4(const INDEX_4 & in2)
+        INDEX_4(const INDEX_4& in2)
         {
             i[0] = in2.i[0];
             i[1] = in2.i[1];
@@ -242,74 +241,74 @@ namespace meshit {
 
         void Sort();
 
-        int operator==(const INDEX_4 & in2) const
+        int operator==(const INDEX_4& in2) const
         {
             return
-            i[0] == in2.i[0] && i[1] == in2.i[1] &&
+                    i[0] == in2.i[0] && i[1] == in2.i[1] &&
                     i[2] == in2.i[2] && i[3] == in2.i[3];
         }
 
-        INDEX & I1()
+        INDEX& I1()
         {
             return i[0];
         }
 
-        INDEX & I2()
+        INDEX& I2()
         {
             return i[1];
         }
 
-        INDEX & I3()
+        INDEX& I3()
         {
             return i[2];
         }
 
-        INDEX & I4()
+        INDEX& I4()
         {
             return i[3];
         }
 
-        INDEX & I(int j)
+        INDEX& I(int j)
         {
             return i[j - 1];
         }
 
-        const INDEX & I1() const
+        const INDEX& I1() const
         {
             return i[0];
         }
 
-        const INDEX & I2() const
+        const INDEX& I2() const
         {
             return i[1];
         }
 
-        const INDEX & I3() const
+        const INDEX& I3() const
         {
             return i[2];
         }
 
-        const INDEX & I4() const
+        const INDEX& I4() const
         {
             return i[3];
         }
 
-        const INDEX & I(int j) const
+        const INDEX& I(int j) const
         {
             return i[j - 1];
         }
 
-        int & operator[](int j)
+        int& operator[](int j)
         {
             return i[j];
         }
 
-        const int & operator[](int j) const
+        const int& operator[](int j) const
         {
             return i[j];
         }
 
-        friend std::ostream & operator<<(std::ostream & s, const INDEX_4 & i4);
+        friend std::ostream& operator<<(std::ostream& s, const INDEX_4& i4);
     };
 
     /// The sort preserves quads !!!
@@ -318,8 +317,7 @@ namespace meshit {
     {
         INDEX i[4];
 
-      public:
-
+     public:
         INDEX_4Q() { }
 
         INDEX_4Q(INDEX ai1, INDEX ai2, INDEX ai3, INDEX ai4)
@@ -330,7 +328,7 @@ namespace meshit {
             i[3] = ai4;
         }
 
-        INDEX_4Q(const INDEX_4Q & in2)
+        INDEX_4Q(const INDEX_4Q& in2)
         {
             i[0] = in2.i[0];
             i[1] = in2.i[1];
@@ -340,66 +338,66 @@ namespace meshit {
 
         void Sort();
 
-        int operator==(const INDEX_4Q & in2) const
+        int operator==(const INDEX_4Q& in2) const
         {
-            return
-            i[0] == in2.i[0] && i[1] == in2.i[1] &&
-                    i[2] == in2.i[2] && i[3] == in2.i[3];
+            return (i[0] == in2.i[0]) && (i[1] == in2.i[1]) &&
+                   (i[2] == in2.i[2]) && (i[3] == in2.i[3]);
         }
 
-        INDEX & I1()
+        INDEX& I1()
         {
             return i[0];
         }
 
-        INDEX & I2()
+        INDEX& I2()
         {
             return i[1];
         }
 
-        INDEX & I3()
+        INDEX& I3()
         {
             return i[2];
         }
 
-        INDEX & I4()
+        INDEX& I4()
         {
             return i[3];
         }
 
-        INDEX & I(int j)
+        INDEX& I(int j)
         {
             return i[j - 1];
         }
 
-        const INDEX & I1() const
+        const INDEX& I1() const
         {
             return i[0];
         }
 
-        const INDEX & I2() const
+        const INDEX& I2() const
         {
             return i[1];
         }
 
-        const INDEX & I3() const
+        const INDEX& I3() const
         {
             return i[2];
         }
 
-        const INDEX & I4() const
+        const INDEX& I4() const
         {
             return i[3];
         }
 
-        const INDEX & I(int j) const
+        const INDEX& I(int j) const
         {
             return i[j - 1];
         }
-        friend std::ostream & operator<<(std::ostream & s, const INDEX_4Q & i4);
+
+        friend std::ostream& operator<<(std::ostream& s, const INDEX_4Q& i4);
     };
 
-    inline bool operator<(const INDEX_4 & a, const INDEX_4 & b)
+    inline bool operator<(const INDEX_4& a, const INDEX_4& b)
     {
         for (int j = 0; j < 4; j++) {
             if (a[j] < b[j]) return true;
@@ -408,6 +406,6 @@ namespace meshit {
         return false;
     }
 
-}
+}  // namespace meshit
 
 #endif

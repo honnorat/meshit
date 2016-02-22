@@ -22,8 +22,8 @@ namespace meshit {
 
     class ADTreeNode3
     {
-      public:
-        ADTreeNode3 *left, *right, *father;
+     public:
+        ADTreeNode3* left, * right, * father;
         double sep;
         double data[3];
         int pi;
@@ -31,37 +31,38 @@ namespace meshit {
 
         ADTreeNode3();
         void DeleteChilds();
+
         friend class ADTree3;
 
         static BlockAllocator ball;
-        void * operator new(size_t);
-        void operator delete (void *);
+        void* operator new(size_t);
+        void operator delete(void*);
     };
 
     class ADTree3
     {
-        ADTreeNode3 * root;
+     protected:
+        ADTreeNode3* root;
         double cmin[3], cmax[3];
         Array<ADTreeNode3*> ela;
 
-      public:
-        ADTree3(const double * acmin,
-                const double * acmax);
+     public:
+        ADTree3(const double* acmin, const double* acmax);
         ~ADTree3();
 
-        void Insert(const double * p, int pi);
-        void GetIntersecting(const double * bmin, const double * bmax,
-                Array<int> & pis) const;
+        void Insert(const double* p, int pi);
+        void GetIntersecting(const double* bmin, const double* bmax,
+                             Array<int>& pis) const;
 
         void DeleteElement(int pi);
 
-        void PrintRec(std::ostream & ost, const ADTreeNode3 * node) const;
+        void PrintRec(std::ostream& ost, const ADTreeNode3* node) const;
     };
 
     class ADTreeNode6
     {
-      public:
-        ADTreeNode6 *left, *right, *father;
+     public:
+        ADTreeNode6* left, * right, * father;
         double sep;
         double data[6];
         int pi;
@@ -69,31 +70,32 @@ namespace meshit {
 
         ADTreeNode6();
         void DeleteChilds();
+
         friend class ADTree6;
 
         static BlockAllocator ball;
-        void * operator new(size_t);
-        void operator delete (void *);
+        void* operator new(size_t);
+        void operator delete(void*);
     };
 
     class ADTree6
     {
-        ADTreeNode6 * root;
+        ADTreeNode6* root;
         double cmin[6], cmax[6];
         Array<ADTreeNode6*> ela;
 
-      public:
-        ADTree6(const double * acmin,
-                const double * acmax);
+     public:
+        ADTree6(const double* acmin,
+                const double* acmax);
         ~ADTree6();
 
-        void Insert(const double * p, int pi);
-        void GetIntersecting(const double * bmin, const double * bmax,
-                Array<int> & pis) const;
+        void Insert(const double* p, int pi);
+        void GetIntersecting(const double* bmin, const double* bmax,
+                             Array<int>& pis) const;
 
         void DeleteElement(int pi);
 
-        void Print(std::ostream & ost) const
+        void Print(std::ostream& ost) const
         {
             PrintRec(ost, root);
         }
@@ -108,30 +110,31 @@ namespace meshit {
             return ElementsRec(root);
         }
 
-        void PrintRec(std::ostream & ost, const ADTreeNode6 * node) const;
-        int DepthRec(const ADTreeNode6 * node) const;
-        int ElementsRec(const ADTreeNode6 * node) const;
+        void PrintRec(std::ostream& ost, const ADTreeNode6* node) const;
+        int DepthRec(const ADTreeNode6* node) const;
+        int ElementsRec(const ADTreeNode6* node) const;
 
-        void PrintMemInfo(std::ostream & ost) const;
+        void PrintMemInfo(std::ostream& ost) const;
     };
 
     class Point3dTree
     {
-        ADTree3 * tree;
+        ADTree3* tree;
 
-      public:
-        Point3dTree(const Point<3> & pmin, const Point<3> & pmax);
+     public:
+        Point3dTree(const Point<3>& pmin, const Point<3>& pmax);
         ~Point3dTree();
-        void Insert(const Point<3> & p, int pi);
+        void Insert(const Point<3>& p, int pi);
 
         void DeleteElement(int pi)
         {
             tree->DeleteElement(pi);
         }
-        void GetIntersecting(const Point<3> & pmin, const Point<3> & pmax,
-                Array<int> & pis) const;
 
-        const ADTree3 & Tree() const
+        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax,
+                             Array<int>& pis) const;
+
+        const ADTree3& Tree() const
         {
             return *tree;
         };
@@ -139,15 +142,18 @@ namespace meshit {
 
     class Box3dTree
     {
-        ADTree6 * tree;
+     protected:
+        ADTree6* tree;
         Point<3> boxpmin, boxpmax;
-      public:
-        Box3dTree(const Box<3> & abox);
-        Box3dTree(const Point<3> & apmin, const Point<3> & apmax);
-        ~Box3dTree();
-        void Insert(const Point<3> & bmin, const Point<3> & bmax, int pi);
 
-        void Insert(const Box<3> & box, int pi)
+     public:
+        explicit Box3dTree(const Box<3>& abox);
+        Box3dTree(const Point<3>& apmin, const Point<3>& apmax);
+        ~Box3dTree();
+
+        void Insert(const Point<3>& bmin, const Point<3>& bmax, int pi);
+
+        void Insert(const Box<3>& box, int pi)
         {
             Insert(box.PMin(), box.PMax(), pi);
         }
@@ -156,10 +162,11 @@ namespace meshit {
         {
             tree->DeleteElement(pi);
         }
-        void GetIntersecting(const Point<3> & pmin, const Point<3> & pmax,
-                Array<int> & pis) const;
 
-        const ADTree6 & Tree() const
+        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax,
+                             Array<int>& pis) const;
+
+        const ADTree6& Tree() const
         {
             return *tree;
         };

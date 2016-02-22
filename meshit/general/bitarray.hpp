@@ -1,5 +1,5 @@
-#ifndef FILE_BitArray
-#define FILE_BitArray
+#ifndef FILE_BitArray_H
+#define FILE_BitArray_H
 
 /**************************************************************************/
 /* File:   bitarray.hpp                                                   */
@@ -53,14 +53,13 @@ namespace meshit {
 
         bool Test(INDEX i) const
         {
-            return data[i / CHAR_BIT] & (char(1) << (i % CHAR_BIT));
+            return data[i / CHAR_BIT] & (static_cast<char>(1) << (i % CHAR_BIT));
         }
 
      private:
-
         inline unsigned char Mask(INDEX i) const
         {
-            return char(1) << (i % CHAR_BIT);
+            return static_cast<char>(1) << (i % CHAR_BIT);
         }
 
         inline INDEX Addr(INDEX i) const
@@ -99,7 +98,6 @@ namespace meshit {
         Array<char, BASE> data;
 
      public:
-
         BitArrayChar() { }
 
         explicit BitArrayChar(int asize)
@@ -149,6 +147,6 @@ namespace meshit {
         return s;
     }
 
-}
+}  // namespace meshit
 
 #endif

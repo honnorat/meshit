@@ -1,5 +1,5 @@
-#ifndef MESHIT_GEOM2D_GEOMETRY2D_HPP
-#define MESHIT_GEOM2D_GEOMETRY2D_HPP
+#ifndef MESHIT_GEOM2D_GEOMETRY2D_H
+#define MESHIT_GEOM2D_GEOMETRY2D_H
 
 /* *************************************************************************/
 /* File:   geometry2d.hpp                                                  */
@@ -16,34 +16,25 @@
 
 namespace meshit {
 
-    void Optimize2d(Mesh & mesh, MeshingParameters & mp);
+    void Optimize2d(Mesh& mesh, MeshingParameters& mp);
 
     class SplineSegExt : public SplineSeg<2>
     {
-      public:
-        const SplineSeg<2> & seg;
+     public:
+        const SplineSeg<2>& seg;
 
-        /// left domain
-        int leftdom;
-        /// right domain
-        int rightdom;
-        /// refinement at line
-        double reffak;
-        /// maximal h;
-        double hmax;
-        /// boundary condition number
-        int bc;
-        /// copy spline mesh from other spline (-1.. do not copy)
-        int copyfrom;
-        /// perfrom anisotropic refinement (hp-refinement) to edge
-        bool hpref_left;
-        /// perfrom anisotropic refinement (hp-refinement) to edge
-        bool hpref_right;
-        ///
+        int leftdom;    // left domain
+        int rightdom;   // right domain
+        double reffak;  // refinement at line
+        double hmax;    // maximal h
+        int bc;         // boundary condition number
+        int copyfrom;   // copy spline mesh from other spline (-1.. do not copy)
+        bool hpref_left;    // perfrom anisotropic refinement (hp-refinement) to edge
+        bool hpref_right;   // perfrom anisotropic refinement (hp-refinement) to edge
         int layer;
 
-        SplineSegExt(const SplineSeg<2> & hseg)
-            : seg(hseg)
+        explicit SplineSegExt(const SplineSeg<2>& hseg)
+                : seg(hseg)
         {
             layer = 1;
             copyfrom = -1;
@@ -54,12 +45,12 @@ namespace meshit {
             delete &seg;
         }
 
-        virtual const GeomPoint<2> & StartPI() const
+        virtual const GeomPoint<2>& StartPI() const
         {
             return seg.StartPI();
         }
 
-        virtual const GeomPoint<2> & EndPI() const
+        virtual const GeomPoint<2>& EndPI() const
         {
             return seg.EndPI();
         }
@@ -75,14 +66,14 @@ namespace meshit {
         }
 
         virtual void GetDerivatives(const double t,
-                Point<2> & point,
-                Vec<2> & first,
-                Vec<2> & second) const
+                                    Point<2>& point,
+                                    Vec<2>& first,
+                                    Vec<2>& second) const
         {
             seg.GetDerivatives(t, point, first, second);
         }
 
-        virtual void GetPoints(int n, Array<Point<2> > & points) const
+        virtual void GetPoints(int n, Array<Point<2> >& points) const
         {
             seg.GetPoints(n, points);
         }
@@ -93,14 +84,14 @@ namespace meshit {
             Vec<2> first, second;
             GetDerivatives(t, point, first, second);
             double fl = first.Length();
-            return fabs(first(0) * second(1) - first(1) * second(0)) / (fl*fl*fl);
+            return fabs(first(0) * second(1) - first(1) * second(0)) / (fl * fl * fl);
         }
 
     };
 
     class SplineGeometry2d : public SplineGeometry<2>
     {
-      protected:
+     protected:
         std::vector<char*> materials;
         std::vector<double> maxh;
         std::vector<bool> quadmeshing;
@@ -109,42 +100,37 @@ namespace meshit {
         std::vector<std::string*> bcnames;
         double elto0;
 
-      public:
+     public:
         SplineGeometry2d() : elto0(1.0) { }
+
         virtual ~SplineGeometry2d();
 
-        void Load(const char * filename);
-        void LoadData(std::istream & infile);
+        void Load(const std::string& filename);
+        void LoadData(std::istream& infile);
 
         void AddLine(const std::vector<Point2d>& point_list,
-                double hmax = 1e99,
-                bool hole = false,
-                int bc = 1);
+                     double hmax = 1e99,
+                     bool hole = false,
+                     int bc = 1);
         void AddStructureLine(const std::vector<Point2d>& point_list,
-                double hmax = 1e99,
-                int bc = 1);
+                              double hmax = 1e99,
+                              int bc = 1);
         void FakeData();
 
-        void TestComment(std::istream & infile);
+        void TestComment(std::istream& infile);
 
-        const SplineSegExt & GetSpline(const size_t i) const
-        {
-            return dynamic_cast<const SplineSegExt&> (*splines[i]);
-        }
-
-        SplineSegExt & GetSpline(const size_t i)
+        SplineSegExt& GetSpline(const size_t i)
         {
             return dynamic_cast<SplineSegExt&> (*splines[i]);
         }
 
-        int GenerateMesh(Mesh*& mesh, MeshingParameters & mp,
-                int perfstepsstart, int perfstepsend);
+        int GenerateMesh(Mesh*& mesh, MeshingParameters& mp);
 
-        void PartitionBoundary(MeshingParameters & mp, double h, Mesh & mesh2d);
+        void PartitionBoundary(MeshingParameters& mp, double h, Mesh& mesh2d);
 
-        void CopyEdgeMesh(int from, int to, Mesh & mesh2d, Point3dTree & searchtree);
+        void CopyEdgeMesh(int from, int to, Mesh& mesh2d, Point3dTree& searchtree);
 
-        void GetMaterial(const int domnr, char* & material);
+        void GetMaterial(const int domnr, char*& material);
 
         double GetDomainMaxh(const int domnr);
 
@@ -173,10 +159,11 @@ namespace meshit {
 
         std::string GetBCName(const int bcnr) const;
 
-        std::string * BCNamePtr(const int bcnr);
+        std::string* BCNamePtr(const int bcnr);
 
-        Refinement & GetRefinement() const;
+        Refinement& GetRefinement() const;
     };
-}
+
+}  // namespace meshit
 
 #endif

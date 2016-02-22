@@ -4,10 +4,11 @@
 
  */
 
-#include <stdexcept>
-
-#include "../meshit.hpp"
 #include "geometry2d.hpp"
+
+#include <string>
+#include <vector>
+
 #include "../general/flags.hpp"
 
 namespace meshit {
@@ -18,11 +19,11 @@ namespace meshit {
             delete bcnames[i];
         }
         for (size_t i = 0; i < materials.size(); i++) {
-            delete [] materials[i];
+            delete[] materials[i];
         }
     }
 
-    void SplineGeometry2d::Load(const char * filename)
+    void SplineGeometry2d::Load(const std::string& filename)
     {
         std::ifstream infile;
         Point<2> x;
@@ -30,14 +31,14 @@ namespace meshit {
 
         infile.open(filename);
 
-        if (!infile.good())
-            throw std::runtime_error(std::string("Input file '") +
-                                     std::string(filename) +
-                                     std::string("' not available!"));
+        if (!infile.good()) {
+            std::string message = "Input file '" + filename + "' not available!";
+            throw std::runtime_error(message);
+        }
 
         TestComment(infile);
 
-        infile >> buf; // file recognition
+        infile >> buf;  // file recognition
 
         tensormeshing.resize(0);
         quadmeshing.resize(0);
@@ -45,32 +46,30 @@ namespace meshit {
         TestComment(infile);
         if (strcmp(buf, "splinecurves2dv2") == 0) {
             LoadData(infile);
-        }
-        else {
+        } else {
             MESHIT_LOG_FATAL("Unsupported file format : '" << buf << "'");
             throw std::runtime_error("Unsupported file format");
         }
         infile.close();
     }
 
-    void SplineGeometry2d::TestComment(std::istream & infile)
+    void SplineGeometry2d::TestComment(std::istream& infile)
     {
         bool comment = true;
         char ch;
-        while (comment == true && !infile.eof()) {
+        while (comment && !infile.eof()) {
             infile.get(ch);
-            if (ch == '#') { // skip comments
+            if (ch == '#') {
+                // skip comments
                 while (ch != '\n' && !infile.eof()) {
                     infile.get(ch);
                 }
-            }
-            else if (ch == '\n') { // skip empty lines
-                ;
-            }
-            else if (isspace(ch)) { // skip whitespaces
-                ;
-            }
-            else { // end of comment
+            } else if (ch == '\n') {
+                // skip empty lines
+            } else if (isspace(ch)) {
+                // skip whitespaces
+            } else {
+                // end of comment
                 infile.putback(ch);
                 comment = false;
             }
@@ -78,7 +77,7 @@ namespace meshit {
         return;
     }
 
-    void SplineGeometry2d::LoadData(std::istream & infile)
+    void SplineGeometry2d::LoadData(std::istream& infile)
     {
         MESHIT_LOG_INFO("Load 2D Geometry");
         int nump, leftdom, rightdom;
@@ -90,8 +89,8 @@ namespace meshit {
 
         std::string keyword;
 
-        Array < GeomPoint<2> > infilepoints(0);
-        Array <int> pointnrs(0);
+        Array<GeomPoint<2> > infilepoints(0);
+        Array<int> pointnrs(0);
         nump = 0;
         int numdomains = 0;
 
@@ -103,25 +102,16 @@ namespace meshit {
 
 
         // test if next ch is a letter, i.e. new keyword starts
-        bool ischar = false;
 
         while (infile.good()) {
             infile >> keyword;
-
-            ischar = false;
 
             if (keyword == "points") {
                 MESHIT_LOG_DEBUG("load points");
                 infile.get(ch);
                 infile.putback(ch);
 
-                // test if ch is a letter
-                if (int(ch) >= 65 && int(ch) <= 90)
-                    ischar = true;
-                if (int(ch) >= 97 && int(ch) <= 122)
-                    ischar = true;
-
-                while (!ischar) {
+                while (!isalpha(static_cast<int>(ch))) {
                     TestComment(infile);
                     infile >> pointnr;
                     // pointnrs 1-based
@@ -137,14 +127,14 @@ namespace meshit {
 
                     Flags flags;
 
-                    // get flags, 
+                    // get flags,
                     ch = 'a';
-                    // infile >> ch;
+
                     do {
                         infile.get(ch);
                         // if another int-value, set refinement flag to this value
                         // (corresponding to old files)
-                        if (int (ch) >= 48 && int(ch) <= 57) {
+                        if (isdigit(static_cast<int>(ch))) {
                             infile.putback(ch);
                             infile >> hd;
                             infile.get(ch);
@@ -174,15 +164,7 @@ namespace meshit {
                     TestComment(infile);
                     infile.get(ch);
                     infile.putback(ch);
-
-                    // test if letter
-                    if (int(ch) >= 65 && int(ch) <= 90)
-                        ischar = true;
-                    if (int(ch) >= 97 && int(ch) <= 122)
-                        ischar = true;
                 }
-
-                //	  infile.putback (ch);
 
                 geompoints.resize(nump);
                 for (int i = 0; i < nump; i++) {
@@ -200,18 +182,11 @@ namespace meshit {
                 infile.putback(ch);
                 int i = 0;
 
-                // test if ch is a letter
-                if (int(ch) >= 65 && int(ch) <= 90)
-                    ischar = true;
-                if (int(ch) >= 97 && int(ch) <= 122)
-                    ischar = true;
-
-                while (!ischar) //ch != 'p' && ch != 'm' )
-                {
+                while (!isalpha(static_cast<int>(ch))) {
                     i++;
                     TestComment(infile);
 
-                    SplineSeg<2> * spline = 0;
+                    SplineSeg<2>* spline = 0;
                     TestComment(infile);
 
                     infile >> leftdom >> rightdom;
@@ -221,22 +196,22 @@ namespace meshit {
 
                     infile >> buf;
                     // type of spline segement
-                    if (strcmp(buf, "2") == 0) { // a line
+                    if (strcmp(buf, "2") == 0) {  // a line
                         infile >> hi1 >> hi2;
                         spline = new LineSeg<2>(
                                 geompoints[hi1 - 1],
                                 geompoints[hi2 - 1]);
                     }
-                    else if (strcmp(buf, "3") == 0) { // a rational spline
+                    else if (strcmp(buf, "3") == 0) {  // a rational spline
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new SplineSeg3<2> (
+                        spline = new SplineSeg3<2>(
                                 geompoints[hi1 - 1],
                                 geompoints[hi2 - 1],
                                 geompoints[hi3 - 1]);
                     }
-                    else if (strcmp(buf, "4") == 0) { // an arc
+                    else if (strcmp(buf, "4") == 0) {  // an arc
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new CircleSeg<2> (
+                        spline = new CircleSeg<2>(
                                 geompoints[hi1 - 1],
                                 geompoints[hi2 - 1],
                                 geompoints[hi3 - 1]);
@@ -244,45 +219,45 @@ namespace meshit {
                     else if (strcmp(buf, "discretepoints") == 0) {
                         int npts;
                         infile >> npts;
-                        Array< Point<2> > pts(npts);
+                        Array<Point<2> > pts(npts);
                         for (int j = 0; j < npts; j++)
                             for (int k = 0; k < 2; k++)
                                 infile >> pts[j](k);
 
-                        spline = new DiscretePointsSeg<2> (pts);
+                        spline = new DiscretePointsSeg<2>(pts);
                     }
                     else if (strcmp(buf, "bsplinepoints") == 0) {
                         int npts, order;
                         infile >> npts;
                         infile >> order;
-                        Array< Point<2> > pts(npts);
+                        Array<Point<2> > pts(npts);
                         for (int j = 0; j < npts; j++)
                             for (int k = 0; k < 2; k++)
                                 infile >> pts[j](k);
                         if (order < 2)
                             std::cerr << "Minimum order of 2 is required!!" << std::endl;
                         else if (order == 2)
-                            spline = new BSplineSeg<2, 2> (pts);
+                            spline = new BSplineSeg<2, 2>(pts);
                         else if (order == 3)
-                            spline = new BSplineSeg<2, 3> (pts);
+                            spline = new BSplineSeg<2, 3>(pts);
                         else if (order == 4)
-                            spline = new BSplineSeg<2, 4> (pts);
+                            spline = new BSplineSeg<2, 4>(pts);
                         else if (order > 4)
                             std::cerr << "Maximum allowed order is 4!!" << std::endl;
                     }
 
                     //      infile >> spline->reffak;
-                    SplineSegExt * spex = new SplineSegExt(*spline);
+                    SplineSegExt* spex = new SplineSegExt(*spline);
 
-                    spex -> leftdom = leftdom;
-                    spex -> rightdom = rightdom;
+                    spex->leftdom = leftdom;
+                    spex->rightdom = rightdom;
                     splines.push_back(spex);
 
                     // hd is now optional, default 1
                     hd = 1;
                     infile >> ch;
 
-                    // get flags, 
+                    // get flags
                     Flags flags;
                     while (ch == '-') {
                         char flag[100];
@@ -296,12 +271,10 @@ namespace meshit {
                     if (infile.good())
                         infile.putback(ch);
 
-                    spex->bc = int (flags.GetNumFlag("bc", i + 1));
-                    spex->hpref_left = int (flags.GetDefineFlag("hpref")) ||
-                            int (flags.GetDefineFlag("hprefleft"));
-                    spex->hpref_right = int (flags.GetDefineFlag("hpref")) ||
-                            int (flags.GetDefineFlag("hprefright"));
-                    spex->copyfrom = int (flags.GetNumFlag("copy", -1));
+                    spex->bc = static_cast<int>(flags.GetNumFlag("bc", i + 1));
+                    spex->hpref_left = flags.GetDefineFlag("hpref") || flags.GetDefineFlag("hprefleft");
+                    spex->hpref_right = flags.GetDefineFlag("hpref") || flags.GetDefineFlag("hprefright");
+                    spex->copyfrom = static_cast<int>(flags.GetNumFlag("copy", -1));
                     spex->reffak = flags.GetNumFlag("ref", 1);
                     spex->hmax = flags.GetNumFlag("maxh", 1e99);
                     if (hd != 1) spex->reffak = hd;
@@ -317,13 +290,6 @@ namespace meshit {
                     TestComment(infile);
                     infile.get(ch);
                     infile.putback(ch);
-
-                    // test if ch is a letter
-                    if (int(ch) >= 65 && int(ch) <= 90)
-                        ischar = true;
-                    if (int(ch) >= 97 && int(ch) <= 122)
-                        ischar = true;
-
                 }
                 infile.get(ch);
                 infile.putback(ch);
@@ -347,7 +313,7 @@ namespace meshit {
                 TestComment(infile);
 
                 for (int i = 0; i < numdomains; i++)
-                    materials [ i ] = new char[100];
+                    materials[i] = new char[100];
 
                 for (int i = 0; i < numdomains && infile.good(); i++) {
                     TestComment(infile);
@@ -374,7 +340,7 @@ namespace meshit {
                     maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
                     if (flags.GetDefineFlag("quad")) quadmeshing[domainnr - 1] = true;
                     if (flags.GetDefineFlag("tensor")) tensormeshing[domainnr - 1] = true;
-                    layer[domainnr - 1] = int(flags.GetNumFlag("layer", 1));
+                    layer[domainnr - 1] = static_cast<int>(flags.GetNumFlag("layer", 1));
                 }
             }
         }
@@ -386,7 +352,6 @@ namespace meshit {
                                    bool hole,
                                    int bc)
     {
-
         size_t nold_points = geompoints.size();
         size_t nnew_points = point_list.size();
 
@@ -402,21 +367,20 @@ namespace meshit {
         for (size_t i = 0; i < nnew_points; i++) {
             size_t i0 = (hole) ? nnew_points - i - 1 : i;
             size_t i1 = (hole) ? (i0 == 0) ? nnew_points - 1 : i0 - 1
-                    : (i0 == nnew_points - 1) ? 0 : i0 + 1;
-            SplineSeg<2> * spline = new LineSeg<2>(gpts[i0], gpts[i1]);
-            SplineSegExt * seg = new SplineSegExt(*spline);
+                               : (i0 == nnew_points - 1) ? 0 : i0 + 1;
+            SplineSeg<2>* spline = new LineSeg<2>(gpts[i0], gpts[i1]);
+            SplineSegExt* seg = new SplineSegExt(*spline);
             if (hole) {
                 seg->leftdom = 0;
                 seg->rightdom = 1;
-            }
-            else {
+            } else {
                 seg->leftdom = 1;
                 seg->rightdom = 0;
             }
             seg->bc = bc;
             seg->hpref_left = false;
             seg->hpref_right = false;
-            seg->reffak = 1; // Refinement factor
+            seg->reffak = 1;  // Refinement factor
             seg->hmax = hmax;
             splines.push_back(seg);
         }
@@ -442,14 +406,14 @@ namespace meshit {
         for (size_t i = 0; i < nnew_points; i++) {
             size_t i0 = i;
             size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
-            SplineSeg<2> * spline = new LineSeg<2>(gpts[i0], gpts[i1]);
-            SplineSegExt * seg = new SplineSegExt(*spline);
+            SplineSeg<2>* spline = new LineSeg<2>(gpts[i0], gpts[i1]);
+            SplineSegExt* seg = new SplineSegExt(*spline);
             seg->leftdom = 1;
             seg->rightdom = 1;
             seg->bc = bc;
             seg->hpref_left = false;
             seg->hpref_right = false;
-            seg->reffak = 2; // Refinement factor
+            seg->reffak = 2;  // Refinement factor
             seg->hmax = hmax;
             splines.push_back(seg);
         }
@@ -471,13 +435,12 @@ namespace meshit {
 
     std::string SplineGeometry2d::GetBCName(const int bcnr) const
     {
-        if ((int) bcnames.size() >= bcnr)
-            if (bcnames[bcnr - 1])
-                return *bcnames[bcnr - 1];
+        if ((int) bcnames.size() >= bcnr) if (bcnames[bcnr - 1])
+            return *bcnames[bcnr - 1];
         return "default";
     }
 
-    std::string * SplineGeometry2d::BCNamePtr(const int bcnr)
+    std::string* SplineGeometry2d::BCNamePtr(const int bcnr)
     {
         if (bcnr > (int) bcnames.size())
             return 0;
@@ -485,7 +448,7 @@ namespace meshit {
             return bcnames[bcnr - 1];
     }
 
-    void SplineGeometry2d::GetMaterial(const int domnr, char* & material)
+    void SplineGeometry2d::GetMaterial(const int domnr, char*& material)
     {
         if ((int) materials.size() >= domnr)
             material = materials[domnr - 1];
@@ -501,16 +464,14 @@ namespace meshit {
             return -1;
     }
 
-    int SplineGeometry2d::GenerateMesh(Mesh*& mesh, MeshingParameters & mp,
-                                       int perfstepsstart, int perfstepsend)
+    int SplineGeometry2d::GenerateMesh(Mesh*& mesh, MeshingParameters& mp)
     {
         mesh->BuildFromSpline2D(*this, mp);
         return 0;
     }
 
-    Refinement & SplineGeometry2d::GetRefinement() const
+    Refinement& SplineGeometry2d::GetRefinement() const
     {
-        return * new Refinement2d(*this);
+        return *new Refinement2d(*this);
     }
-
-}
+}  // namespace meshit

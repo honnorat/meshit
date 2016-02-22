@@ -8,10 +8,10 @@
 /* Date:   10. Oct. 96                                                   */
 /**************************************************************************/
 
+#include <iostream>
+
 #include "../meshit.hpp"
 #include "symbolta.hpp"
-
-#include <iostream>
 
 namespace meshit {
 
@@ -55,7 +55,7 @@ namespace meshit {
         DLL_HEADER bool StringFlagDefined(const char* name) const;
     };
 
-}
+}  // namespace meshit
 
 #endif
 

@@ -34,8 +34,9 @@ namespace meshit {
             char* hcp = new char[size * blocks];
             bablocks.push_back(hcp);
             bablocks.Last() = hcp;
-            for (unsigned i = 0; i < blocks - 1; i++)
+            for (unsigned i = 0; i < blocks - 1; i++) {
                 *(void**) &(hcp[i * size]) = &(hcp[(i + 1) * size]);
+            }
             *(void**) &(hcp[(blocks - 1) * size]) = NULL;
             freelist = hcp;
         }
@@ -44,4 +45,4 @@ namespace meshit {
         freelist = *(void**) freelist;
         return p;
     }
-}  // meshit
+}  // namespace meshit

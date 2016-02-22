@@ -1,5 +1,5 @@
-#ifndef FILE_HASHTABL
-#define FILE_HASHTABL
+#ifndef FILE_HASHTABL_H
+#define FILE_HASHTABL_H
 
 /**************************************************************************/
 /* File:   hashtabl.hh                                                    */
@@ -20,8 +20,8 @@ namespace meshit {
         TABLE<INDEX_2> hash;
 
      public:
-        BASE_INDEX_2_HASHTABLE(int size)
-                : hash(size) { };
+        explicit BASE_INDEX_2_HASHTABLE(int size)
+                : hash(size) { }
 
         int HashValue(const INDEX_2& ind) const
         {
@@ -44,17 +44,16 @@ namespace meshit {
         TABLE<T> cont;
 
      public:
-
-        INDEX_2_HASHTABLE(int size)
+        explicit INDEX_2_HASHTABLE(int size)
                 : BASE_INDEX_2_HASHTABLE(size), cont(size) { }
 
         void Set(const INDEX_2& ahash, const T& acont)
         {
             int bnr = HashValue(ahash);
             int pos = Position(bnr, ahash);
-            if (pos)
+            if (pos) {
                 cont.Set(bnr, pos, acont);
-            else {
+            } else {
                 hash.Add1(bnr, ahash);
                 cont.Add1(bnr, acont);
             }
@@ -130,7 +129,6 @@ namespace meshit {
             {
                 return bagnr != i;
             }
-
         };
 
         Iterator Begin() const
@@ -173,12 +171,10 @@ namespace meshit {
         TABLE<INDEX_3> hash;
 
      public:
-
-        BASE_INDEX_3_HASHTABLE(int size)
-                : hash(size) { };
+        explicit BASE_INDEX_3_HASHTABLE(int size)
+                : hash(size) { }
 
      protected:
-
         int HashValue(const INDEX_3& ind) const
         {
             return (ind.I1() + ind.I2() + ind.I3()) % hash.Size() + 1;
@@ -195,8 +191,6 @@ namespace meshit {
 
             return 0;
         }
-
-
     };
 
     template<class T>
@@ -205,7 +199,9 @@ namespace meshit {
         TABLE<T> cont;
 
      public:
-        inline INDEX_3_HASHTABLE(int size);
+        explicit INDEX_3_HASHTABLE(int size)
+                : BASE_INDEX_3_HASHTABLE(size), cont(size) { }
+
         inline void Set(const INDEX_3& ahash, const T& acont);
         inline const T& Get(const INDEX_3& ahash) const;
         inline bool Used(const INDEX_3& ahash) const;
@@ -225,16 +221,13 @@ namespace meshit {
 
         class Iterator
         {
+         protected:
             const INDEX_3_HASHTABLE& ht;
             int bagnr, pos;
-         public:
 
-            Iterator(const INDEX_3_HASHTABLE& aht,
-                     int abagnr, int apos)
-                    : ht(aht), bagnr(abagnr), pos(apos)
-            {
-                ;
-            }
+         public:
+            Iterator(const INDEX_3_HASHTABLE& aht, int abagnr, int apos)
+                    : ht(aht), bagnr(abagnr), pos(apos) { }
 
             int BagNr() const
             {
@@ -248,21 +241,18 @@ namespace meshit {
 
             void operator++(int)
             {
-                // std::cout << "begin Operator ++: bagnr = " << bagnr << " -  pos = " << pos <<std::endl;
                 pos++;
                 while (bagnr < ht.GetNBags() &&
                        pos == ht.GetBagSize(bagnr + 1)) {
                     pos = 0;
                     bagnr++;
                 }
-                // std::cout << "end Operator ++: bagnr = " << bagnr << " - pos = " << pos <<std::endl;
             }
 
             bool operator!=(int i) const
             {
                 return bagnr != i;
             }
-
         };
 
         Iterator Begin() const
@@ -286,8 +276,6 @@ namespace meshit {
         {
             return cont[it.BagNr()][it.Pos()];
         }
-
-
     };
 
     template<typename T>
@@ -308,8 +296,9 @@ namespace meshit {
         // MoveableArray<INDEX_2> hash;
         Array<INDEX_2> hash;
         int invalid;
+
      public:
-        BASE_INDEX_2_CLOSED_HASHTABLE(int size);
+        explicit BASE_INDEX_2_CLOSED_HASHTABLE(int size);
 
         int Size() const
         {
@@ -357,7 +346,6 @@ namespace meshit {
         }
 
      protected:
-
         int PositionCreate2(const INDEX_2& ind, int& apos);
         void BaseSetSize(int asize);
     };
@@ -368,7 +356,9 @@ namespace meshit {
         Array<T> cont;
 
      public:
-        inline INDEX_2_CLOSED_HASHTABLE(int size);
+        explicit INDEX_2_CLOSED_HASHTABLE(int size)
+                : BASE_INDEX_2_CLOSED_HASHTABLE(size), cont(size) { }
+
         inline void Set(const INDEX_2& ahash, const T& acont);
         inline const T& Get(const INDEX_2& ahash) const;
         inline bool Used(const INDEX_2& ahash) const;
@@ -393,23 +383,19 @@ namespace meshit {
     class BASE_INDEX_3_CLOSED_HASHTABLE
     {
      protected:
-        // MoveableArray<INDEX_3> hash;
         Array<INDEX_3> hash;
         int invalid;
 
      protected:
-
-        BASE_INDEX_3_CLOSED_HASHTABLE(int size)
+        explicit BASE_INDEX_3_CLOSED_HASHTABLE(int size)
                 : hash(size)
         {
-            // hash.SetName ("i3-hashtable, hash");
             invalid = -1;
             for (int i = 0; i < size; i++)
                 hash[i].I1() = invalid;
         }
 
      public:
-
         int Size() const
         {
             return hash.size();
@@ -434,9 +420,6 @@ namespace meshit {
                 i = (i + 1) % hash.size();
             }
         }
-
-
-        // returns true, if new postion is created
 
         bool PositionCreate(const INDEX_3& ind, int& apos)
         {
@@ -464,8 +447,7 @@ namespace meshit {
         Array<T, 0> cont;
 
      public:
-
-        INDEX_3_CLOSED_HASHTABLE(int size)
+        explicit INDEX_3_CLOSED_HASHTABLE(int size)
                 : BASE_INDEX_3_CLOSED_HASHTABLE(size), cont(size) { }
 
         void Set(const INDEX_3& ahash, const T& acont)
@@ -522,13 +504,6 @@ namespace meshit {
     }
 
     template<class T>
-    inline INDEX_3_HASHTABLE<T>::INDEX_3_HASHTABLE(int size)
-            : BASE_INDEX_3_HASHTABLE(size), cont(size)
-    {
-        ;
-    }
-
-    template<class T>
     inline int INDEX_3_HASHTABLE<T>::PositionCreate(const INDEX_3& ahash, int& bnr, int& colnr)
     {
         bnr = HashValue(ahash);
@@ -547,9 +522,9 @@ namespace meshit {
     {
         int bnr = HashValue(ahash);
         int pos = Position(bnr, ahash);
-        if (pos)
+        if (pos) {
             cont.Set(bnr, pos, acont);
-        else {
+        } else {
             hash.Add1(bnr, ahash);
             cont.Add1(bnr, acont);
         }
@@ -566,7 +541,7 @@ namespace meshit {
     template<class T>
     inline bool INDEX_3_HASHTABLE<T>::Used(const INDEX_3& ahash) const
     {
-        return (Position(HashValue(ahash), ahash)) ? 1 : 0;
+        return static_cast<bool>(Position(HashValue(ahash), ahash));
     }
 
     template<class T>
@@ -637,14 +612,6 @@ namespace meshit {
     /* *********** Closed Hashing ************************* */
 
     template<class T>
-    inline INDEX_2_CLOSED_HASHTABLE<T>::
-    INDEX_2_CLOSED_HASHTABLE(int size)
-            : BASE_INDEX_2_CLOSED_HASHTABLE(size), cont(size)
-    {
-        // cont.SetName ("i2-hashtable, contents");
-    }
-
-    template<class T>
     inline void INDEX_2_CLOSED_HASHTABLE<T>::
     Set(const INDEX_2& ahash, const T& acont)
     {
@@ -697,8 +664,7 @@ namespace meshit {
         << std::endl;
     }
 
-
-}
+}  // namespace meshit
 
 
 #endif

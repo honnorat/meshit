@@ -22,12 +22,10 @@ namespace meshit {
     class FlatArray
     {
      protected:
-
         size_t _size;
         T* _data;
 
      public:
-
         typedef T TELEM;
 
         FlatArray(int asize, T* adata)
@@ -70,7 +68,7 @@ namespace meshit {
 
         T& Elem(int i)
         {
-            return ((T*) _data)[i - 1];
+            return _data[i - 1];
         }
 
         /// Access array, one-based  (old fashioned)
@@ -84,7 +82,7 @@ namespace meshit {
 
         void Set(int i, const T& el)
         {
-            ((T*) _data)[i - 1] = el;
+            _data[i - 1] = el;
         }
 
         /// access first element
@@ -117,7 +115,7 @@ namespace meshit {
             return FlatArray<T>(end - start, _data + start);
         }
 
-        /// first position of element elem, returns -1 if element not contained in array 
+        /// first position of element elem, returns -1 if element not contained in array
 
         TIND Pos(const T& elem) const
         {
@@ -150,14 +148,11 @@ namespace meshit {
         using FlatArray<T, BASE, TIND>::_size;
         using FlatArray<T, BASE, TIND>::_data;
 
-        size_t _allocsize; // physical size of array
-        bool _ownmem; // memory is responsibility of container
+        size_t _allocsize;  // physical size of array
+        bool _ownmem;       // memory is responsibility of container
 
      public:
-
-        /// Generate array of logical and physical size asize
-
-        explicit Array()
+        Array()
                 : FlatArray<T, BASE, TIND>(0, NULL)
         {
             _allocsize = 0;
@@ -180,7 +175,7 @@ namespace meshit {
             _ownmem = 0;
         }
 
-        /// array copy 
+        /// array copy
 
         explicit Array(const Array<T, BASE, TIND>& a2)
                 : FlatArray<T, BASE, TIND>(a2.size(), (a2.size() ? new T[a2.size()] : 0))
@@ -299,10 +294,9 @@ namespace meshit {
 
 
      private:
-
-        /// resize array, at least to size minsize. copy contents
         void ReSize(size_t minsize)
         {
+            // resize array, at least to size minsize. copy contents
             size_t nsize = 2 * _allocsize;
             if (nsize < minsize) nsize = minsize;
 
@@ -311,12 +305,12 @@ namespace meshit {
 
                 memcpy(p, _data, std::min(nsize, _size) * sizeof(T));
 
-                if (_ownmem)
+                if (_ownmem) {
                     delete[] _data;
+                }
                 _ownmem = 1;
                 _data = p;
-            }
-            else {
+            } else {
                 _data = new T[nsize];
                 _ownmem = 1;
             }
@@ -363,7 +357,6 @@ namespace meshit {
                 (*this)[i] = a2[i];
             return *this;
         }
-
     };
 
     template<class TA1, class TA2>
@@ -373,7 +366,6 @@ namespace meshit {
         const TA2& ia;
 
      public:
-
         IndirectArray(const TA1& aa, const TA2& aia)
                 : array(aa), ia(aia) { }
 
@@ -397,7 +389,7 @@ namespace meshit {
             return array[ia[i]];
         }
     };
-}
+
+}  // namespace meshit
 
 #endif
-

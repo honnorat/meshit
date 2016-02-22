@@ -1,11 +1,7 @@
 /*
-
-2d Spline curve for Mesh generator
-
+ * 2d Spline curve for Mesh generator
  */
 
-#include <stdexcept>
-#include "../meshit.hpp"
 #include "splinegeometry.hpp"
 
 namespace meshit {
@@ -19,17 +15,7 @@ namespace meshit {
     }
 
     template<int D>
-    void SplineGeometry<D>::GetRawData(Array<double> & raw_data) const
-    {
-        raw_data.push_back(D);
-        raw_data.push_back(splines.size());
-        for (size_t i = 0; i < splines.size(); i++) {
-            splines[i]->GetRawData(raw_data);
-        }
-    }
-
-    template<int D>
-    int SplineGeometry<D>::Load(const Array<double> & raw_data, const int startpos)
+    int SplineGeometry<D>::Load(const Array<double>& raw_data, const int startpos)
     {
         int pos = startpos;
         if (raw_data[pos] != D)
@@ -37,13 +23,13 @@ namespace meshit {
 
         pos++;
 
-        splines.resize(int(raw_data[pos]));
+        splines.resize(static_cast<size_t>(raw_data[pos]));
         pos++;
 
-        Array< Point<D> > pts(3);
+        Array<Point<D> > pts(3);
 
         for (size_t i = 0; i < splines.size(); i++) {
-            int type = int(raw_data[pos]);
+            int type = static_cast<int>(raw_data[pos]);
             pos++;
 
             for (int j = 0; j < type; j++) {
@@ -70,7 +56,7 @@ namespace meshit {
     }
 
     template<int D>
-    void SplineGeometry<D>::GetBoundingBox(Box<D> & box) const
+    void SplineGeometry<D>::GetBoundingBox(Box<D>& box) const
     {
         if (!splines.size()) {
             Point<D> auxp = 0.;
@@ -89,8 +75,11 @@ namespace meshit {
         }
     }
 
-    template class SplineGeometry<2>;
-    template class SplineGeometry<3>;
+    template
+    class SplineGeometry<2>;
+
+    template
+    class SplineGeometry<3>;
 }
 
 

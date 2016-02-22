@@ -17,15 +17,15 @@ namespace meshit {
 
     class DenseMatrix
     {
-      protected:
+     protected:
         int height;
         int width;
-        double * data;
+        double* data;
 
-      public:
+     public:
         DenseMatrix();
         DenseMatrix(int h, int w = 0);
-        DenseMatrix(const DenseMatrix & m2);
+        DenseMatrix(const DenseMatrix& m2);
         ~DenseMatrix();
 
         void SetSize(int h, int w = 0);
@@ -40,7 +40,7 @@ namespace meshit {
             return width;
         }
 
-        double & operator()(int i, int j)
+        double& operator()(int i, int j)
         {
             return data[i * width + j];
         }
@@ -50,7 +50,7 @@ namespace meshit {
             return data[i * width + j];
         }
 
-        double & operator()(int i)
+        double& operator()(int i)
         {
             return data[i];
         }
@@ -60,23 +60,20 @@ namespace meshit {
             return data[i];
         }
 
-        DenseMatrix & operator=(const DenseMatrix & m2);
-        DenseMatrix & operator+=(const DenseMatrix & m2);
-        DenseMatrix & operator-=(const DenseMatrix & m2);
+        DenseMatrix& operator=(const DenseMatrix& m2);
+        DenseMatrix& operator+=(const DenseMatrix& m2);
+        DenseMatrix& operator-=(const DenseMatrix& m2);
 
-        DenseMatrix & operator=(double v);
-        DenseMatrix & operator*=(double v);
+        DenseMatrix& operator=(double v);
+        DenseMatrix& operator*=(double v);
 
-        void Mult(const FlatVector & v, FlatVector & prod) const
+        void Mult(const FlatVector& v, FlatVector& prod) const
         {
-            const double * mp, * sp;
-            double * dp;
-
-            mp = data;
-            dp = &prod(0);
+            const double* mp = data;
+            double* dp = &prod(0);
             for (int i = 0; i < height; i++) {
                 double sum = 0;
-                sp = &v(0);
+                const double* sp = &v(0);
 
                 for (int j = 0; j < width; j++) {
                     sum += *mp * *sp;
@@ -89,27 +86,27 @@ namespace meshit {
             }
         }
 
-        void MultTrans(const Vector & v, Vector & prod) const;
-        void Residuum(const Vector & x, const Vector & b, Vector & res) const;
+        void MultTrans(const Vector& v, Vector& prod) const;
+        void Residuum(const Vector& x, const Vector& b, Vector& res) const;
         double Det() const;
 
-        friend DenseMatrix operator*(const DenseMatrix & m1, const DenseMatrix & m2);
-        friend DenseMatrix operator+(const DenseMatrix & m1, const DenseMatrix & m2);
+        friend DenseMatrix operator*(const DenseMatrix& m1, const DenseMatrix& m2);
+        friend DenseMatrix operator+(const DenseMatrix& m1, const DenseMatrix& m2);
 
-        friend void Transpose(const DenseMatrix & m1, DenseMatrix & m2);
-        friend void Mult(const DenseMatrix & m1, const DenseMatrix & m2, DenseMatrix & m3);
-        friend void CalcAAt(const DenseMatrix & a, DenseMatrix & m2);
-        friend void CalcABt(const DenseMatrix & a, const DenseMatrix & b, DenseMatrix & m2);
-        friend void CalcAtB(const DenseMatrix & a, const DenseMatrix & b, DenseMatrix & m2);
-        void Solve(const Vector & b, Vector & x) const;
-        void SolveDestroy(const Vector & b, Vector & x);
+        friend void Transpose(const DenseMatrix& m1, DenseMatrix& m2);
+        friend void Mult(const DenseMatrix& m1, const DenseMatrix& m2, DenseMatrix& m3);
+        friend void CalcAAt(const DenseMatrix& a, DenseMatrix& m2);
+        friend void CalcABt(const DenseMatrix& a, const DenseMatrix& b, DenseMatrix& m2);
+        friend void CalcAtB(const DenseMatrix& a, const DenseMatrix& b, DenseMatrix& m2);
+        void Solve(const Vector& b, Vector& x) const;
+        void SolveDestroy(const Vector& b, Vector& x);
 
-        const double & Get(int i, int j) const
+        const double& Get(int i, int j) const
         {
             return data[(i - 1) * width + j - 1];
         }
 
-        const double & Get(int i) const
+        const double& Get(int i) const
         {
             return data[i - 1];
         }
@@ -119,30 +116,28 @@ namespace meshit {
             data[(i - 1) * width + j - 1] = v;
         }
 
-        double & Elem(int i, int j)
+        double& Elem(int i, int j)
         {
             return data[(i - 1) * width + j - 1];
         }
 
-        const double & ConstElem(int i, int j) const
+        const double& ConstElem(int i, int j) const
         {
             return data[(i - 1) * width + j - 1];
         }
     };
 
-    extern std::ostream & operator<<(std::ostream & ost, const DenseMatrix & m);
+    extern std::ostream& operator<<(std::ostream& ost, const DenseMatrix& m);
 
-    template <int WIDTH>
+    template<int WIDTH>
     class MatrixFixWidth
     {
-      protected:
-
+     protected:
         int height;
-        double * data;
+        double* data;
         bool ownmem;
 
-      public:
-
+     public:
         MatrixFixWidth()
         {
             height = 0;
@@ -150,14 +145,14 @@ namespace meshit {
             ownmem = false;
         }
 
-        MatrixFixWidth(int h)
+        explicit MatrixFixWidth(int h)
         {
             height = h;
             data = new double[WIDTH * height];
             ownmem = true;
         }
 
-        MatrixFixWidth(int h, double * adata)
+        MatrixFixWidth(int h, double* adata)
         {
             height = h;
             data = adata;
@@ -166,7 +161,7 @@ namespace meshit {
 
         ~MatrixFixWidth()
         {
-            if (ownmem) delete [] data;
+            if (ownmem) delete[] data;
         }
 
         void SetSize(int h)
@@ -189,24 +184,21 @@ namespace meshit {
             return WIDTH;
         }
 
-        MatrixFixWidth & operator=(double v)
+        MatrixFixWidth& operator=(double v)
         {
             for (int i = 0; i < height * WIDTH; i++)
                 data[i] = v;
             return *this;
         }
 
-        void Mult(const FlatVector & v, FlatVector & prod) const
+        void Mult(const FlatVector& v, FlatVector& prod) const
         {
-            double sum;
-            const double * mp, * sp;
-            double * dp;
+            const double* mp = data;
+            double* dp = &prod[0];
 
-            mp = data;
-            dp = &prod[0];
             for (int i = 0; i < height; i++) {
-                sum = 0;
-                sp = &v[0];
+                double sum = 0;
+                const double* sp = &v[0];
 
                 for (int j = 0; j < WIDTH; j++) {
                     sum += *mp * *sp;
@@ -219,17 +211,17 @@ namespace meshit {
             }
         }
 
-        double & operator()(int i, int j)
+        double& operator()(int i, int j)
         {
             return data[i * WIDTH + j];
         }
 
-        const double & operator()(int i, int j) const
+        const double& operator()(int i, int j) const
         {
             return data[i * WIDTH + j];
         }
 
-        MatrixFixWidth & operator*=(double v)
+        MatrixFixWidth& operator*=(double v)
         {
             if (data)
                 for (int i = 0; i < height * WIDTH; i++)
@@ -237,12 +229,12 @@ namespace meshit {
             return *this;
         }
 
-        const double & Get(int i, int j) const
+        const double& Get(int i, int j) const
         {
             return data[(i - 1) * WIDTH + j - 1];
         }
 
-        const double & Get(int i) const
+        const double& Get(int i) const
         {
             return data[i - 1];
         }
@@ -252,19 +244,19 @@ namespace meshit {
             data[(i - 1) * WIDTH + j - 1] = v;
         }
 
-        double & Elem(int i, int j)
+        double& Elem(int i, int j)
         {
             return data[(i - 1) * WIDTH + j - 1];
         }
 
-        const double & ConstElem(int i, int j) const
+        const double& ConstElem(int i, int j) const
         {
             return data[(i - 1) * WIDTH + j - 1];
         }
     };
 
-    template <int WIDTH>
-    extern std::ostream & operator<<(std::ostream & ost, const MatrixFixWidth<WIDTH> & m)
+    template<int WIDTH>
+    extern std::ostream& operator<<(std::ostream& ost, const MatrixFixWidth<WIDTH>& m)
     {
         for (int i = 0; i < m.Height(); i++) {
             for (int j = 0; j < m.Width(); j++)
@@ -274,8 +266,8 @@ namespace meshit {
         return ost;
     };
 
-    extern void CalcAtA(const DenseMatrix & a, DenseMatrix & m2);
-    extern void CalcInverse(const DenseMatrix & m1, DenseMatrix & m2);
+    extern void CalcAtA(const DenseMatrix& a, DenseMatrix& m2);
+    extern void CalcInverse(const DenseMatrix& m1, DenseMatrix& m2);
 }
 
 #endif

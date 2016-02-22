@@ -1,5 +1,5 @@
-#ifndef FILE_OPTMEM
-#define FILE_OPTMEM
+#ifndef FILE_OPTMEM_H
+#define FILE_OPTMEM_H
 
 /**************************************************************************/
 /* File:   optmem.hh                                                      */
@@ -35,6 +35,6 @@ namespace meshit {
         }
     };
 
-}
+}  // namespace meshit
 
 #endif

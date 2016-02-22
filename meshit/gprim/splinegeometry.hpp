@@ -19,15 +19,13 @@ namespace meshit {
     template < int D >
     class SplineGeometry
     {
-        // protected:
       public:
         std::vector<GeomPoint<D> > geompoints;
         std::vector<SplineSeg<D>*> splines;
 
-        ~SplineGeometry();
+        virtual ~SplineGeometry();
 
         int Load(const Array<double> & raw_data, const int startpos = 0);
-        void GetRawData(Array<double> & raw_data) const;
 
         const std::vector<SplineSeg<D>*> & GetSplines() const
         {

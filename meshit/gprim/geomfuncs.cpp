@@ -1,9 +1,8 @@
-#include "../meshit.hpp"
 #include "geomfuncs.hpp"
 
 namespace meshit {
 
-    void CalcInverse(const Mat<3, 3> & m, Mat<3, 3> & inv)
+    void CalcInverse(const Mat<3, 3>& m, Mat<3, 3>& inv)
     {
         double det = Det(m);
         if (det == 0) {
@@ -25,15 +24,15 @@ namespace meshit {
         inv(2, 2) = idet * (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0));
     }
 
-    double Det(const Mat<2, 2> & m)
+    double Det(const Mat<2, 2>& m)
     {
         return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
     }
 
-    double Det(const Mat<3, 3> & m)
+    double Det(const Mat<3, 3>& m)
     {
         return
-        m(0, 0) * m(1, 1) * m(2, 2)
+                m(0, 0) * m(1, 1) * m(2, 2)
                 + m(1, 0) * m(2, 1) * m(0, 2)
                 + m(2, 0) * m(0, 1) * m(1, 2)
                 - m(0, 0) * m(2, 1) * m(1, 2)
@@ -41,7 +40,7 @@ namespace meshit {
                 - m(2, 0) * m(1, 1) * m(0, 2);
     }
 
-    void EigenValues(const Mat<3, 3> & m, Vec<3> & ev)
+    void EigenValues(const Mat<3, 3>& m, Vec<3>& ev)
     {
         const double pi = 3.141592;
         double a, b, c, d;
@@ -50,22 +49,17 @@ namespace meshit {
 
         a = -1.;
         b = m(0, 0) + m(1, 1) + m(2, 2);
-        c = -(m(0, 0) * m(2, 2) + m(1, 1) * m(2, 2) + m(0, 0) * m(1, 1) - m(0, 1) * m(0, 1) - m(0, 2) * m(0, 2) - m(1, 2) * m(1, 2));
+        c = -(m(0, 0) * m(2, 2) + m(1, 1) * m(2, 2) + m(0, 0) * m(1, 1) -
+              m(0, 1) * m(0, 1) - m(0, 2) * m(0, 2) - m(1, 2) * m(1, 2));
         d = Det(m);
-        p = 3. * a * c - b*b;
-        q = 27. * a * a * d - 9. * a * b * c + 2. * b * b*b;
-
+        p = 3. * a * c - b * b;
+        q = 27. * a * a * d - 9. * a * b * c + 2. * b * b * b;
 
         arg = acos((-q / 2) / sqrt(-(p * p * p)));
-
 
         ev(0) = (2. * sqrt(-p) * cos(arg / 3.) - b) / 3. * a;
         ev(1) = (-2. * sqrt(-p) * cos(arg / 3. + pi / 3) - b) / 3. * a;
         ev(2) = (-2. * sqrt(-p) * cos(arg / 3. - pi / 3) - b) / 3. * a;
-
-
-
     }
 
-
-}
+}  // namespace meshit

@@ -4,51 +4,30 @@
 namespace meshit {
 
     void Refinement2d::PointBetween(
-            const Point<3> & p1, const Point<3> & p2,
-            double secpoint, int surfi,
-            const PointGeomInfo & gi1,
-            const PointGeomInfo & gi2,
-            Point<3> & newp, PointGeomInfo & newgi) const
+            const Point<3>& p1, const Point<3>& p2,
+            double secpoint,
+            const PointGeomInfo& gi1,
+            const PointGeomInfo& gi2,
+            Point<3>& newp, PointGeomInfo& newgi) const
     {
         newp = p1 + secpoint * (p2 - p1);
         newgi.trignum = 1;
     }
 
     void Refinement2d::PointBetween(
-            const Point<3> & p1, const Point<3> & p2,
-            double secpoint, int surfi1, int surfi2,
-            const EdgePointGeomInfo & ap1,
-            const EdgePointGeomInfo & ap2,
-            Point<3> & newp, EdgePointGeomInfo & newgi) const
+            const Point<3>& p1, const Point<3>& p2,
+            double secpoint,
+            const EdgePointGeomInfo& ap1,
+            const EdgePointGeomInfo& ap2,
+            Point<3>& newp, EdgePointGeomInfo& newgi) const
     {
         Point<2> p2d;
 
-        p2d = geometry.GetSplines()[ap1.edgenr+1] -> GetPoint(((1 - secpoint) * ap1.dist + secpoint * ap2.dist));
+        p2d = geometry.GetSplines()[ap1.edgenr + 1]->GetPoint(((1 - secpoint) * ap1.dist + secpoint * ap2.dist));
 
         newp = Point3d(p2d(0), p2d(1), 0);
         newgi.edgenr = ap1.edgenr;
         newgi.dist = ((1 - secpoint) * ap1.dist + secpoint * ap2.dist);
     };
 
-    Vec<3> Refinement2d::GetTangent(const Point<3> & p, int surfi1, int surfi2,
-            const EdgePointGeomInfo & ap1) const
-    {
-        Vec<2> t2d = geometry.GetSplines()[ap1.edgenr+1] -> GetTangent(ap1.dist);
-        return Vec<3> (t2d(0), t2d(1), 0);
-    }
-
-    Vec<3> Refinement2d::GetNormal(const Point<3> & p, int surfi1,
-            const PointGeomInfo & gi) const
-    {
-        return Vec<3> (0, 0, 1);
-    }
-
-    void Refinement2d::ProjectToEdge(Point<3> & p, int surfi1, int surfi2,
-            const EdgePointGeomInfo & egi) const
-    {
-        Point<2> p2d(p(0), p(1)), pp;
-        double t;
-        geometry.GetSplines()[egi.edgenr+1] -> Project(p2d, pp, t);
-        p = Point<3> (pp(0), pp(1), 0);
-    }
-}
+}  // namespace meshit

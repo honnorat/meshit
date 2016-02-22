@@ -1,15 +1,8 @@
-
-#include "../meshit.hpp"
 #include "bisect.hpp"
 
 namespace meshit {
 
-    void Refinement::Refine(Mesh & mesh) const
-    {
-        const_cast<Refinement&> (*this).Refine(mesh);
-    }
-
-    void Refinement::Refine(Mesh & mesh)
+    void Refinement::Refine(Mesh& mesh)
     {
         // reduce 2nd order
         mesh.ComputeNVertices();
@@ -25,7 +18,7 @@ namespace meshit {
 
         oldns = mesh.GetNSeg();
         for (SegmentIndex si = 0; si < oldns; si++) {
-            const Segment & el = mesh.LineSegment(si);
+            const Segment& el = mesh.LineSegment(si);
 
             INDEX_2 i2 = INDEX_2::Sort(el[0], el[1]);
             PointIndex pinew;
@@ -38,10 +31,9 @@ namespace meshit {
             else {
                 Point<3> pnew;
                 PointBetween(mesh.Point(el[0]),
-                        mesh.Point(el[1]), 0.5,
-                        el.surfnr1, el.surfnr2,
-                        el.epgeominfo[0], el.epgeominfo[1],
-                        pnew, ngi);
+                             mesh.Point(el[1]), 0.5,
+                             el.epgeominfo[0], el.epgeominfo[1],
+                             pnew, ngi);
 
                 pinew = mesh.AddPoint(pnew);
                 between.Set(i2, pinew);
@@ -65,25 +57,24 @@ namespace meshit {
         // refine surface elements
         Array<PointGeomInfo, PointIndex::BASE> surfgi(8 * mesh.GetNP());
         for (int i = PointIndex::BASE;
-                i < surfgi.size() + PointIndex::BASE; i++)
+             i < surfgi.size() + PointIndex::BASE; i++)
             surfgi[i].trignum = -1;
 
         oldnf = mesh.GetNSE();
         for (SurfaceElementIndex sei = 0; sei < oldnf; sei++) {
             int j, k;
-            const Element2d & el = mesh.SurfaceElement(sei);
+            const Element2d& el = mesh.SurfaceElement(sei);
 
             switch (el.GetType()) {
                 case TRIG:
-                case TRIG6:
-                {
+                case TRIG6: {
                     ArrayMem<PointIndex, 6> pnums(6);
                     ArrayMem<PointGeomInfo, 6> pgis(6);
 
-                    static int betw[3][3] ={
-                        { 2, 3, 4},
-                        { 1, 3, 5},
-                        { 1, 2, 6}
+                    static int betw[3][3] = {
+                            {2, 3, 4},
+                            {1, 3, 5},
+                            {1, 2, 6}
                     };
 
                     for (j = 1; j <= 3; j++) {
@@ -101,11 +92,10 @@ namespace meshit {
                         Point<3> pb;
                         PointGeomInfo pgi;
                         PointBetween(mesh.Point(pi1),
-                                mesh.Point(pi2), 0.5,
-                                mesh.GetFaceDescriptor(el.GetIndex()).SurfNr(),
-                                el.GeomInfoPi(betw[j][0]),
-                                el.GeomInfoPi(betw[j][1]),
-                                pb, pgi);
+                                     mesh.Point(pi2), 0.5,
+                                     el.GeomInfoPi(betw[j][0]),
+                                     el.GeomInfoPi(betw[j][1]),
+                                     pb, pgi);
 
                         pgis.Elem(4 + j) = pgi;
                         if (between.Used(i2))
@@ -120,11 +110,11 @@ namespace meshit {
                         surfgi.Elem(pnums.Elem(4 + j)) = pgis.Elem(4 + j);
                     }
 
-                    static int reftab[4][3] ={
-                        { 1, 6, 5},
-                        { 2, 4, 6},
-                        { 3, 5, 4},
-                        { 6, 4, 5}
+                    static int reftab[4][3] = {
+                            {1, 6, 5},
+                            {2, 4, 6},
+                            {3, 5, 4},
+                            {6, 4, 5}
                     };
 
                     int ind = el.GetIndex();
@@ -145,17 +135,16 @@ namespace meshit {
                 }
                 case QUAD:
                 case QUAD6:
-                case QUAD8:
-                {
+                case QUAD8: {
                     ArrayMem<PointIndex, 9> pnums(9);
                     ArrayMem<PointGeomInfo, 9> pgis(9);
 
-                    static int betw[5][3] ={
-                        { 1, 2, 5},
-                        { 2, 3, 6},
-                        { 3, 4, 7},
-                        { 1, 4, 8},
-                        { 5, 7, 9}
+                    static int betw[5][3] = {
+                            {1, 2, 5},
+                            {2, 3, 6},
+                            {3, 4, 7},
+                            {1, 4, 8},
+                            {5, 7, 9}
                     };
 
                     for (j = 1; j <= 4; j++) {
@@ -177,11 +166,10 @@ namespace meshit {
                         else {
                             Point<3> pb;
                             PointBetween(mesh.Point(pi1),
-                                    mesh.Point(pi2), 0.5,
-                                    mesh.GetFaceDescriptor(el.GetIndex()).SurfNr(),
-                                    el.GeomInfoPi(betw[j][0]),
-                                    el.GeomInfoPi(betw[j][1]),
-                                    pb, pgis.Elem(5 + j));
+                                         mesh.Point(pi2), 0.5,
+                                         el.GeomInfoPi(betw[j][0]),
+                                         el.GeomInfoPi(betw[j][1]),
+                                         pb, pgis.Elem(5 + j));
 
                             pnums.Elem(5 + j) = mesh.AddPoint(pb);
 
@@ -193,11 +181,11 @@ namespace meshit {
                         }
                     }
 
-                    static int reftab[4][4] ={
-                        { 1, 5, 9, 8},
-                        { 5, 2, 6, 9},
-                        { 8, 9, 7, 4},
-                        { 9, 6, 3, 7}
+                    static int reftab[4][4] = {
+                            {1, 5, 9, 8},
+                            {5, 2, 6, 9},
+                            {8, 9, 7, 4},
+                            {9, 6, 3, 7}
                     };
 
                     int ind = el.GetIndex();
@@ -232,7 +220,7 @@ namespace meshit {
                     PointIndex newpi;
                     between.GetData(j, k, i2, newpi);
                     INDEX_2 oi2(identmap.Get(i2.I1()),
-                            identmap.Get(i2.I2()));
+                                identmap.Get(i2.I2()));
                     oi2.Sort();
                     if (between.Used(oi2)) {
                         PointIndex onewpi = between.Get(oi2);

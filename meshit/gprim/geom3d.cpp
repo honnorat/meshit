@@ -1,20 +1,18 @@
-#include <algorithm>
-#include "../meshit.hpp"
 #include "geom3d.hpp"
 
 namespace meshit {
 
-    std::ostream & operator<<(std::ostream & s, const Point3d & p)
+    std::ostream& operator<<(std::ostream& s, const Point3d& p)
     {
         return s << "(" << p.x[0] << ", " << p.x[1] << ", " << p.x[2] << ")";
     }
 
-    std::ostream & operator<<(std::ostream & s, const Vec3d & v)
+    std::ostream& operator<<(std::ostream& s, const Vec3d& v)
     {
         return s << "(" << v.x[0] << ", " << v.x[1] << ", " << v.x[2] << ")";
     }
 
-    double Angle(const Vec3d & v1, const Vec3d & v2)
+    double Angle(const Vec3d& v1, const Vec3d& v2)
     {
         double co = (v1 * v2) / (v1.Length() * v2.Length());
         if (co > 1) co = 1;
@@ -22,14 +20,13 @@ namespace meshit {
         return acos(co);
     }
 
-    void Vec3d::GetNormal(Vec3d & n) const
+    void Vec3d::GetNormal(Vec3d& n) const
     {
         if (fabs(X()) > fabs(Z())) {
             n.X() = -Y();
             n.Y() = X();
             n.Z() = 0;
-        }
-        else {
+        } else {
             n.X() = 0;
             n.Y() = Z();
             n.Z() = -Y();
@@ -56,7 +53,7 @@ namespace meshit {
         maxx[2] = amaxz;
     }
 
-    Box3d::Box3d(const Box3d & b2)
+    Box3d::Box3d(const Box3d& b2)
     {
         for (int i = 0; i < 3; i++) {
             minx[i] = b2.minx[i];
@@ -64,7 +61,7 @@ namespace meshit {
         }
     }
 
-    Box3d::Box3d(const Box<3> & b2)
+    Box3d::Box3d(const Box<3>& b2)
     {
         for (int i = 0; i < 3; i++) {
             minx[i] = b2.PMin()(i);
@@ -72,7 +69,7 @@ namespace meshit {
         }
     }
 
-    void Box3d::GetPointNr(int i, Point3d & point) const
+    void Box3d::GetPointNr(int i, Point3d& point) const
     {
         i--;
         point.X() = (i & 1) ? maxx[0] : minx[0];
@@ -119,7 +116,7 @@ namespace meshit {
         return *this;
     }
 
-    void Transpose(Vec3d & v1, Vec3d & v2, Vec3d & v3)
+    void Transpose(Vec3d& v1, Vec3d& v2, Vec3d& v3)
     {
         std::swap(v1.Y(), v2.X());
         std::swap(v1.Z(), v3.X());
@@ -127,8 +124,8 @@ namespace meshit {
     }
 
     int SolveLinearSystem(
-            const Vec3d & col1, const Vec3d & col2, const Vec3d & col3,
-            const Vec3d & rhs, Vec3d & sol)
+            const Vec3d& col1, const Vec3d& col2, const Vec3d& col3,
+            const Vec3d& rhs, Vec3d& sol)
     {
         // changed by MW
         double matrix[3][3];
@@ -192,10 +189,10 @@ namespace meshit {
 #pragma GCC diagnostic pop
 #endif
 
-    int SolveLinearSystemLS(const Vec3d & col1,
-            const Vec3d & col2,
-            const Vec2d & rhs,
-            Vec3d & sol)
+    int SolveLinearSystemLS(const Vec3d& col1,
+                            const Vec3d& col2,
+                            const Vec2d& rhs,
+                            Vec3d& sol)
     {
         double a11 = col1 * col1;
         double a12 = col1 * col2;
@@ -228,10 +225,10 @@ namespace meshit {
          */
     }
 
-    int SolveLinearSystemLS2(const Vec3d & col1,
-            const Vec3d & col2,
-            const Vec2d & rhs,
-            Vec3d & sol, double & x, double & y)
+    int SolveLinearSystemLS2(const Vec3d& col1,
+                             const Vec3d& col2,
+                             const Vec2d& rhs,
+                             Vec3d& sol, double& x, double& y)
     {
         double a11 = col1 * col1;
         double a12 = col1 * col2;
@@ -240,7 +237,7 @@ namespace meshit {
         double det = a11 * a22 - a12 * a12;
 
         if (fabs(det) <= 1e-12 * col1.Length() * col2.Length() ||
-                col1.Length2() == 0 || col2.Length2() == 0) {
+            col1.Length2() == 0 || col2.Length2() == 0) {
             sol = Vec3d(0, 0, 0);
             x = 0;
             y = 0;
@@ -270,10 +267,10 @@ namespace meshit {
          */
     }
 
-    int PseudoInverse(const Vec3d & col1,
-            const Vec3d & col2,
-            Vec3d & inv1,
-            Vec3d & inv2)
+    int PseudoInverse(const Vec3d& col1,
+                      const Vec3d& col2,
+                      Vec3d& inv1,
+                      Vec3d& inv2)
     {
         double a11 = col1 * col1;
         double a12 = col1 * col2;
@@ -298,7 +295,7 @@ namespace meshit {
     }
 
     QuadraticFunction3d::
-    QuadraticFunction3d(const Point3d & p, const Vec3d & v)
+    QuadraticFunction3d(const Point3d& p, const Vec3d& v)
     {
         Vec3d hv(v);
         hv /= (hv.Length() + 1e-12);
@@ -308,7 +305,7 @@ namespace meshit {
 
         double t1p = t1.X() * p.X() + t1.Y() * p.Y() + t1.Z() * p.Z();
         double t2p = t2.X() * p.X() + t2.Y() * p.Y() + t2.Z() * p.Z();
-        c0 = t1p*t1p + t2p*t2p;
+        c0 = t1p * t1p + t2p * t2p;
         cx = -2 * (t1p * t1.X() + t2p * t2.X());
         cy = -2 * (t1p * t1.Y() + t2p * t2.Y());
         cz = -2 * (t1p * t1.Z() + t2p * t2.Z());
@@ -322,8 +319,8 @@ namespace meshit {
         cyz = 2 * t1.Y() * t1.Z() + 2 * t2.Y() * t2.Z();
     }
 
-    void referencetransform::Set(const Point3d & p1, const Point3d & p2,
-            const Point3d & p3, double ah)
+    void referencetransform::Set(const Point3d& p1, const Point3d& p2,
+                                 const Point3d& p3, double ah)
     {
         ex = p2 - p1;
         ex /= ex.Length();
@@ -343,7 +340,7 @@ namespace meshit {
         ez_h = ah * ez;
     }
 
-    void referencetransform::ToPlain(const Point3d & p, Point3d & pp) const
+    void referencetransform::ToPlain(const Point3d& p, Point3d& pp) const
     {
         Vec3d v;
         v = p - rp;
@@ -352,8 +349,8 @@ namespace meshit {
         pp.Z() = (ez_h * v);
     }
 
-    void referencetransform::ToPlain(const Array<Point3d> & p,
-            Array<Point3d> & pp) const
+    void referencetransform::ToPlain(const Array<Point3d>& p,
+                                     Array<Point3d>& pp) const
     {
         Vec3d v;
         int i;
@@ -367,7 +364,7 @@ namespace meshit {
         }
     }
 
-    void referencetransform::FromPlain(const Point3d & pp, Point3d & p) const
+    void referencetransform::FromPlain(const Point3d& pp, Point3d& p) const
     {
         Vec3d v;
         //  v = (h * pp.X()) * ex + (h * pp.Y()) * ey + (h * pp.Z()) * ez;
@@ -379,6 +376,4 @@ namespace meshit {
         p.Y() = rp.Y() + v.Y();
         p.Z() = rp.Z() + v.Z();
     }
-
-
-}
+}  // namespace meshit

@@ -81,9 +81,6 @@ namespace meshit {
 
     void Flags::SetCommandLineFlag(const char* st)
     {
-        char name[100];
-        double val;
-
         if (st[0] != '-') {
             std::cerr << "flag must start with '-'" << std::endl;
             return;
@@ -93,21 +90,21 @@ namespace meshit {
 
         if (!pos) {
             SetFlag(st + 1);
-        }
-        else {
+        } else {
+            char name[100];
             strncpy(name, st + 1, (pos - st) - 1);
             name[pos - st - 1] = 0;
             pos++;
             char* endptr = NULL;
 
-            val = strtod(pos, &endptr);
+            double val = strtod(pos, &endptr);
 
             if (endptr == pos) {
                 SetFlag(name, pos);
-            }
-            else {
+            } else {
                 SetFlag(name, val);
             }
         }
     }
-}
+
+}  // namespace meshit
