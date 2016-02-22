@@ -51,60 +51,21 @@ namespace meshit {
         GradingBox * root;
         double grading;
         Array<GradingBox*> boxes;
-        Box3d boundingbox;
 
-      public:
+     public:
 
         LocalH(const Point3d & pmin, const Point3d & pmax, double grading);
         LocalH(const Box<3> & box, double grading);
         ~LocalH();
-        void Delete();
-
-        void SetGrading(double agrading)
-        {
-            grading = agrading;
-        }
 
         void SetH(const Point3d & x, double h);
         double GetH(const Point3d & x) const;
         double GetMinH(const Point3d & pmin, const Point3d & pmax) const;
 
-        void CutBoundary(const Box<3> & box)
-        {
-            CutBoundaryRec(box.PMin(), box.PMax(), root);
-        }
-
-        void FindInnerBoxes(class AdFront2 * adfront, int (*testinner)(const Point<2> & p1));
-
-        void ClearFlags()
-        {
-            ClearFlagsRec(root);
-        }
-
-        void GetInnerPoints(Array<Point<3> > & points);
-        void GetOuterPoints(Array<Point<3> > & points);
-
-        void Convexify();
-
-        int GetNBoxes()
-        {
-            return boxes.size();
-        }
-
-        const Box3d & GetBoundingBox() const
-        {
-            return boundingbox;
-        }
 
       private:
 
         double GetMinHRec(const Point3d & pmin, const Point3d & pmax, const GradingBox * box) const;
-
-        void CutBoundaryRec(const Point3d & pmin, const Point3d & pmax, GradingBox * box);
-
-        void SetInnerBoxesRec(GradingBox * box);
-
-        void ClearFlagsRec(GradingBox * box);
 
         friend std::ostream & operator<<(std::ostream & ost, const LocalH & loch);
     };

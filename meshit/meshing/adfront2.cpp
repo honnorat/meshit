@@ -3,15 +3,12 @@
  */
 #include <iostream>
 #include "adfront2.hpp"
-#include "../meshit.hpp"
-#include "../gprim/geom3d.hpp"
-#include "../gprim/geomops.hpp"
 
 namespace meshit {
 
-    FrontPoint2::FrontPoint2(const Point3d & ap, PointIndex agi,
-            MultiPointGeomInfo * amgi, bool aonsurface)
-        : globalindex(agi)
+    FrontPoint2::FrontPoint2(const Point3d& ap, PointIndex agi,
+                             MultiPointGeomInfo* amgi, bool aonsurface)
+            : globalindex(agi)
     {
         p = ap;
         nlinetopoint = 0;
@@ -28,11 +25,11 @@ namespace meshit {
             mgi = NULL;
     }
 
-    AdFront2::AdFront2(const Box3d & aboundingbox)
-        : boundingbox(aboundingbox),
-        linesearchtree(boundingbox.PMin(), boundingbox.PMax()),
-        pointsearchtree(boundingbox.PMin(), boundingbox.PMax()),
-        cpointsearchtree(boundingbox.PMin(), boundingbox.PMax())
+    AdFront2::AdFront2(const Box3d& aboundingbox)
+            : boundingbox(aboundingbox),
+              linesearchtree(boundingbox.PMin(), boundingbox.PMax()),
+              pointsearchtree(boundingbox.PMin(), boundingbox.PMax()),
+              cpointsearchtree(boundingbox.PMin(), boundingbox.PMax())
     {
         nfl = 0;
         allflines = 0;
@@ -46,21 +43,21 @@ namespace meshit {
         delete allflines;
     }
 
-    void AdFront2::PrintOpenSegments(std::ostream & ost) const
+    void AdFront2::PrintOpenSegments(std::ostream& ost) const
     {
         if (nfl > 0) {
             ost << nfl << " open front segments left:" << std::endl;
             for (size_t i = 0; i < lines.size(); i++)
                 if (lines[i].Valid())
                     ost << i << ": "
-                        << GetGlobalIndex(lines[i].L().I1()) << "-"
+                    << GetGlobalIndex(lines[i].L().I1()) << "-"
                     << GetGlobalIndex(lines[i].L().I2()) << std::endl;
         }
     }
 
     int AdFront2::AddPoint(
-            const Point3d & p, PointIndex globind,
-            MultiPointGeomInfo * mgi,
+            const Point3d& p, PointIndex globind,
+            MultiPointGeomInfo* mgi,
             bool pointonsurface)
     {
         // inserts at empty position or resizes array
@@ -87,13 +84,13 @@ namespace meshit {
     }
 
     int AdFront2::AddLine(int pi1, int pi2,
-            const PointGeomInfo & gi1, const PointGeomInfo & gi2)
+                          const PointGeomInfo& gi1, const PointGeomInfo& gi2)
     {
         int minfn;
         int li;
 
-        FrontPoint2 & p1 = points[pi1];
-        FrontPoint2 & p2 = points[pi2];
+        FrontPoint2& p1 = points[pi1];
+        FrontPoint2& p2 = points[pi2];
 
         nfl++;
 
@@ -128,12 +125,12 @@ namespace meshit {
 
         if (allflines) {
             if (allflines->Used(INDEX_2(GetGlobalIndex(pi1),
-                    GetGlobalIndex(pi2)))) {
+                                        GetGlobalIndex(pi2)))) {
                 std::cerr << "ERROR Adfront2::AddLine: line exists" << std::endl;
             }
 
             allflines->Set(INDEX_2(GetGlobalIndex(pi1),
-                    GetGlobalIndex(pi2)), 1);
+                                   GetGlobalIndex(pi2)), 1);
         }
 
         return li;
@@ -163,7 +160,7 @@ namespace meshit {
 
         if (allflines) {
             allflines->Set(INDEX_2(GetGlobalIndex(lines[li].L().I1()),
-                    GetGlobalIndex(lines[li].L().I2())), 2);
+                                   GetGlobalIndex(lines[li].L().I2())), 2);
         }
 
         lines[li].Invalidate();
@@ -182,18 +179,18 @@ namespace meshit {
             return 0;
     }
 
-    int AdFront2::SelectBaseLine(Point<3> & p1, Point<3> & p2,
-            const PointGeomInfo *& geominfo1,
-            const PointGeomInfo *& geominfo2,
-            int & qualclass)
+    int AdFront2::SelectBaseLine(Point<3>& p1, Point<3>& p2,
+                                 const PointGeomInfo*& geominfo1,
+                                 const PointGeomInfo*& geominfo2,
+                                 int& qualclass)
     {
         int baselineindex = -1;
 
         for (size_t i = starti; i < lines.size(); i++) {
             if (lines[i].Valid()) {
                 int hi = lines[i].LineClass() +
-                        points[lines[i].L().I1()].FrontNr() +
-                        points[lines[i].L().I2()].FrontNr();
+                         points[lines[i].L().I1()].FrontNr() +
+                         points[lines[i].L().I2()].FrontNr();
 
                 if (hi <= minval) {
                     minval = hi;
@@ -208,8 +205,8 @@ namespace meshit {
             for (size_t i = 0; i < lines.size(); i++)
                 if (lines[i].Valid()) {
                     int hi = lines[i].LineClass() +
-                            points[lines[i].L().I1()].FrontNr() +
-                            points[lines[i].L().I2()].FrontNr();
+                             points[lines[i].L().I1()].FrontNr() +
+                             points[lines[i].L().I2()].FrontNr();
 
                     if (hi < minval) {
                         minval = hi;
@@ -231,11 +228,11 @@ namespace meshit {
 
     int AdFront2::GetLocals(
             int baselineindex,
-            Array<Point3d> & locpoints,
-            Array<MultiPointGeomInfo> & pgeominfo,
-            Array<INDEX_2> & loclines, // local index
-            Array<INDEX> & pindex,
-            Array<INDEX> & lindex,
+            Array<Point3d>& locpoints,
+            Array<MultiPointGeomInfo>& pgeominfo,
+            Array<INDEX_2>& loclines, // local index
+            Array<INDEX>& pindex,
+            Array<INDEX>& lindex,
             double xh)
     {
         int pstind;
@@ -314,7 +311,7 @@ namespace meshit {
             for (int j = 0; j < 2; j++) {
                 int lpi = loclines[i][j];
 
-                const PointGeomInfo & gi =
+                const PointGeomInfo& gi =
                         lines[lindex[i]].GetGeomInfo(j + 1);
                 pgeominfo.Elem(lpi).AddPointGeomInfo(gi);
             }
@@ -338,7 +335,7 @@ namespace meshit {
                     points[lines[i].L().I(j)].DecFrontNr(0);
     }
 
-    bool AdFront2::Inside(const Point<2> & p) const
+    bool AdFront2::Inside(const Point<2>& p) const
     {
         int cnt;
         Vec<2> n;
@@ -353,8 +350,8 @@ namespace meshit {
         cnt = 0;
         for (size_t i = 0; i < lines.size(); i++) {
             if (lines[i].Valid()) {
-                const Point<3> & p1 = points[lines[i].L().I1()].P();
-                const Point<3> & p2 = points[lines[i].L().I2()].P();
+                const Point<3>& p1 = points[lines[i].L().I1()].P();
+                const Point<3>& p2 = points[lines[i].L().I2()].P();
 
                 v1 = p2 - p1;
 

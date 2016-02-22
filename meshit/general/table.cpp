@@ -8,7 +8,6 @@
    Abstract data type TABLE
 */
 
-#include "../meshit.hpp"
 #include "table.hpp"
 
 namespace meshit
@@ -203,12 +202,6 @@ namespace meshit
     for (int i = 0; i < data.size(); i++)
       els += data[i].size;
     return els;
-  }
-
-  void BASE_TABLE :: SetElementSizesToMaxSizes ()
-  {
-    for (int i = 0; i < data.size(); i++)
-      data[i].size = data[i].maxsize;
   }
 
 }

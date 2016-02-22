@@ -9,55 +9,31 @@
 
 #include "../general/array.hpp"
 
-namespace meshit
-{
+namespace meshit {
 
 /** 
     Optimized Memory allocation classes
 */
 
-class BlockAllocator
-{
-private:
-  ///
-  unsigned size, blocks;
-  ///
-  void * freelist;
-  ///
-  Array<char*> bablocks;
-public:
-  ///
-  BlockAllocator (unsigned asize, unsigned ablocks = 100);
-  ///
-  ~BlockAllocator ();
-  ///
+    class BlockAllocator
+    {
+     private:
+        unsigned size, blocks;
+        void* freelist;
+        Array<char*> bablocks;
 
-  void * Alloc ();
-  /*
-  {
-    if (!freelist)
-      Alloc2();
+     public:
+        explicit BlockAllocator(unsigned asize, unsigned ablocks = 100);
+        ~BlockAllocator();
 
-    void * p = freelist;
-    // freelist = *(void**)freelist;
-    freelist = *static_cast<void**> (freelist);
+        void* Alloc();
 
-    return p;
-  }
-  */
-
-
-  ///
-  void Free (void * p)
-  {
-    *(void**)p = freelist;
-    freelist = p;
-  }
-  
-
-private:
-  //  void Alloc2 ();
-};
+        void Free(void* p)
+        {
+            *(void**) p = freelist;
+            freelist = p;
+        }
+    };
 
 }
 

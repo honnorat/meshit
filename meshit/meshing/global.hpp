@@ -17,11 +17,6 @@
 
 namespace meshit
 {
-  extern double GetTime ();
-  extern void ResetTime ();
-
-  extern int testmode;
-
   extern Array<int> tets_in_qualclass;
 
   extern DebugParameters debugparam;

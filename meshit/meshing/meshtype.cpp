@@ -1,14 +1,11 @@
 #include <stdexcept>
 
-#include "../meshit.hpp"
-#include "meshtype.hpp" 
+#include "meshtype.hpp"
 #include "meshclass.hpp"
-#include "../general/autoptr.hpp"
-#include "../gprim/geom3d.hpp"
 
 namespace meshit {
 
-    int MultiPointGeomInfo::AddPointGeomInfo(const PointGeomInfo & gi)
+    int MultiPointGeomInfo::AddPointGeomInfo(const PointGeomInfo& gi)
     {
         for (int k = 0; k < cnt; k++) {
             if (mgi[k].trignum == gi.trignum)
@@ -48,21 +45,21 @@ namespace meshit {
         bcname = 0;
     }
 
-    Segment::Segment(const Segment & other) :
-        edgenr(other.edgenr),
-        singedge_left(other.singedge_left),
-        singedge_right(other.singedge_right),
-        seginfo(other.seginfo),
-        si(other.si),
-        domin(other.domin),
-        domout(other.domout),
-        tlosurf(other.tlosurf),
-        geominfo(),
-        surfnr1(other.surfnr1),
-        surfnr2(other.surfnr2),
-        epgeominfo(),
-        meshdocval(other.meshdocval),
-        hp_elnr(other.hp_elnr)
+    Segment::Segment(const Segment& other) :
+            edgenr(other.edgenr),
+            singedge_left(other.singedge_left),
+            singedge_right(other.singedge_right),
+            seginfo(other.seginfo),
+            si(other.si),
+            domin(other.domin),
+            domout(other.domout),
+            tlosurf(other.tlosurf),
+            geominfo(),
+            surfnr1(other.surfnr1),
+            surfnr2(other.surfnr2),
+            epgeominfo(),
+            meshdocval(other.meshdocval),
+            hp_elnr(other.hp_elnr)
     {
         for (int j = 0; j < 3; j++) {
             pnums[j] = other.pnums[j];
@@ -75,7 +72,7 @@ namespace meshit {
         bcname = other.bcname;
     }
 
-    Segment& Segment::operator=(const Segment & other)
+    Segment& Segment::operator=(const Segment& other)
     {
         if (&other != this) {
             pnums[0] = other[0];
@@ -103,12 +100,12 @@ namespace meshit {
         return *this;
     }
 
-    std::ostream & operator<<(std::ostream & s, const Segment & seg)
+    std::ostream& operator<<(std::ostream& s, const Segment& seg)
     {
         s << seg[0] << "(gi=" << seg.geominfo[0].trignum << ") - "
-                << seg[1] << "(gi=" << seg.geominfo[1].trignum << ")"
-                << " domin = " << seg.domin << ", domout = " << seg.domout
-                << " si = " << seg.si << ", edgenr = " << seg.edgenr;
+        << seg[1] << "(gi=" << seg.geominfo[1].trignum << ")"
+        << " domin = " << seg.domin << ", domout = " << seg.domout
+        << " si = " << seg.si << ", edgenr = " << seg.edgenr;
         return s;
     }
 
@@ -120,13 +117,8 @@ namespace meshit {
         }
         np = 3;
         index = 0;
-        badel = 0;
         deleted = 0;
-        visible = 1;
         typ = TRIG;
-        orderx = ordery = 1;
-        refflag = 1;
-        strongrefflag = false;
     }
 
     Element2d::Element2d(int anp)
@@ -137,22 +129,21 @@ namespace meshit {
         }
         np = anp;
         index = 0;
-        badel = 0;
         deleted = 0;
-        visible = 1;
         switch (np) {
-            case 3: typ = TRIG;
+            case 3:
+                typ = TRIG;
                 break;
-            case 4: typ = QUAD;
+            case 4:
+                typ = QUAD;
                 break;
-            case 6: typ = TRIG6;
+            case 6:
+                typ = TRIG6;
                 break;
-            case 8: typ = QUAD8;
+            case 8:
+                typ = QUAD8;
                 break;
         }
-        orderx = ordery = 1;
-        refflag = 1;
-        strongrefflag = false;
     }
 
     Element2d::Element2d(ELEMENT_TYPE atyp)
@@ -165,12 +156,7 @@ namespace meshit {
         SetType(atyp);
 
         index = 0;
-        badel = 0;
         deleted = 0;
-        visible = 1;
-        orderx = ordery = 1;
-        refflag = 1;
-        strongrefflag = false;
     }
 
     Element2d::Element2d(int pi1, int pi2, int pi3)
@@ -188,12 +174,7 @@ namespace meshit {
             geominfo[i].trignum = 0;
         }
         index = 0;
-        badel = 0;
-        refflag = 1;
-        strongrefflag = false;
         deleted = 0;
-        visible = 1;
-        orderx = ordery = 1;
     }
 
     Element2d::Element2d(int pi1, int pi2, int pi3, int pi4)
@@ -212,15 +193,10 @@ namespace meshit {
             geominfo[i].trignum = 0;
         }
         index = 0;
-        badel = 0;
-        refflag = 1;
-        strongrefflag = false;
         deleted = 0;
-        visible = 1;
-        orderx = ordery = 1;
     }
 
-    void Element2d::GetBox(const T_POINTS & points, Box3d & box) const
+    void Element2d::GetBox(const T_POINTS& points, Box3d& box) const
     {
         box.SetPoint(points.Get(pnum[0]));
         for (unsigned i = 1; i < np; i++) {
@@ -228,7 +204,7 @@ namespace meshit {
         }
     }
 
-    bool Element2d::operator==(const Element2d & el2) const
+    bool Element2d::operator==(const Element2d& el2) const
     {
         bool retval = (el2.GetNP() == np);
         for (int i = 0; retval && i < np; i++) {
@@ -241,41 +217,24 @@ namespace meshit {
     void Element2d::Invert2()
     {
         switch (typ) {
-            case TRIG:
-            {
+            case TRIG: {
                 std::swap(pnum[1], pnum[2]);
                 break;
             }
-            case TRIG6:
-            {
+            case TRIG6: {
                 std::swap(pnum[1], pnum[2]);
                 std::swap(pnum[4], pnum[5]);
                 break;
             }
-            case QUAD:
-            {
+            case QUAD: {
                 std::swap(pnum[0], pnum[3]);
                 std::swap(pnum[1], pnum[2]);
                 break;
             }
-            default:
-            {
+            default: {
                 std::cerr << "Element2d::Invert2, illegal element type " << int(typ) << std::endl;
             }
         }
-    }
-
-    int Element2d::HasFace(const Element2d & el) const
-    {
-        //nur für tets!!! hannes
-        for (int i = 1; i <= 3; i++) {
-            if (PNumMod(i) == el[0] &&
-                    PNumMod(i + 1) == el[1] &&
-                    PNumMod(i + 2) == el[2]) {
-                return 1;
-            }
-        }
-        return 0;
     }
 
     void Element2d::NormalizeNumbering2()
@@ -318,34 +277,39 @@ namespace meshit {
     {
         int nip;
         switch (np) {
-            case 3: nip = 1;
+            case 3:
+                nip = 1;
                 break;
-            case 4: nip = 4;
+            case 4:
+                nip = 4;
                 break;
-            default: nip = 0;
+            default:
+                nip = 0;
                 break;
         }
         return nip;
     }
 
-    void Element2d::GetIntegrationPoint(int ip, Point2d & p, double & weight) const
+    void Element2d::GetIntegrationPoint(int ip, Point2d& p, double& weight) const
     {
         static double eltriqp[1][3] = {
-            { 1.0 / 3.0, 1.0 / 3.0, 0.5}
+                {1.0 / 3.0, 1.0 / 3.0, 0.5}
         };
 
         static double elquadqp[4][3] = {
-            { 0, 0, 0.25},
-            { 0, 1, 0.25},
-            { 1, 0, 0.25},
-            { 1, 1, 0.25}
+                {0, 0, 0.25},
+                {0, 1, 0.25},
+                {1, 0, 0.25},
+                {1, 1, 0.25}
         };
 
-        double * pp = 0;
+        double* pp = 0;
         switch (typ) {
-            case TRIG: pp = &eltriqp[0][0];
+            case TRIG:
+                pp = &eltriqp[0][0];
                 break;
-            case QUAD: pp = &elquadqp[ip - 1][0];
+            case QUAD:
+                pp = &elquadqp[ip - 1][0];
                 break;
             default:
                 MESHIT_LOG_ERROR("Element2d::GetIntegrationPoint, illegal type " << typ);
@@ -356,7 +320,7 @@ namespace meshit {
         weight = pp[2];
     }
 
-    void Element2d::GetTransformation(int ip, const Array<Point2d> & points, DenseMatrix & trans) const
+    void Element2d::GetTransformation(int ip, const Array<Point2d>& points, DenseMatrix& trans) const
     {
         int np = GetNP();
         DenseMatrix pmat(2, np), dshape(2, np);
@@ -373,14 +337,16 @@ namespace meshit {
         CalcABt(pmat, dshape, trans);
     }
 
-    void Element2d::GetTransformation(int ip, class DenseMatrix & pmat, class DenseMatrix & trans) const
+    void Element2d::GetTransformation(int ip, class DenseMatrix& pmat, class DenseMatrix& trans) const
     {
         ComputeIntegrationPointData();
-        DenseMatrix * dshapep = NULL;
+        DenseMatrix* dshapep = NULL;
         switch (typ) {
-            case TRIG: dshapep = &ipdtrig.Get(ip)->dshape;
+            case TRIG:
+                dshapep = &ipdtrig.Get(ip)->dshape;
                 break;
-            case QUAD: dshapep = &ipdquad.Get(ip)->dshape;
+            case QUAD:
+                dshapep = &ipdquad.Get(ip)->dshape;
                 break;
             default:
                 MESHIT_LOG_ERROR("Element2d::GetTransformation, illegal type " << typ);
@@ -389,7 +355,7 @@ namespace meshit {
         CalcABt(pmat, *dshapep, trans);
     }
 
-    void Element2d::GetShape(const Point2d & p, Vector & shape) const
+    void Element2d::GetShape(const Point2d& p, Vector& shape) const
     {
         if (shape.Size() != GetNP()) {
             std::cerr << "Element::GetShape: Length not fitting" << std::endl;
@@ -413,7 +379,7 @@ namespace meshit {
         }
     }
 
-    void Element2d::GetDShape(const Point2d & p, DenseMatrix & dshape) const
+    void Element2d::GetDShape(const Point2d& p, DenseMatrix& dshape) const
     {
         switch (typ) {
             case TRIG:
@@ -440,18 +406,18 @@ namespace meshit {
         }
     }
 
-    void Element2d::GetPointMatrix(const Array<Point2d> & points, DenseMatrix & pmat) const
+    void Element2d::GetPointMatrix(const Array<Point2d>& points, DenseMatrix& pmat) const
     {
         int np = GetNP();
 
         for (int i = 1; i <= np; i++) {
-            const Point2d & p = points[PNum(i)];
+            const Point2d& p = points[PNum(i)];
             pmat.Elem(1, i) = p.X();
             pmat.Elem(2, i) = p.Y();
         }
     }
 
-    double Element2d::CalcJacobianBadness(const Array<Point2d> & points) const
+    double Element2d::CalcJacobianBadness(const Array<Point2d>& points) const
     {
         int i, j;
         int nip = GetNIP();
@@ -469,7 +435,7 @@ namespace meshit {
             double frob = 0;
             for (j = 1; j <= 4; j++) {
                 double d = trans.Get(j);
-                frob += d*d;
+                frob += d * d;
             }
             frob = 0.5 * sqrt(frob);
 
@@ -486,21 +452,21 @@ namespace meshit {
     }
 
     static const int qip_table[4][4] = {
-        { 0, 1, 0, 3},
-        { 0, 1, 1, 2},
-        { 3, 2, 0, 3},
-        { 3, 2, 1, 2}
+            {0, 1, 0, 3},
+            {0, 1, 1, 2},
+            {3, 2, 0, 3},
+            {3, 2, 1, 2}
     };
 
-    double Element2d::CalcJacobianBadnessDirDeriv(const Array<Point2d> & points,
-            int pi, const Vec2d & dir, double & dd) const
+    double Element2d::CalcJacobianBadnessDirDeriv(const Array<Point2d>& points,
+                                                  int pi, const Vec2d& dir, double& dd) const
     {
         if (typ == QUAD) {
             Mat<2, 2> trans, dtrans;
             Mat<2, 4> vmat, pmat;
 
             for (int j = 0; j < 4; j++) {
-                const Point2d & p = points[pnum[j]];
+                const Point2d& p = points[pnum[j]];
                 pmat(0, j) = p.X();
                 pmat(1, j) = p.Y();
             }
@@ -539,7 +505,7 @@ namespace meshit {
                 double frob = 0;
                 for (int j = 0; j < 4; j++) {
                     double d = trans(j);
-                    frob += d*d;
+                    frob += d * d;
                 }
                 frob = sqrt(frob);
 
@@ -555,7 +521,7 @@ namespace meshit {
                 // ddet = \sum_j det (m_j)   with m_j = trans, except col j = dtrans
                 double ddet
                         = dtrans(0, 0) * trans(1, 1) - trans(0, 1) * dtrans(1, 0)
-                        + trans(0, 0) * dtrans(1, 1) - dtrans(0, 1) * trans(1, 0);
+                          + trans(0, 0) * dtrans(1, 1) - dtrans(0, 1) * trans(1, 0);
 
                 err += frob * frob / det;
                 dd += (2 * frob * dfrob * det - frob * frob * ddet) / (det * det);
@@ -590,7 +556,7 @@ namespace meshit {
             double frob = 0;
             for (int j = 1; j <= 4; j++) {
                 double d = trans.Get(j);
-                frob += d*d;
+                frob += d * d;
             }
             frob = sqrt(frob);
 
@@ -608,7 +574,7 @@ namespace meshit {
             // ddet = \sum_j det (m_j)   with m_j = trans, except col j = dtrans
             double ddet
                     = dtrans(0, 0) * trans(1, 1) - trans(0, 1) * dtrans(1, 0)
-                    + trans(0, 0) * dtrans(1, 1) - dtrans(0, 1) * trans(1, 0);
+                      + trans(0, 0) * dtrans(1, 1) - dtrans(0, 1) * trans(1, 0);
 
             if (det <= 0)
                 err += 1e12;
@@ -623,7 +589,7 @@ namespace meshit {
         return err;
     }
 
-    double Element2d::CalcJacobianBadness(const T_POINTS & points, const Vec3d & n) const
+    double Element2d::CalcJacobianBadness(const T_POINTS& points, const Vec3d& n) const
     {
         int i, j;
         int nip = GetNIP();
@@ -650,7 +616,7 @@ namespace meshit {
             double frob = 0;
             for (j = 1; j <= 4; j++) {
                 double d = trans.Get(j);
-                frob += d*d;
+                frob += d * d;
             }
             frob = 0.5 * sqrt(frob);
 
@@ -668,14 +634,16 @@ namespace meshit {
     void Element2d::ComputeIntegrationPointData() const
     {
         switch (np) {
-            case 3: if (ipdtrig.size()) return;
+            case 3:
+                if (ipdtrig.size()) return;
                 break;
-            case 4: if (ipdquad.size()) return;
+            case 4:
+                if (ipdquad.size()) return;
                 break;
         }
 
         for (int i = 1; i <= GetNIP(); i++) {
-            IntegrationPointData * ipd = new IntegrationPointData;
+            IntegrationPointData* ipd = new IntegrationPointData;
             Point2d hp;
             GetIntegrationPoint(i, hp, ipd->weight);
             ipd->p.X() = hp.X();
@@ -689,15 +657,17 @@ namespace meshit {
             GetDShape(hp, ipd->dshape);
 
             switch (np) {
-                case 3: ipdtrig.push_back(ipd);
+                case 3:
+                    ipdtrig.push_back(ipd);
                     break;
-                case 4: ipdquad.push_back(ipd);
+                case 4:
+                    ipdquad.push_back(ipd);
                     break;
             }
         }
     }
 
-    std::ostream & operator<<(std::ostream & s, const Element2d & el)
+    std::ostream& operator<<(std::ostream& s, const Element2d& el)
     {
         s << "np = " << el.GetNP();
         for (int j = 1; j <= el.GetNP(); j++) {
@@ -719,10 +689,10 @@ namespace meshit {
     }
 
     FaceDescriptor::FaceDescriptor(const FaceDescriptor& other)
-        : surfnr(other.surfnr), domin(other.domin), domout(other.domout),
-        tlosurf(other.tlosurf), bcprop(other.bcprop),
-        surfcolour(other.surfcolour), bcname(other.bcname),
-        domin_singular(other.domin_singular), domout_singular(other.domout_singular)
+            : surfnr(other.surfnr), domin(other.domin), domout(other.domout),
+              tlosurf(other.tlosurf), bcprop(other.bcprop),
+              surfcolour(other.surfcolour), bcname(other.bcname),
+              domin_singular(other.domin_singular), domout_singular(other.domout_singular)
     {
         firstelement = -1;
     }
@@ -742,7 +712,7 @@ namespace meshit {
         firstelement = -1;
     }
 
-    FaceDescriptor::FaceDescriptor(const Segment & seg)
+    FaceDescriptor::FaceDescriptor(const Segment& seg)
     {
         surfnr = seg.si;
         domin = seg.domin + 1;
@@ -757,37 +727,37 @@ namespace meshit {
         firstelement = -1;
     }
 
-    int FaceDescriptor::SegmentFits(const Segment & seg)
+    int FaceDescriptor::SegmentFits(const Segment& seg)
     {
         return
-        surfnr == seg.si &&
+                surfnr == seg.si &&
                 domin == seg.domin + 1 &&
                 domout == seg.domout + 1 &&
                 tlosurf == seg.tlosurf + 1;
     }
 
-    const std::string & FaceDescriptor::GetBCName() const
+    const std::string& FaceDescriptor::GetBCName() const
     {
         static std::string defaultstring = "default";
         if (bcname) return *bcname;
         return defaultstring;
     }
 
-    std::ostream & operator<<(std::ostream & s, const FaceDescriptor & fd)
+    std::ostream& operator<<(std::ostream& s, const FaceDescriptor& fd)
     {
         s << "surfnr = " << fd.SurfNr()
-                << ", domin = " << fd.DomainIn()
-                << ", domout = " << fd.DomainOut()
-                << ", tlosurf = " << fd.TLOSurface()
-                << ", bcprop = " << fd.BCProperty()
-                << ", domin_sing = " << fd.DomainInSingular()
-                << ", domout_sing = " << fd.DomainOutSingular()
-                << ", colour = " << fd.SurfColour();
+        << ", domin = " << fd.DomainIn()
+        << ", domout = " << fd.DomainOut()
+        << ", tlosurf = " << fd.TLOSurface()
+        << ", bcprop = " << fd.BCProperty()
+        << ", domin_sing = " << fd.DomainInSingular()
+        << ", domout_sing = " << fd.DomainOutSingular()
+        << ", colour = " << fd.SurfColour();
         return s;
     }
 
-    Identifications::Identifications(Mesh & amesh)
-        : mesh(amesh)
+    Identifications::Identifications(Mesh& amesh)
+            : mesh(amesh)
     {
         identifiedpoints = new INDEX_2_HASHTABLE<int>(100);
         identifiedpoints_nr = new INDEX_3_HASHTABLE<int>(100);
@@ -845,20 +815,7 @@ namespace meshit {
             return 0;
     }
 
-    int Identifications::GetSymmetric(PointIndex pi1, PointIndex pi2) const
-    {
-        INDEX_2 pair(pi1, pi2);
-        if (identifiedpoints->Used(pair))
-            return identifiedpoints->Get(pair);
-
-        pair = INDEX_2(pi2, pi1);
-        if (identifiedpoints->Used(pair))
-            return identifiedpoints->Get(pair);
-
-        return 0;
-    }
-
-    void Identifications::GetMap(int identnr, Array<int, PointIndex::BASE> & identmap, bool symmetric) const
+    void Identifications::GetMap(int identnr, Array<int, PointIndex::BASE>& identmap, bool symmetric) const
     {
         identmap.resize(mesh.GetNP());
         identmap = 0;
@@ -891,7 +848,7 @@ namespace meshit {
 
     }
 
-    void Identifications::GetPairs(int identnr, Array<INDEX_2> & identpairs) const
+    void Identifications::GetPairs(int identnr, Array<INDEX_2>& identpairs) const
     {
         identpairs.resize(0);
 
@@ -935,7 +892,7 @@ namespace meshit {
         }
     }
 
-    void Identifications::Print(std::ostream & ost) const
+    void Identifications::Print(std::ostream& ost) const
     {
         ost << "Identifications:" << std::endl;
         ost << "pairs: " << std::endl << *identifiedpoints << std::endl;
@@ -978,57 +935,56 @@ namespace meshit {
 
         quad = 0;
         badellimit = 175;
-        check_impossible = 0;
         secondorder = 0;
     }
 
-    void MeshingParameters::Print(std::ostream & ost) const
+    void MeshingParameters::Print(std::ostream& ost) const
     {
         ost << "Meshing parameters: " << std::endl
-                << "optimize3d = " << optimize3d << std::endl
-                << "optsteps3d = " << optsteps3d << std::endl
-                << " optimize2d = " << optimize2d << std::endl
-                << " optsteps2d = " << optsteps2d << std::endl
-                << " opterrpow = " << opterrpow << std::endl
-                << " blockfill = " << blockfill << std::endl
-                << " filldist = " << filldist << std::endl
-                << " safety = " << safety << std::endl
-                << " relinnersafety = " << relinnersafety << std::endl
-                << " uselocalh = " << uselocalh << std::endl
-                << " grading = " << grading << std::endl
-                << " delaunay = " << delaunay << std::endl
-                << " maxh = " << maxh << std::endl;
+        << "optimize3d = " << optimize3d << std::endl
+        << "optsteps3d = " << optsteps3d << std::endl
+        << " optimize2d = " << optimize2d << std::endl
+        << " optsteps2d = " << optsteps2d << std::endl
+        << " opterrpow = " << opterrpow << std::endl
+        << " blockfill = " << blockfill << std::endl
+        << " filldist = " << filldist << std::endl
+        << " safety = " << safety << std::endl
+        << " relinnersafety = " << relinnersafety << std::endl
+        << " uselocalh = " << uselocalh << std::endl
+        << " grading = " << grading << std::endl
+        << " delaunay = " << delaunay << std::endl
+        << " maxh = " << maxh << std::endl;
         if (meshsizefilename)
             ost << " meshsizefilename = " << meshsizefilename << std::endl;
         else
             ost << " meshsizefilename = NULL" << std::endl;
         ost << " startinsurface = " << startinsurface << std::endl
-                << " checkoverlap = " << checkoverlap << std::endl
-                << " checkchartboundary = " << checkchartboundary << std::endl
-                << " curvaturesafety = " << curvaturesafety << std::endl
-                << " segmentsperedge = " << segmentsperedge << std::endl
-                << " parthread = " << parthread << std::endl
-                << " elsizeweight = " << elsizeweight << std::endl
-                << " giveuptol2d = " << giveuptol2d << std::endl
-                << " giveuptol = " << giveuptol << std::endl
-                << " maxoutersteps = " << maxoutersteps << std::endl
-                << " starshapeclass = " << starshapeclass << std::endl
-                << " baseelnp        = " << baseelnp << std::endl
-                << " sloppy = " << sloppy << std::endl
-                << " badellimit = " << badellimit << std::endl
-                << " secondorder = " << secondorder << std::endl
-                << " elementorder = " << elementorder << std::endl
-                << " quad = " << quad << std::endl
-                << " inverttets = " << inverttets << std::endl
-                << " inverttrigs = " << inverttrigs << std::endl;
+        << " checkoverlap = " << checkoverlap << std::endl
+        << " checkchartboundary = " << checkchartboundary << std::endl
+        << " curvaturesafety = " << curvaturesafety << std::endl
+        << " segmentsperedge = " << segmentsperedge << std::endl
+        << " parthread = " << parthread << std::endl
+        << " elsizeweight = " << elsizeweight << std::endl
+        << " giveuptol2d = " << giveuptol2d << std::endl
+        << " giveuptol = " << giveuptol << std::endl
+        << " maxoutersteps = " << maxoutersteps << std::endl
+        << " starshapeclass = " << starshapeclass << std::endl
+        << " baseelnp        = " << baseelnp << std::endl
+        << " sloppy = " << sloppy << std::endl
+        << " badellimit = " << badellimit << std::endl
+        << " secondorder = " << secondorder << std::endl
+        << " elementorder = " << elementorder << std::endl
+        << " quad = " << quad << std::endl
+        << " inverttets = " << inverttets << std::endl
+        << " inverttrigs = " << inverttrigs << std::endl;
     }
 
-    void MeshingParameters::CopyFrom(const MeshingParameters & other)
+    void MeshingParameters::CopyFrom(const MeshingParameters& other)
     {
-        //strcpy(optimize3d,other.optimize3d); 
+        // strcpy(optimize3d,other.optimize3d);
         optimize3d = other.optimize3d;
         optsteps3d = other.optsteps3d;
-        //strcpy(optimize2d,other.optimize2d); 
+        // strcpy(optimize2d,other.optimize2d);
         optimize2d = other.optimize2d;
         optsteps2d = other.optsteps2d;
         opterrpow = other.opterrpow;
@@ -1040,8 +996,8 @@ namespace meshit {
         grading = other.grading;
         delaunay = other.delaunay;
         maxh = other.maxh;
-        //strcpy(const_cast<char*>(meshsizefilename), other.meshsizefilename);
-        //const_cast<char*>(meshsizefilename) = other.meshsizefilename; //???
+        // strcpy(const_cast<char*>(meshsizefilename), other.meshsizefilename);
+        // const_cast<char*>(meshsizefilename) = other.meshsizefilename; //???
         startinsurface = other.startinsurface;
         checkoverlap = other.checkoverlap;
         checkoverlappingboundary = other.checkoverlappingboundary;
@@ -1066,7 +1022,6 @@ namespace meshit {
 
     DebugParameters::DebugParameters()
     {
-        slowchecks = 0;
         haltsuccess = 0;
         haltnosuccess = 0;
         haltlargequalclass = 0;

@@ -43,11 +43,6 @@ namespace meshit {
         return Vec<3> (0, 0, 1);
     }
 
-    void Refinement2d::ProjectToSurface(Point<3> & p, int surfi, const PointGeomInfo & /* gi */) const
-    {
-        p(2) = 0;
-    }
-
     void Refinement2d::ProjectToEdge(Point<3> & p, int surfi1, int surfi2,
             const EdgePointGeomInfo & egi) const
     {

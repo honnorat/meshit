@@ -35,8 +35,8 @@ namespace meshit {
 
         bool onsurface;
 
-      public:
-        MultiPointGeomInfo * mgi;
+     public:
+        MultiPointGeomInfo* mgi;
 
         FrontPoint2()
         {
@@ -46,17 +46,17 @@ namespace meshit {
             onsurface = true;
         }
 
-        FrontPoint2(const Point3d & ap, PointIndex agi,
-                MultiPointGeomInfo * amgi, bool aonsurface = true);
+        FrontPoint2(const Point3d& ap, PointIndex agi,
+                    MultiPointGeomInfo* amgi, bool aonsurface = true);
 
         ~FrontPoint2() { }
 
-        const Point3d & P() const
+        const Point3d& P() const
         {
             return p;
         }
 
-        operator const Point3d & () const
+        operator const Point3d&() const
         {
             return p;
         }
@@ -101,27 +101,27 @@ namespace meshit {
 
     class FrontLine
     {
-      private:
+     private:
         /// Point Indizes
         INDEX_2 l;
         /// quality class 
         int lineclass;
         /// geometry specific data
         PointGeomInfo geominfo[2];
-      public:
+     public:
 
         FrontLine()
         {
             lineclass = 1;
         }
 
-        FrontLine(const INDEX_2 & al)
+        FrontLine(const INDEX_2& al)
         {
             l = al;
             lineclass = 1;
         }
 
-        const INDEX_2 & L() const
+        const INDEX_2& L() const
         {
             return l;
         }
@@ -136,11 +136,6 @@ namespace meshit {
             lineclass++;
         }
 
-        void ResetClass()
-        {
-            lineclass = 1;
-        }
-
         bool Valid() const
         {
             return l.I1() != -1;
@@ -153,18 +148,13 @@ namespace meshit {
             lineclass = 1000;
         }
 
-        void SetGeomInfo(const PointGeomInfo & gi1, const PointGeomInfo & gi2)
+        void SetGeomInfo(const PointGeomInfo& gi1, const PointGeomInfo& gi2)
         {
             geominfo[0] = gi1;
             geominfo[1] = gi2;
         }
 
-        const PointGeomInfo * GetGeomInfo() const
-        {
-            return geominfo;
-        }
-
-        const PointGeomInfo & GetGeomInfo(int endp) const
+        const PointGeomInfo& GetGeomInfo(int endp) const
         {
             return geominfo[endp - 1];
         }
@@ -186,16 +176,16 @@ namespace meshit {
         Array<int> dellinel; /// list of deleted front lines
 
         int nfl; /// number of front lines;
-        INDEX_2_HASHTABLE<int> * allflines; /// all front lines ever have been
+        INDEX_2_HASHTABLE<int>* allflines; /// all front lines ever have been
 
         std::vector<int> invpindex;
 
         int minval;
         int starti;
 
-      public:
+     public:
 
-        AdFront2(const Box3d & aboundingbox);
+        AdFront2(const Box3d& aboundingbox);
         ~AdFront2();
 
         bool Empty() const
@@ -208,37 +198,27 @@ namespace meshit {
             return nfl;
         }
 
-        const FrontLine & GetLine(int nr)
-        {
-            return lines[nr];
-        }
-
-        const FrontPoint2 & GetPoint(int nr)
-        {
-            return points[nr];
-        }
-
-        int SelectBaseLine(Point<3> & p1, Point<3> & p2,
-                const PointGeomInfo *& geominfo1,
-                const PointGeomInfo *& geominfo2,
-                int & qualclass);
+        int SelectBaseLine(Point<3>& p1, Point<3>& p2,
+                           const PointGeomInfo*& geominfo1,
+                           const PointGeomInfo*& geominfo2,
+                           int& qualclass);
 
         int GetLocals(int baseline,
-                Array<Point3d> & locpoints,
-                Array<MultiPointGeomInfo> & pgeominfo,
-                Array<INDEX_2> & loclines, // local index
-                Array<int> & pindex,
-                Array<int> & lindex,
-                double xh);
+                      Array<Point3d>& locpoints,
+                      Array<MultiPointGeomInfo>& pgeominfo,
+                      Array<INDEX_2>& loclines, // local index
+                      Array<int>& pindex,
+                      Array<int>& lindex,
+                      double xh);
 
         void DeleteLine(int li);
         int AddPoint(
-                const Point3d & p, PointIndex globind,
-                MultiPointGeomInfo * mgi = NULL,
+                const Point3d& p, PointIndex globind,
+                MultiPointGeomInfo* mgi = NULL,
                 bool pointonsurface = true);
         int AddLine(
                 int pi1, int pi2,
-                const PointGeomInfo & gi1, const PointGeomInfo & gi2);
+                const PointGeomInfo& gi1, const PointGeomInfo& gi2);
         int ExistsLine(int gpi1, int gpi2);
 
         void IncrementClass(int li)
@@ -246,12 +226,7 @@ namespace meshit {
             lines[li].IncrementClass();
         }
 
-        void ResetClass(int li)
-        {
-            lines[li].ResetClass();
-        }
-
-        const PointGeomInfo & GetLineGeomInfo(int li, int lend) const
+        const PointGeomInfo& GetLineGeomInfo(int li, int lend) const
         {
             return lines[li].GetGeomInfo(lend);
         }
@@ -262,16 +237,10 @@ namespace meshit {
         }
 
         /// is Point p inside Surface (flat geometry only)
-        bool Inside(const Point<2> & p) const;
-
-        bool SameSide(const Point<2> & lp1, const Point<2> & lp2,
-                const Array<int> * /* testfaces */ = NULL) const
-        {
-            return Inside(lp1) == Inside(lp2);
-        }
+        bool Inside(const Point<2>& p) const;
 
         void SetStartFront();
-        void PrintOpenSegments(std::ostream & ost) const;
+        void PrintOpenSegments(std::ostream& ost) const;
     };
 
 }

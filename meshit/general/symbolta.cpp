@@ -8,13 +8,11 @@
    Abstract data type Symbol Table
 */
 
-#include "../meshit.hpp"
 #include "symbolta.hpp"
 
 #ifndef FILE_SYMBOLTABLECC
 #define FILE_SYMBOLTABLECC
 // necessary for SGI ????
-
 
 namespace meshit
 {
@@ -22,7 +20,6 @@ namespace meshit
 
   BASE_SYMBOLTABLE :: BASE_SYMBOLTABLE ()
   {
-    ;
   }
 
 

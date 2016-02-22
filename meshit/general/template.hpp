@@ -20,20 +20,6 @@ namespace meshit {
      */
     typedef int INDEX;
 
-    class threeint
-    {
-      public:
-        int i1, i2, i3;
-
-        threeint() { }
-        threeint(int ii1, int ii2, int ii3)
-        {
-            i1 = ii1;
-            i2 = ii2;
-            i3 = ii3;
-        }
-    };
-
     class INDEX_2;
     std::ostream & operator<<(std::ostream & s, const INDEX_2 & i2);
 

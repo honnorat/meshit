@@ -179,11 +179,6 @@ namespace meshit {
             return oldutonewu;
         }
 
-        const DenseMatrix & GetOldUToFreeArea() const
-        {
-            return oldutofreearea;
-        }
-
         const char * Name() const
         {
             return name;

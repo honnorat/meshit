@@ -28,11 +28,11 @@ namespace meshit {
     class BitArray
     {
         INDEX size;
-        unsigned char * data;
+        unsigned char* data;
 
-      public:
+     public:
         BitArray();
-        BitArray(INDEX asize);
+        explicit BitArray(INDEX asize);
         ~BitArray();
 
         void SetSize(INDEX asize);
@@ -51,20 +51,12 @@ namespace meshit {
 
         void Clear();
 
-        void Clear(INDEX i)
-        {
-            data[Addr(i)] &= ~Mask(i);
-        }
-
         bool Test(INDEX i) const
         {
-            return (data[i / CHAR_BIT] & (char(1) << (i % CHAR_BIT))) ? true : false;
+            return data[i / CHAR_BIT] & (char(1) << (i % CHAR_BIT));
         }
 
-        void Invert();
-        void And(const BitArray & ba2);
-        void Or(const BitArray & ba2);
-      private:
+     private:
 
         inline unsigned char Mask(INDEX i) const
         {
@@ -76,16 +68,17 @@ namespace meshit {
             return (i / CHAR_BIT);
         }
 
-        BitArray & operator=(BitArray &);
-        BitArray(const BitArray &);
+        BitArray& operator=(BitArray&) { return *this; }
+
+        BitArray(const BitArray&) { }
     };
 
     // print bitarray
 
-    inline std::ostream & operator<<(std::ostream & s, const BitArray & a)
+    inline std::ostream& operator<<(std::ostream& s, const BitArray& a)
     {
         for (int i = 1; i <= a.Size(); i++) {
-            s << int (a.Test(i));
+            s << int(a.Test(i));
             if (i % 40 == 0) s << "\n";
         }
         if (a.Size() % 40 != 0) s << "\n";
@@ -100,24 +93,19 @@ namespace meshit {
        Test returns the state of the accoring bit.
        No range checking is done.
      */
-    template <int BASE = 1 >
+    template<int BASE = 1>
     class BitArrayChar
     {
         Array<char, BASE> data;
 
-      public:
+     public:
 
         BitArrayChar() { }
 
-        BitArrayChar(int asize)
-            : data(asize) { }
+        explicit BitArrayChar(int asize)
+                : data(asize) { }
 
         ~BitArrayChar() { }
-
-        void SetSize(int asize)
-        {
-            data.resize(asize);
-        }
 
         inline int Size() const
         {
@@ -130,37 +118,28 @@ namespace meshit {
         {
             data[i] = 1;
         }
-        void Clear();
 
-        inline void Clear(int i)
-        {
-            data[i] = 0;
-        }
+        void Clear();
 
         inline int Test(int i) const
         {
             return data[i];
         }
-        void Invert();
-        void And(const BitArrayChar & ba2);
-        void Or(const BitArrayChar & ba2);
-      private:
+
+     private:
         ///  copy bitarray is not supported
 
-        BitArrayChar & operator=(BitArrayChar &)
+        BitArrayChar& operator=(BitArrayChar&)
         {
             return *this;
         }
         ///  copy bitarray is not supported
 
-        BitArrayChar(const BitArrayChar &)
-        {
-            ;
-        }
+        BitArrayChar(const BitArrayChar&) { }
     };
 
-    template <int BASE>
-    inline std::ostream & operator<<(std::ostream & s, const BitArrayChar<BASE> & a)
+    template<int BASE>
+    inline std::ostream& operator<<(std::ostream& s, const BitArrayChar<BASE>& a)
     {
         for (int i = BASE; i < a.Size() + BASE; i++) {
             s << a.Test(i);

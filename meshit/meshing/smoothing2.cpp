@@ -382,7 +382,7 @@ namespace meshit {
     {
         int lpi, gpi;
         Vec3d n;
-        Vec2d g1, vdir;
+        Vec2d vdir;
         double badness;
 
         badness = 0;
@@ -536,7 +536,6 @@ namespace meshit {
         ld.meshthis = this;
 
         Opti2SurfaceMinFunction surfminf(mesh, ld);
-        Opti2EdgeMinFunction edgeminf(mesh, ld);
         Opti2SurfaceMinFunctionJacobian surfminfj(mesh, ld);
 
         OptiParameters par;

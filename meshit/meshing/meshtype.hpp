@@ -37,35 +37,29 @@ namespace meshit {
         FIXEDPOINT = 1, EDGEPOINT = 2, SURFACEPOINT = 3, INNERPOINT = 4
     };
 
-    enum ELEMENTTYPE
-    {
-        FREEELEMENT, FIXEDELEMENT
-    };
-
     enum OPTIMIZEGOAL
     {
         OPT_QUALITY, OPT_CONFORM, OPT_REST, OPT_WORSTCASE, OPT_LEGAL
     };
 
-    extern int GetTimeStamp();
     extern int NextTimeStamp();
 
     class PointGeomInfo
     {
-      public:
+     public:
         int trignum; // for STL Meshing
         double u, v; // for OCC Meshing
 
         PointGeomInfo()
-            : trignum(-1), u(0), v(0) { }
+                : trignum(-1), u(0), v(0) { }
     };
 
-    inline std::ostream & operator<<(std::ostream & ost, const PointGeomInfo & gi)
+    inline std::ostream& operator<<(std::ostream& ost, const PointGeomInfo& gi)
     {
         return (ost << gi.trignum << " " << gi.u << " " << gi.v);
     }
 
-    inline std::istream & operator>>(std::istream & ist, PointGeomInfo & gi)
+    inline std::istream& operator>>(std::istream& ist, PointGeomInfo& gi)
     {
         return (ist >> gi.trignum >> gi.u >> gi.v);
     }
@@ -76,13 +70,14 @@ namespace meshit {
     {
         int cnt;
         PointGeomInfo mgi[MULTIPOINTGEOMINFO_MAX];
-      public:
+     public:
 
         MultiPointGeomInfo()
         {
             cnt = 0;
         }
-        int AddPointGeomInfo(const PointGeomInfo & gi);
+
+        int AddPointGeomInfo(const PointGeomInfo& gi);
 
         void Init()
         {
@@ -94,7 +89,7 @@ namespace meshit {
             return cnt;
         }
 
-        const PointGeomInfo & GetPGI(int i) const
+        const PointGeomInfo& GetPGI(int i) const
         {
             return mgi[i - 1];
         }
@@ -102,18 +97,18 @@ namespace meshit {
 
     class EdgePointGeomInfo
     {
-      public:
+     public:
         int edgenr;
         int body; // for ACIS
         double dist; // for 2d meshing
         double u, v; // for OCC Meshing
 
-      public:
+     public:
 
         EdgePointGeomInfo()
-            : edgenr(0), body(0), dist(0.0), u(0.0), v(0.0) { }
+                : edgenr(0), body(0), dist(0.0), u(0.0), v(0.0) { }
 
-        EdgePointGeomInfo & operator=(const EdgePointGeomInfo & gi2)
+        EdgePointGeomInfo& operator=(const EdgePointGeomInfo& gi2)
         {
             edgenr = gi2.edgenr;
             body = gi2.body;
@@ -124,7 +119,7 @@ namespace meshit {
         }
     };
 
-    inline std::ostream & operator<<(std::ostream & ost, const EdgePointGeomInfo & gi)
+    inline std::ostream& operator<<(std::ostream& ost, const EdgePointGeomInfo& gi)
     {
         ost << "epgi: edgnr=" << gi.edgenr << ", dist=" << gi.dist;
         return ost;
@@ -134,19 +129,19 @@ namespace meshit {
     {
         int i;
 
-      public:
+     public:
 
         PointIndex() : i(-1) { }
 
         PointIndex(int ai) : i(ai) { }
 
-        PointIndex & operator=(const PointIndex &ai)
+        PointIndex& operator=(const PointIndex& ai)
         {
             i = ai.i;
             return *this;
         }
 
-        operator int () const
+        operator int() const
         {
             return i;
         }
@@ -189,10 +184,10 @@ namespace meshit {
         {
             BASE = 1
         };
-#endif  
+#endif
     };
 
-    inline std::istream & operator>>(std::istream & ist, PointIndex & pi)
+    inline std::istream& operator>>(std::istream& ist, PointIndex& pi)
     {
         int i;
         ist >> i;
@@ -200,7 +195,7 @@ namespace meshit {
         return ist;
     }
 
-    inline std::ostream & operator<<(std::ostream & ost, const PointIndex & pi)
+    inline std::ostream& operator<<(std::ostream& ost, const PointIndex& pi)
     {
         return (ost << int(pi));
     }
@@ -208,49 +203,49 @@ namespace meshit {
     class SurfaceElementIndex
     {
         int i;
-      public:
+     public:
 
         SurfaceElementIndex() { }
 
         SurfaceElementIndex(int ai) : i(ai) { }
 
-        SurfaceElementIndex & operator=(const SurfaceElementIndex & ai)
+        SurfaceElementIndex& operator=(const SurfaceElementIndex& ai)
         {
             i = ai.i;
             return *this;
         }
 
-        SurfaceElementIndex & operator=(int ai)
+        SurfaceElementIndex& operator=(int ai)
         {
             i = ai;
             return *this;
         }
 
-        operator int () const
+        operator int() const
         {
             return i;
         }
 
-        SurfaceElementIndex & operator++(int)
+        SurfaceElementIndex& operator++(int)
         {
             i++;
             return *this;
         }
 
-        SurfaceElementIndex & operator+=(int inc)
+        SurfaceElementIndex& operator+=(int inc)
         {
             i += inc;
             return *this;
         }
 
-        SurfaceElementIndex & operator--(int)
+        SurfaceElementIndex& operator--(int)
         {
             i--;
             return *this;
         }
     };
 
-    inline std::istream & operator>>(std::istream & ist, SurfaceElementIndex & pi)
+    inline std::istream& operator>>(std::istream& ist, SurfaceElementIndex& pi)
     {
         int i;
         ist >> i;
@@ -258,7 +253,7 @@ namespace meshit {
         return ist;
     }
 
-    inline std::ostream & operator<<(std::ostream & ost, const SurfaceElementIndex & pi)
+    inline std::ostream& operator<<(std::ostream& ost, const SurfaceElementIndex& pi)
     {
         return (ost << int(pi));
     }
@@ -267,43 +262,43 @@ namespace meshit {
     {
         int i;
 
-      public:
+     public:
 
         SegmentIndex() { }
 
         SegmentIndex(int ai) : i(ai) { }
 
-        SegmentIndex & operator=(const SegmentIndex & ai)
+        SegmentIndex& operator=(const SegmentIndex& ai)
         {
             i = ai.i;
             return *this;
         }
 
-        SegmentIndex & operator=(int ai)
+        SegmentIndex& operator=(int ai)
         {
             i = ai;
             return *this;
         }
 
-        operator int () const
+        operator int() const
         {
             return i;
         }
 
-        SegmentIndex & operator++(int)
+        SegmentIndex& operator++(int)
         {
             i++;
             return *this;
         }
 
-        SegmentIndex & operator--(int)
+        SegmentIndex& operator--(int)
         {
             i--;
             return *this;
         }
     };
 
-    inline std::istream & operator>>(std::istream & ist, SegmentIndex & pi)
+    inline std::istream& operator>>(std::istream& ist, SegmentIndex& pi)
     {
         int i;
         ist >> i;
@@ -311,7 +306,7 @@ namespace meshit {
         return ist;
     }
 
-    inline std::ostream & operator<<(std::ostream & ost, const SegmentIndex & pi)
+    inline std::ostream& operator<<(std::ostream& ost, const SegmentIndex& pi)
     {
         return (ost << int(pi));
     }
@@ -326,19 +321,12 @@ namespace meshit {
         double singular; // singular factor for hp-refinement
         POINTTYPE type;
 
-      public:
+     public:
 
         MeshPoint() { }
 
-        MeshPoint(const Point3d & ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
-            : Point3d (ap), layer(alayer), singular(0.), type(apt) { }
-
-        void SetPoint(const Point3d & ap)
-        {
-            Point3d::operator=(ap);
-            layer = 0;
-            singular = 0;
-        }
+        MeshPoint(const Point3d& ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
+                : Point3d(ap), layer(alayer), singular(0.), type(apt) { }
 
         int GetLayer() const
         {
@@ -365,10 +353,6 @@ namespace meshit {
             singular = s;
         }
 
-        bool IsSingular() const
-        {
-            return (singular != 0.0);
-        }
     };
 
     typedef Array<MeshPoint, PointIndex::BASE, PointIndex> T_POINTS;
@@ -388,24 +372,15 @@ namespace meshit {
         ELEMENT_TYPE typ : 6;
         /// number of points
         unsigned int np : 4;
-        bool badel : 1;
-        bool refflag : 1; // marked for refinement
-        bool strongrefflag : 1;
+        // marked for refinement
         bool deleted : 1; // element is deleted
 
-        // Philippose - 08 August 2010
-        // Set a new property for each element, to 
-        // control whether it is visible or not
-        bool visible : 1; // element visible
-
-        /// order for hp-FEM
-        unsigned int orderx : 6;
-        unsigned int ordery : 6;
+        // element visible
 
         /// a linked list for all segments in the same face
         SurfaceElementIndex next;
 
-      public:
+     public:
         Element2d();
         Element2d(int anp);
         Element2d(ELEMENT_TYPE type);
@@ -421,15 +396,20 @@ namespace meshit {
         {
             typ = atyp;
             switch (typ) {
-                case TRIG: np = 3;
+                case TRIG:
+                    np = 3;
                     break;
-                case QUAD: np = 4;
+                case QUAD:
+                    np = 4;
                     break;
-                case TRIG6: np = 6;
+                case TRIG6:
+                    np = 6;
                     break;
-                case QUAD6: np = 6;
+                case QUAD6:
+                    np = 6;
                     break;
-                case QUAD8: np = 8;
+                case QUAD8:
+                    np = 8;
                     break;
                 default:
                     MESHIT_LOG_ERROR("Element2d::SetType, illegal type " << typ);
@@ -450,57 +430,57 @@ namespace meshit {
             }
         }
 
-        PointIndex & operator[](int i)
+        PointIndex& operator[](int i)
         {
             return pnum[i];
         }
 
-        const PointIndex & operator[](int i) const
+        const PointIndex& operator[](int i) const
         {
             return pnum[i];
         }
 
         FlatArray<const PointIndex> PNums() const
         {
-            return FlatArray<const PointIndex> (np, &pnum[0]);
+            return FlatArray<const PointIndex>(np, &pnum[0]);
         }
 
-        PointIndex & PNum(int i)
+        PointIndex& PNum(int i)
         {
             return pnum[i - 1];
         }
 
-        const PointIndex & PNum(int i) const
+        const PointIndex& PNum(int i) const
         {
             return pnum[i - 1];
         }
 
-        PointIndex & PNumMod(int i)
+        PointIndex& PNumMod(int i)
         {
             return pnum[(i - 1) % np];
         }
 
-        const PointIndex & PNumMod(int i) const
+        const PointIndex& PNumMod(int i) const
         {
             return pnum[(i - 1) % np];
         }
 
-        PointGeomInfo & GeomInfoPi(int i)
+        PointGeomInfo& GeomInfoPi(int i)
         {
             return geominfo[i - 1];
         }
 
-        const PointGeomInfo & GeomInfoPi(int i) const
+        const PointGeomInfo& GeomInfoPi(int i) const
         {
             return geominfo[i - 1];
         }
 
-        PointGeomInfo & GeomInfoPiMod(int i)
+        PointGeomInfo& GeomInfoPiMod(int i)
         {
             return geominfo[(i - 1) % np];
         }
 
-        const PointGeomInfo & GeomInfoPiMod(int i) const
+        const PointGeomInfo& GeomInfoPiMod(int i) const
         {
             return geominfo[(i - 1) % np];
         }
@@ -513,43 +493,9 @@ namespace meshit {
         int GetIndex() const
         {
             return index;
-        }
-
-        int GetOrder() const
-        {
-            return orderx;
-        }
-
-        void SetOrder(int aorder)
-        {
-            orderx = ordery = aorder;
-        }
-
-        void GetOrder(int & ox, int & oy) const
-        {
-            ox = orderx, oy = ordery;
         };
 
-        void GetOrder(int & ox, int & oy, int & oz) const
-        {
-            ox = orderx;
-            oy = ordery;
-            oz = 0;
-        }
-
-        void SetOrder(int ox, int oy, int /* oz */)
-        {
-            orderx = ox;
-            ordery = oy;
-        }
-
-        void SetOrder(int ox, int oy)
-        {
-            orderx = ox;
-            ordery = oy;
-        }
-
-        void GetBox(const T_POINTS & points, Box3d & box) const;
+        void GetBox(const T_POINTS& points, Box3d& box) const;
         /// invert orientation
         inline void Invert();
         void Invert2();
@@ -557,37 +503,31 @@ namespace meshit {
         inline void NormalizeNumbering();
         void NormalizeNumbering2();
 
-        bool BadElement() const
-        {
-            return badel;
-        }
-
         // friend ostream & operator<<(ostream  & s, const Element2d & el);
         friend class Mesh;
 
         /// get number of 'integration points'
         int GetNIP() const;
-        void GetIntegrationPoint(int ip, Point2d & p, double & weight) const;
+        void GetIntegrationPoint(int ip, Point2d& p, double& weight) const;
 
-        void GetTransformation(int ip, const Array<Point2d> & points,
-                class DenseMatrix & trans) const;
-        void GetTransformation(int ip, class DenseMatrix & pmat,
-                class DenseMatrix & trans) const;
+        void GetTransformation(int ip, const Array<Point2d>& points,
+                               class DenseMatrix& trans) const;
+        void GetTransformation(int ip, class DenseMatrix& pmat,
+                               class DenseMatrix& trans) const;
 
-        void GetShape(const Point2d & p, class Vector & shape) const;
-        void GetShapeNew(const Point2d & p, class FlatVector & shape) const;
+        void GetShape(const Point2d& p, class Vector& shape) const;
         /// matrix 2 * np
-        void GetDShape(const Point2d & p, class DenseMatrix & dshape) const;
+        void GetDShape(const Point2d& p, class DenseMatrix& dshape) const;
         /// matrix 2 * np
-        void GetPointMatrix(const Array<Point2d> & points,
-                class DenseMatrix & pmat) const;
+        void GetPointMatrix(const Array<Point2d>& points,
+                            class DenseMatrix& pmat) const;
 
         void ComputeIntegrationPointData() const;
 
-        double CalcJacobianBadness(const Array<Point2d> & points) const;
-        double CalcJacobianBadness(const T_POINTS & points, const Vec3d & n) const;
-        double CalcJacobianBadnessDirDeriv(const Array<Point2d> & points,
-                int pi, const Vec2d & dir, double & dd) const;
+        double CalcJacobianBadness(const Array<Point2d>& points) const;
+        double CalcJacobianBadness(const T_POINTS& points, const Vec3d& n) const;
+        double CalcJacobianBadnessDirDeriv(const Array<Point2d>& points,
+                                           int pi, const Vec2d& dir, double& dd) const;
 
         void Delete()
         {
@@ -603,53 +543,15 @@ namespace meshit {
         // Philippose - 08 August 2010
         // Access functions for the new property: visible
 
-        void Visible(bool vis = 1)
-        {
-            visible = vis;
-        }
+        bool operator==(const Element2d& el2) const;
 
-        bool IsVisible() const
-        {
-            return visible;
-        }
-
-        void SetRefinementFlag(bool rflag = 1)
-        {
-            refflag = rflag;
-        }
-
-        bool TestRefinementFlag() const
-        {
-            return refflag;
-        }
-
-        void SetStrongRefinementFlag(bool rflag = 1)
-        {
-            strongrefflag = rflag;
-        }
-
-        bool TestStrongRefinementFlag() const
-        {
-            return strongrefflag;
-        }
-
-        SurfaceElementIndex NextElement()
-        {
-            return next;
-        }
-
-        bool operator==(const Element2d & el2) const;
-
-        int HasFace(const Element2d& el) const;
-        int meshdocval;
-        int hp_elnr;
     };
 
-    std::ostream & operator<<(std::ostream & s, const Element2d & el);
+    std::ostream& operator<<(std::ostream& s, const Element2d& el);
 
     class IntegrationPointData
     {
-      public:
+     public:
         Point3d p;
         double weight;
         Vector shape;
@@ -661,7 +563,7 @@ namespace meshit {
      */
     class Segment
     {
-      public:
+     public:
         Segment();
         Segment(const Segment& other);
 
@@ -692,35 +594,18 @@ namespace meshit {
         // int pmid; // for second order
         int meshdocval;
 
-      private:
+     private:
         std::string* bcname;
 
-      public:
+     public:
 
-        Segment& operator=(const Segment & other);
+        Segment& operator=(const Segment& other);
 
         int hp_elnr;
 
-        void SetBCName(std::string * abcname)
+        void SetBCName(std::string* abcname)
         {
             bcname = abcname;
-        }
-
-        std::string * BCNamePtr()
-        {
-            return bcname;
-        }
-
-        const std::string * BCNamePtr() const
-        {
-            return bcname;
-        }
-
-        const std::string & GetBCName() const
-        {
-            static std::string defaultstring = "default";
-            if (!bcname) return defaultstring;
-            return *bcname;
         }
 
         int GetNP() const
@@ -733,18 +618,18 @@ namespace meshit {
             return (pnums[2] < 0) ? SEGMENT : SEGMENT3;
         }
 
-        PointIndex & operator[](int i)
+        PointIndex& operator[](int i)
         {
             return pnums[i];
         }
 
-        const PointIndex & operator[](int i) const
+        const PointIndex& operator[](int i) const
         {
             return pnums[i];
         }
     };
 
-    std::ostream & operator<<(std::ostream & s, const Segment & seg);
+    std::ostream& operator<<(std::ostream& s, const Segment& seg);
 
     class FaceDescriptor
     {
@@ -764,17 +649,17 @@ namespace meshit {
         /// surface colour (Default: R=0.0 ; G=1.0 ; B=0.0)
         Vec3d surfcolour;
 
-        std::string * bcname;
+        std::string* bcname;
         /// root of linked list 
         SurfaceElementIndex firstelement;
 
         double domin_singular;
         double domout_singular;
 
-      public:
+     public:
         FaceDescriptor();
         FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi);
-        FaceDescriptor(const Segment & seg);
+        FaceDescriptor(const Segment& seg);
         FaceDescriptor(const FaceDescriptor& other);
 
         ~FaceDescriptor()
@@ -782,7 +667,7 @@ namespace meshit {
             ;
         }
 
-        int SegmentFits(const Segment & seg);
+        int SegmentFits(const Segment& seg);
 
         int SurfNr() const
         {
@@ -826,14 +711,10 @@ namespace meshit {
         {
             return surfcolour;
         }
-        const std::string & GetBCName() const;
+
+        const std::string& GetBCName() const;
         // string * BCNamePtr () { return bcname; }
         // const string * BCNamePtr () const  { return bcname; }
-
-        void SetSurfNr(int sn)
-        {
-            surfnr = sn;
-        }
 
         void SetDomainIn(int di)
         {
@@ -850,67 +731,19 @@ namespace meshit {
             bcprop = bc;
         }
 
-        void SetBCName(std::string * bcn)
+        void SetBCName(std::string* bcn)
         {
             bcname = bcn;
         }
 
-        void SetDomainInSingular(double v)
-        {
-            domin_singular = v;
-        }
-
-        void SetDomainOutSingular(double v)
-        {
-            domout_singular = v;
-        }
-
-        SurfaceElementIndex FirstElement()
-        {
-            return firstelement;
-        }
-        // friend ostream & operator<<(ostream  & s, const FaceDescriptor & fd);
         friend class Mesh;
     };
 
-    std::ostream & operator<<(std::ostream & s, const FaceDescriptor & fd);
-
-    class EdgeDescriptor
-    {
-        int tlosurf;
-        int surfnr[2];
-      public:
-
-        EdgeDescriptor()
-            : tlosurf(-1)
-        {
-            surfnr[0] = surfnr[1] = -1;
-        }
-
-        int SurfNr(int i) const
-        {
-            return surfnr[i];
-        }
-
-        void SetSurfNr(int i, int nr)
-        {
-            surfnr[i] = nr;
-        }
-
-        int TLOSurface() const
-        {
-            return tlosurf;
-        }
-
-        void SetTLOSurface(int nr)
-        {
-            tlosurf = nr;
-        }
-    };
+    std::ostream& operator<<(std::ostream& s, const FaceDescriptor& fd);
 
     class MeshingParameters
     {
-      public:
+     public:
         /**
            3d optimization strategy:
            // m .. move nodes
@@ -923,7 +756,7 @@ namespace meshit {
            // h .. Histogramm, no pause
            // H .. Histogramm, pause
          */
-        const char * optimize3d;
+        const char* optimize3d;
         /// number of 3d optimization steps
         int optsteps3d;
         /**
@@ -935,7 +768,7 @@ namespace meshit {
            // P .. plot, pause
            // c .. combine
          **/
-        const char * optimize2d;
+        const char* optimize2d;
         /// number of 2d optimization steps
         int optsteps2d;
         /// power of error (to approximate max err optimization)
@@ -959,7 +792,7 @@ namespace meshit {
         /// minimal mesh size
         double minh;
         /// file for meshsize
-        const char * meshsizefilename;
+        const char* meshsizefilename;
         /// start surfacemeshing from everywhere in surface
         int startinsurface;
         /// check overlapping surfaces (debug)
@@ -995,8 +828,6 @@ namespace meshit {
         /// limit for max element angle (150-180)
         double badellimit;
 
-        bool check_impossible;
-
         int secondorder;
         /// high order element curvature
         int elementorder;
@@ -1004,19 +835,15 @@ namespace meshit {
         int quad;
         int inverttets;
         int inverttrigs;
-        int autozrefine;
         MeshingParameters();
-        void Print(std::ostream & ost) const;
+        void Print(std::ostream& ost) const;
 
-        void CopyFrom(const MeshingParameters & other);
+        void CopyFrom(const MeshingParameters& other);
     };
 
     class DebugParameters
     {
-      public:
-        int debugoutput;
-        /// use slow checks
-        int slowchecks;
+     public:
         int haltsuccess;
         int haltnosuccess;
         int haltlargequalclass;
@@ -1063,33 +890,26 @@ namespace meshit {
             NormalizeNumbering2();
     }
 
-    static const int gftetfacesa[4][3] = {
-        { 1, 2, 3},
-        { 2, 0, 3},
-        { 0, 1, 3},
-        { 1, 0, 2}
-    };
-
     /**
        Identification of periodic surfaces, close surfaces, etc. 
      */
     class Identifications
     {
-      public:
+     public:
 
         enum ID_TYPE
         {
             UNDEFINED = 1, PERIODIC = 2, CLOSESURFACES = 3, CLOSEEDGES = 4
         };
 
-      private:
-        class Mesh & mesh;
+     private:
+        class Mesh& mesh;
 
         /// identify points (thin layers, periodic b.c.)  
-        INDEX_2_HASHTABLE<int> * identifiedpoints;
+        INDEX_2_HASHTABLE<int>* identifiedpoints;
 
         /// the same, with info about the id-nr
-        INDEX_3_HASHTABLE<int> * identifiedpoints_nr;
+        INDEX_3_HASHTABLE<int>* identifiedpoints_nr;
 
         /// sorted by identification nr
         TABLE<INDEX_2> idpoints_table;
@@ -1099,8 +919,8 @@ namespace meshit {
         /// number of identifications (or, actually used identifications ?)
         int maxidentnr;
 
-      public:
-        Identifications(class Mesh & amesh);
+     public:
+        Identifications(class Mesh& amesh);
         ~Identifications();
 
         void Delete();
@@ -1112,12 +932,9 @@ namespace meshit {
         void Add(PointIndex pi1, PointIndex pi2, int identnr);
 
         int Get(PointIndex pi1, PointIndex pi2) const;
-        int GetSymmetric(PointIndex pi1, PointIndex pi2) const;
-
         bool Get(PointIndex pi1, PointIndex pi2, int identnr) const;
-        bool GetSymmetric(PointIndex pi1, PointIndex pi2, int identnr) const;
 
-        INDEX_2_HASHTABLE<int> & GetIdentifiedPoints()
+        INDEX_2_HASHTABLE<int>& GetIdentifiedPoints()
         {
             return *identifiedpoints;
         }
@@ -1130,11 +947,11 @@ namespace meshit {
         bool UsedSymmetric(PointIndex pi1, PointIndex pi2)
         {
             return
-            identifiedpoints->Used(INDEX_2(pi1, pi2)) ||
+                    identifiedpoints->Used(INDEX_2(pi1, pi2)) ||
                     identifiedpoints->Used(INDEX_2(pi2, pi1));
         }
 
-        void GetMap(int identnr, Array<int, PointIndex::BASE> & identmap, bool symmetric = false) const;
+        void GetMap(int identnr, Array<int, PointIndex::BASE>& identmap, bool symmetric = false) const;
 
         ID_TYPE GetType(int identnr) const
         {
@@ -1151,7 +968,7 @@ namespace meshit {
             type[identnr - 1] = t;
         }
 
-        void GetPairs(int identnr, Array<INDEX_2> & identpairs) const;
+        void GetPairs(int identnr, Array<INDEX_2>& identpairs) const;
 
         int GetMaxNr() const
         {
@@ -1161,7 +978,7 @@ namespace meshit {
         /// remove secondorder
         void SetMaxPointNr(int maxpnum);
 
-        void Print(std::ostream & ost) const;
+        void Print(std::ostream& ost) const;
     };
 
 }

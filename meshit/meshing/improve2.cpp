@@ -1,7 +1,5 @@
 #include "improve2.hpp"
-#include "../meshit.hpp"
 #include "global.hpp"
-#include "../gprim/geomfuncs.hpp"
 
 namespace meshit {
 
@@ -10,7 +8,7 @@ namespace meshit {
         int nr[3];
         int orient[3];
 
-      public:
+     public:
 
         Neighbour() { }
 
@@ -37,7 +35,7 @@ namespace meshit {
 
     class trionedge
     {
-      public:
+     public:
         int tnr;
         int sidenr;
 
@@ -54,7 +52,7 @@ namespace meshit {
         }
     };
 
-    void MeshOptimize2d::EdgeSwapping(Mesh & mesh, int usemetric)
+    void MeshOptimize2d::EdgeSwapping(Mesh& mesh, int usemetric)
     {
         if (!faceindex) {
             if (usemetric)
@@ -92,7 +90,7 @@ namespace meshit {
         static const double minangle[] = {0, 1.481, 2.565, 3.627, 4.683, 5.736, 7, 9};
 
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++) {
                 pangle[sel[j]] = 0.0;
             }
@@ -100,7 +98,7 @@ namespace meshit {
         // pangle = 0;
 
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++) {
                 POINTTYPE typ = mesh.Point(sel[j]).Type();
                 if (typ == FIXEDPOINT || typ == EDGEPOINT) {
@@ -112,7 +110,7 @@ namespace meshit {
         }
 
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
                 if (mesh.Point(pi).Type() == INNERPOINT || mesh.Point(pi).Type() == SURFACEPOINT)
@@ -128,7 +126,7 @@ namespace meshit {
         }
 
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++)
                 pdef[sel[j]]++;
         }
@@ -141,7 +139,7 @@ namespace meshit {
         }
 
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.SurfaceElement(seia[i]);
 
             for (int j = 0; j < 3; j++) {
                 PointIndex pi1 = sel.PNumMod(j + 2);
@@ -209,7 +207,8 @@ namespace meshit {
                     Vec3d auxvec1 = mesh.Point(pi3) - mesh.Point(pi4);
                     Vec3d auxvec2 = mesh.Point(pi1) - mesh.Point(pi4);
 
-                    allowswap = allowswap && fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
+                    allowswap =
+                            allowswap && fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
                     if (!allowswap)
                         continue;
@@ -219,7 +218,8 @@ namespace meshit {
 
                     auxvec1 = mesh.Point(pi4) - mesh.Point(pi3);
                     auxvec2 = mesh.Point(pi2) - mesh.Point(pi3);
-                    allowswap = allowswap && fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
+                    allowswap =
+                            allowswap && fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
                     if (!allowswap)
                         continue;
@@ -237,13 +237,13 @@ namespace meshit {
 
                     nv1.Normalize();
                     nv2.Normalize();
-                    
+
                     double critval = cos(M_PI / 6); // 30 degree
                     allowswap = allowswap &&
-                            (nv1.Z() > critval) &&
-                            (nv2.Z() > critval) &&
-                            (nv3.Z() > critval) &&
-                            (nv4.Z() > critval);
+                                (nv1.Z() > critval) &&
+                                (nv2.Z() > critval) &&
+                                (nv3.Z() > critval) &&
+                                (nv4.Z() > critval);
 
                     double horder = Dist(mesh.Point(pi1), mesh.Point(pi2));
 
@@ -261,10 +261,14 @@ namespace meshit {
                         }
                         else {
                             double loch = mesh.GetH(mesh.Point(pi1));
-                            double bad1 = CalcTriangleBadness(mesh.Point(pi4), mesh.Point(pi3), mesh.Point(pi1), metricweight, loch);
-                            double bad2 = CalcTriangleBadness(mesh.Point(pi3), mesh.Point(pi4), mesh.Point(pi2), metricweight, loch);
-                            double bad3 = CalcTriangleBadness(mesh.Point(pi1), mesh.Point(pi2), mesh.Point(pi3), metricweight, loch);
-                            double bad4 = CalcTriangleBadness(mesh.Point(pi2), mesh.Point(pi1), mesh.Point(pi4), metricweight, loch);
+                            double bad1 = CalcTriangleBadness(mesh.Point(pi4), mesh.Point(pi3), mesh.Point(pi1),
+                                                              metricweight, loch);
+                            double bad2 = CalcTriangleBadness(mesh.Point(pi3), mesh.Point(pi4), mesh.Point(pi2),
+                                                              metricweight, loch);
+                            double bad3 = CalcTriangleBadness(mesh.Point(pi1), mesh.Point(pi2), mesh.Point(pi3),
+                                                              metricweight, loch);
+                            double bad4 = CalcTriangleBadness(mesh.Point(pi2), mesh.Point(pi1), mesh.Point(pi4),
+                                                              metricweight, loch);
                             should = (bad1 + bad2) < (bad3 + bad4);
                         }
 
@@ -320,7 +324,7 @@ namespace meshit {
         mesh.SetNextTimeStamp();
     }
 
-    void MeshOptimize2d::CombineImprove(Mesh & mesh)
+    void MeshOptimize2d::CombineImprove(Mesh& mesh)
     {
         if (!faceindex) {
             MESHIT_LOG_DEBUG("Combine improve");
@@ -356,16 +360,16 @@ namespace meshit {
         Array<SurfaceElementIndex> hasonepi, hasbothpi;
 
         for (int i = 0; i < seia.size(); i++) {
-            Element2d & el = mesh.SurfaceElement(seia[i]);
+            Element2d& el = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < el.GetNP(); j++)
                 elementsonnode.Add(el[j], seia[i]);
         }
 
-        Array<bool, PointIndex::BASE > fixed(np);
+        Array<bool, PointIndex::BASE> fixed(np);
         fixed = false;
 
         for (int i = 0; i < seia.size(); i++) {
-            Element2d & sel = mesh.SurfaceElement(seia[i]);
+            Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < sel.GetNP(); j++) {
                 PointIndex pi1 = sel.PNumMod(j + 2);
                 PointIndex pi2 = sel.PNumMod(j + 3);
@@ -383,7 +387,7 @@ namespace meshit {
 
         for (PointIndex pi = mesh.Points().Begin(); pi < mesh.Points().End(); pi++) {
             if (elementsonnode[pi].size()) {
-                Element2d & hel = mesh.SurfaceElement(elementsonnode[pi][0]);
+                Element2d& hel = mesh.SurfaceElement(elementsonnode[pi][0]);
                 for (int k = 0; k < 3; k++) {
                     if (hel[k] == pi) {
                         GetNormalVector(surfnr, mesh.Point(pi), hel.GeomInfoPi(k + 1), normals[pi]);
@@ -395,7 +399,7 @@ namespace meshit {
 
         for (int i = 0; i < seia.size(); i++) {
             SurfaceElementIndex sei = seia[i];
-            Element2d & elem = mesh.SurfaceElement(sei);
+            Element2d& elem = mesh.SurfaceElement(sei);
             if (elem.IsDeleted()) continue;
 
             for (int j = 0; j < 3; j++) {
@@ -409,7 +413,7 @@ namespace meshit {
 
                 if (debugflag) {
                     std::cerr << "Combineimprove, face = " << faceindex
-                            << "pi1 = " << pi1 << " pi2 = " << pi2 << std::endl;
+                    << "pi1 = " << pi1 << " pi2 = " << pi2 << std::endl;
                 }
 
                 // more general 
@@ -428,7 +432,7 @@ namespace meshit {
                 hasbothpi.resize(0);
 
                 for (int k = 0; k < elementsonnode[pi1].size(); k++) {
-                    const Element2d & el2 = mesh.SurfaceElement(elementsonnode[pi1][k]);
+                    const Element2d& el2 = mesh.SurfaceElement(elementsonnode[pi1][k]);
 
                     if (el2.IsDeleted()) continue;
 
@@ -443,7 +447,7 @@ namespace meshit {
                     }
                 }
 
-                Element2d & hel = mesh.SurfaceElement(hasbothpi[0]);
+                Element2d& hel = mesh.SurfaceElement(hasbothpi[0]);
                 for (int k = 0; k < 3; k++)
                     if (hel[k] == pi1) {
                         GetNormalVector(surfnr, mesh.Point(pi1), hel.GeomInfoPi(k + 1), nv);
@@ -451,11 +455,10 @@ namespace meshit {
                     }
 
                 for (int k = 0; k < elementsonnode[pi2].size(); k++) {
-                    const Element2d & el2 = mesh.SurfaceElement(elementsonnode[pi2][k]);
+                    const Element2d& el2 = mesh.SurfaceElement(elementsonnode[pi2][k]);
                     if (el2.IsDeleted()) continue;
 
-                    if (el2[0] == pi1 || el2[1] == pi1 || el2[2] == pi1)
-                        ;
+                    if (el2[0] == pi1 || el2[1] == pi1 || el2[2] == pi1);
                     else
                         hasonepi.push_back(elementsonnode[pi2][k]);
                 }
@@ -463,14 +466,14 @@ namespace meshit {
                 bad1 = 0;
                 int illegal1 = 0, illegal2 = 0;
                 for (int k = 0; k < hasonepi.size(); k++) {
-                    const Element2d & el = mesh.SurfaceElement(hasonepi[k]);
+                    const Element2d& el = mesh.SurfaceElement(hasonepi[k]);
                     bad1 += CalcTriangleBadness(
                             mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
                     illegal1 += 1 - mesh.LegalTrig(el);
                 }
 
                 for (int k = 0; k < hasbothpi.size(); k++) {
-                    const Element2d & el = mesh.SurfaceElement(hasbothpi[k]);
+                    const Element2d& el = mesh.SurfaceElement(hasbothpi[k]);
                     bad1 += CalcTriangleBadness(
                             mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
                     illegal1 += 1 - mesh.LegalTrig(el);
@@ -486,14 +489,14 @@ namespace meshit {
 
                 bad2 = 0;
                 for (int k = 0; k < hasonepi.size(); k++) {
-                    Element2d & el = mesh.SurfaceElement(hasonepi[k]);
+                    Element2d& el = mesh.SurfaceElement(hasonepi[k]);
                     double err = CalcTriangleBadness(
                             mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
                     bad2 += err;
 
                     Vec3d hnv = Cross(
                             mesh.Point(el[1]) - mesh.Point(el[0]),
-                            mesh.Point(el[2]) - mesh.Point(el[0]) );
+                            mesh.Point(el[2]) - mesh.Point(el[0]));
                     if (hnv * nv < 0)
                         bad2 += 1e10;
 
@@ -523,7 +526,7 @@ namespace meshit {
                     mesh[pi1] = pnew;
                     PointGeomInfo gi;
 
-                    Element2d * el1p(NULL);
+                    Element2d* el1p(NULL);
                     int l = 0;
                     while (mesh.SurfaceElement(elementsonnode[pi1][l]).IsDeleted() && l < elementsonnode.EntrySize(pi1))
                         l++;
@@ -539,7 +542,7 @@ namespace meshit {
 
                     // std::cerr << "Connect point " << pi2 << " to " << pi1 << "\n";
                     for (int k = 0; k < elementsonnode[pi2].size(); k++) {
-                        Element2d & el = mesh.SurfaceElement(elementsonnode[pi2][k]);
+                        Element2d& el = mesh.SurfaceElement(elementsonnode[pi2][k]);
                         if (el.IsDeleted()) continue;
                         elementsonnode.Add(pi1, elementsonnode[pi2][k]);
 

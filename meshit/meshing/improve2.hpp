@@ -8,32 +8,27 @@ namespace meshit {
     class MeshOptimize2d
     {
         int faceindex;
-        int improveedges;
         double metricweight;
         int writestatus;
 
-      public:
+     public:
         MeshOptimize2d();
 
         virtual ~MeshOptimize2d() { }
-        void ImproveMesh(Mesh & mesh2d, const MeshingParameters & mp);
-        void ImproveMeshJacobian(Mesh & mesh2d, const MeshingParameters & mp);
-        void ImproveVolumeMesh(Mesh & mesh);
 
-        void EdgeSwapping(Mesh & mesh, int usemetric);
-        void CombineImprove(Mesh & mesh);
+        void ImproveMesh(Mesh& mesh2d, const MeshingParameters& mp);
 
-        void GenericImprove(Mesh & mesh);
+        void EdgeSwapping(Mesh& mesh, int usemetric);
+        void CombineImprove(Mesh& mesh);
+
+        void GenericImprove(Mesh& mesh);
 
         void SetFaceIndex(int fi)
         {
             faceindex = fi;
         }
 
-        void SetImproveEdges(int ie)
-        {
-            improveedges = ie;
-        }
+        void SetImproveEdges(int ie) { }
 
         void SetMetricWeight(double mw)
         {
@@ -46,56 +41,49 @@ namespace meshit {
         }
 
         /// project point, use gi as initial value, and compute new gi
-
-        int ProjectPointGI(INDEX surfind, Point3d & p, PointGeomInfo & gi) const
+        int ProjectPointGI(INDEX surfind, Point3d& p, PointGeomInfo& gi) const
         {
             return CalcPointGeomInfo(surfind, gi, p);
         }
 
         /// liefert zu einem 3d-Punkt die geominfo (Dreieck) und liefert 1, wenn erfolgreich, 
         /// 0, wenn nicht (Punkt ausserhalb von chart)
-
-        int CalcPointGeomInfo(PointGeomInfo& gi, const Point3d & /*p3*/) const
+        int CalcPointGeomInfo(PointGeomInfo& gi, const Point3d& /*p3*/) const
         {
             gi.trignum = 1;
             return 1;
         };
 
-        int CalcPointGeomInfo(int /* surfind */, PointGeomInfo& gi, const Point3d & p3) const
+        int CalcPointGeomInfo(int /* surfind */, PointGeomInfo& gi, const Point3d& p3) const
         {
             return CalcPointGeomInfo(gi, p3);
         }
 
-        void GetNormalVector(INDEX surfind, const Point3d & p, PointGeomInfo & gi, Vec3d & n) const;
-        void GetNormalVector(INDEX surfind, const Point3d & p, Vec3d & n) const;
-
-        void CheckMeshApproximation(Mesh & mesh);
+        void GetNormalVector(INDEX surfind, const Point3d& p, PointGeomInfo& gi, Vec3d& n) const;
+        void GetNormalVector(INDEX surfind, const Point3d& p, Vec3d& n) const;
 
         friend class Opti2SurfaceMinFunction;
         friend class Opti2EdgeMinFunction;
-        friend double Opti2FunctionValueGrad(const Vector & x, Vector & grad);
-        friend double Opti2EdgeFunctionValueGrad(const Vector & x, Vector & grad);
-
     };
 
     void CalcTriangleBadness(
             double x2, double x3, double y3,
             double metricweight,
-            double h, double & badness,
-            double & g1x, double & g1y);
+            double h, double& badness,
+            double& g1x, double& g1y);
 
     double CalcTriangleBadness(
-            const Point3d & p1,
-            const Point3d & p2,
-            const Point3d & p3,
+            const Point3d& p1,
+            const Point3d& p2,
+            const Point3d& p3,
             double metricweight,
             double h);
 
     double CalcTriangleBadness(
-            const Point3d & p1,
-            const Point3d & p2,
-            const Point3d & p3,
-            const Vec3d & n,
+            const Point3d& p1,
+            const Point3d& p2,
+            const Point3d& p3,
+            const Vec3d& n,
             double metricweight,
             double h);
 }

@@ -20,65 +20,6 @@ namespace meshit {
       Alternating Digital Tree
      */
 
-    class ADTreeNode
-    {
-      public:
-        ADTreeNode *left, *right, *father;
-        int dim;
-        double sep;
-        double *data;
-        double *boxmin;
-        double *boxmax;
-        int pi;
-        int nchilds;
-
-        ADTreeNode(int adim);
-        ~ADTreeNode();
-
-        friend class ADTree;
-    };
-
-    class ADTreeCriterion
-    {
-      public:
-
-        ADTreeCriterion() { }
-        virtual int Eval(const ADTreeNode * node) const = 0;
-    };
-
-    class ADTree
-    {
-        int dim;
-        ADTreeNode * root;
-        double *cmin, *cmax;
-        Array<ADTreeNode*> ela;
-        const ADTreeCriterion * criterion;
-
-        Array<ADTreeNode*> stack;
-        Array<int> stackdir;
-        int stackindex;
-
-      public:
-        ADTree(int adim, const double * acmin, const double * acmax);
-        ~ADTree() {}
-
-        void Insert(const double * p, int pi);
-
-        void SetCriterion(ADTreeCriterion & acriterion);
-        void Reset();
-        int Next();
-        void GetMatch(Array<int> & matches);
-
-        void DeleteElement(int pi);
-
-        void Print(std::ostream & ost) const
-        {
-            PrintRec(ost, root);
-        }
-
-        void PrintRec(std::ostream & ost, const ADTreeNode * node) const;
-    };
-
     class ADTreeNode3
     {
       public:
@@ -113,11 +54,6 @@ namespace meshit {
                 Array<int> & pis) const;
 
         void DeleteElement(int pi);
-
-        void Print(std::ostream & ost) const
-        {
-            PrintRec(ost, root);
-        }
 
         void PrintRec(std::ostream & ost, const ADTreeNode3 * node) const;
     };

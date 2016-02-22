@@ -190,7 +190,6 @@ namespace meshit {
         Array<Point3d> critpoints;
 
         // test for doubled edges
-        testmode = 0;
 
         StartMesh();
 

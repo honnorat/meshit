@@ -9,6 +9,7 @@
 
 #include "adfront2.hpp"
 #include "ruler2.hpp"
+#include "meshclass.hpp"
 
 namespace meshit {
 
@@ -49,9 +50,6 @@ namespace meshit {
         void LoadRules(const char * filename, bool quad);
 
         MESHING2_RESULT GenerateMesh(Mesh & mesh, const MeshingParameters & mp, double gh, int facenr);
-
-        void Delaunay(Mesh & mesh, int domainnr, const MeshingParameters & mp);
-        void BlockFillLocalH(Mesh & mesh, const MeshingParameters & mp);
 
         void AddPoint(const Point3d & p, PointIndex globind, MultiPointGeomInfo * mgi = NULL,
                 bool pointonsurface = true);
