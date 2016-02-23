@@ -7,6 +7,7 @@
 /* Date:   24. Jul. 96                                                    */
 /**************************************************************************/
 
+#define _USE_MATH_DEFINES 1
 #include <iostream>
 #include <string>
 #include <cmath>

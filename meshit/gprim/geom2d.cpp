@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES 1
 #include "geom2d.hpp"
 
 namespace meshit {

@@ -7,6 +7,7 @@
 /* Date:   20. Jul. 02                                                     */
 /* *************************************************************************/
 
+#define _USE_MATH_DEFINES 1
 #include <vector>
 #include <string>
 
