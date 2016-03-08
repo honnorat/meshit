@@ -47,20 +47,6 @@ namespace meshit {
             const Vec3d& col3,
             const Vec3d& rhs,
             Vec3d& sol);
-    int SolveLinearSystemLS(
-            const Vec3d& col1,
-            const Vec3d& col2,
-            const Vec2d& rhs,
-            Vec3d& sol);
-    int SolveLinearSystemLS2(
-            const Vec3d& col1,
-            const Vec3d& col2,
-            const Vec2d& rhs,
-            Vec3d& sol,
-            double& x, double& y);
-    int PseudoInverse(
-            const Vec3d& col1, const Vec3d& col2,
-            Vec3d& inv1, Vec3d& inv2);
     double Determinant(const Vec3d& col1, const Vec3d& col2, const Vec3d& col3);
 
     inline double Dist2(const Point3d& p1, const Point3d& p2);
@@ -394,40 +380,9 @@ namespace meshit {
                                      const Vec3d& col3,
                                      const Vec3d& rhs,
                                      Vec3d& sol);
-        friend int SolveLinearSystemLS(const Vec3d& col1,
-                                       const Vec3d& col2,
-                                       const Vec2d& rhs,
-                                       Vec3d& sol);
-        friend int SolveLinearSystemLS2(const Vec3d& col1,
-                                        const Vec3d& col2,
-                                        const Vec2d& rhs,
-                                        Vec3d& sol,
-                                        double& x, double& y);
-        friend int PseudoInverse(const Vec3d& col1,
-                                 const Vec3d& col2,
-                                 Vec3d& inv1,
-                                 Vec3d& inv2);
         friend double Determinant(const Vec3d& col1,
                                   const Vec3d& col2,
                                   const Vec3d& col3);
-    };
-
-    class QuadraticFunction3d
-    {
-        double c0, cx, cy, cz;
-        double cxx, cyy, czz, cxy, cxz, cyz;
-
-     public:
-        QuadraticFunction3d(const Point3d& p, const Vec3d& v);
-
-        double Eval(const Point3d& p)
-        {
-            return
-                    c0
-                    + p.X() * (cx + cxx * p.X() + cxy * p.Y() + cxz * p.Z())
-                    + p.Y() * (cy + cyy * p.Y() + cyz * p.Z())
-                    + p.Z() * (cz + czz * p.Z());
-        }
     };
 
     inline Point3d Center(const Point3d& p1, const Point3d& p2)
@@ -737,24 +692,6 @@ namespace meshit {
                     0.5 * (minx[1] + maxx[1]),
                     0.5 * (minx[2] + maxx[2]));
         }
-    };
-
-    class referencetransform
-    {
-        Vec3d ex, ey, ez;
-        Vec3d exh, eyh, ezh;
-        Vec3d ex_h, ey_h, ez_h;
-        Point3d rp;
-        double h;
-
-     public:
-
-        void Set(const Point3d& p1, const Point3d& p2,
-                 const Point3d& p3, double ah);
-
-        void ToPlain(const Point3d& p, Point3d& pp) const;
-        void ToPlain(const Array<Point3d>& p, Array<Point3d>& pp) const;
-        void FromPlain(const Point3d& pp, Point3d& p) const;
     };
 
 }

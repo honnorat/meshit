@@ -8,7 +8,7 @@
 /**************************************************************************/
 
 #include "../gprim/geomobjects.hpp"
-#include "../meshing/bisect.hpp"
+#include "../meshing/refine.hpp"
 
 namespace meshit {
 

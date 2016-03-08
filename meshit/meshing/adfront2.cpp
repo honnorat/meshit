@@ -68,8 +68,7 @@ namespace meshit {
             delpointl.DeleteLast();
 
             points[pi] = FrontPoint2(p, globind, mgi, pointonsurface);
-        }
-        else {
+        } else {
             points.push_back(FrontPoint2(p, globind, mgi, pointonsurface));
             pi = points.size() - 1;
         }
@@ -105,8 +104,7 @@ namespace meshit {
             li = dellinel.Last();
             dellinel.DeleteLast();
             lines[li] = FrontLine(INDEX_2(pi1, pi2));
-        }
-        else {
+        } else {
             lines.push_back(FrontLine(INDEX_2(pi1, pi2)));
             li = lines.size() - 1;
         }
@@ -230,7 +228,7 @@ namespace meshit {
             int baselineindex,
             Array<Point3d>& locpoints,
             Array<MultiPointGeomInfo>& pgeominfo,
-            Array<INDEX_2>& loclines, // local index
+            Array<INDEX_2>& loclines,  // local index
             Array<INDEX>& pindex,
             Array<INDEX>& lindex,
             double xh)
@@ -320,19 +318,24 @@ namespace meshit {
         for (int i = 0; i < locpoints.size(); i++) {
             int pi = pindex[i];
 
-            if (points[pi].mgi)
-                for (int j = 1; j <= points[pi].mgi->GetNPGI(); j++)
+            if (points[pi].mgi) {
+                for (int j = 1; j <= points[pi].mgi->GetNPGI(); j++) {
                     pgeominfo[i].AddPointGeomInfo(points[pi].mgi->GetPGI(j));
+                }
+            }
         }
         return lines[baselineindex].LineClass();
     }
 
     void AdFront2::SetStartFront()
     {
-        for (size_t i = 0; i < lines.size(); i++)
-            if (lines[i].Valid())
-                for (int j = 1; j <= 2; j++)
+        for (size_t i = 0; i < lines.size(); i++) {
+            if (lines[i].Valid()) {
+                for (int j = 1; j <= 2; j++) {
                     points[lines[i].L().I(j)].DecFrontNr(0);
+                }
+            }
+        }
     }
 
     bool AdFront2::Inside(const Point<2>& p) const
@@ -373,4 +376,4 @@ namespace meshit {
         }
         return ((cnt % 2) != 0);
     }
-}
+}  // namespace meshit

@@ -1,7 +1,5 @@
-#include "../meshit.hpp"
 #include "localh.hpp"
 #include "adfront2.hpp"
-#include "../gprim/geomfuncs.hpp"
 
 namespace meshit {
 
@@ -14,7 +12,6 @@ namespace meshit {
         for (int i = 0; i < 8; i++) {
             childs[i] = NULL;
         }
-        father = NULL;
 
         flags.cutboundary = 0;
         flags.isinner = 0;
@@ -54,7 +51,7 @@ namespace meshit {
         Box3d(pmin, pmax);
         grading = agrading;
 
-        // a small enlargement, non-regular points 
+        // a small enlargement, non-regular points
         double val = 0.0879;
         for (int i = 1; i <= 3; i++) {
             x1[i - 1] = (1 + val * i) * pmin.X(i) - val * i * pmax.X(i);
@@ -84,7 +81,7 @@ namespace meshit {
         Box3d(pmin, pmax);
         grading = agrading;
 
-        // a small enlargement, non-regular points 
+        // a small enlargement, non-regular points
         double val = 0.0879;
         for (int i = 1; i <= 3; i++) {
             x1[i - 1] = (1 + val * i) * pmin.X(i) - val * i * pmax.X(i);
@@ -132,7 +129,7 @@ namespace meshit {
             if (p.Y() > box->xmid[1]) childnr += 2;
             if (p.Z() > box->xmid[2]) childnr += 4;
             nbox = box->childs[childnr];
-        };
+        }
 
         const double h_half = 0.5 * h;
 
@@ -146,8 +143,7 @@ namespace meshit {
             if (childnr & 1) {
                 x1[0] = box->xmid[0];
                 x2[0] = x1[0] + h2;  // box->x2[0];
-            }
-            else {
+            } else {
                 x2[0] = box->xmid[0];
                 x1[0] = x2[0] - h2;  // box->x1[0];
             }
@@ -155,8 +151,7 @@ namespace meshit {
             if (childnr & 2) {
                 x1[1] = box->xmid[1];
                 x2[1] = x1[1] + h2;  // box->x2[1];
-            }
-            else {
+            } else {
                 x2[1] = box->xmid[1];
                 x1[1] = x2[1] - h2;  // box->x1[1];
             }
@@ -164,15 +159,13 @@ namespace meshit {
             if (childnr & 4) {
                 x1[2] = box->xmid[2];
                 x2[2] = x1[2] + h2;  // box->x2[2];
-            }
-            else {
+            } else {
                 x2[2] = box->xmid[2];
                 x1[2] = x2[2] - h2;  // box->x1[2];
             }
 
             ngb = new GradingBox(x1, x2);
             box->childs[childnr] = ngb;
-            ngb->father = box;
 
             boxes.push_back(ngb);
             box = box->childs[childnr];
@@ -219,8 +212,7 @@ namespace meshit {
             if (pmin.X(j) < pmax.X(j)) {
                 pmin2.X(j) = pmin.X(j);
                 pmax2.X(j) = pmax.X(j);
-            }
-            else {
+            } else {
                 pmin2.X(j) = pmax.X(j);
                 pmax2.X(j) = pmin.X(j);
             }
@@ -238,7 +230,7 @@ namespace meshit {
             pmax.Z() < box->xmid[2] - h2 || pmin.Z() > box->xmid[2] + h2)
             return 1e8;
 
-        double hmin = 2 * box->h2; // box->x2[0] - box->x1[0];
+        double hmin = 2 * box->h2;  // box->x2[0] - box->x1[0];
 
         for (int i = 0; i < 8; i++) {
             if (box->childs[i])
@@ -247,4 +239,4 @@ namespace meshit {
 
         return hmin;
     }
-}
+}  // namespace meshit

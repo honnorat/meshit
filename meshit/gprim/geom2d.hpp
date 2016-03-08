@@ -197,9 +197,6 @@ namespace meshit {
             return ax * by - ay * bx > eps * eps * std::max(ax * ax + ay * ay, bx * bx + by * by);
         }
 
-        friend inline void PpSmV(const Point2d& p1, double s, const Vec2d& v, Point2d& p2);
-        friend inline void PmP(const Point2d& p1, const Point2d& p2, Vec2d& v);
-
         friend std::ostream& operator<<(std::ostream& s, const Point2d& p);
     };
 

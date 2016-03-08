@@ -9,7 +9,6 @@ namespace meshit {
         int orient[3];
 
      public:
-
         Neighbour() { }
 
         void SetNr(int side, int anr)
@@ -113,12 +112,12 @@ namespace meshit {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
-                if (mesh.Point(pi).Type() == INNERPOINT || mesh.Point(pi).Type() == SURFACEPOINT)
+                if (mesh.Point(pi).Type() == INNERPOINT || mesh.Point(pi).Type() == SURFACEPOINT) {
                     pdef[pi] = -6;
-                else {
-                    for (int j = 0; j < 8; j++) {
-                        if (pangle[pi] >= minangle[j]) {
-                            pdef[pi] = -1 - j;
+                } else {
+                    for (int k = 0; k < 8; k++) {
+                        if (pangle[pi] >= minangle[k]) {
+                            pdef[pi] = -1 - k;
                         }
                     }
                 }
@@ -153,16 +152,13 @@ namespace meshit {
 
                 INDEX_2 ii2(pi1, pi2);
                 if (other.Used(ii2)) {
-
                     int i2 = other.Get(ii2).tnr;
                     int j2 = other.Get(ii2).sidenr;
-
                     neighbors[seia[i]].SetNr(j, i2);
                     neighbors[seia[i]].SetOrientation(j, j2);
                     neighbors[i2].SetNr(j2, seia[i]);
                     neighbors[i2].SetOrientation(j2, j);
-                }
-                else {
+                } else {
                     other.Set(INDEX_2(pi2, pi1), trionedge(seia[i], j));
                 }
             }
@@ -238,7 +234,7 @@ namespace meshit {
                     nv1.Normalize();
                     nv2.Normalize();
 
-                    double critval = cos(M_PI / 6); // 30 degree
+                    double critval = cos(M_PI / 6);  // 30 degree
                     allowswap = allowswap &&
                                 (nv1.Z() > critval) &&
                                 (nv2.Z() > critval) &&
@@ -247,7 +243,7 @@ namespace meshit {
 
                     double horder = Dist(mesh.Point(pi1), mesh.Point(pi2));
 
-                    if (// nv1 * nv2 >= 0 &&
+                    if (  // nv1 * nv2 >= 0 &&
                             nv1.Length() > 1e-3 * horder * horder &&
                             nv2.Length() > 1e-3 * horder * horder &&
                             allowswap) {
@@ -258,8 +254,7 @@ namespace meshit {
                                     Dist2(mesh.Point(pi3), mesh.Point(pi4));
 
                             should = e >= t && (e > 2 || d > 0);
-                        }
-                        else {
+                        } else {
                             double loch = mesh.GetH(mesh.Point(pi1));
                             double bad1 = CalcTriangleBadness(mesh.Point(pi4), mesh.Point(pi3), mesh.Point(pi1),
                                                               metricweight, loch);
@@ -270,20 +265,6 @@ namespace meshit {
                             double bad4 = CalcTriangleBadness(mesh.Point(pi2), mesh.Point(pi1), mesh.Point(pi4),
                                                               metricweight, loch);
                             should = (bad1 + bad2) < (bad3 + bad4);
-                        }
-
-                        if (allowswap) {
-                            Element2d sw1(pi4, pi3, pi1);
-                            Element2d sw2(pi3, pi4, pi2);
-
-                            int legal1 =
-                                    mesh.LegalTrig(mesh.SurfaceElement(t1)) +
-                                    mesh.LegalTrig(mesh.SurfaceElement(t2));
-                            int legal2 =
-                                    mesh.LegalTrig(sw1) + mesh.LegalTrig(sw2);
-
-                            if (legal1 < legal2) should = 1;
-                            if (legal2 < legal1) should = 0;
                         }
 
                         if (should) {
@@ -354,7 +335,6 @@ namespace meshit {
         Vec3d nv;
 
         int np = mesh.GetNP();
-        //int nse = mesh.GetNSE();
 
         TABLE<SurfaceElementIndex, PointIndex::BASE> elementsonnode(np);
         Array<SurfaceElementIndex> hasonepi, hasbothpi;
@@ -409,14 +389,7 @@ namespace meshit {
                 if (pi1 < PointIndex::BASE || pi2 < PointIndex::BASE)
                     continue;
 
-                bool debugflag = 0;
-
-                if (debugflag) {
-                    std::cerr << "Combineimprove, face = " << faceindex
-                    << "pi1 = " << pi1 << " pi2 = " << pi2 << std::endl;
-                }
-
-                // more general 
+                // more general
                 if (fixed[pi2])
                     std::swap(pi1, pi2);
 
@@ -441,8 +414,7 @@ namespace meshit {
                         nv = Cross(
                                 Vec3d(mesh.Point(el2[0]), mesh.Point(el2[1])),
                                 Vec3d(mesh.Point(el2[0]), mesh.Point(el2[2])));
-                    }
-                    else {
+                    } else {
                         hasonepi.push_back(elementsonnode[pi1][k]);
                     }
                 }
@@ -464,19 +436,16 @@ namespace meshit {
                 }
 
                 bad1 = 0;
-                int illegal1 = 0, illegal2 = 0;
                 for (int k = 0; k < hasonepi.size(); k++) {
                     const Element2d& el = mesh.SurfaceElement(hasonepi[k]);
                     bad1 += CalcTriangleBadness(
                             mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
-                    illegal1 += 1 - mesh.LegalTrig(el);
                 }
 
                 for (int k = 0; k < hasbothpi.size(); k++) {
                     const Element2d& el = mesh.SurfaceElement(hasbothpi[k]);
                     bad1 += CalcTriangleBadness(
                             mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
-                    illegal1 += 1 - mesh.LegalTrig(el);
                 }
                 bad1 /= (hasonepi.size() + hasbothpi.size());
 
@@ -503,26 +472,15 @@ namespace meshit {
                     for (int l = 0; l < 3; l++)
                         if ((normals[el[l]] * nv) < 0.5)
                             bad2 += 1e10;
-
-                    illegal2 += 1 - mesh.LegalTrig(el);
                 }
                 bad2 /= hasonepi.size();
 
                 mesh[pi1] = p1;
                 mesh[pi2] = p2;
 
-                if (debugflag) {
-                    std::cerr << "bad1 = " << bad1 << ", bad2 = " << bad2 << std::endl;
-                }
-
                 bool should = (bad2 < bad1 && bad2 < 1e4);
-                if (bad2 < 1e4) {
-                    if (illegal1 > illegal2) should = 1;
-                    if (illegal2 > illegal1) should = 0;
-                }
 
                 if (should) {
-
                     mesh[pi1] = pnew;
                     PointGeomInfo gi;
 
@@ -552,7 +510,7 @@ namespace meshit {
                                 haspi1 = 1;
                         if (haspi1) continue;
 
-                        for (int l = 0; l < el.GetNP(); l++) {
+                        for (l = 0; l < el.GetNP(); l++) {
                             if (el[l] == pi2) {
                                 el[l] = pi1;
                                 el.GeomInfoPi(l + 1) = gi;
@@ -571,4 +529,4 @@ namespace meshit {
         mesh.Compress();
         mesh.SetNextTimeStamp();
     }
-}
+}  // namespace meshit

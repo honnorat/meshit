@@ -102,8 +102,6 @@ namespace meshit {
 
         /// changed by every minor modification (addpoint, ...)
         int timestamp;
-        /// changed after finishing global algorithm (improve, ...)
-        int majortimestamp;
 
         SYMBOLTABLE<Array<int>*> userdata_int;
         SYMBOLTABLE<Array<double>*> userdata_double;
@@ -324,14 +322,14 @@ namespace meshit {
          */
         double AverageH(int surfnr = 0) const;
         /// Calculates localh 
-        void CalcLocalH(double grading);
+        void CalcLocalH();
         void SetLocalH(const Point3d& pmin, const Point3d& pmax, double grading);
         void RestrictLocalH(const Point3d& p, double hloc);
         void RestrictLocalHLine(const Point3d& p1, const Point3d& p2,
                                 double hloc);
         /// number of elements per radius
-        void CalcLocalHFromSurfaceCurvature(double grading, double elperr);
-        void CalcLocalHFromPointDistances(double grading);
+        void CalcLocalHFromSurfaceCurvature(double elperr);
+        void CalcLocalHFromPointDistances();
         void RestrictLocalH(resthtype rht, int nr, double loch);
         void LoadLocalMeshSize(const char* meshsizefilename);
         void SetGlobalH(double h);
@@ -383,8 +381,6 @@ namespace meshit {
         void Load(std::istream& infile);
         void Save(const std::string& filename) const;
         void Load(const std::string& filename);
-
-        bool LegalTrig(const Element2d& el);
 
         /// orient surface mesh, for one sub-domain only
         void SurfaceMeshOrientation();
@@ -502,11 +498,6 @@ namespace meshit {
         void SetNextTimeStamp()
         {
             timestamp = NextTimeStamp();
-        }
-
-        void SetNextMajorTimeStamp()
-        {
-            majortimestamp = timestamp = NextTimeStamp();
         }
 
         void SetUserData(const char* id, Array<int>& data);

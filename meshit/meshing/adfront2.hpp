@@ -108,8 +108,8 @@ namespace meshit {
         int lineclass;
         /// geometry specific data
         PointGeomInfo geominfo[2];
-     public:
 
+     public:
         FrontLine()
         {
             lineclass = 1;

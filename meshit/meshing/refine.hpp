@@ -8,7 +8,7 @@ namespace meshit {
     class Refinement
     {
      public:
-        Refinement();
+        Refinement() { }
 
         virtual ~Refinement() { }
 

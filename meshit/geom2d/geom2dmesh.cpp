@@ -1,5 +1,6 @@
-#include "../meshing/bisect.hpp"
 #include "geometry2d.hpp"
+
+#include "../meshing/refine.hpp"
 
 namespace meshit {
 

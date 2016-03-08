@@ -22,12 +22,10 @@ namespace meshit {
     enum GMSH_ELEMENTS
     {
         GMSH_TRIG = 2, GMSH_TRIG6 = 9,
-        GMSH_QUAD = 3, GMSH_QUAD8 = 16,
-        GMSH_TET = 4, GMSH_TET10 = 11
+        GMSH_QUAD = 3, GMSH_QUAD8 = 16
     };
     const int triGmsh[7] = {0, 1, 2, 3, 6, 4, 5};
     const int quadGmsh[9] = {0, 1, 2, 3, 4, 5, 8, 6, 7};
-    const int tetGmsh[11] = {0, 1, 2, 3, 4, 5, 8, 6, 7, 10, 9};
 
     /*! GMSH v2.xx mesh format export function
      *

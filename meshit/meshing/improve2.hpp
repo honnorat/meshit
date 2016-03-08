@@ -63,7 +63,6 @@ namespace meshit {
         void GetNormalVector(INDEX surfind, const Point3d& p, Vec3d& n) const;
 
         friend class Opti2SurfaceMinFunction;
-        friend class Opti2EdgeMinFunction;
     };
 
     void CalcTriangleBadness(

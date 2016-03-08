@@ -10,13 +10,12 @@
 
 #include <algorithm>
 
-#include "../meshit.hpp"
 #include "../meshing/msghandler.hpp"
 #include "opti.hpp"
 
 namespace meshit {
 
-    void Cholesky(const DenseMatrix & a, DenseMatrix & l, Vector & d)
+    void Cholesky(const DenseMatrix& a, DenseMatrix& l, Vector& d)
     {
         // Factors   A = L D L^T
 
@@ -48,7 +47,7 @@ namespace meshit {
         }
     }
 
-    void MultLDLt(const DenseMatrix & l, const Vector & d, const Vector & g, Vector & p)
+    void MultLDLt(const DenseMatrix& l, const Vector& d, const Vector& g, Vector& p)
     {
         double val;
 
@@ -73,7 +72,7 @@ namespace meshit {
         }
     }
 
-    void SolveLDLt(const DenseMatrix & l, const Vector & d, const Vector & g, Vector & p)
+    void SolveLDLt(const DenseMatrix& l, const Vector& d, const Vector& g, Vector& p)
     {
         double val;
 
@@ -98,7 +97,7 @@ namespace meshit {
         }
     }
 
-    int LDLtUpdate(DenseMatrix & l, Vector & d, double a, const Vector & u)
+    int LDLtUpdate(DenseMatrix& l, Vector& d, double a, const Vector& u)
     {
         // Bemerkung: Es wird a aus R erlaubt
         // Rueckgabewert: 0 .. D bleibt positiv definit
@@ -135,10 +134,10 @@ namespace meshit {
     }
 
     double BFGS(
-            Vector & x, // i: Startwert, o: Loesung, falls IFAIL = 0
-            const MinFunction & fun,
-            const OptiParameters & par,
-            double eps )
+            Vector& x, // i: Startwert, o: Loesung, falls IFAIL = 0
+            const MinFunction& fun,
+            const OptiParameters& par,
+            double eps)
     {
         int n = x.Size();
         long it;
@@ -209,7 +208,7 @@ namespace meshit {
 
             alphahat = 1;
             lines(x, xneu, p, f, g, fun, par, alphahat, fmin,
-                    mu1, sigma, xi1, xi2, tau, tau1, tau2, ifail);
+                  mu1, sigma, xi1, xi2, tau, tau1, tau2, ifail);
 
             if (ifail == 1)
                 std::cerr << "no success with linesearch" << std::endl;
@@ -232,7 +231,7 @@ namespace meshit {
                     std::cerr << "BFGS update error1" << std::endl;
                     std::cerr << "BFGS update error1" << std::endl;
                     std::cerr << "l " << std::endl << l << std::endl
-                            << "d " << d << std::endl;
+                    << "d " << d << std::endl;
                     ifail = 1;
                     break;
                 }
@@ -240,7 +239,7 @@ namespace meshit {
                 if (LDLtUpdate(l, d, -1 / a2, bs) != 0) {
                     std::cerr << "BFGS update error2" << std::endl;
                     std::cerr << "l " << std::endl << l << std::endl
-                            << "d " << d << std::endl;
+                    << "d " << d << std::endl;
                     ifail = 1;
                     break;
                 }
@@ -262,7 +261,7 @@ namespace meshit {
         } while (!a1crit || !a3acrit);
 
         if (f0 < f || (ifail == 1)) {
-            MESHIT_LOG_DEBUG("fail, f = " << f << " f0 = " << f0 << " diff = " << f0-f << "  ifail = " << ifail);
+            MESHIT_LOG_DEBUG("fail, f = " << f << " f0 = " << f0 << " diff = " << f0 - f << "  ifail = " << ifail);
             f = f0;
             x = x0;
         }

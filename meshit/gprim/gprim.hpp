@@ -22,7 +22,6 @@
 #include "geom3d.hpp"
 
 #include "geomtest3d.hpp"
-#include "transform3d.hpp"
 
 #include "adtree.hpp"
 

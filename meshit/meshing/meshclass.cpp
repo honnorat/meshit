@@ -1,7 +1,6 @@
 #include <stdexcept>
 #include <cassert>
 
-#include "../meshit.hpp"
 #include "meshtool.hpp"
 #include "../gprim/geomtest3d.hpp"
 #include "../geom2d/geometry2d.hpp"
@@ -19,7 +18,7 @@ namespace meshit {
         lochfunc = NULL;
         elementsearchtree = NULL;
         elementsearchtreets = NextTimeStamp();
-        majortimestamp = timestamp = NextTimeStamp();
+        timestamp = NextTimeStamp();
         hglob = 1e10;
         hmin = 0;
         numvertices = -1;
@@ -172,18 +171,16 @@ namespace meshit {
             segments[si].SetBCName(bcnames[segments[si].si - 1]);
         }
 
-        CalcLocalH(mp.grading);
+        CalcLocalH();
 
-        int bnp = GetNP(); // boundary points
+        int bnp = GetNP();  // boundary points
         int hquad = mp.quad;
 
         for (int domnr = 1; domnr <= maxdomnr; domnr++) {
-
             if (!geometry.GetDomainTensorMeshing(domnr))
                 continue;
 
             // tensor product mesh
-
             Array<PointIndex, PointIndex::BASE> nextpi(bnp);
             Array<int, PointIndex::BASE> si1(bnp), si2(bnp);
 
@@ -204,7 +201,7 @@ namespace meshit {
 
                 if (p1 == -1) continue;
 
-                nextpi[p1] = p2; // counter-clockwise
+                nextpi[p1] = p2;  // counter-clockwise
 
                 int index = segments[si].si;
                 if (si1[p1] != index && si2[p1] != index) {
@@ -217,7 +214,7 @@ namespace meshit {
                 }
             }
 
-            PointIndex c1(0), c2, c3, c4; // 4 corner points
+            PointIndex c1(0), c2, c3, c4;  // 4 corner points
             int nex = 1, ney = 1;
 
             for (PointIndex pi = 1; pi <= si2.size(); pi++) {
@@ -226,11 +223,11 @@ namespace meshit {
                     break;
                 }
             }
-            for (c2 = nextpi[c1]; si2[c2] == -1; c2 = nextpi[c2], nex++);
-            for (c3 = nextpi[c2]; si2[c3] == -1; c3 = nextpi[c3], ney++);
-            for (c4 = nextpi[c3]; si2[c4] == -1; c4 = nextpi[c4]);
+            for (c2 = nextpi[c1]; si2[c2] == -1; c2 = nextpi[c2], nex++) { }
+            for (c3 = nextpi[c2]; si2[c3] == -1; c3 = nextpi[c3], ney++) { }
+            for (c4 = nextpi[c3]; si2[c4] == -1; c4 = nextpi[c4]) { }
 
-            Array<PointIndex> pts((nex + 1) * (ney + 1)); // x ... inner loop
+            Array<PointIndex> pts((nex + 1) * (ney + 1));  // x ... inner loop
             pts = -1;
 
             for (PointIndex pi = c1, i = 0; pi != c2; pi = nextpi[pi], i++) {
@@ -268,8 +265,8 @@ namespace meshit {
         }
 
         for (int domnr = 1; domnr <= maxdomnr; domnr++) {
-
-            if (geometry.GetDomainTensorMeshing(domnr)) continue;
+            if (geometry.GetDomainTensorMeshing(domnr))
+                continue;
 
             if (geometry.GetDomainMaxh(domnr) > 0)
                 h = geometry.GetDomainMaxh(domnr);
@@ -306,7 +303,6 @@ namespace meshit {
                             compress[segments[si][0]], gi, gi);
 
                 }
-
             }
 
             mp.checkoverlap = 0;
@@ -339,7 +335,6 @@ namespace meshit {
         mp.optsteps2d = hsteps;
 
         Compress();
-        SetNextMajorTimeStamp();
     }
 
     PointIndex Mesh::AddPoint(const Point3d& p, int layer)
@@ -432,10 +427,7 @@ namespace meshit {
 
     void Mesh::Save(const std::string& filename) const
     {
-
         std::ofstream outfile(filename.c_str());
-        // ogzstream outfile( (filename+".gz") .c_str());
-
         Save(outfile);
     }
 
@@ -443,8 +435,8 @@ namespace meshit {
     {
         int i, j;
 
-        double scale = 1; // globflags.GetNumFlag ("scale", 1);
-        int invertsurf = 0; // globflags.GetDefineFlag ("invertsurfacemesh");
+        double scale = 1;    // globflags.GetNumFlag ("scale", 1);
+        int invertsurf = 0;  // globflags.GetDefineFlag ("invertsurfacemesh");
 
 
 
@@ -474,8 +466,7 @@ namespace meshit {
 
         outfile << GetNSE() << "\n";
 
-        SurfaceElementIndex sei;
-        for (sei = 0; sei < GetNSE(); sei++) {
+        for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
             if (surfelements[sei].GetIndex()) {
                 outfile << " " << GetFaceDescriptor(surfelements[sei].GetIndex()).SurfNr() + 1;
                 outfile << " " << GetFaceDescriptor(surfelements[sei].GetIndex()).BCProperty();
@@ -513,15 +504,15 @@ namespace meshit {
         }
 
         outfile << "\n" << "\n";
-        outfile <<
-        "# surfid  0   p1   p2   trignum1    trignum2   domin/surfnr1    domout/surfnr2   ednr1   dist1   ednr2   dist2 \n";
+        outfile << "# surfid  0   p1   p2   trignum1    trignum2   domin/surfnr1    domout/surfnr2   ";
+        outfile << "ednr1   dist1   ednr2   dist2 \n";
         outfile << "edgesegmentsgi2" << "\n";
         outfile << GetNSeg() << "\n";
 
         for (i = 1; i <= GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
             outfile.width(8);
-            outfile << seg.si; // 2D: bc number, 3D: wievielte Kante
+            outfile << seg.si;  // 2D: bc number, 3D: wievielte Kante
             outfile.width(8);
             outfile << 0;
             outfile.width(8);
@@ -530,10 +521,10 @@ namespace meshit {
             outfile << seg[1];
             outfile << " ";
             outfile.width(8);
-            outfile << seg.geominfo[0].trignum; // stl dreiecke
+            outfile << seg.geominfo[0].trignum;  // stl dreiecke
             outfile << " ";
             outfile.width(8);
-            outfile << seg.geominfo[1].trignum; // <<std::endl;  // stl dreieck
+            outfile << seg.geominfo[1].trignum;  // <<std::endl;  // stl dreieck
 
             outfile << " ";
             outfile.width(8);
@@ -548,11 +539,11 @@ namespace meshit {
             outfile << " ";
             outfile.width(12);
             outfile.precision(16);
-            outfile << seg.epgeominfo[0].dist; // splineparameter (2D)
+            outfile << seg.epgeominfo[0].dist;  // splineparameter (2D)
             outfile << " ";
             outfile.width(8);
             outfile.precision(16);
-            outfile << seg.epgeominfo[1].edgenr; // geometry dependent
+            outfile << seg.epgeominfo[1].edgenr;  // geometry dependent
             outfile << " ";
             outfile.width(12);
             outfile << seg.epgeominfo[1].dist;
@@ -729,12 +720,10 @@ namespace meshit {
                 outfile << std::endl;
             }
         }
-
     }
 
     void Mesh::Load(const std::string& filename)
     {
-
         std::ifstream infile(filename.c_str());
         if (!infile.good())
             throw std::runtime_error("mesh file not found");
@@ -744,12 +733,11 @@ namespace meshit {
 
     void Mesh::Load(std::istream& infile)
     {
-
         char str[100];
         int i, n;
 
-        double scale = 1; // globflags.GetNumFlag ("scale", 1);
-        int invertsurf = 0; // globflags.GetDefineFlag ("invertsurfacemesh");
+        double scale = 1;    // globflags.GetNumFlag ("scale", 1);
+        int invertsurf = 0;  // globflags.GetDefineFlag ("invertsurfacemesh");
 
         facedecoding.resize(0);
 
@@ -830,7 +818,6 @@ namespace meshit {
                     AddSegment(seg);
                 }
             }
-
 
             if (strcmp(str, "edgesegmentsgi") == 0) {
                 infile >> n;
@@ -939,8 +926,7 @@ namespace meshit {
                         else
                             seg.SetBCName(0);
                     }
-                }
-                else {
+                } else {
                     for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
                         if (surfelements[sei].GetIndex()) {
                             int bcp = GetFaceDescriptor(surfelements[sei].GetIndex()).BCProperty();
@@ -1017,8 +1003,6 @@ namespace meshit {
         CalcSurfacesOfNode();
 
         topology->Update();
-
-        SetNextMajorTimeStamp();
     }
 
     void Mesh::BuildBoundaryEdges(void)
@@ -1175,8 +1159,7 @@ namespace meshit {
 
         Array<char, 1> hasface(GetNFD());
 
-        int i;
-        for (i = 1; i <= GetNFD(); i++) {
+        for (int i = 1; i <= GetNFD(); i++) {
             int domin = GetFaceDescriptor(i).DomainIn();
             int domout = GetFaceDescriptor(i).DomainOut();
             hasface[i] =
@@ -1278,7 +1261,7 @@ namespace meshit {
         }
 
         int cnt3 = 0;
-        for (i = 0; i < openelements.size(); i++) {
+        for (int i = 0; i < openelements.size(); i++) {
             if (openelements[i].GetNP() == 3)
                 cnt3++;
         }
@@ -1599,7 +1582,7 @@ namespace meshit {
         return (hsum / n);
     }
 
-    void Mesh::CalcLocalH(double grading)
+    void Mesh::CalcLocalH()
     {
         assert(lochfunc);
 
@@ -1656,7 +1639,7 @@ namespace meshit {
         }
     }
 
-    void Mesh::CalcLocalHFromPointDistances(double grading)
+    void Mesh::CalcLocalHFromPointDistances()
     {
         MESHIT_LOG_DEBUG("Calculating local h from point distances");
 
@@ -1679,7 +1662,7 @@ namespace meshit {
 
     }
 
-    void Mesh::CalcLocalHFromSurfaceCurvature(double grading, double elperr)
+    void Mesh::CalcLocalHFromSurfaceCurvature(double elperr)
     {
         MESHIT_LOG_DEBUG("Calculating local h from surface curvature");
 
@@ -2076,10 +2059,6 @@ namespace meshit {
         bool overlap = 0;
         bool incons_layers = 0;
 
-
-        for (i = 1; i <= GetNSE(); i++) {
-        }
-
         for (i = 1; i <= GetNSE(); i++) {
             const Element2d& tri = SurfaceElement(i);
 
@@ -2161,33 +2140,6 @@ namespace meshit {
         if (incons_layers) overlap = 0;
 
         return overlap;
-    }
-
-    bool Mesh::LegalTrig(const Element2d& el)
-    {
-        return 1;
-        if (/* hp */ 1) // needed for old, simple hp-refinement
-        {
-            // trigs with 2 or more segments are illegal
-            int i;
-            int nseg = 0;
-
-            if (!segmentht) {
-                std::cerr << "no segmentht allocated" << std::endl;
-                return 0;
-            }
-
-            //      Point3d cp(0.5, 0.5, 0.5);
-            for (i = 1; i <= 3; i++) {
-                INDEX_2 i2(el.PNumMod(i), el.PNumMod(i + 1));
-                i2.Sort();
-                if (segmentht->Used(i2))
-                    nseg++;
-            }
-            if (nseg >= 2)
-                return 0;
-        }
-        return 1;
     }
 
     int Mesh::GetNDomains() const
@@ -2710,4 +2662,4 @@ namespace meshit {
         if (surfelementht)
             surfelementht->PrintMemInfo(ost);
     }
-}
+}  // namespace meshit

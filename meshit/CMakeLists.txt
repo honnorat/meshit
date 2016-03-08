@@ -20,8 +20,7 @@ SET(src_GPRIM
     gprim/geomfuncs.cpp
     gprim/geomtest3d.cpp
     gprim/spline.cpp
-    gprim/splinegeometry.cpp
-    gprim/transform3d.cpp)
+    gprim/splinegeometry.cpp)
 
 SET(src_INTERFACE
     interface/writegmsh2.cpp
@@ -31,12 +30,10 @@ SET(src_LINALG
     linalg/bfgs.cpp
     linalg/densemat.cpp
     linalg/linopt.cpp
-    linalg/linsearch.cpp
-    linalg/polynomial.cpp)
+    linalg/linsearch.cpp)
 
 SET(src_MESHING
     meshing/adfront2.cpp
-    meshing/bisect.cpp
     meshing/global.cpp
     meshing/improve2.cpp
     meshing/improve2gen.cpp

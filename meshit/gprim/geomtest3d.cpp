@@ -1,7 +1,6 @@
 #include "geomtest3d.hpp"
 
 #include "../linalg/densemat.hpp"
-#include "../linalg/polynomial.hpp"
 
 namespace meshit {
 

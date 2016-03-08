@@ -17,9 +17,7 @@
 
 namespace meshit
 {
-  extern Array<int> tets_in_qualclass;
-
-  extern DebugParameters debugparam;
+    extern DebugParameters debugparam;
 }
 
 #endif

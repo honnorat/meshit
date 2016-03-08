@@ -294,22 +294,15 @@ namespace meshit {
             PointIndex gpi1 = adfront->GetGlobalIndex(pindex.Get(loclines[0].I1()));
             PointIndex gpi2 = adfront->GetGlobalIndex(pindex.Get(loclines[0].I2()));
 
-            debugflag =
-                    (debugparam.haltsegment &&
-                    (((debugparam.haltsegmentp1 == gpi1) && (debugparam.haltsegmentp2 == gpi2)) ||
-                    ((debugparam.haltsegmentp1 == gpi2) && (debugparam.haltsegmentp2 == gpi1))))
-                    ||
-                    (debugparam.haltnode &&
-                    ((debugparam.haltsegmentp1 == gpi1) || (debugparam.haltsegmentp2 == gpi1)));
-
+            debugflag = false;
 
             if (debugparam.haltface && debugparam.haltfacenr == facenr) {
-                debugflag = 1;
-                std::cout << "set debugflag" << std::endl;
+                debugflag = true;
+                MESHIT_LOG_DEBUG("set debugflag");
             }
 
             if (debugparam.haltlargequalclass && qualclass > 50)
-                debugflag = 1;
+                debugflag = true;
 
             // problem recognition !
             if (found &&
@@ -709,10 +702,6 @@ namespace meshit {
 
                                 if (debugflag || debugparam.haltnosuccess)
                                     MESHIT_LOG_WARNING("overlapping");
-
-                                if (debugparam.haltoverlap) {
-                                    debugflag = 1;
-                                }
                             }
                         }
                     }
@@ -734,11 +723,6 @@ namespace meshit {
                             std::cout << "ERROR: new line exits, val = " << exval << std::endl;
                             std::cerr << "ERROR: new line exits, val = " << exval << std::endl;
                             found = 0;
-
-
-                            if (debugparam.haltexistingline)
-                                debugflag = 1;
-
                         }
                     }
                 }

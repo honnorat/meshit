@@ -24,7 +24,7 @@ namespace meshit {
 
      public:
         DenseMatrix();
-        DenseMatrix(int h, int w = 0);
+        explicit DenseMatrix(int h, int w = 0);
         DenseMatrix(const DenseMatrix& m2);
         ~DenseMatrix();
 
@@ -249,10 +249,6 @@ namespace meshit {
             return data[(i - 1) * WIDTH + j - 1];
         }
 
-        const double& ConstElem(int i, int j) const
-        {
-            return data[(i - 1) * WIDTH + j - 1];
-        }
     };
 
     template<int WIDTH>

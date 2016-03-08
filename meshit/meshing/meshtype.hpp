@@ -849,8 +849,6 @@ namespace meshit {
         int haltlargequalclass;
         int haltsegment;
         int haltnode;
-        int haltsegmentp1;
-        int haltsegmentp2;
         int haltexistingline;
         int haltoverlap;
         int haltface;

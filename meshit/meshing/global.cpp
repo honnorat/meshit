@@ -1,6 +1,5 @@
 #include "global.hpp"
 
-
 namespace meshit {
 
     DebugParameters debugparam;
@@ -12,4 +11,4 @@ namespace meshit {
         timestamp++;
         return timestamp;
     }
-}
+}  // namespace meshit
