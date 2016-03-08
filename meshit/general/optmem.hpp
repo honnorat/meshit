@@ -1,5 +1,5 @@
-#ifndef FILE_OPTMEM_H
-#define FILE_OPTMEM_H
+#ifndef FILE_OPTMEM_HPP
+#define FILE_OPTMEM_HPP
 
 /**************************************************************************/
 /* File:   optmem.hh                                                      */

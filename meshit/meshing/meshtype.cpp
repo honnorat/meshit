@@ -259,12 +259,12 @@ namespace meshit {
         }
         else {
             int mini = 1;
-            for (int i = 2; i <= GetNP(); i++) {
+            for (size_t i = 2; i <= GetNP(); i++) {
                 if (PNum(i) < PNum(mini)) mini = i;
             }
 
             Element2d hel = (*this);
-            for (int i = 1; i <= GetNP(); i++) {
+            for (size_t i = 1; i <= GetNP(); i++) {
                 PNum(i) = hel.PNumMod(i + mini - 1);
             }
         }
@@ -273,9 +273,9 @@ namespace meshit {
     Array<IntegrationPointData*> ipdtrig;
     Array<IntegrationPointData*> ipdquad;
 
-    int Element2d::GetNIP() const
+    size_t Element2d::GetNIP() const
     {
-        int nip;
+        size_t nip;
         switch (np) {
             case 3:
                 nip = 1;
@@ -591,8 +591,7 @@ namespace meshit {
 
     double Element2d::CalcJacobianBadness(const T_POINTS& points, const Vec3d& n) const
     {
-        int i, j;
-        int nip = GetNIP();
+        size_t nip = GetNIP();
         DenseMatrix trans(2, 2);
         DenseMatrix pmat;
 
@@ -602,19 +601,19 @@ namespace meshit {
         n.GetNormal(t1);
         t2 = Cross(n, t1);
 
-        for (i = 1; i <= GetNP(); i++) {
+        for (size_t i = 1; i <= GetNP(); i++) {
             Point3d p = points[PNum(i)];
             pmat.Elem(1, i) = p.X() * t1.X() + p.Y() * t1.Y() + p.Z() * t1.Z();
             pmat.Elem(2, i) = p.X() * t2.X() + p.Y() * t2.Y() + p.Z() * t2.Z();
         }
 
         double err = 0;
-        for (i = 1; i <= nip; i++) {
+        for (size_t i = 1; i <= nip; i++) {
             GetTransformation(i, pmat, trans);
 
             // Frobenius norm
             double frob = 0;
-            for (j = 1; j <= 4; j++) {
+            for (size_t j = 1; j <= 4; j++) {
                 double d = trans.Get(j);
                 frob += d * d;
             }
@@ -642,7 +641,7 @@ namespace meshit {
                 break;
         }
 
-        for (int i = 1; i <= GetNIP(); i++) {
+        for (size_t i = 1; i <= GetNIP(); i++) {
             IntegrationPointData* ipd = new IntegrationPointData;
             Point2d hp;
             GetIntegrationPoint(i, hp, ipd->weight);
@@ -670,7 +669,7 @@ namespace meshit {
     std::ostream& operator<<(std::ostream& s, const Element2d& el)
     {
         s << "np = " << el.GetNP();
-        for (int j = 1; j <= el.GetNP(); j++) {
+        for (size_t j = 1; j <= el.GetNP(); j++) {
             s << " " << el.PNum(j);
         }
         return s;

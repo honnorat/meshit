@@ -377,13 +377,13 @@ namespace meshit {
         timestamp = NextTimeStamp();
 
         int maxn = el[0];
-        for (int i = 1; i < el.GetNP(); i++) {
+        for (size_t i = 1; i < el.GetNP(); i++) {
             if (el[i] > maxn) maxn = el[i];
         }
         maxn += 1 - PointIndex::BASE;
 
         if (maxn <= points.size()) {
-            for (int i = 0; i < el.GetNP(); i++) {
+            for (size_t i = 0; i < el.GetNP(); i++) {
                 if (points[el[i]].Type() > SURFACEPOINT)
                     points[el[i]].SetType(SURFACEPOINT);
             }
@@ -433,24 +433,14 @@ namespace meshit {
 
     void Mesh::Save(std::ostream& outfile) const
     {
-        int i, j;
-
         double scale = 1;    // globflags.GetNumFlag ("scale", 1);
         int invertsurf = 0;  // globflags.GetDefineFlag ("invertsurfacemesh");
 
-
-
         outfile << "mesh3d" << "\n";
-
         outfile << "dimension\n" << GetDimension() << "\n";
-
         outfile << "geomtype\n" << int(geomtype) << "\n";
-
-
         outfile << "\n";
-        outfile << "# surfnr    bcnr   domin  domout      np      p1      p2      p3"
-        << "\n";
-
+        outfile << "# surfnr    bcnr   domin  domout      np      p1      p2      p3" << "\n";
 
         switch (geomtype) {
             case GEOM_STL:
@@ -481,19 +471,19 @@ namespace meshit {
                 sel.Invert();
 
             outfile << " " << sel.GetNP();
-            for (j = 0; j < sel.GetNP(); j++) {
+            for (size_t j = 0; j < sel.GetNP(); j++) {
                 outfile << " " << sel[j];
             }
 
             switch (geomtype) {
                 case GEOM_STL:
-                    for (j = 1; j <= sel.GetNP(); j++) {
+                    for (size_t j = 1; j <= sel.GetNP(); j++) {
                         outfile << " " << sel.GeomInfoPi(j).trignum;
                     }
                     break;
                 case GEOM_OCC:
                 case GEOM_ACIS:
-                    for (j = 1; j <= sel.GetNP(); j++) {
+                    for (size_t j = 1; j <= sel.GetNP(); j++) {
                         outfile << " " << sel.GeomInfoPi(j).u;
                         outfile << " " << sel.GeomInfoPi(j).v;
                     }
@@ -509,7 +499,7 @@ namespace meshit {
         outfile << "edgesegmentsgi2" << "\n";
         outfile << GetNSeg() << "\n";
 
-        for (i = 1; i <= GetNSeg(); i++) {
+        for (int i = 1; i <= GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
             outfile.width(8);
             outfile << seg.si;  // 2D: bc number, 3D: wievielte Kante
@@ -572,14 +562,14 @@ namespace meshit {
             outfile << "identifications\n";
             Array<INDEX_2> identpairs;
             int cnt = 0;
-            for (i = 1; i <= ident->GetMaxNr(); i++) {
+            for (int i = 1; i <= ident->GetMaxNr(); i++) {
                 ident->GetPairs(i, identpairs);
                 cnt += identpairs.size();
             }
             outfile << cnt << "\n";
-            for (i = 1; i <= ident->GetMaxNr(); i++) {
+            for (int i = 1; i <= ident->GetMaxNr(); i++) {
                 ident->GetPairs(i, identpairs);
-                for (j = 1; j <= identpairs.size(); j++) {
+                for (int j = 1; j <= identpairs.size(); j++) {
                     outfile.width(8);
                     outfile << identpairs.Get(j).I1();
                     outfile.width(8);
@@ -591,7 +581,7 @@ namespace meshit {
 
             outfile << "identificationtypes\n";
             outfile << ident->GetMaxNr() << "\n";
-            for (i = 1; i <= ident->GetMaxNr(); i++) {
+            for (int i = 1; i <= ident->GetMaxNr(); i++) {
                 int type = ident->GetType(i);
                 outfile << " " << type;
             }
@@ -599,7 +589,7 @@ namespace meshit {
         }
 
         int cntmat = 0;
-        for (i = 1; i <= materials.size(); i++) {
+        for (int i = 1; i <= materials.size(); i++) {
             if (materials.Get(i) && strlen(materials.Get(i)))
                 cntmat++;
         }
@@ -607,7 +597,7 @@ namespace meshit {
         if (cntmat) {
             outfile << "materials" << std::endl;
             outfile << cntmat << std::endl;
-            for (i = 1; i <= materials.size(); i++) {
+            for (int i = 1; i <= materials.size(); i++) {
                 if (materials.Get(i) && strlen(materials.Get(i)))
                     outfile << i << " " << materials.Get(i) << std::endl;
             }
@@ -620,7 +610,7 @@ namespace meshit {
 
         if (cntbcnames) {
             outfile << "\n\nbcnames" << std::endl << bcnames.size() << std::endl;
-            for (i = 0; i < bcnames.size(); i++) {
+            for (int i = 0; i < bcnames.size(); i++) {
                 outfile << i + 1 << "\t" << GetBCName(i) << std::endl;
             }
             outfile << std::endl << std::endl;
@@ -708,7 +698,7 @@ namespace meshit {
             outfile.setf(std::ios::fixed, std::ios::floatfield);
             outfile.setf(std::ios::showpoint);
 
-            for (i = 1; i <= cnt_facedesc; i++) {
+            for (int i = 1; i <= cnt_facedesc; i++) {
                 outfile.width(8);
                 outfile << GetFaceDescriptor(i).SurfNr() + 1 << " ";
                 outfile.width(12);
@@ -734,7 +724,7 @@ namespace meshit {
     void Mesh::Load(std::istream& infile)
     {
         char str[100];
-        int i, n;
+        int n;
 
         double scale = 1;    // globflags.GetNumFlag ("scale", 1);
         int invertsurf = 0;  // globflags.GetDefineFlag ("invertsurfacemesh");
@@ -761,7 +751,7 @@ namespace meshit {
                 bool uv = strcmp(str, "surfaceelementsuv") == 0;
 
 
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     int surfnr, bcp, domin, domout, nep, faceind = 0;
 
                     infile >> surfnr >> bcp >> domin >> domout;
@@ -811,7 +801,7 @@ namespace meshit {
 
             if (strcmp(str, "edgesegments") == 0) {
                 infile >> n;
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     Segment seg;
                     int hi;
                     infile >> seg.si >> hi >> seg[0] >> seg[1];
@@ -821,7 +811,7 @@ namespace meshit {
 
             if (strcmp(str, "edgesegmentsgi") == 0) {
                 infile >> n;
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     Segment seg;
                     int hi;
                     infile >> seg.si >> hi >> seg[0] >> seg[1]
@@ -838,7 +828,7 @@ namespace meshit {
 
                 MESHIT_LOG_DEBUG(n << " curve elements");
 
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     Segment seg;
                     int hi;
                     infile >> seg.si >> hi >> seg[0] >> seg[1]
@@ -865,7 +855,7 @@ namespace meshit {
             if (strcmp(str, "points") == 0) {
                 infile >> n;
                 MESHIT_LOG_DEBUG(n << " points");
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     Point3d p;
                     infile >> p.X() >> p.Y() >> p.Z();
                     p.X() *= scale;
@@ -878,7 +868,7 @@ namespace meshit {
             if (strcmp(str, "identifications") == 0) {
                 infile >> n;
                 MESHIT_LOG_DEBUG(n << " identifications");
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     PointIndex pi1, pi2;
                     int ind;
                     infile >> pi1 >> pi2 >> ind;
@@ -889,7 +879,7 @@ namespace meshit {
             if (strcmp(str, "identificationtypes") == 0) {
                 infile >> n;
                 MESHIT_LOG_DEBUG(n << " identificationtypes");
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     int type;
                     infile >> type;
                     ident->SetType(i, Identifications::ID_TYPE(type));
@@ -899,7 +889,7 @@ namespace meshit {
             if (strcmp(str, "materials") == 0) {
                 infile >> n;
                 MESHIT_LOG_DEBUG(n << " materials");
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     int nr;
                     std::string mat;
                     infile >> nr >> mat;
@@ -912,14 +902,14 @@ namespace meshit {
                 MESHIT_LOG_DEBUG(n << " bcnames");
                 Array<int, 0> bcnrs(n);
                 SetNBCNames(n);
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     std::string nextbcname;
                     infile >> bcnrs[i - 1] >> nextbcname;
                     bcnames[bcnrs[i - 1] - 1] = new std::string(nextbcname);
                 }
 
                 if (GetDimension() == 2) {
-                    for (i = 1; i <= GetNSeg(); i++) {
+                    for (int i = 1; i <= GetNSeg(); i++) {
                         Segment& seg = LineSegment(i);
                         if (seg.si <= n)
                             seg.SetBCName(bcnames[seg.si - 1]);
@@ -942,7 +932,7 @@ namespace meshit {
 
             if (strcmp(str, "singular_points") == 0) {
                 infile >> n;
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     PointIndex pi;
                     double s;
                     infile >> pi;
@@ -953,7 +943,7 @@ namespace meshit {
 
             if (strcmp(str, "singular_edge_left") == 0) {
                 infile >> n;
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     SegmentIndex si;
                     double s;
                     infile >> si;
@@ -963,7 +953,7 @@ namespace meshit {
             }
             if (strcmp(str, "singular_edge_right") == 0) {
                 infile >> n;
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     SegmentIndex si;
                     double s;
                     infile >> si;
@@ -974,7 +964,7 @@ namespace meshit {
 
             if (strcmp(str, "singular_face_inside") == 0) {
                 infile >> n;
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     SurfaceElementIndex sei;
                     double s;
                     infile >> sei;
@@ -985,7 +975,7 @@ namespace meshit {
 
             if (strcmp(str, "singular_face_outside") == 0) {
                 infile >> n;
-                for (i = 1; i <= n; i++) {
+                for (int i = 1; i <= n; i++) {
                     SurfaceElementIndex sei;
                     double s;
                     infile >> sei;
@@ -1020,7 +1010,7 @@ namespace meshit {
             // int si = sel.GetIndex();
 
             if (sel.GetNP() <= 4)
-                for (int j = 0; j < sel.GetNP(); j++) {
+                for (size_t j = 0; j < sel.GetNP(); j++) {
                     INDEX_2 i2;
                     i2.I1() = sel.PNumMod(j + 1);
                     i2.I2() = sel.PNumMod(j + 2);
@@ -1043,7 +1033,7 @@ namespace meshit {
 
         for (int i = 0; i < openelements.size(); i++) {
             const Element2d& sel = openelements[i];
-            for (int j = 0; j < sel.GetNP(); j++) {
+            for (size_t j = 0; j < sel.GetNP(); j++) {
                 INDEX_2 i2;
                 i2.I1() = sel.PNumMod(j + 1);
                 i2.I2() = sel.PNumMod(j + 2);
@@ -1085,7 +1075,7 @@ namespace meshit {
 
             int si = sel.GetIndex();
 
-            for (int j = 0; j < sel.GetNP(); j++) {
+            for (size_t j = 0; j < sel.GetNP(); j++) {
                 PointIndex pi = sel[j];
                 bool found = 0;
                 for (int k = 0; k < surfacesonnode[pi].size(); k++) {
@@ -1174,7 +1164,7 @@ namespace meshit {
             if (hasface[ind]) {
                 const Element2d& hel = surfelements[sii];
                 int mini = 0;
-                for (int j = 1; j < hel.GetNP(); j++) {
+                for (size_t j = 1; j < hel.GetNP(); j++) {
                     if (hel[j] < hel[mini])
                         mini = j;
                 }
@@ -1189,7 +1179,7 @@ namespace meshit {
             if (hasface[ind]) {
                 const Element2d& hel = surfelements[sii];
                 int mini = 0;
-                for (int j = 1; j < hel.GetNP(); j++) {
+                for (size_t j = 1; j < hel.GetNP(); j++) {
                     if (hel[j] < hel[mini])
                         mini = j;
                 }
@@ -1275,7 +1265,7 @@ namespace meshit {
             const Element2d& sel = openelements.Get(i);
 
             if (boundaryedges)
-                for (int j = 1; j <= sel.GetNP(); j++) {
+                for (size_t j = 1; j <= sel.GetNP(); j++) {
                     INDEX_2 i2;
                     i2.I1() = sel.PNumMod(j);
                     i2.I2() = sel.PNumMod(j + 1);
@@ -1337,7 +1327,7 @@ namespace meshit {
             if (el.IsDeleted()) continue;
 
             if (surfnr == 0 || el.GetIndex() == surfnr) {
-                for (int j = 1; j <= el.GetNP(); j++) {
+                for (size_t j = 1; j <= el.GetNP(); j++) {
                     INDEX_2 seg(el.PNumMod(j), el.PNumMod(j + 1));
                     INDEX_2 data;
 
@@ -1384,7 +1374,7 @@ namespace meshit {
                     if (data.I2() > 0) {
                         // segment due to triangle
                         const Element2d& el = SurfaceElement(data.I2());
-                        for (int k = 1; k <= el.GetNP(); k++) {
+                        for (size_t k = 1; k <= el.GetNP(); k++) {
                             if (seg[0] == el.PNum(k))
                                 seg.geominfo[0] = el.GeomInfoPi(k);
                             if (seg[1] == el.PNum(k))
@@ -1428,45 +1418,6 @@ namespace meshit {
             points[seg[0]].SetType(EDGEPOINT);
             points[seg[1]].SetType(EDGEPOINT);
         }
-    }
-
-    void Mesh::RemoveOneLayerSurfaceElements()
-    {
-        int i, j;
-        int np = GetNP();
-
-        FindOpenSegments();
-        BitArray frontpoints(np);
-
-        frontpoints.Clear();
-        for (i = 1; i <= GetNOpenSegments(); i++) {
-            const Segment& seg = GetOpenSegment(i);
-            frontpoints.Set(seg[0]);
-            frontpoints.Set(seg[1]);
-        }
-
-        for (i = 1; i <= GetNSE(); i++) {
-            Element2d& sel = surfelements.Elem(i);
-            int remove = 0;
-            for (j = 1; j <= sel.GetNP(); j++) {
-                if (frontpoints.Test(sel.PNum(j)))
-                    remove = 1;
-            }
-            if (remove)
-                sel.PNum(1) = 0;
-        }
-
-        for (i = surfelements.size(); i >= 1; i--) {
-            if (surfelements.Elem(i).PNum(1) == 0) {
-                surfelements.Elem(i) = surfelements.Last();
-                surfelements.DeleteLast();
-            }
-        }
-
-        RebuildSurfaceElementLists();
-
-        timestamp = NextTimeStamp();
-        //  Compress();
     }
 
     void Mesh::SetLocalH(const Point3d& pmin, const Point3d& pmax, double grading)
@@ -1921,7 +1872,7 @@ namespace meshit {
 
         for (int i = 0; i < surfelements.size(); i++) {
             const Element2d& el = surfelements[i];
-            for (int j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 pused.Set(el[j]);
             }
         }
@@ -1934,7 +1885,7 @@ namespace meshit {
 
         for (int i = 0; i < openelements.size(); i++) {
             const Element2d& el = openelements[i];
-            for (int j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 pused.Set(el[j]);
             }
         }
@@ -1962,7 +1913,7 @@ namespace meshit {
 
         for (int i = 1; i <= surfelements.size(); i++) {
             Element2d& el = SurfaceElement(i);
-            for (int j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 el[j] = op2np[el[j]];
             }
         }
@@ -1975,7 +1926,7 @@ namespace meshit {
 
         for (int i = 1; i <= openelements.size(); i++) {
             Element2d& el = openelements.Elem(i);
-            for (int j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 el[j] = op2np[el[j]];
             }
         }
@@ -2009,7 +1960,7 @@ namespace meshit {
         for (int i = 1; i <= nf; i++) {
             const Element2d& sel = OpenElement(i);
 
-            for (int j = 1; j <= sel.GetNP(); j++) {
+            for (size_t j = 1; j <= sel.GetNP(); j++) {
                 i2.I1() = sel.PNumMod(j);
                 i2.I2() = sel.PNumMod(j + 1);
 
@@ -2031,7 +1982,7 @@ namespace meshit {
                     i2s.Sort();
                     for (int k = 1; k <= nf; k++) {
                         const Element2d& sel = OpenElement(k);
-                        for (int l = 1; l <= sel.GetNP(); l++) {
+                        for (size_t l = 1; l <= sel.GetNP(); l++) {
                             edge.I1() = sel.PNumMod(l);
                             edge.I2() = sel.PNumMod(l + 1);
                             edge.Sort();
@@ -2049,8 +2000,6 @@ namespace meshit {
 
     int Mesh::CheckOverlappingBoundary()
     {
-        int i, j, k;
-
         Point3d pmin, pmax;
         GetBox(pmin, pmax);
         Box3dTree setree(pmin, pmax);
@@ -2059,13 +2008,13 @@ namespace meshit {
         bool overlap = 0;
         bool incons_layers = 0;
 
-        for (i = 1; i <= GetNSE(); i++) {
+        for (int i = 1; i <= GetNSE(); i++) {
             const Element2d& tri = SurfaceElement(i);
 
             Point3d tpmin(Point(tri[0]));
             Point3d tpmax(tpmin);
 
-            for (k = 1; k < tri.GetNP(); k++) {
+            for (size_t k = 1; k < tri.GetNP(); k++) {
                 tpmin.SetToMin(Point(tri[k]));
                 tpmax.SetToMax(Point(tri[k]));
             }
@@ -2077,20 +2026,20 @@ namespace meshit {
             setree.Insert(tpmin, tpmax, i);
         }
 
-        for (i = 1; i <= GetNSE(); i++) {
+        for (int i = 1; i <= GetNSE(); i++) {
             const Element2d& tri = SurfaceElement(i);
 
             Point3d tpmin(Point(tri[0]));
             Point3d tpmax(tpmin);
 
-            for (k = 1; k < tri.GetNP(); k++) {
+            for (size_t k = 1; k < tri.GetNP(); k++) {
                 tpmin.SetToMin(Point(tri[k]));
                 tpmax.SetToMax(Point(tri[k]));
             }
 
             setree.GetIntersecting(tpmin, tpmax, inters);
 
-            for (j = 1; j <= inters.size(); j++) {
+            for (int j = 1; j <= inters.size(); j++) {
                 const Element2d& tri2 = SurfaceElement(inters.Get(j));
 
                 if (points[tri[0]].GetLayer() != points[tri2[0]].GetLayer())
@@ -2104,7 +2053,7 @@ namespace meshit {
 
 
                 const meshit::Point3d* trip1[3], * trip2[3];
-                for (k = 1; k <= 3; k++) {
+                for (size_t k = 1; k <= 3; k++) {
                     trip1[k - 1] = &Point(tri.PNum(k));
                     trip2[k - 1] = &Point(tri2.PNum(k));
                 }
@@ -2115,17 +2064,17 @@ namespace meshit {
                     MESHIT_LOG_DEBUG(" el1 = " << tri);
                     MESHIT_LOG_DEBUG(" el2 = " << tri2);
 
-                    for (k = 1; k <= 3; k++)
+                    for (size_t k = 1; k <= 3; k++)
                         MESHIT_LOG_DEBUG_CONT(tri.PNum(k) << "  ");
                     MESHIT_LOG_DEBUG("");
-                    for (k = 1; k <= 3; k++)
+                    for (size_t k = 1; k <= 3; k++)
                         MESHIT_LOG_DEBUG_CONT(tri2.PNum(k) << "  ");
                     MESHIT_LOG_DEBUG("");
 
-                    for (k = 0; k <= 2; k++)
+                    for (size_t k = 0; k <= 2; k++)
                         MESHIT_LOG_DEBUG_CONT(*trip1[k] << "   ");
                     MESHIT_LOG_DEBUG("");
-                    for (k = 0; k <= 2; k++)
+                    for (size_t k = 0; k <= 2; k++)
                         MESHIT_LOG_DEBUG_CONT(*trip2[k] << "   ");
                     MESHIT_LOG_DEBUG("");
 

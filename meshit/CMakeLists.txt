@@ -29,7 +29,6 @@ SET(src_INTERFACE
 SET(src_LINALG
     linalg/bfgs.cpp
     linalg/densemat.cpp
-    linalg/linopt.cpp
     linalg/linsearch.cpp)
 
 SET(src_MESHING

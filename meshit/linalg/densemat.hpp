@@ -1,5 +1,5 @@
-#ifndef FILE_DENSEMAT
-#define FILE_DENSEMAT
+#ifndef FILE_DENSEMAT_HPP
+#define FILE_DENSEMAT_HPP
 
 /**************************************************************************/
 /* File:   densemat.hpp                                                    */
@@ -18,44 +18,46 @@ namespace meshit {
     class DenseMatrix
     {
      protected:
-        int height;
-        int width;
+        size_t height;
+        size_t width;
         double* data;
 
      public:
-        DenseMatrix();
-        explicit DenseMatrix(int h, int w = 0);
+        DenseMatrix()
+                : height{0}, width{0}, data{nullptr} { }
+
+        explicit DenseMatrix(size_t h, size_t w = 0);
         DenseMatrix(const DenseMatrix& m2);
         ~DenseMatrix();
 
-        void SetSize(int h, int w = 0);
+        void SetSize(size_t h, size_t w = 0);
 
-        int Height() const
+        size_t Height() const
         {
             return height;
         }
 
-        int Width() const
+        size_t Width() const
         {
             return width;
         }
 
-        double& operator()(int i, int j)
+        double& operator()(size_t i, size_t j)
         {
             return data[i * width + j];
         }
 
-        double operator()(int i, int j) const
+        double operator()(size_t i, size_t j) const
         {
             return data[i * width + j];
         }
 
-        double& operator()(int i)
+        double& operator()(size_t i)
         {
             return data[i];
         }
 
-        double operator()(int i) const
+        double operator()(size_t i) const
         {
             return data[i];
         }
@@ -71,11 +73,11 @@ namespace meshit {
         {
             const double* mp = data;
             double* dp = &prod(0);
-            for (int i = 0; i < height; i++) {
+            for (size_t i = 0; i < height; i++) {
                 double sum = 0;
                 const double* sp = &v(0);
 
-                for (int j = 0; j < width; j++) {
+                for (size_t j = 0; j < width; j++) {
                     sum += *mp * *sp;
                     mp++;
                     sp++;
@@ -101,27 +103,27 @@ namespace meshit {
         void Solve(const Vector& b, Vector& x) const;
         void SolveDestroy(const Vector& b, Vector& x);
 
-        const double& Get(int i, int j) const
+        const double& Get(size_t i, size_t j) const
         {
             return data[(i - 1) * width + j - 1];
         }
 
-        const double& Get(int i) const
+        const double& Get(size_t i) const
         {
             return data[i - 1];
         }
 
-        void Set(int i, int j, double v)
+        void Set(size_t i, size_t j, double v)
         {
             data[(i - 1) * width + j - 1] = v;
         }
 
-        double& Elem(int i, int j)
+        double& Elem(size_t i, size_t j)
         {
             return data[(i - 1) * width + j - 1];
         }
 
-        const double& ConstElem(int i, int j) const
+        const double& ConstElem(size_t i, size_t j) const
         {
             return data[(i - 1) * width + j - 1];
         }
@@ -129,42 +131,36 @@ namespace meshit {
 
     extern std::ostream& operator<<(std::ostream& ost, const DenseMatrix& m);
 
-    template<int WIDTH>
+    template<size_t WIDTH>
     class MatrixFixWidth
     {
      protected:
-        int height;
+        size_t height;
         double* data;
         bool ownmem;
 
      public:
         MatrixFixWidth()
+                : height{0}, ownmem{false}
         {
-            height = 0;
-            data = 0;
-            ownmem = false;
+            data = nullptr;
         }
 
-        explicit MatrixFixWidth(int h)
+        explicit MatrixFixWidth(size_t h)
+                : height{h}, ownmem{true}
         {
-            height = h;
             data = new double[WIDTH * height];
-            ownmem = true;
         }
 
-        MatrixFixWidth(int h, double* adata)
-        {
-            height = h;
-            data = adata;
-            ownmem = false;
-        }
+        explicit MatrixFixWidth(size_t h, double* adata)
+                : height{h}, ownmem{false}, data{adata} { }
 
         ~MatrixFixWidth()
         {
             if (ownmem) delete[] data;
         }
 
-        void SetSize(int h)
+        void SetSize(size_t h)
         {
             if (h != height) {
                 if (ownmem) delete data;
@@ -174,20 +170,21 @@ namespace meshit {
             }
         }
 
-        int Height() const
+        size_t Height() const
         {
             return height;
         }
 
-        int Width() const
+        size_t Width() const
         {
             return WIDTH;
         }
 
         MatrixFixWidth& operator=(double v)
         {
-            for (int i = 0; i < height * WIDTH; i++)
+            for (size_t i = 0; i < height * WIDTH; i++) {
                 data[i] = v;
+            }
             return *this;
         }
 
@@ -196,11 +193,11 @@ namespace meshit {
             const double* mp = data;
             double* dp = &prod[0];
 
-            for (int i = 0; i < height; i++) {
+            for (size_t i = 0; i < height; i++) {
                 double sum = 0;
                 const double* sp = &v[0];
 
-                for (int j = 0; j < WIDTH; j++) {
+                for (size_t j = 0; j < WIDTH; j++) {
                     sum += *mp * *sp;
                     mp++;
                     sp++;
@@ -211,59 +208,61 @@ namespace meshit {
             }
         }
 
-        double& operator()(int i, int j)
+        double& operator()(size_t i, size_t j)
         {
             return data[i * WIDTH + j];
         }
 
-        const double& operator()(int i, int j) const
+        const double& operator()(size_t i, size_t j) const
         {
             return data[i * WIDTH + j];
         }
 
         MatrixFixWidth& operator*=(double v)
         {
-            if (data)
-                for (int i = 0; i < height * WIDTH; i++)
+            if (data) {
+                for (size_t i = 0; i < height * WIDTH; i++) {
                     data[i] *= v;
+                }
+            }
             return *this;
         }
 
-        const double& Get(int i, int j) const
+        const double& Get(size_t i, size_t j) const
         {
             return data[(i - 1) * WIDTH + j - 1];
         }
 
-        const double& Get(int i) const
+        const double& Get(size_t i) const
         {
             return data[i - 1];
         }
 
-        void Set(int i, int j, double v)
+        void Set(size_t i, size_t j, double v)
         {
             data[(i - 1) * WIDTH + j - 1] = v;
         }
 
-        double& Elem(int i, int j)
+        double& Elem(size_t i, size_t j)
         {
             return data[(i - 1) * WIDTH + j - 1];
         }
-
     };
 
-    template<int WIDTH>
+    template<size_t WIDTH>
     extern std::ostream& operator<<(std::ostream& ost, const MatrixFixWidth<WIDTH>& m)
     {
-        for (int i = 0; i < m.Height(); i++) {
-            for (int j = 0; j < m.Width(); j++)
+        for (size_t i = 0; i < m.Height(); i++) {
+            for (size_t j = 0; j < m.Width(); j++) {
                 ost << m.Get(i + 1, j + 1) << " ";
+            }
             ost << std::endl;
         }
         return ost;
     };
 
     extern void CalcAtA(const DenseMatrix& a, DenseMatrix& m2);
-    extern void CalcInverse(const DenseMatrix& m1, DenseMatrix& m2);
-}
+
+}  // namespace meshit
 
 #endif

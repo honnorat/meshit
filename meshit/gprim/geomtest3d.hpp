@@ -23,9 +23,6 @@ namespace meshit {
     /// return 1 = degenerated sphere
     int CalcSphereCenter(const Point3d ** pts, Point3d & c);
 
-    /// return 1 = degenerated triangle
-    int CalcTriangleCenter(const Point3d ** pts, Point3d & c);
-
     /*
       Compute radius of cylinder fitting 4 points.
       cylinder axis is in the direction of p1-p2

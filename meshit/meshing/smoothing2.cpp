@@ -1,19 +1,16 @@
-#include "../meshit.hpp"
 #include "improve2.hpp"
 #include "global.hpp"
 
 #include "../linalg/opti.hpp"
-#include "../gprim/geomfuncs.hpp"
 
 namespace meshit {
 
-    static const double c_trig = 0.14433756; // sqrt(3.0) / 12
-    static const double c_trig4 = 0.57735026; // sqrt(3.0) / 3
+    static const double c_trig = 0.14433756;   // sqrt(3.0) / 12
+    static const double c_trig4 = 0.57735026;  // sqrt(3.0) / 3
 
-    inline double CalcTriangleBadness(double x2, double x3, double y3,
-            double metricweight, double h)
+    inline double CalcTriangleBadness(double x2, double x3, double y3, double metricweight, double h)
     {
-        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1 
+        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
         // p1 = (0, 0), p2 = (x2, 0), p3 = (x3, y3);
 
         double cir_2 = (x2 * x2 + x3 * x3 + y3 * y3 - x2 * x3);
@@ -34,10 +31,10 @@ namespace meshit {
     }
 
     inline void CalcTriangleBadness(double x2, double x3, double y3, double metricweight,
-            double h, double & badness, double & g1x, double & g1y)
+                                    double h, double& badness, double& g1x, double& g1y)
     {
-        // old: badness = sqrt(3.0) /36 * circumference^2 / area - 1 
-        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1 
+        // old: badness = sqrt(3.0) /36 * circumference^2 / area - 1
+        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
         // p1 = (0, 0), p2 = (x2, 0), p3 = (x3, y3);
 
         double cir_2 = 2 * (x2 * x2 + x3 * x3 + y3 * y3 - x2 * x3);
@@ -75,13 +72,13 @@ namespace meshit {
     }
 
     double CalcTriangleBadness(
-            const Point3d & p1,
-            const Point3d & p2,
-            const Point3d & p3,
+            const Point3d& p1,
+            const Point3d& p2,
+            const Point3d& p3,
             double metricweight,
             double h)
     {
-        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1 
+        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
 
         Vec3d e12 = p2 - p1;
         Vec3d e13 = p3 - p1;
@@ -97,7 +94,7 @@ namespace meshit {
 
         if (metricweight > 0) {
             // add:  metricweight * (area / h^2 + h^2 / area - 2)
-            area *= 2; // optimum for (2 area) is h^2
+            area *= 2;   // optimum for (2 area) is h^2
             double areahh = area / (h * h);
             badness += metricweight * (areahh + 1 / areahh - 2);
         }
@@ -106,14 +103,14 @@ namespace meshit {
     }
 
     double CalcTriangleBadnessGrad(
-            const Point3d & p1,
-            const Point3d & p2,
-            const Point3d & p3,
-            Vec3d & gradp1,
+            const Point3d& p1,
+            const Point3d& p2,
+            const Point3d& p3,
+            Vec3d& gradp1,
             double metricweight,
             double h)
     {
-        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1 
+        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
 
         Vec3d e12 = p2 - p1;
         Vec3d e13 = p3 - p1;
@@ -136,7 +133,7 @@ namespace meshit {
 
         if (metricweight > 0) {
             // add:  metricweight * (area / h^2 + h^2 / area - 2)
-            area *= 2; // optimum for (2 area) is h^2
+            area *= 2;  // optimum for (2 area) is h^2
 
             double areahh = area / (h * h);
             badness += metricweight * (areahh + 1 / areahh - 2);
@@ -148,10 +145,10 @@ namespace meshit {
     }
 
     double CalcTriangleBadness(
-            const Point3d & p1,
-            const Point3d & p2,
-            const Point3d & p3,
-            const Vec3d & n,
+            const Point3d& p1,
+            const Point3d& p2,
+            const Point3d& p3,
+            const Vec3d& n,
             double metricweight,
             double h)
     {
@@ -170,8 +167,8 @@ namespace meshit {
 
     class Opti2dLocalData
     {
-      public:
-        const MeshOptimize2d * meshthis;
+     public:
+        const MeshOptimize2d* meshthis;
         MeshPoint sp1;
         PointGeomInfo gi1;
         Vec3d normal, t1, t2;
@@ -182,10 +179,10 @@ namespace meshit {
         // static int lostd::cerr2;
         double locmetricweight;
         double loch;
-        int surfi, surfi2;
+        int surfi;
         int uselocalh;
-      public:
 
+     public:
         Opti2dLocalData()
         {
             locmetricweight = 0;
@@ -194,21 +191,20 @@ namespace meshit {
 
     class Opti2SurfaceMinFunction : public MinFunction
     {
-        const Mesh & mesh;
-        Opti2dLocalData & ld;
-      public:
+        const Mesh& mesh;
+        Opti2dLocalData& ld;
 
-        Opti2SurfaceMinFunction(const Mesh & amesh,
-                Opti2dLocalData & ald)
-            : mesh(amesh), ld(ald) { };
+     public:
+        Opti2SurfaceMinFunction(const Mesh& amesh, Opti2dLocalData& ald)
+                : mesh(amesh), ld(ald) { }
 
-        virtual double Func(const Vector & x) const
+        virtual double Func(const Vector& x) const
         {
             Vec3d n;
 
             double badness = 0;
 
-            ld.meshthis -> GetNormalVector(ld.surfi, ld.sp1, ld.gi1, n);
+            ld.meshthis->GetNormalVector(ld.surfi, ld.sp1, ld.gi1, n);
             Point3d pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
 
             for (int j = 0; j < ld.locelements.size(); j++) {
@@ -218,10 +214,8 @@ namespace meshit {
                 if (ld.uselocalh) ld.loch = ld.lochs[j];
 
                 if (Determinant(e1, e2, n) > 1e-8 * ld.loch * ld.loch) {
-                    badness += CalcTriangleBadness(
-                            pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], ld.locmetricweight, ld.loch);
-                }
-                else {
+                    badness += CalcTriangleBadness(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], ld.locmetricweight, ld.loch);
+                } else {
                     badness += 1e8;
                 }
             }
@@ -229,7 +223,7 @@ namespace meshit {
             return badness;
         }
 
-        virtual double FuncGrad(const Vector & x, Vector & g) const
+        virtual double FuncGrad(const Vector& x, Vector& g) const
         {
             Vec3d vgrad;
             Point3d pp1;
@@ -247,12 +241,10 @@ namespace meshit {
 
                 if (Determinant(e1, e2, ld.normal) > 1e-8 * ld.loch * ld.loch) {
                     Vec3d hgrad;
-                    badness +=
-                            CalcTriangleBadnessGrad(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], hgrad,
-                            ld.locmetricweight, ld.loch);
+                    badness += CalcTriangleBadnessGrad(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], hgrad,
+                                                       ld.locmetricweight, ld.loch);
                     vgrad += hgrad;
-                }
-                else {
+                } else {
                     badness += 1e8;
                 }
             }
@@ -261,7 +253,7 @@ namespace meshit {
             return badness;
         }
 
-        virtual double FuncDeriv(const Vector & x, const Vector & dir, double & deriv) const
+        virtual double FuncDeriv(const Vector& x, const Vector& dir, double& deriv) const
         {
             deriv = 0;
             double badness = 0;
@@ -277,12 +269,10 @@ namespace meshit {
 
                 if (Determinant(e1, e2, ld.normal) > 1e-8 * ld.loch * ld.loch) {
                     Vec3d hgrad;
-                    badness +=
-                            CalcTriangleBadnessGrad(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], hgrad,
-                            ld.locmetricweight, ld.loch);
+                    badness += CalcTriangleBadnessGrad(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], hgrad,
+                                                       ld.locmetricweight, ld.loch);
                     deriv += dir3d * hgrad;
-                }
-                else {
+                } else {
                     badness += 1e8;
                 }
             }
@@ -292,30 +282,28 @@ namespace meshit {
 
     class Opti2SurfaceMinFunctionJacobian : public MinFunction
     {
-        const Mesh & mesh;
-        Opti2dLocalData & ld;
+        const Mesh& mesh;
+        Opti2dLocalData& ld;
 
-      public:
+     public:
+        Opti2SurfaceMinFunctionJacobian(const Mesh& amesh, Opti2dLocalData& ald)
+                : mesh(amesh), ld(ald) { }
 
-        Opti2SurfaceMinFunctionJacobian(const Mesh & amesh,
-                Opti2dLocalData & ald)
-            : mesh(amesh), ld(ald) { };
-        virtual double FuncGrad(const Vector & x, Vector & g) const;
-        virtual double FuncDeriv(const Vector & x, const Vector & dir, double & deriv) const;
-        virtual double Func(const Vector & x) const;
+        virtual double FuncGrad(const Vector& x, Vector& g) const;
+        virtual double FuncDeriv(const Vector& x, const Vector& dir, double& deriv) const;
+        virtual double Func(const Vector& x) const;
     };
 
-    double Opti2SurfaceMinFunctionJacobian::Func(const Vector & x) const
+    double Opti2SurfaceMinFunctionJacobian::Func(const Vector& x) const
     {
         Vector g(x.Size());
         return FuncGrad(x, g);
     }
 
-    double Opti2SurfaceMinFunctionJacobian::FuncGrad(const Vector & x, Vector & grad) const
+    double Opti2SurfaceMinFunctionJacobian::FuncGrad(const Vector& x, Vector& grad) const
     {
         int lpi, gpi;
         Vec3d n;
-        Vec2d vdir;
         double badness;
 
         badness = 0;
@@ -328,12 +316,11 @@ namespace meshit {
         grad = 0;
 
         for (int j = 1; j <= ld.locelements.size(); j++) {
-
-            const Element2d & bel = mesh.SurfaceElement(ld.locelements.Get(j));
+            const Element2d& bel = mesh.SurfaceElement(ld.locelements.Get(j));
             lpi = ld.locrots.Get(j);
             gpi = bel.PNum(lpi);
 
-            for (int k = 1; k <= bel.GetNP(); k++) {
+            for (size_t k = 1; k <= bel.GetNP(); k++) {
                 PointIndex pi = bel.PNum(k);
                 pts2d[pi] = Point2d(
                         ld.t1 * (mesh.Point(pi) - ld.sp1),
@@ -352,12 +339,12 @@ namespace meshit {
     }
 
     double Opti2SurfaceMinFunctionJacobian::
-    FuncDeriv(const Vector & x, const Vector & dir, double & deriv) const
+    FuncDeriv(const Vector& x, const Vector& dir, double& deriv) const
     {
         // from 2d:
 
-        int j, k, lpi, gpi;
-        Vec2d g1, vdir;
+        int j, lpi, gpi;
+        Vec2d vdir;
         double badness, hbad, hderiv;
 
         static Array<Point2d> pts2d;
@@ -368,12 +355,12 @@ namespace meshit {
 
         for (j = 1; j <= ld.locelements.size(); j++) {
             lpi = ld.locrots.Get(j);
-            const Element2d & bel =
+            const Element2d& bel =
                     mesh.SurfaceElement(ld.locelements.Get(j));
 
             gpi = bel.PNum(lpi);
 
-            for (k = 1; k <= bel.GetNP(); k++) {
+            for (size_t k = 1; k <= bel.GetNP(); k++) {
                 PointIndex pi = bel.PNum(k);
                 pts2d[pi] = Point2d(
                         ld.t1 * (mesh.Point(pi) - ld.sp1),
@@ -400,7 +387,7 @@ namespace meshit {
         SetWriteStatus(1);
     }
 
-    void MeshOptimize2d::ImproveMesh(Mesh & mesh, const MeshingParameters & mp)
+    void MeshOptimize2d::ImproveMesh(Mesh& mesh, const MeshingParameters& mp)
     {
         if (!faceindex) {
             MESHIT_LOG_DEBUG("Smoothing");
@@ -434,14 +421,14 @@ namespace meshit {
         Array<int, PointIndex::BASE> compress(mesh.GetNP());
         Array<PointIndex> icompress;
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < el.GetNP(); j++) {
+            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 compress[el[j]] = -1;
             }
         }
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < el.GetNP(); j++) {
+            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 if (compress[el[j]] == -1) {
                     compress[el[j]] = icompress.size();
                     icompress.push_back(el[j]);
@@ -451,15 +438,15 @@ namespace meshit {
         Array<int> cnta(icompress.size());
         cnta = 0;
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < el.GetNP(); j++) {
+            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 cnta[compress[el[j]]]++;
             }
         }
         TABLE<SurfaceElementIndex> elementsonpoint(cnta);
         for (int i = 0; i < seia.size(); i++) {
-            const Element2d & el = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < el.GetNP(); j++) {
+            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            for (size_t j = 0; j < el.GetNP(); j++) {
                 elementsonpoint.Add(compress[el[j]], seia[i]);
             }
         }
@@ -480,7 +467,6 @@ namespace meshit {
         for (int hi = 0; hi < icompress.size(); hi++) {
             PointIndex pi = icompress[hi];
             if (mesh[pi].Type() == SURFACEPOINT) {
-
                 cnt++;
 
                 // if (elementsonpoint[pi].Size() == 0) continue;
@@ -489,10 +475,10 @@ namespace meshit {
                 ld.sp1 = mesh[pi];
 
                 // Element2d & hel = mesh[elementsonpoint[pi][0]];
-                Element2d & hel = mesh.SurfaceElement(elementsonpoint[hi][0]);
+                Element2d& hel = mesh.SurfaceElement(elementsonpoint[hi][0]);
 
                 int hpi = 0;
-                for (int j = 1; j <= hel.GetNP(); j++) {
+                for (size_t j = 1; j <= hel.GetNP(); j++) {
                     if (hel.PNum(j) == pi) {
                         hpi = j;
                         break;
@@ -508,12 +494,11 @@ namespace meshit {
 
                 for (int j = 0; j < elementsonpoint[hi].size(); j++) {
                     SurfaceElementIndex sei = elementsonpoint[hi][j];
-                    const Element2d & bel = mesh.SurfaceElement(sei);
+                    const Element2d& bel = mesh.SurfaceElement(sei);
                     ld.surfi = mesh.GetFaceDescriptor(bel.GetIndex()).SurfNr();
-
                     ld.locelements.push_back(sei);
 
-                    for (int k = 1; k <= bel.GetNP(); k++) {
+                    for (size_t k = 1; k <= bel.GetNP(); k++) {
                         if (bel.PNum(k) == pi) {
                             ld.locrots.push_back(k);
                             ld.loc_pnts2.push_back(mesh[bel.PNumMod(k + 1)]);
@@ -533,15 +518,15 @@ namespace meshit {
 
                 // save points, and project to tangential plane
                 for (int j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d & el = mesh.SurfaceElement(ld.locelements[j]);
-                    for (int k = 0; k < el.GetNP(); k++) {
+                    const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
+                    for (size_t k = 0; k < el.GetNP(); k++) {
                         savepoints[el[k]] = mesh[el[k]];
                     }
                 }
 
                 for (int j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d & el = mesh.SurfaceElement(ld.locelements[j]);
-                    for (int k = 0; k < el.GetNP(); k++) {
+                    const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
+                    for (size_t k = 0; k < el.GetNP(); k++) {
                         PointIndex hhpi = el[k];
                         double lam = ld.normal * (mesh[hhpi] - ld.sp1);
                         mesh.Point(hhpi) -= lam * ld.normal;
@@ -553,8 +538,7 @@ namespace meshit {
 
                 if (mixed) {
                     BFGS(x, surfminfj, par, 1e-6);
-                }
-                else {
+                } else {
                     BFGS(x, surfminf, par, 1e-6);
                 }
 
@@ -565,14 +549,14 @@ namespace meshit {
 
                 // restore other points
                 for (int j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d & el = mesh.SurfaceElement(ld.locelements[j]);
-                    for (int k = 0; k < el.GetNP(); k++) {
+                    const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
+                    for (size_t k = 0; k < el.GetNP(); k++) {
                         PointIndex hhpi = el[k];
                         if (hhpi != pi) mesh[hhpi] = savepoints[hhpi];
                     }
                 }
 
-                //optimizer loop (if whole distance is not possible, move only a bit!!!!)
+                // optimizer loop (if whole distance is not possible, move only a bit!!!!)
                 while (loci <= 5 && !moveisok) {
                     loci++;
 
@@ -582,7 +566,7 @@ namespace meshit {
                     mesh.Point(pi).Y() = hnp.Y();
                     mesh.Point(pi).Z() = hnp.Z();
 
-                    fact /=  2.;
+                    fact /= 2.;
 
                     PointGeomInfo ngi;
                     ngi = ld.gi1;
@@ -593,24 +577,22 @@ namespace meshit {
                         for (int j = 0; j < ld.locelements.size(); j++) {
                             mesh.SurfaceElement(ld.locelements[j]).GeomInfoPi(ld.locrots[j]) = ngi;
                         }
-                    }
-                    else {
+                    } else {
                         mesh.Point(pi) = origp;
                     }
-
                 }
             }
         }
         mesh.SetNextTimeStamp();
     }
 
-    void MeshOptimize2d::GetNormalVector(INDEX /* surfind */, const Point3d & p, Vec3d & nv) const
+    void MeshOptimize2d::GetNormalVector(INDEX /* surfind */, const Point3d& p, Vec3d& nv) const
     {
         nv = Vec3d(0, 0, 1);
     }
 
-    void MeshOptimize2d::GetNormalVector(INDEX surfind, const Point3d & p, PointGeomInfo & gi, Vec3d & n) const
+    void MeshOptimize2d::GetNormalVector(INDEX surfind, const Point3d& p, PointGeomInfo& gi, Vec3d& n) const
     {
         GetNormalVector(surfind, p, n);
     }
-}
+}  // namespace meshit

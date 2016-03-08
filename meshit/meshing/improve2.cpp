@@ -341,7 +341,7 @@ namespace meshit {
 
         for (int i = 0; i < seia.size(); i++) {
             Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < el.GetNP(); j++)
+            for (size_t j = 0; j < el.GetNP(); j++)
                 elementsonnode.Add(el[j], seia[i]);
         }
 
@@ -350,7 +350,7 @@ namespace meshit {
 
         for (int i = 0; i < seia.size(); i++) {
             Element2d& sel = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < sel.GetNP(); j++) {
+            for (size_t j = 0; j < sel.GetNP(); j++) {
                 PointIndex pi1 = sel.PNumMod(j + 2);
                 PointIndex pi2 = sel.PNumMod(j + 3);
                 if (mesh.IsSegment(pi1, pi2)) {
@@ -493,29 +493,28 @@ namespace meshit {
                     else
                         std::cerr << "OOPS!" << std::endl;
 
-                    for (l = 0; l < el1p->GetNP(); l++)
+                    for (size_t l = 0; l < el1p->GetNP(); l++) {
                         if ((*el1p)[l] == pi1) {
                             gi = el1p->GeomInfoPi(l + 1);
                         }
-
-                    // std::cerr << "Connect point " << pi2 << " to " << pi1 << "\n";
+                    }
                     for (int k = 0; k < elementsonnode[pi2].size(); k++) {
                         Element2d& el = mesh.SurfaceElement(elementsonnode[pi2][k]);
                         if (el.IsDeleted()) continue;
                         elementsonnode.Add(pi1, elementsonnode[pi2][k]);
 
                         bool haspi1 = 0;
-                        for (l = 0; l < el.GetNP(); l++)
+                        for (size_t l = 0; l < el.GetNP(); l++) {
                             if (el[l] == pi1)
                                 haspi1 = 1;
+                        }
                         if (haspi1) continue;
 
-                        for (l = 0; l < el.GetNP(); l++) {
+                        for (size_t l = 0; l < el.GetNP(); l++) {
                             if (el[l] == pi2) {
                                 el[l] = pi1;
                                 el.GeomInfoPi(l + 1) = gi;
                             }
-
                             fixed[el[l]] = true;
                         }
                     }

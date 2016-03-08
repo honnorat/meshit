@@ -15,83 +15,48 @@
 
 namespace meshit {
 
-    void Cholesky(const DenseMatrix& a, DenseMatrix& l, Vector& d)
-    {
-        // Factors   A = L D L^T
-
-        double x;
-        int n = a.Height();
-
-        l = a;
-
-        for (int i = 1; i <= n; i++) {
-            for (int j = i; j <= n; j++) {
-                x = l.Get(i, j);
-
-                for (int k = 1; k < i; k++)
-                    x -= l.Get(i, k) * l.Get(j, k) * d(k - 1);
-
-                if (i == j) {
-                    d(i - 1) = x;
-                }
-                else {
-                    l.Elem(j, i) = x / d(i - 1);
-                }
-            }
-        }
-
-        for (int i = 1; i <= n; i++) {
-            l.Elem(i, i) = 1;
-            for (int j = i + 1; j <= n; j++)
-                l.Elem(i, j) = 0;
-        }
-    }
-
     void MultLDLt(const DenseMatrix& l, const Vector& d, const Vector& g, Vector& p)
     {
-        double val;
-
-        int n = l.Height();
+        size_t n = l.Height();
         p = g;
 
-        for (int i = 0; i < n; i++) {
-            val = 0;
-            for (int j = i; j < n; j++)
+        for (size_t i = 0; i < n; i++) {
+            double val = 0;
+            for (size_t j = i; j < n; j++)
                 val += p(j) * l(j, i);
             p(i) = val;
         }
 
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
             p(i) *= d(i);
 
         for (int i = n - 1; i >= 0; i--) {
-            val = 0;
-            for (int j = 0; j <= i; j++)
+            double val = 0;
+            for (size_t j = 0; j <= static_cast<size_t>(i); j++) {
                 val += p(j) * l(i, j);
+            }
             p(i) = val;
         }
     }
 
     void SolveLDLt(const DenseMatrix& l, const Vector& d, const Vector& g, Vector& p)
     {
-        double val;
-
-        int n = l.Height();
+        size_t n = l.Height();
         p = g;
 
-        for (int i = 0; i < n; i++) {
-            val = 0;
-            for (int j = 0; j < i; j++)
+        for (size_t i = 0; i < n; i++) {
+            double val = 0;
+            for (size_t j = 0; j < i; j++)
                 val += p(j) * l(i, j);
             p(i) -= val;
         }
 
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
             p(i) /= d(i);
 
         for (int i = n - 1; i >= 0; i--) {
-            val = 0;
-            for (int j = i + 1; j < n; j++)
+            double val = 0;
+            for (size_t j = i + 1; j < n; j++)
                 val += p(j) * l(j, i);
             p(i) -= val;
         }
@@ -103,26 +68,24 @@ namespace meshit {
         // Rueckgabewert: 0 .. D bleibt positiv definit
         //                1 .. sonst
 
-        int n = l.Height();
+        size_t n = l.Height();
 
         Vector v(n);
-        double t, told, xi;
-
-        told = 1;
+        double told = 1.0;
         v = u;
 
-        for (int j = 1; j <= n; j++) {
-            t = told + a * (v(j - 1) * v(j - 1)) / d(j - 1);
+        for (size_t j = 1; j <= n; j++) {
+            double t = told + a * (v(j - 1) * v(j - 1)) / d(j - 1);
 
             if (t <= 0) {
                 std::cout << "update err, t = " << t << std::endl;
                 return 1;
             }
 
-            xi = a * v(j - 1) / (d(j - 1) * t);
+            double xi = a * v(j - 1) / (d(j - 1) * t);
             d(j - 1) *= t / told;
 
-            for (int i = j + 1; i <= n; i++) {
+            for (size_t i = j + 1; i <= n; i++) {
                 v(i - 1) -= v(j - 1) * l.Elem(i, j);
                 l.Elem(i, j) += xi * v(i - 1);
             }
@@ -134,33 +97,31 @@ namespace meshit {
     }
 
     double BFGS(
-            Vector& x, // i: Startwert, o: Loesung, falls IFAIL = 0
+            Vector& x,  // i: Startwert, o: Loesung, falls IFAIL = 0
             const MinFunction& fun,
             const OptiParameters& par,
             double eps)
     {
-        int n = x.Size();
-        long it;
+        size_t n = x.Size();
+        int it;
         char a1crit, a3acrit;
 
 
-        Vector d(n), g(n), p(n), temp(n), bs(n), xneu(n), y(n), s(n), x0(n);
+        Vector d(n), g(n), p(n), bs(n), xneu(n), y(n), s(n), x0(n);
         DenseMatrix l(n);
-        DenseMatrix hesse(n);
 
         double /* normg, */ alphahat, hd, fold;
         double a1, a2;
         const double mu1 = 0.1, sigma = 0.1, xi1 = 1, xi2 = 10;
         const double tau = 0.1, tau1 = 0.1, tau2 = 0.6;
 
-        Vector typx(x.Size()); // i: typische Groessenordnung der Komponenten
+        Vector typx(x.Size());  // i: typische Groessenordnung der Komponenten
         double f, f0;
-        double typf; // i: typische Groessenordnung der Loesung
-        double fmin = -1e5; // i: untere Schranke fuer Funktionswert
-        //  double eps = 1e-8;            // i: Abbruchschranke fuer relativen Gradienten
-        double tauf = 0.1; // i: Abbruchschranke fuer die relative Aenderung der
+        double typf;  // i: typische Groessenordnung der Loesung
+        double fmin = -1e5;  // i: untere Schranke fuer Funktionswert
+        double tauf = 0.1;  // i: Abbruchschranke fuer die relative Aenderung der
         //    Funktionswerte
-        int ifail; // o:  0 .. Erfolg
+        int ifail;   // o:  0 .. Erfolg
         //    -1 .. Unterschreitung von fmin
         //     1 .. kein Erfolg bei Liniensuche
         //     2 .. Überschreitung von itmax
@@ -168,9 +129,8 @@ namespace meshit {
         typx = par.typx;
         typf = par.typf;
 
-
         l = 0;
-        for (int i = 1; i <= n; i++)
+        for (size_t i = 1; i <= n; i++)
             l.Elem(i, i) = 1;
 
         f = fun.FuncGrad(x, g);
@@ -181,12 +141,14 @@ namespace meshit {
         do {
             // Restart
             if (it % (5 * n) == 0) {
-
-                for (int i = 1; i <= n; i++)
-                    d(i - 1) = typf / (typx(i - 1) * typx(i - 1)); // 1;
-                for (int i = 2; i <= n; i++)
-                    for (int j = 1; j < i; j++)
+                for (size_t i = 1; i <= n; i++) {
+                    d(i - 1) = typf / (typx(i - 1) * typx(i - 1));  // 1;
+                }
+                for (size_t i = 2; i <= n; i++) {
+                    for (size_t j = 1; j < i; j++) {
                         l.Elem(i, j) = 0;
+                    }
+                }
             }
 
             it++;
@@ -196,7 +158,6 @@ namespace meshit {
             }
 
             // Solve with factorized B
-
             SolveLDLt(l, d, g, p);
 
             p *= -1;
@@ -215,12 +176,11 @@ namespace meshit {
 
             s.Set2(1, xneu, -1, x);
             y *= -1;
-            y.Add(1, g); // y += g;
+            y.Add(1, g);  // y += g;
 
             x = xneu;
 
             // BFGS Update
-
             MultLDLt(l, d, s, bs);
 
             a1 = y * s;
@@ -246,18 +206,19 @@ namespace meshit {
             }
 
             // Calculate stop conditions
-
             hd = eps * std::max(typf, fabs(f));
             a1crit = 1;
-            for (int i = 1; i <= n; i++)
-                if (fabs(g(i - 1)) * std::max(typx(i - 1), fabs(x(i - 1))) > hd)
+            for (size_t i = 1; i <= n; i++) {
+                if (fabs(g(i - 1)) * std::max(typx(i - 1), fabs(x(i - 1))) > hd) {
                     a1crit = 0;
-
+                }
+            }
 
             a3acrit = (fold - f <= tauf * std::max(typf, fabs(f)));
 
-            if (g.L2Norm() < fun.GradStopping(x)) break;
-
+            if (g.L2Norm() < fun.GradStopping(x)) {
+                break;
+            }
         } while (!a1crit || !a3acrit);
 
         if (f0 < f || (ifail == 1)) {
@@ -268,4 +229,4 @@ namespace meshit {
 
         return f;
     }
-}
+}  // namelist meshit

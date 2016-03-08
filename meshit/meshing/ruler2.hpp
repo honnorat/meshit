@@ -103,37 +103,37 @@ namespace meshit {
             return quality;
         }
 
-        int GetLNearness(int li) const
+        int GetLNearness(size_t li) const
         {
             return lnearness[li-1];
         }
 
-        const Point2d & GetPoint(int i) const
+        const Point2d & GetPoint(size_t i) const
         {
             return points[i - 1];
         }
 
-        const INDEX_2 & GetLine(int i) const
+        const INDEX_2 & GetLine(size_t i) const
         {
             return lines[i - 1];
         }
 
-        const Element2d & GetElement(int i) const
+        const Element2d & GetElement(size_t i) const
         {
             return elements[i - 1];
         }
 
-        const threeint & GetOrientation(int i) const
+        const threeint & GetOrientation(size_t i) const
         {
             return orientations[i - 1];
         }
 
-        int GetDelLine(int i) const
+        int GetDelLine(size_t i) const
         {
             return dellines[i - 1];
         }
 
-        double CalcPointDist(int pi, const Point2d & p) const
+        double CalcPointDist(size_t pi, const Point2d & p) const
         {
             double dx = p.X() - points[pi - 1].X();
             double dy = p.Y() - points[pi - 1].Y();
@@ -169,7 +169,7 @@ namespace meshit {
         int IsLineInFreeZone2(const Point2d & p1, const Point2d & p2) const;
         int ConvexFreeZone() const;
 
-        int GetPointNr(int ln, int endp) const
+        int GetPointNr(size_t ln, int endp) const
         {
             return lines[ln - 1].I(endp);
         }

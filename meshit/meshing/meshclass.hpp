@@ -290,10 +290,6 @@ namespace meshit {
            store in opensegmentsy
          */
         void FindOpenSegments(int surfnr = 0);
-        /**
-           remove one layer of surface elements
-         */
-        void RemoveOneLayerSurfaceElements();
 
         int GetNOpenSegments()
         {

@@ -416,7 +416,7 @@ namespace meshit {
             }
         }
 
-        int GetNP() const
+        size_t GetNP() const
         {
             return np;
         }
@@ -507,7 +507,7 @@ namespace meshit {
         friend class Mesh;
 
         /// get number of 'integration points'
-        int GetNIP() const;
+        size_t GetNIP() const;
         void GetIntegrationPoint(int ip, Point2d& p, double& weight) const;
 
         void GetTransformation(int ip, const Array<Point2d>& points,

@@ -1,5 +1,5 @@
-#ifndef FILE_SYMBOLTA_H
-#define FILE_SYMBOLTA_H
+#ifndef FILE_SYMBOLTA_HPP
+#define FILE_SYMBOLTA_HPP
 
 #include "array.hpp"
 #include "template.hpp"

@@ -134,40 +134,6 @@ namespace meshit {
         return 0;
     }
 
-    int CalcTriangleCenter(const Point3d** pts, Point3d& c)
-    {
-        static DenseMatrix a(2), inva(2);
-        static Vector rs(2), sol(2);
-        double h = Dist(*pts[0], *pts[1]);
-
-        Vec3d v1(*pts[0], *pts[1]);
-        Vec3d v2(*pts[0], *pts[2]);
-
-        rs(0) = v1 * v1;
-        rs(1) = v2 * v2;
-
-        a(0, 0) = 2 * rs(0);
-        a(0, 1) = a(1, 0) = 2 * (v1 * v2);
-        a(1, 1) = 2 * rs(1);
-
-        if (fabs(a.Det()) <= 1e-12 * h * h) {
-            std::cerr << "CalcTriangleCenter: degenerated" << std::endl;
-            return 1;
-        }
-
-        CalcInverse(a, inva);
-        inva.Mult(rs, sol);
-
-        c = *pts[0];
-        v1 *= sol(0);
-        v2 *= sol(1);
-
-        c += v1;
-        c += v2;
-
-        return 0;
-    }
-
     double ComputeCylinderRadius(
             const Point3d& p1,
             const Point3d& p2,

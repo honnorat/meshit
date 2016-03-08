@@ -236,9 +236,6 @@ namespace meshit {
             return points[pi].GlobalIndex();
         }
 
-        /// is Point p inside Surface (flat geometry only)
-        bool Inside(const Point<2>& p) const;
-
         void SetStartFront();
         void PrintOpenSegments(std::ostream& ost) const;
     };

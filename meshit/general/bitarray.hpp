@@ -1,5 +1,5 @@
-#ifndef FILE_BitArray_H
-#define FILE_BitArray_H
+#ifndef FILE_BitArray_HPP
+#define FILE_BitArray_HPP
 
 /**************************************************************************/
 /* File:   bitarray.hpp                                                   */

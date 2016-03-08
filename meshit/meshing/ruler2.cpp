@@ -1,11 +1,10 @@
-#include "../meshit.hpp"
 #include "meshing2.hpp"
 
 namespace meshit {
 
     static double CalcElementBadness(
-            const Array<Point2d> & points,
-            const Element2d & elem)
+            const Array<Point2d>& points,
+            const Element2d& elem)
     {
         // badness = sqrt(3) /36 * circumference^2 / area - 1 +
         //           h / li + li / h - 2
@@ -29,18 +28,18 @@ namespace meshit {
         }
 
         return 10 * (c * cir * cir / area - 1)
-                + 1 / l12 + l12 + 1 / l13 + l13 + 1 / l23 + l23 - 6;
+               + 1 / l12 + l12 + 1 / l13 + l13 + 1 / l23 + l23 - 6;
     }
 
     int Meshing2::ApplyRules(
-            Array<Point2d> & lpoints,
-            Array<int> & legalpoints,
+            Array<Point2d>& lpoints,
+            Array<int>& legalpoints,
             int maxlegalpoint,
-            Array<INDEX_2> & llines1,
+            Array<INDEX_2>& llines1,
             int maxlegalline,
-            Array<Element2d> & elements,
-            Array<INDEX> & dellines, int tolerance,
-            const MeshingParameters & mp)
+            Array<Element2d>& elements,
+            Array<INDEX>& dellines, int tolerance,
+            const MeshingParameters& mp)
     {
         double maxerr = 0.5 + 0.3 * tolerance;
         double minelerr = 2 + 0.5 * tolerance * tolerance;
@@ -62,7 +61,7 @@ namespace meshit {
 
         // check every rule
 
-        int found = 0; // rule number
+        int found = 0;  // rule number
 
         pnearness = 1000;
 
@@ -75,7 +74,7 @@ namespace meshit {
         for (int cnt = 0; cnt < MAX_NEARNESS; cnt++) {
             bool ok = true;
             for (int i = 0; i < maxlegalline; i++) {
-                const INDEX_2 & hline = llines1[i];
+                const INDEX_2& hline = llines1[i];
 
                 int minn = std::min(pnearness.Get(hline[0]), pnearness.Get(hline[1]));
 
@@ -117,8 +116,7 @@ namespace meshit {
                 llines[lnearness_class[lnearness[i]]] = llines1[i];
                 sortlines[lnearness_class[lnearness[i]]] = i + 1;
                 lnearness_class[lnearness[i]]++;
-            }
-            else {
+            } else {
                 llines[cumm] = llines1[i];
                 sortlines[cumm] = i + 1;
                 cumm++;
@@ -137,8 +135,7 @@ namespace meshit {
         pused = 0;
 
         for (int ri = 1; ri <= rules.size(); ri++) {
-
-            netrule * rule = rules.Get(ri);
+            netrule* rule = rules.Get(ri);
 
             if (rule->GetQuality() > tolerance) continue;
 
@@ -160,11 +157,11 @@ namespace meshit {
             bool ok = false;
 
             while (nlok >= 2) {
-
-                if (nlok <= (int) rule->GetNOldL()) {
+                if (nlok <= static_cast<int>(rule->GetNOldL())) {
                     ok = 0;
 
-                    int maxline = (rule->GetLNearness(nlok) < MAX_NEARNESS) ? lnearness_class[rule->GetLNearness(nlok)] : maxlegalline;
+                    int maxline = (rule->GetLNearness(nlok) < MAX_NEARNESS)
+                                  ? lnearness_class[rule->GetLNearness(nlok)] : maxlegalline;
                     // int maxline = maxlegalline;
 
                     while (!ok && lmap.Get(nlok) < maxline) {
@@ -192,11 +189,10 @@ namespace meshit {
                                     ok = 0;
                                     break;
                                 }
-                            }
-                            else {
+                            } else {
                                 if (rule->CalcPointDist(refpi, lpoints.Get(loclin[j])) > maxerr
-                                        || !legalpoints.Get(loclin[j])
-                                        || pused.Get(loclin[j])) {
+                                    || !legalpoints.Get(loclin[j])
+                                    || pused.Get(loclin[j])) {
                                     ok = 0;
                                     break;
                                 }
@@ -214,8 +210,7 @@ namespace meshit {
                             pused.Elem(loclin[j])++;
                         }
                         nlok++;
-                    }
-                    else {
+                    } else {
                         lmap.Elem(nlok) = 0;
                         nlok--;
 
@@ -226,8 +221,7 @@ namespace meshit {
                                 pmap.Set(rule->GetLine(nlok)[j], 0);
                         }
                     }
-                }
-                else {
+                } else {
                     // all lines are mapped !!
                     // map also all points:
 
@@ -235,19 +229,18 @@ namespace meshit {
                     int incnpok = 1;
 
                     pfixed.resize(pmap.size());
-                    for (int i = 0; i < pmap.size(); i++)
+                    for (int i = 0; i < pmap.size(); i++) {
                         pfixed[i] = (pmap[i] >= 1);
+                    }
 
                     while (npok >= 1) {
-
-                        if (npok <= (int) rule->GetNOldP()) {
-                            if (pfixed[npok-1]) {
+                        if (npok <= static_cast<int>(rule->GetNOldP())) {
+                            if (pfixed[npok - 1]) {
                                 if (incnpok)
                                     npok++;
                                 else
                                     npok--;
-                            }
-                            else {
+                            } else {
                                 ok = 0;
 
                                 if (pmap.Get(npok))
@@ -260,10 +253,9 @@ namespace meshit {
 
                                     if (pused.Get(pmap.Get(npok))) {
                                         ok = 0;
-                                    }
-                                    else {
+                                    } else {
                                         if (rule->CalcPointDist(npok, lpoints.Get(pmap.Get(npok))) > maxerr
-                                                || !legalpoints.Get(pmap.Get(npok)))
+                                            || !legalpoints.Get(pmap.Get(npok)))
 
                                             ok = 0;
                                     }
@@ -273,16 +265,13 @@ namespace meshit {
                                     pused.Elem(pmap.Get(npok))++;
                                     npok++;
                                     incnpok = 1;
-                                }
-
-                                else {
+                                } else {
                                     pmap.Elem(npok) = 0;
                                     npok--;
                                     incnpok = 0;
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             npok = rule->GetNOldP();
                             incnpok = 0;
 
@@ -295,8 +284,8 @@ namespace meshit {
 
                             for (size_t i = 1; i <= rule->GetNOrientations(); i++) {
                                 if (CW(lpoints.Get(pmap.Get(rule->GetOrientation(i).i1)),
-                                        lpoints.Get(pmap.Get(rule->GetOrientation(i).i2)),
-                                        lpoints.Get(pmap.Get(rule->GetOrientation(i).i3)))) {
+                                       lpoints.Get(pmap.Get(rule->GetOrientation(i).i2)),
+                                       lpoints.Get(pmap.Get(rule->GetOrientation(i).i3)))) {
                                     ok = 0;
                                     break;
                                 }
@@ -312,9 +301,8 @@ namespace meshit {
                                 oldu(2 * i - 1) = ui.Y();
                             }
 
-                            rule -> SetFreeZoneTransformation(oldu, tolerance);
+                            rule->SetFreeZoneTransformation(oldu, tolerance);
 
-                            if (!ok) continue;
                             if (!rule->ConvexFreeZone()) {
                                 ok = 0;
                             }
@@ -323,7 +311,7 @@ namespace meshit {
                             if (!ok) continue;
                             for (int i = 1; i <= maxlegalpoint && ok; i++) {
                                 if (!pused.Get(i) &&
-                                        rule->IsInFreeZone(lpoints.Get(i))) {
+                                    rule->IsInFreeZone(lpoints.Get(i))) {
                                     ok = 0;
                                     break;
                                 }
@@ -340,8 +328,8 @@ namespace meshit {
                             if (!ok) continue;
                             for (int i = 1; i <= maxlegalline; i++) {
                                 if (!lused.Get(i) &&
-                                        rule->IsLineInFreeZone(lpoints.Get(llines.Get(i).I1()),
-                                        lpoints.Get(llines.Get(i).I2()))) {
+                                    rule->IsLineInFreeZone(lpoints.Get(llines.Get(i).I1()),
+                                                           lpoints.Get(llines.Get(i).I2()))) {
                                     ok = 0;
                                     break;
                                 }
@@ -351,7 +339,7 @@ namespace meshit {
 
                             for (int i = maxlegalline + 1; i <= llines.size(); i++) {
                                 if (rule->IsLineInFreeZone(lpoints.Get(llines.Get(i).I1()),
-                                        lpoints.Get(llines.Get(i).I2()))) {
+                                                           lpoints.Get(llines.Get(i).I2()))) {
                                     ok = 0;
                                     break;
                                 }
@@ -364,7 +352,7 @@ namespace meshit {
                                 Vector newu(rule->GetOldUToNewU().Height());
                                 rule->GetOldUToNewU().Mult(oldu, newu);
 
-                                int oldnp = rule->GetNOldP();
+                                size_t oldnp = rule->GetNOldP();
                                 for (size_t i = oldnp + 1; i <= rule->GetNP(); i++) {
                                     Point2d np = rule->GetPoint(i);
                                     np.X() += newu(2 * (i - oldnp) - 2);
@@ -388,8 +376,8 @@ namespace meshit {
 
                             // insert new elements:
                             for (size_t i = 0; i < rule->GetNE(); i++) {
-                                elements.push_back(rule->GetElement(i+1));
-                                for (int j = 1; j <= elements[i].GetNP(); j++) {
+                                elements.push_back(rule->GetElement(i + 1));
+                                for (size_t j = 1; j <= elements[i].GetNP(); j++) {
                                     elements[i].PNum(j) = pmap.Get(elements[i].PNum(j));
                                 }
                             }
@@ -398,9 +386,9 @@ namespace meshit {
                             for (int i = 1; i <= elements.size(); i++) {
                                 double hf;
                                 if (!mp.quad)
-                                    hf = CalcElementBadness(lpoints, elements[i-1]);
+                                    hf = CalcElementBadness(lpoints, elements[i - 1]);
                                 else
-                                    hf = elements[i-1].CalcJacobianBadness(lpoints) * 5;
+                                    hf = elements[i - 1].CalcJacobianBadness(lpoints) * 5;
 
                                 if (hf > elerr) elerr = hf;
                             }
@@ -449,4 +437,4 @@ namespace meshit {
 
         return found;
     }
-}
+}  // namespace meshit

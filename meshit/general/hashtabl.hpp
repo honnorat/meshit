@@ -1,5 +1,5 @@
-#ifndef FILE_HASHTABL_H
-#define FILE_HASHTABL_H
+#ifndef FILE_HASHTABL_HPP
+#define FILE_HASHTABL_HPP
 
 /**************************************************************************/
 /* File:   hashtabl.hh                                                    */

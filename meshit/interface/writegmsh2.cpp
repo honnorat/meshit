@@ -107,7 +107,7 @@ namespace meshit {
             os << cnt++ << " " << elType << " 2 ";
             os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
             os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty();
-            for (int l = 1; l <= el.GetNP(); l++) {
+            for (size_t l = 1; l <= el.GetNP(); l++) {
                 os << " ";
                 if ((elType == GMSH_TRIG) || (elType == GMSH_TRIG6)) {
                     os << el.PNum(triGmsh[l]);

@@ -36,7 +36,7 @@ namespace meshit {
 
         Array<ImprovementRule*> rules;
         Array<SurfaceElementIndex> elmap;
-        Array<int> elrot;
+        Array<size_t> elrot;
         Array<PointIndex> pmap;
         Array<PointGeomInfo> pgi;
 
@@ -193,13 +193,13 @@ namespace meshit {
 
             for (int j = 1; j <= rule.oldels.size(); j++) {
                 const Element2d & el = rule.oldels.Elem(j);
-                for (int k = 1; k <= el.GetNP(); k++)
+                for (size_t k = 1; k <= el.GetNP(); k++)
                     rule.incelsonnode.Elem(el.PNum(k))--;
             }
 
             for (int j = 1; j <= rule.newels.size(); j++) {
                 const Element2d & el = rule.newels.Elem(j);
-                for (int k = 1; k <= el.GetNP(); k++) {
+                for (size_t k = 1; k <= el.GetNP(); k++) {
                     rule.incelsonnode.Elem(el.PNum(k))++;
                     rule.reused.Elem(el.PNum(k)) = 1;
                 }
@@ -216,11 +216,11 @@ namespace meshit {
             const Element2d & el = mesh.SurfaceElement(sei);
 
             if (el.GetIndex() == faceindex && !el.IsDeleted()) {
-                for (int j = 0; j < el.GetNP(); j++)
+                for (size_t j = 0; j < el.GetNP(); j++)
                     elonnode.Add(el[j], sei);
             }
             if (!el.IsDeleted()) {
-                for (int j = 0; j < el.GetNP(); j++)
+                for (size_t j = 0; j < el.GetNP(); j++)
                     nelonnode[el[j]]++;
             }
         }
@@ -228,7 +228,7 @@ namespace meshit {
         for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
             const Element2d & el = mesh.SurfaceElement(sei);
             if (el.GetIndex() == faceindex && !el.IsDeleted()) {
-                for (int j = 0; j < el.GetNP(); j++) {
+                for (size_t j = 0; j < el.GetNP(); j++) {
                     for (int k = 0; k < elonnode[el[j]].size(); k++) {
                         int nbel = elonnode[el[j]] [k];
                         bool inuse = false;
@@ -268,7 +268,7 @@ namespace meshit {
 
                     pmap = PointIndex(-1);
 
-                    for (int k = 0; k < el0.GetNP(); k++) {
+                    for (size_t k = 0; k < el0.GetNP(); k++) {
                         pmap.Elem(rel0[k]) = el0.PNumMod(k + elrot[0] + 1);
                         pgi.Elem(rel0[k]) = el0.GeomInfoPiMod(k + elrot[0] + 1);
                     }
@@ -288,13 +288,13 @@ namespace meshit {
                             for (elrot[i] = 0; elrot[i] < rel.GetNP(); elrot[i]++) {
                                 possible = 1;
 
-                                for (int k = 0; k < rel.GetNP(); k++)
+                                for (size_t k = 0; k < rel.GetNP(); k++)
                                     if (pmap.Elem(rel[k]) != -1 &&
                                             pmap.Elem(rel[k]) != el.PNumMod(k + elrot[i] + 1))
                                         possible = 0;
 
                                 if (possible) {
-                                    for (int k = 0; k < el.GetNP(); k++) {
+                                    for (size_t k = 0; k < el.GetNP(); k++) {
                                         pmap.Elem(rel[k]) = el.PNumMod(k + elrot[i] + 1);
                                         pgi.Elem(rel[k]) = el.GeomInfoPiMod(k + elrot[i] + 1);
                                     }
@@ -352,7 +352,7 @@ namespace meshit {
                     for (int j = 1; j <= rule.newels.size(); j++) {
                         const Element2d & rnel = rule.newels.Get(j);
                         Element2d nel(rnel.GetNP());
-                        for (int k = 1; k <= rnel.GetNP(); k++)
+                        for (size_t k = 1; k <= rnel.GetNP(); k++)
                             nel.PNum(k) = pmap.Get(rnel.PNum(k));
 
                         bad2 += nel.CalcJacobianBadness(mesh.Points(), n);
@@ -367,7 +367,7 @@ namespace meshit {
                         const Element2d & rnel = rule.newels.Get(j);
                         Element2d nel(rnel.GetNP());
                         nel.SetIndex(faceindex);
-                        for (int k = 1; k <= rnel.GetNP(); k++) {
+                        for (size_t k = 1; k <= rnel.GetNP(); k++) {
                             nel.PNum(k) = pmap.Get(rnel.PNum(k));
                             nel.GeomInfoPi(k) = pgi.Get(rnel.PNum(k));
                         }

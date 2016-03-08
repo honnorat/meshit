@@ -413,7 +413,7 @@ namespace meshit {
             oldutofreearea_i[i] = new DenseMatrix(oldutofreearea.Height(), oldutofreearea.Width());
             DenseMatrix & mati = *oldutofreearea_i[i];
             for (j = 0; j < oldutofreearea.Height(); j++)
-                for (int k = 0; k < oldutofreearea.Width(); k++)
+                for (size_t k = 0; k < oldutofreearea.Width(); k++)
                     mati(j, k) = lam1 * oldutofreearea(j, k) + (1 - lam1) * oldutofreearealimit(j, k);
 
             freezone_i[i] = new Array<Point2d> (freezone.size());
