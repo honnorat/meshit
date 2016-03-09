@@ -96,13 +96,13 @@ namespace meshit {
                     };
 
                     for (j = 1; j <= 3; j++) {
-                        pnums.Elem(j) = el.PNum(j);
-                        pgis.Elem(j) = el.GeomInfoPi(j);
+                        pnums[j - 1] = el.PNum(j);
+                        pgis[j - 1] = el.GeomInfoPi(j);
                     }
 
                     for (j = 0; j < 3; j++) {
-                        PointIndex pi1 = pnums.Elem(betw[j][0]);
-                        PointIndex pi2 = pnums.Elem(betw[j][1]);
+                        PointIndex pi1 = pnums[betw[j][0] - 1];
+                        PointIndex pi2 = pnums[betw[j][1] - 1];
 
                         INDEX_2 i2(pi1, pi2);
                         i2.Sort();
@@ -115,17 +115,17 @@ namespace meshit {
                                      el.GeomInfoPi(betw[j][1]),
                                      pb, pgi);
 
-                        pgis.Elem(4 + j) = pgi;
+                        pgis[4 + j - 1] = pgi;
                         if (between.Used(i2))
-                            pnums.Elem(4 + j) = between.Get(i2);
+                            pnums[4 + j - 1] = between.Get(i2);
                         else {
-                            pnums.Elem(4 + j) = mesh.AddPoint(pb);
+                            pnums[4 + j - 1] = mesh.AddPoint(pb);
                             between.Set(i2, pnums.Get(4 + j));
                         }
 
-                        if (surfgi.size() < pnums.Elem(4 + j))
-                            surfgi.resize(pnums.Elem(4 + j));
-                        surfgi.Elem(pnums.Elem(4 + j)) = pgis.Elem(4 + j);
+                        if (surfgi.size() < pnums[4 + j - 1])
+                            surfgi.resize(pnums[4 + j - 1]);
+                        surfgi[pnums[4 + j - 1] - 1] = pgis[4 + j - 1];
                     }
 
                     static int reftab[4][3] = {
@@ -166,20 +166,20 @@ namespace meshit {
                     };
 
                     for (j = 1; j <= 4; j++) {
-                        pnums.Elem(j) = el.PNum(j);
-                        pgis.Elem(j) = el.GeomInfoPi(j);
+                        pnums[j - 1] = el.PNum(j);
+                        pgis[j - 1] = el.GeomInfoPi(j);
                     }
 
                     for (j = 0; j < 5; j++) {
-                        int pi1 = pnums.Elem(betw[j][0]);
-                        int pi2 = pnums.Elem(betw[j][1]);
+                        int pi1 = pnums[betw[j][0] - 1];
+                        int pi2 = pnums[betw[j][1] - 1];
 
                         INDEX_2 i2(pi1, pi2);
                         i2.Sort();
 
                         if (between.Used(i2)) {
-                            pnums.Elem(5 + j) = between.Get(i2);
-                            pgis.Elem(5 + j) = surfgi.Get(pnums.Elem(4 + j));
+                            pnums[4 + j] = between.Get(i2);
+                            pgis[4 + j] = surfgi.Get(pnums[4 + j - 1]);
                         }
                         else {
                             Point<3> pb;
@@ -187,15 +187,15 @@ namespace meshit {
                                          mesh.Point(pi2), 0.5,
                                          el.GeomInfoPi(betw[j][0]),
                                          el.GeomInfoPi(betw[j][1]),
-                                         pb, pgis.Elem(5 + j));
+                                         pb, pgis[4 + j]);
 
-                            pnums.Elem(5 + j) = mesh.AddPoint(pb);
+                            pnums[4 + j] = mesh.AddPoint(pb);
 
                             between.Set(i2, pnums.Get(5 + j));
 
-                            if (surfgi.size() < pnums.Elem(5 + j))
-                                surfgi.resize(pnums.Elem(5 + j));
-                            surfgi.Elem(pnums.Elem(5 + j)) = pgis.Elem(5 + j);
+                            if (surfgi.size() < pnums[4 + j])
+                                surfgi.resize(pnums[4 + j]);
+                            surfgi[pnums[4 + j] - 1] = pgis[4 + j];
                         }
                     }
 

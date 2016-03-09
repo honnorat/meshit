@@ -391,10 +391,8 @@ namespace meshit {
 
     void Element2d::GetPointMatrix(const Array<Point2d>& points, DenseMatrix& pmat) const
     {
-        int np = GetNP();
-
-        for (int i = 1; i <= np; i++) {
-            const Point2d& p = points[PNum(i)];
+        for (size_t i = 1; i <= np; i++) {
+            const Point2d& p = points[pnum[i - 1]];
             pmat.Elem(1, i) = p.X();
             pmat.Elem(2, i) = p.Y();
         }
@@ -820,9 +818,9 @@ namespace meshit {
                     identifiedpoints_nr->GetData(i, j, i3, dummy);
 
                     if (i3.I3() == identnr || !identnr) {
-                        identmap.Elem(i3.I1()) = i3.I2();
+                        identmap[i3.I1() - 1] = i3.I2();
                         if (symmetric)
-                            identmap.Elem(i3.I2()) = i3.I1();
+                            identmap[i3.I2() - 1] = i3.I1();
                     }
                 }
             }

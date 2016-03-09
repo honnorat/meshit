@@ -146,7 +146,7 @@ namespace meshit {
 
         MeshPoint& Point(int i)
         {
-            return points.Elem(i);
+            return points[i - 1];
         }
 
         MeshPoint& Point(PointIndex pi)
@@ -220,10 +220,10 @@ namespace meshit {
 
         void DeleteSurfaceElement(int eli)
         {
-            surfelements.Elem(eli).Delete();
-            surfelements.Elem(eli).PNum(1) = -1;
-            surfelements.Elem(eli).PNum(2) = -1;
-            surfelements.Elem(eli).PNum(3) = -1;
+            surfelements[eli - 1].Delete();
+            surfelements[eli - 1].PNum(1) = -1;
+            surfelements[eli - 1].PNum(2) = -1;
+            surfelements[eli - 1].PNum(3) = -1;
             timestamp = NextTimeStamp();
         }
 
@@ -239,7 +239,7 @@ namespace meshit {
 
         Element2d& SurfaceElement(int i)
         {
-            return surfelements.Elem(i);
+            return surfelements[i - 1];
         }
 
         const Element2d& SurfaceElement(int i) const
@@ -418,7 +418,7 @@ namespace meshit {
 
         FaceDescriptor& GetFaceDescriptor(int i)
         {
-            return facedecoding.Elem(i);
+            return facedecoding[i - 1];
         }
 
         /// return periodic, close surface etc. identifications

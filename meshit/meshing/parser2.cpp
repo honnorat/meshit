@@ -364,17 +364,18 @@ namespace meshit {
 
         freesetinequ.SetSize(freezone.size());
 
-
         {
             char ok;
             int minn;
             Array<int> pnearness(noldp);
 
-            for (int i = 1; i <= pnearness.size(); i++)
-                pnearness.Elem(i) = 1000;
+            for (int i = 0; i < pnearness.size(); i++) {
+                pnearness[i] = 1000;
+            }
 
-            for (int j = 1; j <= 2; j++)
-                pnearness.Elem(GetPointNr(1, j)) = 0;
+            for (int j = 1; j <= 2; j++) {
+                pnearness[GetPointNr(1, j) - 1] = 0;
+            }
 
             do {
                 ok = 1;
@@ -385,9 +386,9 @@ namespace meshit {
                         minn = std::min(minn, pnearness.Get(GetPointNr(i, j)));
                     }
                     for (int j = 1; j <= 2; j++) {
-                        if (pnearness.Get(GetPointNr(i, j)) > minn + 1) {
+                        if (pnearness[GetPointNr(i, j) - 1] > minn + 1) {
                             ok = 0;
-                            pnearness.Elem(GetPointNr(i, j)) = minn + 1;
+                            pnearness[GetPointNr(i, j) - 1] = minn + 1;
                         }
                     }
                 }

@@ -51,15 +51,11 @@ namespace meshit {
         inline SYMBOLTABLE();
         /// Returns size of symboltable
         inline INDEX Size() const;
-        /// Returns reference to element, error if not used
-        inline T& Elem(const char* name);
 
         /// Returns element, error if not used
         inline const T& Get(const char* name) const;
         /// Returns i-th element
         inline const T& Get(int i) const;
-        /// Returns name of i-th element
-        inline const char* GetName(int i) const;
         /// Associates el to the string name, overrides if name is used
         inline void Set(const char* name, const T& el);
         /// Checks whether name is used
@@ -91,16 +87,6 @@ namespace meshit {
     }
 
     template<class T>
-    inline T& SYMBOLTABLE<T>::Elem(const char* name)
-    {
-        int i = Index(name);
-        if (i)
-            return data.Elem(i);
-        else
-            return data.Elem(1);
-    }
-
-    template<class T>
     inline const T& SYMBOLTABLE<T>::Get(const char* name) const
     {
         int i;
@@ -115,12 +101,6 @@ namespace meshit {
     inline const T& SYMBOLTABLE<T>::Get(int i) const
     {
         return data.Get(i);
-    }
-
-    template<class T>
-    inline const char* SYMBOLTABLE<T>::GetName(int i) const
-    {
-        return names.Get(i);
     }
 
     template<class T>

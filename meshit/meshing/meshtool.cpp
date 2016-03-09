@@ -6,7 +6,7 @@
 
 namespace meshit {
 
-    int CheckSurfaceMesh(const Mesh & mesh)
+    int CheckSurfaceMesh(const Mesh& mesh)
     {
         MESHIT_LOG_DEBUG("Check Surface mesh");
 
@@ -41,9 +41,9 @@ namespace meshit {
         return 1;
     }
 
-    int CheckSurfaceMesh2(const Mesh & mesh)
+    int CheckSurfaceMesh2(const Mesh& mesh)
     {
-        const Point3d * tri1[3], *tri2[3];
+        const Point3d* tri1[3], * tri2[3];
 
         for (int i = 1; i <= mesh.GetNOpenElements(); i++) {
             for (int j = 1; j < i; j++) {
@@ -67,8 +67,8 @@ namespace meshit {
         return 0;
     }
 
-    static double TriangleQualityInst(const Point3d & p1, const Point3d & p2,
-            const Point3d & p3)
+    static double TriangleQualityInst(const Point3d& p1, const Point3d& p2,
+                                      const Point3d& p3)
     {
         // quality 0 (worst) .. 1 (optimal)
 
@@ -92,7 +92,7 @@ namespace meshit {
         return 8 * s1 * s2 * s3;
     }
 
-    void MeshQuality2d(const Mesh & mesh)
+    void MeshQuality2d(const Mesh& mesh)
     {
         int ncl = 20, cl;
         Array<INDEX> incl(ncl);
@@ -107,8 +107,8 @@ namespace meshit {
                     mesh[mesh.SurfaceElement(sei)[1]],
                     mesh[mesh.SurfaceElement(sei)[2]]);
 
-            cl = int ( (ncl - 1e-3) * qual) + 1;
-            incl.Elem(cl)++;
+            cl = static_cast<int>((ncl - 1e-3) * qual);
+            incl[cl]++;
         }
 
         MESHIT_LOG_INFO("\n\n");
@@ -117,16 +117,16 @@ namespace meshit {
         MESHIT_LOG_INFO("\nElements in qualityclasses:");
         for (i = 1; i <= ncl; i++) {
             MESHIT_LOG_INFO(std::fixed << std::setprecision(2) <<
-                    std::setw(4) << double (i - 1) / ncl << " - " <<
-                    std::setw(4) << double (i) / ncl << ": " << incl.Get(i));
+                            std::setw(4) << double(i - 1) / ncl << " - " <<
+                            std::setw(4) << double(i) / ncl << ": " << incl.Get(i));
         }
     }
 
-    void SaveEdges(const Mesh & mesh, const char * geomfile, double h, char * filename)
+    void SaveEdges(const Mesh& mesh, const char* geomfile, double h, char* filename)
     {
         std::ofstream of(filename);
         int i;
-        const Segment * seg;
+        const Segment* seg;
 
         of << "edges" << std::endl;
         of << geomfile << std::endl;
@@ -149,9 +149,9 @@ namespace meshit {
     }
 
     void SaveSurfaceMesh(
-            const Mesh & mesh,
+            const Mesh& mesh,
             double h,
-            char * filename)
+            char* filename)
     {
         INDEX i;
 
@@ -168,7 +168,7 @@ namespace meshit {
 
         outfile << mesh.GetNSE() << std::endl;
         for (i = 1; i <= mesh.GetNSE(); i++) {
-            const Element2d & el = mesh.SurfaceElement(i);
+            const Element2d& el = mesh.SurfaceElement(i);
 
             if (mesh.GetFaceDescriptor(el.GetIndex()).DomainOut() == 0)
                 outfile << mesh.SurfaceElement(i).PNum(1) << " "

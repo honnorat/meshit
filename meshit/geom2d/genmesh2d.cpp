@@ -279,18 +279,18 @@ namespace meshit {
         for (int i = 1; i <= mesh.GetNSeg(); i++) {
             const Segment& seg = mesh.LineSegment(i);
             if (seg.edgenr == from) {
-                mappoints.Elem(seg[0]) = 1;
-                param.Elem(seg[0]) = seg.epgeominfo[0].dist;
+                mappoints[seg[0]-1] = 1;
+                param[seg[0]-1] = seg.epgeominfo[0].dist;
 
-                mappoints.Elem(seg[1]) = 1;
-                param.Elem(seg[1]) = seg.epgeominfo[1].dist;
+                mappoints[seg[1]-1] = 1;
+                param[seg[1]-1] = seg.epgeominfo[1].dist;
             }
         }
 
         bool mapped = false;
         for (int i = 1; i <= mappoints.size(); i++) {
-            if (mappoints.Get(i) != -1) {
-                Point<2> newp = splines[to + 1]->GetPoint(param.Get(i));
+            if (mappoints[i-1] != -1) {
+                Point<2> newp = splines[to + 1]->GetPoint(param[i-1]);
                 Point<3> newp3(newp(0), newp(1), 0);
 
                 int npi = -1;
@@ -306,7 +306,7 @@ namespace meshit {
                     searchtree.Insert(newp3, npi);
                 }
 
-                mappoints.Elem(i) = npi;
+                mappoints[i-1] = npi;
 
                 mesh.GetIdentifications().Add(i, npi, to);
                 mapped = true;

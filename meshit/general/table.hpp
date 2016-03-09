@@ -100,7 +100,7 @@ namespace meshit {
         inline void Add1(int i, const T& acont)
         {
             IncSize(i - 1, sizeof(T));
-            ((T*) data.Elem(i).col)[data.Elem(i).size - 1] = acont;
+            ((T*) data[i-1].col)[data[i-1].size - 1] = acont;
         }
 
         void IncSizePrepare(int i)

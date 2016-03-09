@@ -1101,9 +1101,9 @@ namespace meshit {
             return;
         }
         int np = GetNP();
-        for (int i = 1; i <= np; i++) {
-            if (fixpoints.Test(i)) {
-                points.Elem(i).SetType(FIXEDPOINT);
+        for (int i = 0; i < np; i++) {
+            if (fixpoints.Test(i + 1)) {
+                points[i].SetType(FIXEDPOINT);
             }
         }
     }
@@ -1374,8 +1374,8 @@ namespace meshit {
         }
         MESHIT_LOG_DEBUG(opensegments.size() << " open segments found");
 
-        for (int i = 1; i <= points.size(); i++) {
-            points.Elem(i).SetType(SURFACEPOINT);
+        for (int i = 0; i < points.size(); i++) {
+            points[i].SetType(SURFACEPOINT);
         }
 
         for (int i = 1; i <= GetNSeg(); i++) {
@@ -1448,8 +1448,8 @@ namespace meshit {
     void Mesh::SetMaxHDomain(const Array<double>& mhd)
     {
         maxhdomain.resize(mhd.size());
-        for (int i = 1; i <= mhd.size(); i++) {
-            maxhdomain.Elem(i) = mhd.Get(i);
+        for (int i = 0; i < mhd.size(); i++) {
+            maxhdomain[i] = mhd[i];
         }
     }
 
@@ -1889,8 +1889,8 @@ namespace meshit {
             seg[1] = op2np[seg[1]];
         }
 
-        for (int i = 1; i <= openelements.size(); i++) {
-            Element2d& el = openelements.Elem(i);
+        for (int i = 0; i < openelements.size(); i++) {
+            Element2d& el = openelements[i];
             for (size_t j = 0; j < el.GetNP(); j++) {
                 el[j] = op2np[el[j]];
             }
@@ -2095,7 +2095,7 @@ namespace meshit {
                 changed = 0;
                 for (i = 1; i <= nse; i++) {
                     if (!used.Test(i)) {
-                        Element2d& el = surfelements.Elem(i);
+                        Element2d& el = surfelements[i - 1];
                         int found = 0, foundrev = 0;
                         for (j = 1; j <= 3; j++) {
                             INDEX_2 i2(el.PNumMod(j), el.PNumMod(j + 1));
@@ -2282,7 +2282,7 @@ namespace meshit {
         else {
             //	  SurfaceElement(element).GetTets (loctets);
             loctrigs.resize(1);
-            loctrigs.Elem(1) = SurfaceElement(element);
+            loctrigs[0] = SurfaceElement(element);
 
             for (int j = 1; j <= loctrigs.size(); j++) {
                 const Element2d& el = loctrigs.Get(j);
@@ -2458,8 +2458,8 @@ namespace meshit {
                 materials[i] = 0;
             }
         }
-        materials.Elem(domnr) = new char[strlen(mat) + 1];
-        strcpy(materials.Elem(domnr), mat);
+        materials[domnr - 1] = new char[strlen(mat) + 1];
+        strcpy(materials[domnr - 1], mat);
     }
 
     const char* Mesh::GetMaterial(int domnr) const

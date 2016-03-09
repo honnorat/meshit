@@ -66,13 +66,6 @@ namespace meshit {
 
         /// Access array, one-based  (old fashioned)
 
-        T& Elem(int i)
-        {
-            return _data[i - 1];
-        }
-
-        /// Access array, one-based  (old fashioned)
-
         const T& Get(int i) const
         {
             return _data[i - 1];

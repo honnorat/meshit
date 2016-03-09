@@ -307,11 +307,8 @@ namespace meshit {
 
         for (int i = 0; i < loclines.size(); i++) {
             for (int j = 0; j < 2; j++) {
-                int lpi = loclines[i][j];
-
-                const PointGeomInfo& gi =
-                        lines[lindex[i]].GetGeomInfo(j + 1);
-                pgeominfo.Elem(lpi).AddPointGeomInfo(gi);
+                const PointGeomInfo& gi = lines[lindex[i]].GetGeomInfo(j + 1);
+                pgeominfo[loclines[i][j]-1].AddPointGeomInfo(gi);
             }
         }
 

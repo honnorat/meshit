@@ -148,8 +148,8 @@ namespace meshit {
         stackdir.resize(1000);
         pis.resize(0);
 
-        stack.Elem(1) = root;
-        stackdir.Elem(1) = 0;
+        stack[0] = root;
+        stackdir[0] = 0;
 
         int stacks = 1;
 
@@ -172,13 +172,13 @@ namespace meshit {
 
             if (node->left && bmin[dir] <= node->sep) {
                 stacks++;
-                stack.Elem(stacks) = node->left;
-                stackdir.Elem(stacks) = ndir;
+                stack[stacks-1] = node->left;
+                stackdir[stacks-1] = ndir;
             }
             if (node->right && bmax[dir] >= node->sep) {
                 stacks++;
-                stack.Elem(stacks) = node->right;
-                stackdir.Elem(stacks) = ndir;
+                stack[stacks-1] = node->right;
+                stackdir[stacks-1] = ndir;
             }
         }
     }

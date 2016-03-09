@@ -64,16 +64,17 @@ namespace meshit {
             : hash(size)
     {
         invalid = -1;
-        for (int i = 1; i <= size; i++)
-            hash.Elem(i).I1() = invalid;
+        for (int i = 0; i < size; i++) {
+            hash[i].I1() = invalid;
+        }
     }
 
     void BASE_INDEX_2_CLOSED_HASHTABLE::
     BaseSetSize(int size)
     {
         hash.resize(size);
-        for (int i = 1; i <= size; i++)
-            hash.Elem(i).I1() = invalid;
+        for (int i = 0; i < size; i++)
+            hash[i].I1() = invalid;
     }
 
     int BASE_INDEX_2_CLOSED_HASHTABLE::
@@ -89,7 +90,7 @@ namespace meshit {
                 return 0;
             }
             if (hash.Get(i).I1() == invalid) {
-                hash.Elem(i) = ind;
+                hash[i - 1] = ind;
                 apos = i;
                 return 1;
             }

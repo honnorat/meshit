@@ -336,7 +336,7 @@ namespace meshit {
                 return 0;
             }
             if (hash.Get(i).I1() == invalid) {
-                hash.Elem(i) = ind;
+                hash[i - 1] = ind;
                 apos = i;
                 return 1;
             }
@@ -601,8 +601,8 @@ namespace meshit {
     {
         int pos;
         PositionCreate(ahash, pos);
-        hash.Elem(pos) = ahash;
-        cont.Elem(pos) = acont;
+        hash[pos - 1] = ahash;
+        cont[pos - 1] = acont;
     }
 
     template<class T>

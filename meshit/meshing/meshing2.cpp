@@ -318,15 +318,10 @@ namespace meshit {
                     MESHIT_LOG_DEBUG("3d->2d transformation");
                 }
 
-                for (int i = 1; i <= locpoints.size(); i++) {
-                    TransformToPlain(locpoints.Get(i),
-                                     mpgeominfo.Get(i),
-                                     plainpoints.Elem(i), h, plainzones.Elem(i));
+                for (int i = 0; i < locpoints.size(); i++) {
+                    TransformToPlain(locpoints[i], mpgeominfo[i],
+                                     plainpoints[i], h, plainzones[i]);
                 }
-
-//                if (debugflag)
-//                    std::cerr << "2d points: " << std::endl << plainpoints << std::endl;
-
 
                 p12d = plainpoints.Get(1);
                 p22d = plainpoints.Get(2);
@@ -371,10 +366,10 @@ namespace meshit {
                                 plainzones.push_back(0);
                                 pindex.push_back(-1);
                                 oldnp++;
-                                loclines.Elem(i).I(3 - innerp) = oldnp;
+                                loclines[i - 1].I(3 - innerp) = oldnp;
                             }
                             else
-                                plainzones.Elem(loclines.Get(i).I(3 - innerp)) = 0;
+                                plainzones[loclines.Get(i).I(3 - innerp) - 1] = 0;
                         }
                         else {
                             // remove line
@@ -394,29 +389,27 @@ namespace meshit {
                 }
 
                 legalpoints.resize(plainpoints.size());
-                for (int i = 1; i <= legalpoints.size(); i++) {
-                    legalpoints.Elem(i) = 1;
+                for (int i = 0; i < legalpoints.size(); i++) {
+                    legalpoints[i] = 1;
                 }
                 double avy = 0;
-                for (int i = 1; i <= plainpoints.size(); i++) {
-                    avy += plainpoints.Elem(i).Y();
+                for (int i = 0; i < plainpoints.size(); i++) {
+                    avy += plainpoints[i].Y();
                 }
                 avy *= 1. / plainpoints.size();
 
 
-                for (int i = 1; i <= plainpoints.size(); i++) {
-                    if (plainzones.Elem(i) < 0) {
-                        plainpoints.Elem(i) = Point2d(1e4, 1e4);
-                        legalpoints.Elem(i) = 0;
+                for (int i = 0; i < plainpoints.size(); i++) {
+                    if (plainzones[i] < 0) {
+                        plainpoints[i] = Point2d(1e4, 1e4);
+                        legalpoints[i] = 0;
                     }
-                    if (pindex.Elem(i) == -1) {
-                        legalpoints.Elem(i) = 0;
+                    if (pindex[i] == -1) {
+                        legalpoints[i] = 0;
                     }
-
-
-                    if (plainpoints.Elem(i).Y() < -1e-10 * avy) // changed
+                    if (plainpoints[i].Y() < -1e-10 * avy) // changed
                     {
-                        legalpoints.Elem(i) = 0;
+                        legalpoints[i] = 0;
                     }
                 }
 
@@ -471,10 +464,8 @@ namespace meshit {
                 locpoints.resize(plainpoints.size());
                 upgeominfo.resize(locpoints.size());
 
-                for (int i = oldnp + 1; i <= plainpoints.size(); i++) {
-                    int err =
-                            TransformFromPlain(plainpoints.Elem(i), locpoints.Elem(i),
-                                               upgeominfo.Elem(i), h);
+                for (int i = oldnp; i < plainpoints.size(); i++) {
+                    int err = TransformFromPlain(plainpoints[i], locpoints[i], upgeominfo[i], h);
 
                     if (err) {
                         found = 0;
@@ -549,10 +540,10 @@ namespace meshit {
                         int pi = locelements.Get(i).PNum(j);
                         if (pi <= oldnp) {
 
-                            if (ChooseChartPointGeomInfo(mpgeominfo.Get(pi), upgeominfo.Elem(pi))) {
+                            if (ChooseChartPointGeomInfo(mpgeominfo.Get(pi), upgeominfo[pi - 1])) {
                                 // cannot select, compute new one
                                 MESHIT_LOG_WARNING("calc point geominfo instead of using");
-                                if (ComputePointGeomInfo(locpoints.Get(pi), upgeominfo.Elem(pi))) {
+                                if (ComputePointGeomInfo(locpoints.Get(pi), upgeominfo[pi - 1])) {
                                     found = 0;
                                     MESHIT_LOG_ERROR("meshing2d, geominfo failed");
                                 }
@@ -717,13 +708,13 @@ namespace meshit {
             if (found) {
                 // everything is ok, perform mesh update
 
-                ruleused.Elem(rulenr)++;
+                ruleused[rulenr - 1]++;
 
                 pindex.resize(locpoints.size());
 
-                for (int i = oldnp + 1; i <= locpoints.size(); i++) {
-                    PointIndex globind = mesh.AddPoint(locpoints.Get(i));
-                    pindex.Elem(i) = adfront->AddPoint(locpoints.Get(i), globind);
+                for (int i = oldnp; i < locpoints.size(); i++) {
+                    PointIndex globind = mesh.AddPoint(locpoints[i]);
+                    pindex[i] = adfront->AddPoint(locpoints[i], globind);
                 }
 
                 for (int i = oldnl + 1; i <= loclines.size(); i++) {
@@ -743,20 +734,19 @@ namespace meshit {
                                      upgeominfo.Get(loclines.Get(i).I1()),
                                      upgeominfo.Get(loclines.Get(i).I2()));
                 }
-                for (int i = 1; i <= locelements.size(); i++) {
-                    Element2d mtri(locelements.Get(i).GetNP());
-                    mtri = locelements.Get(i);
+                for (int i = 0; i < locelements.size(); i++) {
+                    Element2d mtri(locelements[i].GetNP());
+                    mtri = locelements[i];
                     mtri.SetIndex(facenr);
 
                     // compute triangle geominfo:
-                    for (size_t j = 1; j <= locelements.Get(i).GetNP(); j++) {
-                        mtri.GeomInfoPi(j) = upgeominfo.Get(locelements.Get(i).PNum(j));
+                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
+                        mtri.GeomInfoPi(j) = upgeominfo.Get(locelements[i].PNum(j));
                     }
 
-                    for (size_t j = 1; j <= locelements.Get(i).GetNP(); j++) {
-                        mtri.PNum(j) =
-                        locelements.Elem(i).PNum(j) =
-                                adfront->GetGlobalIndex(pindex.Get(locelements.Get(i).PNum(j)));
+                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
+                        mtri.PNum(j) = locelements[i].PNum(j) =
+                                adfront->GetGlobalIndex(pindex.Get(locelements[i].PNum(j)));
                     }
 
                     mesh.AddSurfaceElement(mtri);
