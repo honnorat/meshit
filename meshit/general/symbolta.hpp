@@ -24,7 +24,8 @@ namespace meshit {
 
      public:
         /// Constructor
-        BASE_SYMBOLTABLE() {}
+        BASE_SYMBOLTABLE() { }
+
         ~BASE_SYMBOLTABLE();
 
         void DelNames();
@@ -106,11 +107,10 @@ namespace meshit {
     template<class T>
     inline void SYMBOLTABLE<T>::Set(const char* name, const T& el)
     {
-        int i;
-        i = Index(name);
-        if (i)
-            data.Set(i, el);
-        else {
+        int i = Index(name);
+        if (i) {
+            data[i - 1] = el;
+        } else {
             data.push_back(el);
             char* hname = new char[strlen(name) + 1];
             strcpy(hname, name);

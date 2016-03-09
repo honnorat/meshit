@@ -12,7 +12,6 @@
 
 #ifndef FILE_SYMBOLTABLECC
 #define FILE_SYMBOLTABLECC
-// necessary for SGI ????
 
 namespace meshit {
 
@@ -21,19 +20,21 @@ namespace meshit {
         DelNames();
     }
 
-
     void BASE_SYMBOLTABLE::DelNames()
     {
-        for (int i = 0; i < names.size(); i++)
+        for (int i = 0; i < names.size(); i++) {
             delete[] names[i];
+        }
         names.resize(0);
     }
 
     int BASE_SYMBOLTABLE::Index(const char* name) const
     {
         if (!name) return 0;
-        for (int i = 0; i < names.size(); i++)
-            if (strcmp(names[i], name) == 0) return i + 1;
+        for (int i = 0; i < names.size(); i++) {
+            if (strcmp(names[i], name) == 0)
+                return i + 1;
+        }
         return 0;
     }
 }  // namespace meshit

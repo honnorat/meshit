@@ -66,7 +66,7 @@ namespace meshit {
         pnearness = 1000;
 
         for (int j = 0; j < 2; j++) {
-            pnearness.Set(llines1[0][j], 0);
+            pnearness[llines1[0][j] - 1] = 0;
         }
 
         const int MAX_NEARNESS = 3;
@@ -81,7 +81,7 @@ namespace meshit {
                 for (int j = 0; j < 2; j++) {
                     if (pnearness.Get(hline[j]) > minn + 1) {
                         ok = false;
-                        pnearness.Set(hline[j], minn + 1);
+                        pnearness[hline[j]-1] = minn + 1;
                     }
                 }
             }
@@ -206,7 +206,7 @@ namespace meshit {
 
                         lused[locli - 1] = 1;
                         for (int j = 0; j < 2; j++) {
-                            pmap.Set(rule->GetLine(nlok)[j], loclin[j]);
+                            pmap[rule->GetLine(nlok)[j]-1] = loclin[j];
                             pused[loclin[j] - 1]++;
                         }
                         nlok++;
@@ -218,7 +218,7 @@ namespace meshit {
                         for (int j = 0; j < 2; j++) {
                             pused[llines.Get(lmap.Get(nlok))[j] - 1]--;
                             if (!pused.Get(llines.Get(lmap.Get(nlok))[j]))
-                                pmap.Set(rule->GetLine(nlok)[j], 0);
+                                pmap[rule->GetLine(nlok)[j]-1] = 0;
                         }
                     }
                 } else {
@@ -418,14 +418,14 @@ namespace meshit {
 
                     nlok = rule->GetNOldL();
 
-                    lused.Set(lmap.Get(nlok), 0);
+                    lused[lmap.Get(nlok)-1] = 0;
 
                     for (int j = 1; j <= 2; j++) {
                         int refpi = rule->GetPointNr(nlok, j);
                         pused[pmap.Get(refpi) - 1]--;
 
                         if (pused.Get(pmap.Get(refpi)) == 0)
-                            pmap.Set(refpi, 0);
+                            pmap[refpi-1] = 0;
                     }
                 }
             }

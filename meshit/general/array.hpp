@@ -71,13 +71,6 @@ namespace meshit {
             return _data[i - 1];
         }
 
-        /// Access array, one-based  (old fashioned)
-
-        void Set(int i, const T& el)
-        {
-            _data[i - 1] = el;
-        }
-
         /// access first element
 
         T& First() const
