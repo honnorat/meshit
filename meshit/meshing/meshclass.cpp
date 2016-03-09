@@ -1089,20 +1089,6 @@ namespace meshit {
         }
     }
 
-    void Mesh::FixPoints(const BitArray& fixpoints)
-    {
-        if (fixpoints.Size() != GetNP()) {
-            std::cerr << "Mesh::FixPoints: sizes don't fit" << std::endl;
-            return;
-        }
-        int np = GetNP();
-        for (int i = 0; i < np; i++) {
-            if (fixpoints.Test(i + 1)) {
-                points[i].SetType(FIXEDPOINT);
-            }
-        }
-    }
-
     void Mesh::FindOpenElements(int dom)
     {
         int np = GetNP();
@@ -2063,79 +2049,6 @@ namespace meshit {
         }
 
         return ndom;
-    }
-
-    void Mesh::SurfaceMeshOrientation()
-    {
-        int i, j;
-        int nse = GetNSE();
-
-        BitArray used(nse);
-        used.Clear();
-        INDEX_2_HASHTABLE<int> edges(nse + 1);
-
-        bool haschanged = 0;
-
-        const Element2d& tri = SurfaceElement(1);
-        for (j = 1; j <= 3; j++) {
-            INDEX_2 i2(tri.PNumMod(j), tri.PNumMod(j + 1));
-            edges.Set(i2, 1);
-        }
-        used.Set(1);
-
-        bool unused;
-        do {
-            bool changed;
-            do {
-                changed = 0;
-                for (i = 1; i <= nse; i++) {
-                    if (!used.Test(i)) {
-                        Element2d& el = surfelements[i - 1];
-                        int found = 0, foundrev = 0;
-                        for (j = 1; j <= 3; j++) {
-                            INDEX_2 i2(el.PNumMod(j), el.PNumMod(j + 1));
-                            if (edges.Used(i2))
-                                foundrev = 1;
-                            std::swap(i2.I1(), i2.I2());
-                            if (edges.Used(i2))
-                                found = 1;
-                        }
-
-                        if (found || foundrev) {
-                            if (foundrev) {
-                                std::swap(el.PNum(2), el.PNum(3));
-                            }
-                            changed = 1;
-                            for (j = 1; j <= 3; j++) {
-                                INDEX_2 i2(el.PNumMod(j), el.PNumMod(j + 1));
-                                edges.Set(i2, 1);
-                            }
-                            used.Set(i);
-                        }
-                    }
-                }
-                if (changed)
-                    haschanged = 1;
-            } while (changed);
-
-
-            unused = 0;
-            for (i = 1; i <= nse; i++) {
-                if (!used.Test(i)) {
-                    unused = 1;
-                    const Element2d& tri = SurfaceElement(i);
-                    for (j = 1; j <= 3; j++) {
-                        INDEX_2 i2(tri.PNumMod(j), tri.PNumMod(j + 1));
-                        edges.Set(i2, 1);
-                    }
-                    used.Set(i);
-                    break;
-                }
-            }
-        } while (unused);
-
-        if (haschanged)
-            timestamp = NextTimeStamp();
     }
 
     void Mesh::BuildElementSearchTree()

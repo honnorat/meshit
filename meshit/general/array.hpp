@@ -18,7 +18,7 @@ namespace meshit {
        Optional range check by macro RANGE_CHECK
      */
 
-    template<typename T, int BASE = 0, typename TIND = int>
+    template<typename T>
     class FlatArray
     {
      protected:
@@ -28,34 +28,33 @@ namespace meshit {
      public:
         typedef T TELEM;
 
-        FlatArray(int asize, T* adata)
+        FlatArray(size_t asize, T* adata)
                 : _size(asize), _data(adata) { }
 
-        int size() const
+        size_t size() const
         {
             return _size;
         }
 
-        TIND Begin() const
+        size_t Begin() const
         {
-            return TIND(BASE);
+            return 0;
         }
 
-        TIND End() const
+        size_t End() const
         {
-            return TIND(_size + BASE);
+            return _size;
         }
 
-        /// Access array. BASE-based
-
-        inline T& operator[](TIND i)
+        /// Access array.
+        T& operator[](size_t i)
         {
-            return _data[i - BASE];
+            return _data[i];
         }
 
-        const T& operator[](TIND i) const
+        const T& operator[](size_t i) const
         {
-            return _data[i - BASE];
+            return _data[i];
         }
 
         template<typename T2>
@@ -82,33 +81,16 @@ namespace meshit {
 
         FlatArray& operator=(const T& val)
         {
-            for (size_t i = 0; i < _size; i++)
+            for (size_t i = 0; i < _size; i++) {
                 _data[i] = val;
+            }
             return *this;
         }
 
         /// takes range starting from position start of end-start elements
-
-        const FlatArray<T> Range(TIND start, TIND end)
+        const FlatArray<T> Range(size_t start, size_t end)
         {
             return FlatArray<T>(end - start, _data + start);
-        }
-
-        /// first position of element elem, returns -1 if element not contained in array
-
-        TIND Pos(const T& elem) const
-        {
-            TIND pos = -1;
-            for (TIND i = 0; pos == -1 && i < (TIND) this->_size; i++)
-                if (elem == _data[i]) pos = i;
-            return pos;
-        }
-
-        /// does the array contain element elem ?
-
-        bool Contains(const T& elem) const
-        {
-            return (Pos(elem) >= 0);
         }
     };
 
@@ -120,26 +102,25 @@ namespace meshit {
         Either the container takes care of memory allocation and deallocation,
         or the user provides one block of data.
      */
-    template<class T, int BASE = 0, typename TIND = int>
-    class Array : public FlatArray<T, BASE, TIND>
+    template<class T>
+    class Array : public FlatArray<T>
     {
      protected:
-        using FlatArray<T, BASE, TIND>::_size;
-        using FlatArray<T, BASE, TIND>::_data;
+        using FlatArray<T>::_size;
+        using FlatArray<T>::_data;
 
         size_t _allocsize;  // physical size of array
         bool _ownmem;       // memory is responsibility of container
 
      public:
-        Array()
-                : FlatArray<T, BASE, TIND>(0, NULL)
+        Array() : FlatArray<T>(0, nullptr)
         {
             _allocsize = 0;
             _ownmem = 1;
         }
 
         explicit Array(int asize)
-                : FlatArray<T, BASE, TIND>(asize, new T[asize])
+                : FlatArray<T>(asize, new T[asize])
         {
             _allocsize = asize;
             _ownmem = 1;
@@ -147,8 +128,8 @@ namespace meshit {
 
         /// Generate array in user data
 
-        Array(TIND asize, T* adata)
-                : FlatArray<T, BASE, TIND>(asize, adata)
+        Array(int asize, T* adata)
+                : FlatArray<T>(asize, adata)
         {
             _allocsize = asize;
             _ownmem = 0;
@@ -156,12 +137,12 @@ namespace meshit {
 
         /// array copy
 
-        explicit Array(const Array<T, BASE, TIND>& a2)
-                : FlatArray<T, BASE, TIND>(a2.size(), (a2.size() ? new T[a2.size()] : 0))
+        explicit Array(const Array<T>& a2)
+                : FlatArray<T>(a2.size(), (a2.size() ? new T[a2.size()] : 0))
         {
             _allocsize = _size;
             _ownmem = 1;
-            for (TIND i = BASE; i < (TIND) _size + BASE; i++)
+            for (int i = 0; i < (int) _size; i++)
                 (*this)[i] = a2[i];
         }
 
@@ -199,13 +180,13 @@ namespace meshit {
             return _size;
         }
 
-        template<typename T2, int B2>
-        void Append(FlatArray<T2, B2> a2)
+        template<typename T2>
+        void Append(FlatArray<T2> a2)
         {
             if (_size + a2.size() > _allocsize)
                 ReSize(_size + a2.size());
             for (int i = 0; i < a2.size(); i++)
-                _data[_size + i] = a2[i + B2];
+                _data[_size + i] = a2[i];
             _size += a2.size();
         }
 
@@ -225,7 +206,7 @@ namespace meshit {
         }
 
         /// Delete element i (0-based). Move last element to position i.
-        void Delete(TIND i)
+        void Delete(int i)
         {
             _data[i] = _data[_size - 1];
             _size--;
@@ -249,7 +230,7 @@ namespace meshit {
         /// Fill array with val
         Array& operator=(const T& val)
         {
-            FlatArray<T, BASE, TIND>::operator=(val);
+            FlatArray<T>::operator=(val);
             return *this;
         }
 
@@ -257,7 +238,7 @@ namespace meshit {
         Array& operator=(const Array& a2)
         {
             resize(a2.size());
-            for (size_t i = BASE; i < _size + BASE; i++)
+            for (size_t i = 0; i < _size; i++)
                 (*this)[i] = a2[i];
             return *this;
         }
@@ -266,11 +247,10 @@ namespace meshit {
         Array& operator=(const FlatArray<T>& a2)
         {
             resize(a2.size());
-            for (size_t i = BASE; i < _size + BASE; i++)
+            for (size_t i = 0; i < _size; i++)
                 (*this)[i] = a2[i];
             return *this;
         }
-
 
      private:
         void ReSize(size_t minsize)

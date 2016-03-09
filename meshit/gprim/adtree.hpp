@@ -131,13 +131,7 @@ namespace meshit {
             tree->DeleteElement(pi);
         }
 
-        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax,
-                             Array<int>& pis) const;
-
-        const ADTree3& Tree() const
-        {
-            return *tree;
-        };
+        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<int>& pis) const;
     };
 
     class Box3dTree

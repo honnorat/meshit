@@ -21,9 +21,6 @@ namespace meshit {
     {
         SEGMENT = 1, SEGMENT3 = 2,
         TRIG = 10, QUAD = 11, TRIG6 = 12, QUAD6 = 13, QUAD8 = 14,
-        TET = 20, TET10 = 21,
-        PYRAMID = 22, PRISM = 23, PRISM12 = 24,
-        HEX = 25
     };
 
     typedef int ELEMENT_EDGE[2]; // initial point, end point

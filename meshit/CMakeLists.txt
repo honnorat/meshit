@@ -1,7 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(src_GENERAL
-    general/bitarray.cpp
     general/flags.cpp
     general/hashtabl.cpp
     general/optmem.cpp

@@ -274,9 +274,6 @@ namespace meshit {
         /// sets internal tables
         void CalcSurfacesOfNode();
 
-        /// additional (temporarily) fix points 
-        void FixPoints(const BitArray& fixpoints);
-
         /**
            finds elements without neighbour and
            boundary elements without inner element.
@@ -377,9 +374,6 @@ namespace meshit {
         void Load(std::istream& infile);
         void Save(const std::string& filename) const;
         void Load(const std::string& filename);
-
-        /// orient surface mesh, for one sub-domain only
-        void SurfaceMeshOrientation();
 
         /// build box-search tree
         void BuildElementSearchTree();
