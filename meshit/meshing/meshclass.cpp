@@ -2504,58 +2504,6 @@ namespace meshit {
             return defaultstring;
     }
 
-    void Mesh::SetUserData(const char* id, Array<int>& data)
-    {
-        if (userdata_int.Used(id))
-            delete userdata_int.Get(id);
-
-        Array<int>* newdata = new Array<int>(data);
-
-        userdata_int.Set(id, newdata);
-    }
-
-    bool Mesh::GetUserData(const char* id, Array<int>& data, int shift) const
-    {
-        if (userdata_int.Used(id)) {
-            if (data.size() < (*userdata_int.Get(id)).size() + shift)
-                data.resize((*userdata_int.Get(id)).size() + shift);
-            for (int i = 0; i < (*userdata_int.Get(id)).size(); i++) {
-                data[i + shift] = (*userdata_int.Get(id))[i];
-            }
-            return true;
-        }
-        else {
-            data.resize(0);
-            return false;
-        }
-    }
-
-    void Mesh::SetUserData(const char* id, Array<double>& data)
-    {
-        if (userdata_double.Used(id))
-            delete userdata_double.Get(id);
-
-        Array<double>* newdata = new Array<double>(data);
-
-        userdata_double.Set(id, newdata);
-    }
-
-    bool Mesh::GetUserData(const char* id, Array<double>& data, int shift) const
-    {
-        if (userdata_double.Used(id)) {
-            if (data.size() < (*userdata_double.Get(id)).size() + shift)
-                data.resize((*userdata_double.Get(id)).size() + shift);
-            for (int i = 0; i < (*userdata_double.Get(id)).size(); i++) {
-                data[i + shift] = (*userdata_double.Get(id))[i];
-            }
-            return true;
-        }
-        else {
-            data.resize(0);
-            return false;
-        }
-    }
-
     void Mesh::PrintMemInfo(std::ostream& ost) const
     {
         ost << "Mesh Mem:" << std::endl;

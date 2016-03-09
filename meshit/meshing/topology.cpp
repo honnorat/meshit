@@ -105,13 +105,7 @@ namespace meshit {
         }
 
         if (buildedges) {
-            edges.resize(0);
-            surfedges.resize(nse);
             segedges.resize(nseg);
-
-            for (int i = 0; i < nse; i++)
-                for (int j = 0; j < 4; j++)
-                    surfedges[i][j].nr = -1;
 
             // keep existing edges
             cnt = 0;
@@ -164,7 +158,7 @@ namespace meshit {
                     const Element2d& el = mesh.SurfaceElement(elnr);
 
                     int neledges = GetNEdges(el.GetType());
-                    const ELEMENT_EDGE* eledges = GetEdges0(el.GetType());
+                    const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
 
                     for (int k = 0; k < neledges; k++) {
                         INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
@@ -203,7 +197,7 @@ namespace meshit {
                     const Element2d& el = mesh.SurfaceElement(elnr);
 
                     int neledges = GetNEdges(el.GetType());
-                    const ELEMENT_EDGE* eledges = GetEdges0(el.GetType());
+                    const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
 
                     for (int k = 0; k < neledges; k++) {
                         INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
@@ -212,12 +206,6 @@ namespace meshit {
                         if (edgedir) std::swap(edge.I1(), edge.I2());
 
                         if (edge.I1() != i) continue;
-
-                        int edgenum = edgenr[edge.I2()];
-                        // if (edgedir) edgenum *= -1;
-                        // surfedges.Elem(elnr)[k] = edgenum;
-                        surfedges.Elem(elnr)[k].nr = edgenum - 1;
-
                     }
                 }
 
@@ -232,29 +220,21 @@ namespace meshit {
 
                     if (edge.I1() != i) continue;
 
-                    int edgenum = edgenr[edge.I2()];
-                    /*
-            if (edgedir) edgenum *= -1;
-            segedges.Elem(elnr) = edgenum;
-                     */
-                    segedges.Elem(elnr).nr = edgenum - 1;
+                    segedges.Elem(elnr) = edgenr[edge.I2()] - 1;
                 }
             }
         }
 
-
-
         // generate faces
         if (buildfaces) {
-
-            faces.resize(0);
             surffaces.resize(nse);
 
             int oldnfa = face2vert.size();
 
             cnt = 0;
-            for (int i = 0; i < face2vert.size(); i++)
+            for (int i = 0; i < face2vert.size(); i++) {
                 cnt[face2vert[i][0]]++;
+            }
             TABLE<int, PointIndex::BASE> vert2oldface(cnt);
             for (int i = 0; i < face2vert.size(); i++)
                 vert2oldface.AddSave(face2vert[i][0], i);
@@ -279,7 +259,6 @@ namespace meshit {
                     vert2face.Set(face, fnr + 1);
                 }
 
-
                 for (int pass = 1; pass <= 2; pass++) {
 
                     if (pass == 2) {
@@ -289,18 +268,17 @@ namespace meshit {
                                              face2vert[j].I2(),
                                              face2vert[j].I3());
                                 vert2face.Set(face, j + 1);
-                            }
-                            else
+                            } else {
                                 break;
+                            }
                         }
                     }
 
                     for (int j = 0; j < (*vert2surfelement)[v].size(); j++) {
                         int elnr = (*vert2surfelement)[v][j];
-                        // std::cout << "surfelnr = " << elnr <<std::endl;
                         const Element2d& el = mesh.SurfaceElement(elnr);
 
-                        const ELEMENT_FACE* elfaces = GetFaces1(el.GetType());
+                        const ELEMENT_FACE* elfaces = GetFaces(el.GetType());
 
                         if (elfaces[0][3] == 0) { // triangle
 
@@ -329,9 +307,9 @@ namespace meshit {
 
                             if (face.I1() != v) continue;
 
-                            if (vert2face.Used(face))
+                            if (vert2face.Used(face)) {
                                 facenum = vert2face.Get(face);
-                            else {
+                            } else {
                                 nfa++;
                                 vert2face.Set(face, nfa);
                                 facenum = nfa;
@@ -340,11 +318,8 @@ namespace meshit {
                                 face2vert.push_back(hface);
                             }
 
-                            // surffaces.Elem(elnr) = 8*(facenum-1)+facedir+1;
-                            surffaces.Elem(elnr).fnr = facenum - 1;
-                        }
-
-                        else {
+                            surffaces.Elem(elnr) = facenum - 1;
+                        } else {
                             // quad
                             int facenum;
                             int facedir;
@@ -386,17 +361,19 @@ namespace meshit {
                                 face2vert.push_back(hface);
                             }
 
-                            // surffaces.Elem(elnr) = 8*(facenum-1)+facedir+1;
-                            surffaces.Elem(elnr).fnr = facenum - 1;
+                            surffaces.Elem(elnr) = facenum - 1;
                         }
                     }
 
                     // sort faces
                     if (pass == 1) {
-                        for (int i = 0; i < nfa - first_fa; i++)
-                            for (int j = first_fa + 1; j < nfa - i; j++)
-                                if (face2vert[j] < face2vert[j - 1])
+                        for (int i = 0; i < nfa - first_fa; i++) {
+                            for (int j = first_fa + 1; j < nfa - i; j++) {
+                                if (face2vert[j] < face2vert[j - 1]) {
                                     std::swap(face2vert[j - 1], face2vert[j]);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -509,19 +486,9 @@ namespace meshit {
         return 0;
     }
 
-    void MeshTopology::GetSurfaceElementEdges(int elnr, Array<int>& eledges) const
-    {
-        int ned = GetNEdges(mesh.SurfaceElement(elnr).GetType());
-        eledges.resize(ned);
-        for (int i = 0; i < ned; i++)
-            // eledges[i] = abs (surfedges.Get(elnr)[i]);
-            eledges[i] = surfedges.Get(elnr)[i].nr + 1;
-    }
-
     int MeshTopology::GetSurfaceElementFace(int elnr) const
     {
-        // return (surffaces.Get(elnr)-1) / 8 + 1;  
-        return surffaces.Get(elnr).fnr + 1;
+        return surffaces.Get(elnr) + 1;
     }
 
     void MeshTopology::GetFaceVertices(int fnr, Array<int>& vertices) const

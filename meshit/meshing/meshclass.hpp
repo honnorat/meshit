@@ -496,11 +496,6 @@ namespace meshit {
             timestamp = NextTimeStamp();
         }
 
-        void SetUserData(const char* id, Array<int>& data);
-        bool GetUserData(const char* id, Array<int>& data, int shift = 0) const;
-        void SetUserData(const char* id, Array<double>& data);
-        bool GetUserData(const char* id, Array<double>& data, int shift = 0) const;
-
         void PrintMemInfo(std::ostream& ost) const;
 
         friend class Meshing3;
