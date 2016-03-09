@@ -201,6 +201,11 @@ namespace meshit {
             return segments[si];
         }
 
+        const Segment& LineSegment(SegmentIndex si) const
+        {
+            return segments[si];
+        }
+
         const Segment& operator[](SegmentIndex si) const
         {
             return segments[si];

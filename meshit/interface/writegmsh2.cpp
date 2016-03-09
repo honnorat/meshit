@@ -39,16 +39,16 @@ namespace meshit {
      *
      */
     void WriteGmsh2Format(
-            const Mesh & mesh,
-            const std::string & filename)
+            const Mesh& mesh,
+            const std::string& filename)
     {
         std::ofstream ofs(filename.c_str());
         WriteGmsh2Format(mesh, ofs);
     }
 
     void WriteGmsh2Format(
-            const Mesh & mesh,
-            std::ostream & os)
+            const Mesh& mesh,
+            std::ostream& os)
     {
         os.precision(6);
         os.setf(std::ios::fixed, std::ios::floatfield);
@@ -61,15 +61,15 @@ namespace meshit {
         /// Prepare GMSH 2.2 file (See GMSH 2.2 Documentation)
         os << "$MeshFormat\n";
         os << "2.2 0 "
-                << (int) sizeof (double) << "\n";
+        << (int) sizeof(double) << "\n";
         os << "$EndMeshFormat\n";
 
         /// Write nodes
         os << "$Nodes\n";
         os << np << "\n";
         int cnt = PointIndex::BASE;
-        for (int i = 1; i <= np; i++) {
-            const Point3d & p = mesh.Point(i);
+        for (PointIndex i = 0; i < np; i++) {
+            const Point3d& p = mesh.Point(i);
             os << cnt++ << " "; /// node number
             os << p.X() << " ";
             os << p.Y() << " ";
@@ -86,13 +86,13 @@ namespace meshit {
         os << nse + ns << "\n";
 
         cnt = PointIndex::BASE;
-        for (int i = 1; i <= ns; i++) {
-            const Segment & seg = mesh.LineSegment(i);
+        for (SegmentIndex i = 0; i < ns; i++) {
+            const Segment& seg = mesh.LineSegment(i);
             os << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;
         }
         //            cnt += ns;
-        for (int k = 1; k <= nse; k++) {
-            const Element2d & el = mesh.SurfaceElement(k);
+        for (SurfaceElementIndex k = 0; k < nse; k++) {
+            const Element2d& el = mesh.SurfaceElement(k);
 
             int elType = 0;
             if (el.GetNP() == 3) elType = GMSH_TRIG; //// GMSH Type for a 3 node triangle

@@ -105,15 +105,13 @@ namespace meshit {
         }
 
         if (buildedges) {
-            segedges.resize(nseg);
-
             // keep existing edges
             cnt = 0;
             for (int i = 0; i < edge2vert.size(); i++)
                 cnt[edge2vert[i][0]]++;
             TABLE<int, PointIndex::BASE> vert2edge(cnt);
             for (int i = 0; i < edge2vert.size(); i++)
-                vert2edge.AddSave(edge2vert[i][0], i + 1);
+                vert2edge.AddSave(edge2vert[i][0], i);
 
             // ensure all coarse grid and intermediate level edges
             cnt = 0;
@@ -140,7 +138,7 @@ namespace meshit {
 
                 for (int j = 0; j < vert2edge[i].size(); j++) {
                     int ednr = vert2edge[i][j];
-                    int i2 = edge2vert.Get(ednr)[1];
+                    int i2 = edge2vert[ednr][1];
                     edgeflag[i2] = i;
                     edgenr[i2] = ednr;
                 }
@@ -219,15 +217,12 @@ namespace meshit {
                     if (edgedir) std::swap(edge.I1(), edge.I2());
 
                     if (edge.I1() != i) continue;
-
-                    segedges.Elem(elnr) = edgenr[edge.I2()] - 1;
                 }
             }
         }
 
         // generate faces
         if (buildfaces) {
-            surffaces.resize(nse);
 
             int oldnfa = face2vert.size();
 
@@ -282,7 +277,6 @@ namespace meshit {
 
                         if (elfaces[0][3] == 0) { // triangle
 
-                            int facenum;
                             int facedir;
 
                             INDEX_3 face(el.PNum(elfaces[0][0]),
@@ -307,21 +301,15 @@ namespace meshit {
 
                             if (face.I1() != v) continue;
 
-                            if (vert2face.Used(face)) {
-                                facenum = vert2face.Get(face);
-                            } else {
+                            if (! vert2face.Used(face)) {
                                 nfa++;
                                 vert2face.Set(face, nfa);
-                                facenum = nfa;
 
                                 INDEX_4 hface(face.I1(), face.I2(), face.I3(), 0);
                                 face2vert.push_back(hface);
                             }
-
-                            surffaces.Elem(elnr) = facenum - 1;
                         } else {
                             // quad
-                            int facenum;
                             int facedir;
 
                             INDEX_4Q face4(el.PNum(elfaces[0][0]),
@@ -350,18 +338,13 @@ namespace meshit {
                             INDEX_3 face(face4.I1(), face4.I2(), face4.I3());
                             if (face.I1() != v) continue;
 
-                            if (vert2face.Used(face))
-                                facenum = vert2face.Get(face);
-                            else {
+                            if (! vert2face.Used(face)) {
                                 nfa++;
                                 vert2face.Set(face, nfa);
-                                facenum = nfa;
 
                                 INDEX_4 hface(face4.I1(), face4.I2(), face4.I3(), face4.I3());
                                 face2vert.push_back(hface);
                             }
-
-                            surffaces.Elem(elnr) = facenum - 1;
                         }
                     }
 
@@ -377,126 +360,8 @@ namespace meshit {
                     }
                 }
             }
-
-
             face2vert.reserve(nfa);
-
-
-            face2surfel.resize(nfa);
-            face2surfel = 0;
-            for (int i = 1; i <= nse; i++)
-                face2surfel.Elem(GetSurfaceElementFace(i)) = i;
-
-            surf2volelement.resize(nse);
-            for (int i = 1; i <= nse; i++) {
-                surf2volelement.Elem(i)[0] = 0;
-                surf2volelement.Elem(i)[1] = 0;
-            }
-            face2vert.reserve(face2vert.size());
-
-            // face table complete
-            Array<short int> face_els(nfa), face_surfels(nfa);
-            face_els = 0;
-            face_surfels = 0;
-            Array<int> hfaces;
-            for (int i = 1; i <= nse; i++)
-                face_surfels[GetSurfaceElementFace(i) - 1]++;
         }
-
         timestamp = NextTimeStamp();
     }
-
-    const Point3d* MeshTopology::GetVertices(ELEMENT_TYPE et)
-    {
-        static Point3d segm_points[] = {Point3d(1, 0, 0),
-                                        Point3d(0, 0, 0)};
-
-        static Point3d trig_points[] = {Point3d(1, 0, 0),
-                                        Point3d(0, 1, 0),
-                                        Point3d(0, 0, 0)};
-
-        static Point3d quad_points[] = {Point3d(0, 0, 0),
-                                        Point3d(1, 0, 0),
-                                        Point3d(1, 1, 0),
-                                        Point3d(0, 1, 0)};
-
-        static Point3d tet_points[] = {Point3d(1, 0, 0),
-                                       Point3d(0, 1, 0),
-                                       Point3d(0, 0, 1),
-                                       Point3d(0, 0, 0)};
-
-        static Point3d pyramid_points[] = {
-                Point3d(0, 0, 0),
-                Point3d(1, 0, 0),
-                Point3d(1, 1, 0),
-                Point3d(0, 1, 0),
-                Point3d(0, 0, 1 - 1e-7),
-        };
-
-        static Point3d prism_points[] = {
-                Point3d(1, 0, 0),
-                Point3d(0, 1, 0),
-                Point3d(0, 0, 0),
-                Point3d(1, 0, 1),
-                Point3d(0, 1, 1),
-                Point3d(0, 0, 1)
-        };
-
-
-        static Point3d hex_points[] = {Point3d(0, 0, 0),
-                                       Point3d(1, 0, 0),
-                                       Point3d(1, 1, 0),
-                                       Point3d(0, 1, 0),
-                                       Point3d(0, 0, 1),
-                                       Point3d(1, 0, 1),
-                                       Point3d(1, 1, 1),
-                                       Point3d(0, 1, 1)};
-
-
-        switch (et) {
-            case SEGMENT:
-            case SEGMENT3:
-                return segm_points;
-
-            case TRIG:
-            case TRIG6:
-                return trig_points;
-
-            case QUAD:
-            case QUAD6:
-            case QUAD8:
-                return quad_points;
-
-            case TET:
-            case TET10:
-                return tet_points;
-
-            case PYRAMID:
-                return pyramid_points;
-
-            case PRISM:
-            case PRISM12:
-                return prism_points;
-
-            case HEX:
-                return hex_points;
-            default:
-                std::cerr << "Ng_ME_GetVertices, illegal element type " << et << std::endl;
-        }
-        return 0;
-    }
-
-    int MeshTopology::GetSurfaceElementFace(int elnr) const
-    {
-        return surffaces.Get(elnr) + 1;
-    }
-
-    void MeshTopology::GetFaceVertices(int fnr, Array<int>& vertices) const
-    {
-        vertices.resize(4);
-        for (int i = 0; i < 4; i++)
-            vertices[i] = face2vert.Get(fnr)[i];
-        if (vertices[3] == 0)
-            vertices.resize(3);
-    }
-}
+}  // namespace meshit

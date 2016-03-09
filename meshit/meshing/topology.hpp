@@ -23,12 +23,8 @@ namespace meshit {
         bool buildedges;
         bool buildfaces;
 
-        Array<INDEX_2> edge2vert;
-        Array<INDEX_4> face2vert;
-        Array<int32_t> segedges;
-        Array<int32_t> surffaces;
-        Array<INDEX_2> surf2volelement;
-        Array<int> face2surfel;
+        std::vector<INDEX_2> edge2vert;
+        std::vector<INDEX_4> face2vert;
         TABLE<int, PointIndex::BASE>* vert2surfelement;
         TABLE<int, PointIndex::BASE>* vert2segment;
         int timestamp;
@@ -52,14 +48,10 @@ namespace meshit {
         static inline int GetNVertices(ELEMENT_TYPE et);
         static inline int GetNEdges(ELEMENT_TYPE et);
 
-        static const Point3d* GetVertices(ELEMENT_TYPE et);
         inline static const ELEMENT_EDGE* GetEdges(ELEMENT_TYPE et);
         inline static const ELEMENT_FACE* GetFaces(ELEMENT_TYPE et);
 
-        void GetFaceVertices(int fnr, Array<int>& vertices) const;
-
         void GetSurfaceElementEdges(int elnr, Array<int>& edges) const;
-        int GetSurfaceElementFace(int elnr) const;
 
     };
 

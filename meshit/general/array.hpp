@@ -75,7 +75,7 @@ namespace meshit {
 
         const T& Get(int i) const
         {
-            return ((const T*) _data)[i - 1];
+            return _data[i - 1];
         }
 
         /// Access array, one-based  (old fashioned)
