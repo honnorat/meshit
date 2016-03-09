@@ -1,5 +1,5 @@
-#ifndef FILE_TABLE_H
-#define FILE_TABLE_H
+#ifndef FILE_TABLE_HPP
+#define FILE_TABLE_HPP
 
 /**************************************************************************/
 /* File:   table.hpp                                                      */
@@ -73,8 +73,7 @@ namespace meshit {
 
         /// Creates fixed maximal element size table
         explicit TABLE(const FlatArray<int, BASE>& entrysizes)
-                : BASE_TABLE(FlatArray<int>(entrysizes.size(), const_cast<int*> (&entrysizes[BASE])),
-                             sizeof(T))
+                : BASE_TABLE(FlatArray<int>(entrysizes.size(), const_cast<int*> (&entrysizes[BASE])), sizeof(T))
         {
         }
 

@@ -209,8 +209,6 @@ namespace meshit {
         inline int GetBagSize(int bnr) const;
         inline void SetData(int bnr, int colnr, const INDEX_3& ahash, const T& acont);
         inline void GetData(int bnr, int colnr, INDEX_3& ahash, T& acont) const;
-        /// returns position, if not existing, will create (create == return 1)
-        inline int PositionCreate(const INDEX_3& ahash, int& bnr, int& colnr);
         inline void SetSize(int size);
 
         inline void PrepareSet(const INDEX_3& ahash);
@@ -501,20 +499,6 @@ namespace meshit {
                 ost << "hash = " << hash << ", data = " << data << std::endl;
             }
         return ost;
-    }
-
-    template<class T>
-    inline int INDEX_3_HASHTABLE<T>::PositionCreate(const INDEX_3& ahash, int& bnr, int& colnr)
-    {
-        bnr = HashValue(ahash);
-        colnr = Position(bnr, ahash);
-        if (!colnr) {
-            hash.Add(bnr, ahash);
-            cont.AddEmpty(bnr);
-            colnr = cont.EntrySize(bnr);
-            return 1;
-        }
-        return 0;
     }
 
     template<class T>

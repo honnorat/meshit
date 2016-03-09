@@ -1,7 +1,5 @@
 #include "topology.hpp"
 
-#include <stdexcept>
-
 namespace meshit {
 
     template<class T>
@@ -219,7 +217,6 @@ namespace meshit {
                         // if (edgedir) edgenum *= -1;
                         // surfedges.Elem(elnr)[k] = edgenum;
                         surfedges.Elem(elnr)[k].nr = edgenum - 1;
-                        surfedges.Elem(elnr)[k].orient = edgedir;
 
                     }
                 }
@@ -241,7 +238,6 @@ namespace meshit {
             segedges.Elem(elnr) = edgenum;
                      */
                     segedges.Elem(elnr).nr = edgenum - 1;
-                    segedges.Elem(elnr).orient = edgedir;
                 }
             }
         }
@@ -346,7 +342,6 @@ namespace meshit {
 
                             // surffaces.Elem(elnr) = 8*(facenum-1)+facedir+1;
                             surffaces.Elem(elnr).fnr = facenum - 1;
-                            surffaces.Elem(elnr).forient = facedir;
                         }
 
                         else {
@@ -393,7 +388,6 @@ namespace meshit {
 
                             // surffaces.Elem(elnr) = 8*(facenum-1)+facedir+1;
                             surffaces.Elem(elnr).fnr = facenum - 1;
-                            surffaces.Elem(elnr).forient = facedir;
                         }
                     }
 

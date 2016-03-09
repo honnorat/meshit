@@ -1,5 +1,5 @@
-#ifndef FILE_MESHTOOL
-#define FILE_MESHTOOL
+#ifndef MESHTOOL_HPP
+#define MESHTOOL_HPP
 
 #include "meshclass.hpp"
 

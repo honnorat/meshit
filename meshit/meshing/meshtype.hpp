@@ -1,5 +1,5 @@
-#ifndef MESHTYPE
-#define MESHTYPE
+#ifndef MESHTYPE_HPP
+#define MESHTYPE_HPP
 
 /**************************************************************************/
 /* File:   meshtype.hpp                                                   */
@@ -29,17 +29,11 @@ namespace meshit {
     typedef int ELEMENT_EDGE[2]; // initial point, end point
     typedef int ELEMENT_FACE[4]; // points, last one is -1 for trig
 
-#define ELEMENT_MAXPOINTS 12
 #define ELEMENT2D_MAXPOINTS 8
 
     enum POINTTYPE
     {
         FIXEDPOINT = 1, EDGEPOINT = 2, SURFACEPOINT = 3, INNERPOINT = 4
-    };
-
-    enum OPTIMIZEGOAL
-    {
-        OPT_QUALITY, OPT_CONFORM, OPT_REST, OPT_WORSTCASE, OPT_LEGAL
     };
 
     extern int NextTimeStamp();
@@ -127,60 +121,66 @@ namespace meshit {
 
     class PointIndex
     {
-        int i;
+        int i_;
 
      public:
 
-        PointIndex() : i(-1) { }
+        PointIndex() : i_{-1} { }
 
-        PointIndex(int ai) : i(ai) { }
+        PointIndex(int ai) : i_{ai} { }
 
         PointIndex& operator=(const PointIndex& ai)
         {
-            i = ai.i;
+            i_ = ai.i_;
+            return *this;
+        }
+
+        PointIndex& operator=(int ai)
+        {
+            i_ = ai;
             return *this;
         }
 
         operator int() const
         {
-            return i;
+            return i_;
         }
 
         PointIndex operator++(int)
         {
             PointIndex hi(*this);
-            i++;
+            i_++;
             return hi;
         }
 
         PointIndex operator--(int)
         {
             PointIndex hi(*this);
-            i--;
+            i_--;
             return hi;
         }
 
         PointIndex operator++()
         {
-            i++;
+            i_++;
             return *this;
         }
 
         PointIndex operator--()
         {
-            i--;
+            i_--;
             return *this;
         }
 
 #ifdef BASE0
 
-        enum
+        enum : int
         {
             BASE = 0
         };
 #else
 
-        enum
+        enum : int
         {
             BASE = 1
         };
@@ -847,10 +847,6 @@ namespace meshit {
         int haltsuccess;
         int haltnosuccess;
         int haltlargequalclass;
-        int haltsegment;
-        int haltnode;
-        int haltexistingline;
-        int haltoverlap;
         int haltface;
         int haltfacenr;
         DebugParameters();
@@ -897,7 +893,7 @@ namespace meshit {
 
         enum ID_TYPE
         {
-            UNDEFINED = 1, PERIODIC = 2, CLOSESURFACES = 3, CLOSEEDGES = 4
+            UNDEFINED = 1, PERIODIC = 2
         };
 
      private:
@@ -932,21 +928,10 @@ namespace meshit {
         int Get(PointIndex pi1, PointIndex pi2) const;
         bool Get(PointIndex pi1, PointIndex pi2, int identnr) const;
 
-        INDEX_2_HASHTABLE<int>& GetIdentifiedPoints()
-        {
-            return *identifiedpoints;
-        }
-
-        bool Used(PointIndex pi1, PointIndex pi2)
-        {
-            return identifiedpoints->Used(INDEX_2(pi1, pi2));
-        }
-
         bool UsedSymmetric(PointIndex pi1, PointIndex pi2)
         {
-            return
-                    identifiedpoints->Used(INDEX_2(pi1, pi2)) ||
-                    identifiedpoints->Used(INDEX_2(pi2, pi1));
+            return identifiedpoints->Used(INDEX_2(pi1, pi2)) ||
+                   identifiedpoints->Used(INDEX_2(pi2, pi1));
         }
 
         void GetMap(int identnr, Array<int, PointIndex::BASE>& identmap, bool symmetric = false) const;

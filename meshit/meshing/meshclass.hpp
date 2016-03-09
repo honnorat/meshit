@@ -1,5 +1,5 @@
-#ifndef MESHCLASS
-#define MESHCLASS
+#ifndef MESHCLASS_HPP
+#define MESHCLASS_HPP
 
 /**************************************************************************/
 /* File:   meshclass.hpp                                                  */
@@ -504,13 +504,6 @@ namespace meshit {
         void PrintMemInfo(std::ostream& ost) const;
 
         friend class Meshing3;
-
-        enum GEOM_TYPE
-        {
-            NO_GEOM = 0, GEOM_2D = 1, GEOM_CSG = 10, GEOM_STL = 11, GEOM_OCC = 12, GEOM_ACIS = 13
-        };
-        GEOM_TYPE geomtype;
-
     };
 
     inline std::ostream& operator<<(std::ostream& ost, const Mesh& mesh)

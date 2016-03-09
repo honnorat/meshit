@@ -25,8 +25,6 @@ namespace meshit {
 
         topology = new MeshTopology(*this);
         ident = new Identifications(*this);
-
-        geomtype = NO_GEOM;
     }
 
     Mesh::~Mesh()
@@ -136,7 +134,7 @@ namespace meshit {
                 PointIndex mpi(0);
                 ::meshit::Point<2> gp = geometry.GetPoint(i);
                 ::meshit::Point<3> gp3(gp(0), gp(1), 0);
-                for (PointIndex pi = PointIndex::BASE; pi < GetNP() + PointIndex::BASE; pi++)
+                for (PointIndex pi{PointIndex::BASE}; pi < GetNP() + PointIndex::BASE; pi++)
                     if (Dist2(gp3, points[pi]) < mindist) {
                         mpi = pi;
                         mindist = Dist2(gp3, points[pi]);
@@ -438,22 +436,10 @@ namespace meshit {
 
         outfile << "mesh3d" << "\n";
         outfile << "dimension\n" << GetDimension() << "\n";
-        outfile << "geomtype\n" << int(geomtype) << "\n";
+        outfile << "geomtype\n" << 0 << "\n";
         outfile << "\n";
         outfile << "# surfnr    bcnr   domin  domout      np      p1      p2      p3" << "\n";
-
-        switch (geomtype) {
-            case GEOM_STL:
-                outfile << "surfaceelementsgi" << "\n";
-                break;
-            case GEOM_OCC:
-            case GEOM_ACIS:
-                outfile << "surfaceelementsuv" << "\n";
-                break;
-            default:
-                outfile << "surfaceelements" << "\n";
-        }
-
+        outfile << "surfaceelements" << "\n";
         outfile << GetNSE() << "\n";
 
         for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
@@ -473,22 +459,6 @@ namespace meshit {
             outfile << " " << sel.GetNP();
             for (size_t j = 0; j < sel.GetNP(); j++) {
                 outfile << " " << sel[j];
-            }
-
-            switch (geomtype) {
-                case GEOM_STL:
-                    for (size_t j = 1; j <= sel.GetNP(); j++) {
-                        outfile << " " << sel.GeomInfoPi(j).trignum;
-                    }
-                    break;
-                case GEOM_OCC:
-                case GEOM_ACIS:
-                    for (size_t j = 1; j <= sel.GetNP(); j++) {
-                        outfile << " " << sel.GeomInfoPi(j).u;
-                        outfile << " " << sel.GeomInfoPi(j).v;
-                    }
-                    break;
-                default:;
             }
             outfile << "\n";
         }
@@ -739,7 +709,6 @@ namespace meshit {
             if (strcmp(str, "geomtype") == 0) {
                 int hi;
                 infile >> hi;
-                geomtype = GEOM_TYPE(hi);
             }
 
             if (strcmp(str, "surfaceelements") == 0 || strcmp(str, "surfaceelementsgi") == 0 ||
@@ -1550,8 +1519,7 @@ namespace meshit {
                     const Point3d& p1 = points[el.PNumMod(j)];
                     const Point3d& p2 = points[el.PNumMod(j + 1)];
 
-                    if (!ident->UsedSymmetric(el.PNumMod(j),
-                                              el.PNumMod(j + 1))) {
+                    if (!ident->UsedSymmetric(el.PNumMod(j), el.PNumMod(j + 1))) {
                         double hedge = Dist(p1, p2);
                         if (hedge > hel)
                             hel = hedge;

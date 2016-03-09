@@ -1,5 +1,5 @@
-#ifndef BISECT_H
-#define BISECT_H
+#ifndef REFINE_HPP
+#define REFINE_HPP
 
 #include "improve2.hpp"
 

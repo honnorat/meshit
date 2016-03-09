@@ -1,5 +1,5 @@
-#ifndef TOPOLOGY
-#define TOPOLOGY
+#ifndef TOPOLOGY_HPP
+#define TOPOLOGY_HPP
 
 /**************************************************************************/
 /* File:   topology.hh                                                    */
@@ -19,14 +19,12 @@ namespace meshit {
 
     struct T_EDGE
     {
-        int orient : 1;
-        int nr : 31; // 0-based
+        int nr; // 0-based
     };
 
     struct T_FACE
     {
-        int forient : 3;
-        int fnr : 29; // 0-based
+        int fnr; // 0-based
     };
 
     class MeshTopology
@@ -112,10 +110,10 @@ namespace meshit {
             case HEX:
                 return 8;
 
-                // default:
-                // std::cerr << "Ng_ME_GetNVertices, illegal element type " << et <<std::endl;
+            default:
+                MESHIT_LOG_ERROR("MeshTopology::GetNVertices, illegal element type " << et);
+                return 0;
         }
-        return 0;
     }
 
     inline int MeshTopology::GetNPoints(ELEMENT_TYPE et)

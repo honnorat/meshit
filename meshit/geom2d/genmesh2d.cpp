@@ -142,7 +142,7 @@ namespace meshit {
                 mark = spline.GetPoint(edgelength);
 
                 {
-                    PointIndex pi1 = -1, pi2 = -1;
+                    PointIndex pi1{-1}, pi2{-1};
 
                     Point3d mark3(mark(0), mark(1), 0);
                     Point3d oldmark3(oldmark(0), oldmark(1), 0);

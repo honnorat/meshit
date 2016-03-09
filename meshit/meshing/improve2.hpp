@@ -1,5 +1,5 @@
-#ifndef FILE_IMPROVE2
-#define FILE_IMPROVE2
+#ifndef IMPROVE2_HPP
+#define IMPROVE2_HPP
 
 #include "meshclass.hpp"
 

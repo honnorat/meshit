@@ -1,7 +1,7 @@
+#include "meshtool.hpp"
+
 #include <iomanip>
 
-#include "../meshit.hpp"
-#include "meshtool.hpp"
 #include "../gprim/geomtest3d.hpp"
 
 namespace meshit {

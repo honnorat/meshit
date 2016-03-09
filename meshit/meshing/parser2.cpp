@@ -1,6 +1,5 @@
 #include <sstream>
 
-#include "../meshit.hpp"
 #include "meshing2.hpp"
 
 #ifdef WIN32
@@ -11,7 +10,7 @@
 
 namespace meshit {
 
-    void LoadMatrixLine(std::istream & ist, DenseMatrix & m, int line)
+    void LoadMatrixLine(std::istream& ist, DenseMatrix& m, int line)
     {
         char ch;
         int pnum;
@@ -35,13 +34,12 @@ namespace meshit {
         }
     }
 
-    void netrule::LoadRule(std::istream & ist)
+    void netrule::LoadRule(std::istream& ist)
     {
         char buf[256];
         char ch;
         Point2d p;
         INDEX_2 lin;
-        int i, j;
         DenseMatrix tempoldutonewu(20, 20), tempoldutofreearea(20, 20),
                 tempoldutofreearealimit(20, 20);
 
@@ -52,13 +50,13 @@ namespace meshit {
         noldp = 0;
         noldl = 0;
 
-        ist.get(buf, sizeof (buf), '"');
+        ist.get(buf, sizeof(buf), '"');
         ist.get(ch);
-        ist.get(buf, sizeof (buf), '"');
+        ist.get(buf, sizeof(buf), '"');
         ist.get(ch);
 
         // if(name != NULL) 
-        delete [] name;
+        delete[] name;
         name = new char[strlen(buf) + 1];
         strcpy(name, buf);
 
@@ -169,11 +167,11 @@ namespace meshit {
                     while (ch != ';') {
                         if (ch == '{') {
                             LoadMatrixLine(ist, tempoldutonewu,
-                                    2 * (points.size() - noldp) - 1);
+                                           2 * (points.size() - noldp) - 1);
 
                             ist >> ch; // '{'
                             LoadMatrixLine(ist, tempoldutonewu,
-                                    2 * (points.size() - noldp));
+                                           2 * (points.size() - noldp));
                         }
 
                         ist >> ch;
@@ -224,11 +222,11 @@ namespace meshit {
                     while (ch != ';') {
                         if (ch == '{') {
                             LoadMatrixLine(ist, tempoldutofreearea,
-                                    2 * freezone.size() - 1);
+                                           2 * freezone.size() - 1);
 
                             ist >> ch; // '{'
                             LoadMatrixLine(ist, tempoldutofreearea,
-                                    2 * freezone.size());
+                                           2 * freezone.size());
                         }
 
                         ist >> ch;
@@ -237,10 +235,10 @@ namespace meshit {
                     ist >> ch;
                 }
 
-                for (i = 1; i <= tempoldutofreearealimit.Height(); i++)
-                    for (j = 1; j <= tempoldutofreearealimit.Width(); j++)
+                for (size_t i = 1; i <= tempoldutofreearealimit.Height(); i++)
+                    for (size_t j = 1; j <= tempoldutofreearealimit.Width(); j++)
                         tempoldutofreearealimit.Elem(i, j) =
-                            tempoldutofreearea.Elem(i, j);
+                                tempoldutofreearea.Elem(i, j);
 
 
                 ist.putback(ch);
@@ -264,11 +262,11 @@ namespace meshit {
                     while (ch != ';') {
                         if (ch == '{') {
                             LoadMatrixLine(ist, tempoldutofreearealimit,
-                                    2 * freepi - 1);
+                                           2 * freepi - 1);
 
                             ist >> ch; // '{'
                             LoadMatrixLine(ist, tempoldutofreearealimit,
-                                    2 * freepi);
+                                           2 * freepi);
                         }
 
                         ist >> ch;
@@ -286,7 +284,7 @@ namespace meshit {
                 while (ch == '(') {
                     elements.push_back(Element2d());
                     //                    Element2d & last = *elements.end();
-                    Element2d & last = elements[elements.size() - 1];
+                    Element2d& last = elements[elements.size() - 1];
 
                     ist >> last.PNum(1);
                     ist >> ch; // ','
@@ -323,7 +321,7 @@ namespace meshit {
                     //        threeint a = threeint();
                     orientations.push_back(threeint());
                     //                    threeint & last = *orientations.end();
-                    threeint & last = orientations[orientations.size() - 1];
+                    threeint& last = orientations[orientations.size() - 1];
 
                     ist >> last.i1;
                     ist >> ch; // ','
@@ -352,16 +350,16 @@ namespace meshit {
         oldutofreearea.SetSize(2 * freezone.size(), 2 * noldp);
         oldutofreearealimit.SetSize(2 * freezone.size(), 2 * noldp);
 
-        for (i = 1; i <= oldutonewu.Height(); i++)
-            for (j = 1; j <= oldutonewu.Width(); j++)
+        for (size_t i = 1; i <= oldutonewu.Height(); i++)
+            for (size_t j = 1; j <= oldutonewu.Width(); j++)
                 oldutonewu.Elem(i, j) = tempoldutonewu.Elem(i, j);
 
-        for (i = 1; i <= oldutofreearea.Height(); i++)
-            for (j = 1; j <= oldutofreearea.Width(); j++)
+        for (size_t i = 1; i <= oldutofreearea.Height(); i++)
+            for (size_t j = 1; j <= oldutofreearea.Width(); j++)
                 oldutofreearea.Elem(i, j) = tempoldutofreearea.Elem(i, j);
 
-        for (i = 1; i <= oldutofreearea.Height(); i++)
-            for (j = 1; j <= oldutofreearea.Width(); j++)
+        for (size_t i = 1; i <= oldutofreearea.Height(); i++)
+            for (size_t j = 1; j <= oldutofreearea.Width(); j++)
                 oldutofreearealimit.Elem(i, j) = tempoldutofreearealimit.Elem(i, j);
 
         freesetinequ.SetSize(freezone.size());
@@ -372,25 +370,26 @@ namespace meshit {
             int minn;
             Array<int> pnearness(noldp);
 
-            for (i = 1; i <= pnearness.size(); i++)
+            for (int i = 1; i <= pnearness.size(); i++)
                 pnearness.Elem(i) = 1000;
 
-            for (j = 1; j <= 2; j++)
+            for (int j = 1; j <= 2; j++)
                 pnearness.Elem(GetPointNr(1, j)) = 0;
 
             do {
                 ok = 1;
 
-                for (i = 1; i <= (int) noldl; i++) {
+                for (size_t i = 1; i <= noldl; i++) {
                     minn = 1000;
-                    for (j = 1; j <= 2; j++)
+                    for (int j = 1; j <= 2; j++) {
                         minn = std::min(minn, pnearness.Get(GetPointNr(i, j)));
-
-                    for (j = 1; j <= 2; j++)
+                    }
+                    for (int j = 1; j <= 2; j++) {
                         if (pnearness.Get(GetPointNr(i, j)) > minn + 1) {
                             ok = 0;
                             pnearness.Elem(GetPointNr(i, j)) = minn + 1;
                         }
+                    }
                 }
             } while (!ok);
 
@@ -398,7 +397,7 @@ namespace meshit {
 
             for (size_t i = 0; i < noldl; i++) {
                 lnearness[i] = 0;
-                for (j = 1; j <= 2; j++) {
+                for (int j = 1; j <= 2; j++) {
                     lnearness[i] += pnearness.Get(GetPointNr(i + 1, j));
                 }
             }
@@ -411,25 +410,25 @@ namespace meshit {
             double lam1 = 1.0 / (i + 1);
 
             oldutofreearea_i[i] = new DenseMatrix(oldutofreearea.Height(), oldutofreearea.Width());
-            DenseMatrix & mati = *oldutofreearea_i[i];
-            for (j = 0; j < oldutofreearea.Height(); j++)
+            DenseMatrix& mati = *oldutofreearea_i[i];
+            for (size_t j = 0; j < oldutofreearea.Height(); j++)
                 for (size_t k = 0; k < oldutofreearea.Width(); k++)
                     mati(j, k) = lam1 * oldutofreearea(j, k) + (1 - lam1) * oldutofreearealimit(j, k);
 
-            freezone_i[i] = new Array<Point2d> (freezone.size());
-            Array<Point2d> & fzi = *freezone_i[i];
+            freezone_i[i] = new Array<Point2d>(freezone.size());
+            Array<Point2d>& fzi = *freezone_i[i];
             for (size_t j = 0; j < freezone.size(); j++)
                 fzi[j] = freezonelimit[j] + lam1 * (freezone[j] - freezonelimit[j]);
         }
     }
 
-    extern const char * triarules[];
-    extern const char * quadrules[];
+    extern const char* triarules[];
+    extern const char* quadrules[];
 
-    void Meshing2::LoadRules(const char * filename, bool quad)
+    void Meshing2::LoadRules(const char* filename, bool quad)
     {
         char buf[256];
-        std::istream * ist;
+        std::istream* ist;
         std::string tr1;
 
         if (filename) {
@@ -437,7 +436,7 @@ namespace meshit {
         }
         else {
             /* connect tetrules to one string */
-            const char ** hcp;
+            const char** hcp;
 
             if (!quad) {
                 hcp = triarules;
@@ -486,7 +485,7 @@ namespace meshit {
             (*ist) >> buf;
 
             if (strcmp(buf, "rule") == 0) {
-                netrule * rule = new netrule;
+                netrule* rule = new netrule;
                 rule->LoadRule(*ist);
                 rules.push_back(rule);
             }

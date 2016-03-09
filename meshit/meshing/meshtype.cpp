@@ -1024,7 +1024,6 @@ namespace meshit {
         haltsuccess = 0;
         haltnosuccess = 0;
         haltlargequalclass = 0;
-        haltsegment = 0;
     };
 }
 

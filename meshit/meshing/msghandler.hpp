@@ -1,5 +1,5 @@
-#ifndef FILE_MSGHANDLER
-#define FILE_MSGHANDLER
+#ifndef MSGHANDLER_HPP
+#define MSGHANDLER_HPP
 
 /**************************************************************************/
 /* File:   msghandler.hh                                                  */
