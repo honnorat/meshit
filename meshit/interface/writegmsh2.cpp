@@ -12,7 +12,6 @@
  *  2. Supports upto second order elements of each type
  *
  */
-#include "../meshit.hpp"
 #include "writeuser.hpp"
 
 #include "../meshing/meshclass.hpp"
@@ -54,9 +53,9 @@ namespace meshit {
         os.setf(std::ios::fixed, std::ios::floatfield);
         os.setf(std::ios::showpoint);
 
-        int np = mesh.GetNP(); /// number of points in mesh
-        int ns = mesh.GetNSeg(); /// number of segments in mesh
-        int nse = mesh.GetNSE(); /// number of surface elements (BC)
+        int np = mesh.GetNP();    // number of points in mesh
+        int ns = mesh.GetNSeg();  // number of segments in mesh
+        int nse = mesh.GetNSE();  // number of surface elements (BC)
 
         /// Prepare GMSH 2.2 file (See GMSH 2.2 Documentation)
         os << "$MeshFormat\n";
@@ -70,7 +69,7 @@ namespace meshit {
         int cnt = 0;
         for (PointIndex i = 0; i < np; i++) {
             const Point3d& p = mesh.Point(i);
-            os << cnt++ << " "; /// node number
+            os << cnt++ << " ";  // number of nodes
             os << p.X() << " ";
             os << p.Y() << " ";
             os << p.Z() << "\n";
@@ -81,7 +80,7 @@ namespace meshit {
          * 2D section : available for triangles and quadrangles
          *              upto 2nd Order
          */
-        /// write triangles & quadrangles
+        // Write triangles & quadrangles
         os << "$Elements\n";
         os << nse + ns << "\n";
 
@@ -95,10 +94,10 @@ namespace meshit {
             const Element2d& el = mesh.SurfaceElement(k);
 
             int elType = 0;
-            if (el.GetNP() == 3) elType = GMSH_TRIG; //// GMSH Type for a 3 node triangle
-            if (el.GetNP() == 6) elType = GMSH_TRIG6; //// GMSH Type for a 6 node triangle
-            if (el.GetNP() == 4) elType = GMSH_QUAD; //// GMSH Type for a 4 node quadrangle
-            if (el.GetNP() == 8) elType = GMSH_QUAD8; //// GMSH Type for an 8 node quadrangle
+            if (el.GetNP() == 3) elType = GMSH_TRIG;   // GMSH Type for a 3 node triangle
+            if (el.GetNP() == 6) elType = GMSH_TRIG6;  // GMSH Type for a 6 node triangle
+            if (el.GetNP() == 4) elType = GMSH_QUAD;   // GMSH Type for a 4 node quadrangle
+            if (el.GetNP() == 8) elType = GMSH_QUAD8;  // GMSH Type for an 8 node quadrangle
             if (elType == 0) {
                 std::cerr << " Invalid surface element type for Gmsh 2.0 2D-Mesh Export Format !\n";
                 return;
@@ -111,8 +110,7 @@ namespace meshit {
                 os << " ";
                 if ((elType == GMSH_TRIG) || (elType == GMSH_TRIG6)) {
                     os << el.PNum(triGmsh[l]);
-                }
-                else if ((elType == GMSH_QUAD) || (elType == GMSH_QUAD8)) {
+                } else if ((elType == GMSH_QUAD) || (elType == GMSH_QUAD8)) {
                     os << el.PNum(quadGmsh[l]);
                 }
             }
@@ -123,4 +121,4 @@ namespace meshit {
          * End of 2D section
          */
     }
-}
+}  // namespace meshit

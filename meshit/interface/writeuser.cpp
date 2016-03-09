@@ -3,34 +3,31 @@
 //
 
 #include <iostream>
-#include "../meshit.hpp"
 #include "writeuser.hpp"
 
-namespace meshit
-{
-    bool WriteUserFormat(
-            const std::string & format,
-            const Mesh & mesh,
-            const std::string & filename) {
-
-        if (format == "Gmsh2 Format")
+namespace meshit {
+    bool WriteUserFormat(const std::string& format,
+                         const Mesh& mesh,
+                         const std::string& filename)
+    {
+        if (format == "Gmsh2 Format") {
             WriteGmsh2Format(mesh, filename);
-        else {
+        } else {
             return 1;
         }
         return 0;
     }
-    bool WriteUserFormat(
-            const std::string & format,
-            const Mesh & mesh,
-            std::ostream & os) {
 
-        if (format == "Gmsh2 Format")
+    bool WriteUserFormat(const std::string& format,
+                         const Mesh& mesh,
+                         std::ostream& os)
+    {
+        if (format == "Gmsh2 Format") {
             WriteGmsh2Format(mesh, os);
-        else {
+        } else {
             return 1;
         }
         return 0;
     }
-}
+}  // namespace meshit
 

@@ -32,6 +32,6 @@ namespace meshit {
             const std::string & format,
             const Mesh & mesh,
             std::ostream & ostream);
-}
+}  // namespace meshit
 #endif
 
