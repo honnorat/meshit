@@ -25,8 +25,8 @@ namespace meshit {
 
         std::vector<INDEX_2> edge2vert;
         std::vector<INDEX_4> face2vert;
-        TABLE<int, PointIndex::BASE>* vert2surfelement;
-        TABLE<int, PointIndex::BASE>* vert2segment;
+        TABLE<int>* vert2surfelement;
+        TABLE<int>* vert2segment;
         int timestamp;
 
      public:

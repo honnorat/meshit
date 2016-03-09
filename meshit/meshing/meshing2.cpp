@@ -189,8 +189,8 @@ namespace meshit {
 
         // illegal points: points with more then 50 elements per node
         int maxlegalpoint(-1), maxlegalline(-1);
-        Array<int, PointIndex::BASE> trigsonnode;
-        Array<int, PointIndex::BASE> illegalpoint;
+        Array<int> trigsonnode;
+        Array<int> illegalpoint;
 
         trigsonnode.resize(mesh.GetNP());
         illegalpoint.resize(mesh.GetNP());
@@ -295,9 +295,7 @@ namespace meshit {
                 debugflag = true;
 
             // problem recognition !
-            if (found &&
-                (gpi1 < illegalpoint.size() + PointIndex::BASE) &&
-                (gpi2 < illegalpoint.size() + PointIndex::BASE)) {
+            if (found && (gpi1 < illegalpoint.size()) && (gpi2 < illegalpoint.size())) {
                 if (illegalpoint[gpi1] || illegalpoint[gpi2])
                     found = 0;
             }
@@ -317,8 +315,7 @@ namespace meshit {
                 plainzones.resize(locpoints.size());
 
                 if (debugflag) {
-                    std::cerr << "3d->2d transformation" << std::endl;
-//                    std::cerr << "3d points: " << std::endl << locpoints << std::endl;
+                    MESHIT_LOG_DEBUG("3d->2d transformation");
                 }
 
                 for (int i = 1; i <= locpoints.size(); i++) {
@@ -797,11 +794,10 @@ namespace meshit {
 
                         int gpi = locelements.Get(i).PNum(j);
                         int oldts = trigsonnode.size();
-                        if (gpi >= oldts + PointIndex::BASE) {
-                            trigsonnode.resize(gpi + 1 - PointIndex::BASE);
-                            illegalpoint.resize(gpi + 1 - PointIndex::BASE);
-                            for (int k = oldts + PointIndex::BASE;
-                                 k <= gpi; k++) {
+                        if (gpi >= oldts) {
+                            trigsonnode.resize(gpi + 1);
+                            illegalpoint.resize(gpi + 1);
+                            for (int k = oldts; k <= gpi; k++) {
                                 trigsonnode[k] = 0;
                                 illegalpoint[k] = 0;
                             }

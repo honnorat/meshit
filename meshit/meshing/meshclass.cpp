@@ -134,11 +134,12 @@ namespace meshit {
                 PointIndex mpi(0);
                 ::meshit::Point<2> gp = geometry.GetPoint(i);
                 ::meshit::Point<3> gp3(gp(0), gp(1), 0);
-                for (PointIndex pi{PointIndex::BASE}; pi < GetNP() + PointIndex::BASE; pi++)
+                for (PointIndex pi{0}; pi < GetNP(); pi++) {
                     if (Dist2(gp3, points[pi]) < mindist) {
                         mpi = pi;
                         mindist = Dist2(gp3, points[pi]);
                     }
+                }
                 points[mpi].Singularity(1.);
             }
         }
@@ -179,8 +180,8 @@ namespace meshit {
                 continue;
 
             // tensor product mesh
-            Array<PointIndex, PointIndex::BASE> nextpi(bnp);
-            Array<int, PointIndex::BASE> si1(bnp), si2(bnp);
+            Array<PointIndex> nextpi(bnp);
+            Array<int> si1(bnp), si2(bnp);
 
             nextpi = -1;
             si1 = -1;
@@ -277,10 +278,10 @@ namespace meshit {
 
             Meshing2 meshing(mp, Box<3>(pmin, pmax));
 
-            Array<int, PointIndex::BASE> compress(bnp);
+            Array<int> compress(bnp);
             compress = -1;
             int cnt = 0;
-            for (PointIndex pi = PointIndex::BASE; pi < bnp + PointIndex::BASE; pi++) {
+            for (PointIndex pi = 0; pi < bnp; pi++) {
                 if (points[pi].GetLayer() == geometry.GetDomainLayer(domnr)) {
                     meshing.AddPoint(points[pi], pi);
                     cnt++;
@@ -355,7 +356,7 @@ namespace meshit {
         timestamp = NextTimeStamp();
 
         int maxn = std::max(s[0], s[1]);
-        maxn += 1 - PointIndex::BASE;
+        maxn += 1;
 
         if (maxn <= points.size()) {
             if (points[s[0]].Type() > EDGEPOINT)
@@ -378,7 +379,7 @@ namespace meshit {
         for (size_t i = 1; i < el.GetNP(); i++) {
             if (el[i] > maxn) maxn = el[i];
         }
-        maxn += 1 - PointIndex::BASE;
+        maxn += 1;
 
         if (maxn <= points.size()) {
             for (size_t i = 0; i < el.GetNP(); i++) {
@@ -519,7 +520,7 @@ namespace meshit {
         outfile.setf(std::ios::fixed, std::ios::floatfield);
         outfile.setf(std::ios::showpoint);
 
-        for (PointIndex pi = PointIndex::BASE; pi < GetNP() + PointIndex::BASE; pi++) {
+        for (PointIndex pi = 0; pi < GetNP(); pi++) {
             outfile.width(22);
             outfile << points[pi].X() / scale << "  ";
             outfile.width(22);
@@ -1112,7 +1113,7 @@ namespace meshit {
         int np = GetNP();
         int nse = GetNSE();
 
-        Array<int, PointIndex::BASE> numonpoint(np);
+        Array<int> numonpoint(np);
 
         numonpoint = 0;
 
@@ -1141,7 +1142,7 @@ namespace meshit {
             }
         }
 
-        TABLE<SurfaceElementIndex, PointIndex::BASE> selsonpoint(numonpoint);
+        TABLE<SurfaceElementIndex> selsonpoint(numonpoint);
         for (SurfaceElementIndex sii = 0; sii < nse; sii++) {
             int ind = surfelements[sii].GetIndex();
 
@@ -1180,7 +1181,7 @@ namespace meshit {
                             INDEX_3 i3(hel[0], hel[1], hel[2]);
                             INDEX_2 i2(GetFaceDescriptor(ind).DomainIn(),
                                        (hel.GetNP() == 3)
-                                       ? PointIndex(PointIndex::BASE - 1)
+                                       ? PointIndex{-1}
                                        : hel.PNum(4));
                             faceht.Set(i3, i2);
                         }
@@ -1193,7 +1194,7 @@ namespace meshit {
                             INDEX_3 i3(hel[0], hel[1], hel[2]);
                             INDEX_2 i2(GetFaceDescriptor(ind).DomainOut(),
                                        (hel.GetNP() == 3)
-                                       ? PointIndex(PointIndex::BASE - 1)
+                                       ? PointIndex{-1}
                                        : hel.PNum(4));
                             faceht.Set(i3, i2);
                         }
@@ -1204,9 +1205,9 @@ namespace meshit {
                         INDEX_3 i3;
                         INDEX_2 i2;
                         faceht.GetData(i, i3, i2);
-                        if (i2.I1() != PointIndex::BASE - 1) {
+                        if (i2.I1() != -1) {
                             Element2d tri;
-                            tri.SetType((i2.I2() == PointIndex::BASE - 1) ? TRIG : QUAD);
+                            tri.SetType((i2.I2() == -1) ? TRIG : QUAD);
                             for (int l = 0; l < 3; l++) {
                                 tri[l] = i3.I(l + 1);
                             }
@@ -1564,15 +1565,11 @@ namespace meshit {
 
         assert(lochfunc);
 
-        PointIndex i, j;
-        double hl;
-
-        for (i = PointIndex::BASE;
-             i < GetNP() + PointIndex::BASE; i++) {
-            for (j = i + 1; j < GetNP() + PointIndex::BASE; j++) {
+        for (PointIndex i = 0; i < GetNP(); i++) {
+            for (PointIndex j = i + 1; j < GetNP(); j++) {
                 const Point3d& p1 = points[i];
                 const Point3d& p2 = points[j];
-                hl = Dist(p1, p2);
+                double hl = Dist(p1, p2);
                 RestrictLocalH(p1, hl);
                 RestrictLocalH(p2, hl);
             }
@@ -1820,9 +1817,9 @@ namespace meshit {
 
     void Mesh::Compress()
     {
-        Array<PointIndex, PointIndex::BASE, PointIndex> op2np(GetNP());
+        Array<PointIndex, 0, PointIndex> op2np(GetNP());
         Array<MeshPoint> hpoints;
-        BitArrayChar<PointIndex::BASE> pused(GetNP());
+        BitArrayChar<0> pused(GetNP());
 
         for (int i = 0; i < surfelements.size(); i++) {
             if (surfelements[i].IsDeleted()) {
@@ -1831,7 +1828,7 @@ namespace meshit {
             }
         }
         for (int i = 0; i < segments.size(); i++) {
-            if (segments[i][0] <= PointIndex::BASE - 1) {
+            if (segments[i][0] <= -1) {
                 segments.Delete(i);
                 i--;
             }
@@ -1862,7 +1859,7 @@ namespace meshit {
             pused.Set(lockedpoints[i]);
         }
 
-        int npi = PointIndex::BASE - 1;
+        int npi = -1;
 
         for (PointIndex pi = points.Begin(); pi < points.End(); pi++) {
             if (pused.Test(pi)) {
@@ -2343,7 +2340,7 @@ namespace meshit {
         while (si != -1) {
             const Element2d& se = SurfaceElement(si);
             if (se.GetIndex() == facenr
-                && se[0] >= PointIndex::BASE
+                && se[0] >= 0
                 && !se.IsDeleted()) {
                 sei.push_back(si);
             }
@@ -2403,7 +2400,7 @@ namespace meshit {
                     numvertices = el.PNum(j);
             }
         }
-        numvertices += 1 - PointIndex::BASE;
+        numvertices += 1;
     }
 
     int Mesh::GetNV() const
@@ -2421,14 +2418,13 @@ namespace meshit {
 
         int mlold = mlbetweennodes.size();
         mlbetweennodes.resize(np);
-        if (np > mlold)
-            for (int i = mlold + PointIndex::BASE;
-                 i < np + PointIndex::BASE; i++) {
-                mlbetweennodes[i].I1() = PointIndex::BASE - 1;
-                mlbetweennodes[i].I2() = PointIndex::BASE - 1;
+        if (np > mlold) {
+            for (int i = mlold; i < np; i++) {
+                mlbetweennodes[i].I1() = -1;
+                mlbetweennodes[i].I2() = -1;
             }
-
-        GetIdentifications().SetMaxPointNr(np + PointIndex::BASE - 1);
+        }
+        GetIdentifications().SetMaxPointNr(np - 1);
     }
 
     bool Mesh::PureTrigMesh(int faceindex) const

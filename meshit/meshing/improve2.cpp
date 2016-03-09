@@ -83,8 +83,8 @@ namespace meshit {
 
 
         Array<char> swapped(mesh.GetNSE());
-        Array<int, PointIndex::BASE> pdef(mesh.GetNP());
-        Array<double, PointIndex::BASE> pangle(mesh.GetNP());
+        Array<int> pdef(mesh.GetNP());
+        Array<double> pangle(mesh.GetNP());
 
         static const double minangle[] = {0, 1.481, 2.565, 3.627, 4.683, 5.736, 7, 9};
 
@@ -336,7 +336,7 @@ namespace meshit {
 
         int np = mesh.GetNP();
 
-        TABLE<SurfaceElementIndex, PointIndex::BASE> elementsonnode(np);
+        TABLE<SurfaceElementIndex> elementsonnode(np);
         Array<SurfaceElementIndex> hasonepi, hasbothpi;
 
         for (int i = 0; i < seia.size(); i++) {
@@ -345,7 +345,7 @@ namespace meshit {
                 elementsonnode.Add(el[j], seia[i]);
         }
 
-        Array<bool, PointIndex::BASE> fixed(np);
+        Array<bool> fixed(np);
         fixed = false;
 
         for (int i = 0; i < seia.size(); i++) {
@@ -363,7 +363,7 @@ namespace meshit {
         for (int i = 0; i < mesh.LockedPoints().size(); i++)
             fixed[mesh.LockedPoints()[i]] = true;
 
-        Array<Vec3d, PointIndex::BASE> normals(np);
+        Array<Vec3d> normals(np);
 
         for (PointIndex pi = mesh.Points().Begin(); pi < mesh.Points().End(); pi++) {
             if (elementsonnode[pi].size()) {
@@ -386,7 +386,7 @@ namespace meshit {
                 PointIndex pi1 = elem[j];
                 PointIndex pi2 = elem[(j + 1) % 3];
 
-                if (pi1 < PointIndex::BASE || pi2 < PointIndex::BASE)
+                if (pi1 < 0 || pi2 < 0)
                     continue;
 
                 // more general

@@ -67,7 +67,7 @@ namespace meshit {
         delete vert2surfelement;
         delete vert2segment;
 
-        Array<int, PointIndex::BASE> cnt(nv);
+        Array<int> cnt(nv);
         Array<int> vnums;
 
         /*
@@ -83,7 +83,7 @@ namespace meshit {
                 cnt[el[j]]++;
         }
 
-        vert2surfelement = new TABLE<int, PointIndex::BASE>(cnt);
+        vert2surfelement = new TABLE<int>(cnt);
         for (SurfaceElementIndex sei = 0; sei < nse; sei++) {
             const Element2d& el = mesh.SurfaceElement(sei);
             for (int j = 0; j < el.GetNV(); j++)
@@ -97,7 +97,7 @@ namespace meshit {
             cnt[seg[1]]++;
         }
 
-        vert2segment = new TABLE<int, PointIndex::BASE>(cnt);
+        vert2segment = new TABLE<int>(cnt);
         for (int i = 1; i <= nseg; i++) {
             const Segment& seg = mesh.LineSegment(i);
             vert2segment->AddSave(seg[0], i);
@@ -109,7 +109,7 @@ namespace meshit {
             cnt = 0;
             for (int i = 0; i < edge2vert.size(); i++)
                 cnt[edge2vert[i][0]]++;
-            TABLE<int, PointIndex::BASE> vert2edge(cnt);
+            TABLE<int> vert2edge(cnt);
             for (int i = 0; i < edge2vert.size(); i++)
                 vert2edge.AddSave(edge2vert[i][0], i);
 
@@ -117,23 +117,23 @@ namespace meshit {
             cnt = 0;
             for (int i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
                 INDEX_2 parents = Sort(mesh.mlbetweennodes[i]);
-                if (parents[0] >= PointIndex::BASE) cnt[parents[0]]++;
+                if (parents[0] >= 0) cnt[parents[0]]++;
             }
-            TABLE<int, PointIndex::BASE> vert2vertcoarse(cnt);
+            TABLE<int> vert2vertcoarse(cnt);
             for (int i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
                 INDEX_2 parents = Sort(mesh.mlbetweennodes[i]);
-                if (parents[0] > PointIndex::BASE) vert2vertcoarse.AddSave(parents[0], parents[1]);
+                if (parents[0] > 0) vert2vertcoarse.AddSave(parents[0], parents[1]);
             }
 
-            Array<int, PointIndex::BASE> edgenr(nv);
-            Array<int, PointIndex::BASE> edgeflag(nv);
+            Array<int> edgenr(nv);
+            Array<int> edgeflag(nv);
             Array<int> vertex2;
 
-            edgeflag = PointIndex::BASE - 1;
+            edgeflag = -1;
 
             ned = edge2vert.size();
 
-            for (int i = PointIndex::BASE; i < nv + PointIndex::BASE; i++) {
+            for (int i = 0; i < nv; i++) {
                 vertex2.resize(0);
 
                 for (int j = 0; j < vert2edge[i].size(); j++) {
@@ -230,18 +230,18 @@ namespace meshit {
             for (int i = 0; i < face2vert.size(); i++) {
                 cnt[face2vert[i][0]]++;
             }
-            TABLE<int, PointIndex::BASE> vert2oldface(cnt);
+            TABLE<int> vert2oldface(cnt);
             for (int i = 0; i < face2vert.size(); i++)
                 vert2oldface.AddSave(face2vert[i][0], i);
 
             int max_face_on_vertex = 0;
-            for (int i = PointIndex::BASE; i < nv + PointIndex::BASE; i++) {
+            for (int i = 0; i < nv; i++) {
                 int onv = vert2oldface[i].size() + (*vert2surfelement)[i].size();
                 max_face_on_vertex = std::max(onv, max_face_on_vertex);
             }
 
             nfa = oldnfa;
-            for (int v = PointIndex::BASE; v < nv + PointIndex::BASE; v++) {
+            for (int v = 0; v < nv; v++) {
                 int first_fa = nfa;
 
                 INDEX_3_CLOSED_HASHTABLE<int> vert2face(2 * max_face_on_vertex + 10);
@@ -301,7 +301,7 @@ namespace meshit {
 
                             if (face.I1() != v) continue;
 
-                            if (! vert2face.Used(face)) {
+                            if (!vert2face.Used(face)) {
                                 nfa++;
                                 vert2face.Set(face, nfa);
 
@@ -338,7 +338,7 @@ namespace meshit {
                             INDEX_3 face(face4.I1(), face4.I2(), face4.I3());
                             if (face.I1() != v) continue;
 
-                            if (! vert2face.Used(face)) {
+                            if (!vert2face.Used(face)) {
                                 nfa++;
                                 vert2face.Set(face, nfa);
 

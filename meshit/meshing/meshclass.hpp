@@ -52,7 +52,7 @@ namespace meshit {
         Array<PointIndex> lockedpoints;
 
         /// surface indices at boundary nodes
-        TABLE<int, PointIndex::BASE> surfacesonnode;
+        TABLE<int> surfacesonnode;
         /// boundary edges  (1..normal bedge, 2..segment)
         INDEX_2_CLOSED_HASHTABLE<int>* boundaryedges;
         INDEX_2_CLOSED_HASHTABLE<int>* segmentht;
@@ -123,7 +123,7 @@ namespace meshit {
      public:
 
         /// refinement hierarchy
-        Array<INDEX_2, PointIndex::BASE> mlbetweennodes;
+        Array<INDEX_2> mlbetweennodes;
 
         Mesh();
         ~Mesh();

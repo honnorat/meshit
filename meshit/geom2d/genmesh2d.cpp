@@ -265,8 +265,8 @@ namespace meshit {
 
     void SplineGeometry2d::CopyEdgeMesh(int from, int to, Mesh& mesh, Point3dTree& searchtree)
     {
-        Array<int, PointIndex::BASE> mappoints(mesh.GetNP());
-        Array<double, PointIndex::BASE> param(mesh.GetNP());
+        Array<int> mappoints(mesh.GetNP());
+        Array<double> param(mesh.GetNP());
         mappoints = -1;
         param = 0;
 
@@ -295,10 +295,11 @@ namespace meshit {
 
                 int npi = -1;
 
-                for (PointIndex pi = PointIndex::BASE;
-                     pi < mesh.GetNP() + PointIndex::BASE; pi++)
-                    if (Dist2(mesh.Point(pi), newp3) < 1e-12 * diam2)
+                for (PointIndex pi = 0; pi < mesh.GetNP(); pi++) {
+                    if (Dist2(mesh.Point(pi), newp3) < 1e-12 * diam2) {
                         npi = pi;
+                    }
+                }
 
                 if (npi == -1) {
                     npi = mesh.AddPoint(newp3);

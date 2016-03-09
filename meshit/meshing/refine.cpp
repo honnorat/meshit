@@ -31,7 +31,7 @@ namespace meshit {
 
         // refine edges
 
-        Array<EdgePointGeomInfo, PointIndex::BASE> epgi;
+        Array<EdgePointGeomInfo> epgi;
 
         oldns = mesh.GetNSeg();
         for (SegmentIndex si = 0; si < oldns; si++) {
@@ -55,8 +55,9 @@ namespace meshit {
                 pinew = mesh.AddPoint(pnew);
                 between.Set(i2, pinew);
 
-                if (pinew >= epgi.size() + PointIndex::BASE)
-                    epgi.resize(pinew + 1 - PointIndex::BASE);
+                if (pinew >= epgi.size()) {
+                    epgi.resize(pinew + 1);
+                }
                 epgi[pinew] = ngi;
             }
 
@@ -72,10 +73,10 @@ namespace meshit {
         }
 
         // refine surface elements
-        Array<PointGeomInfo, PointIndex::BASE> surfgi(8 * mesh.GetNP());
-        for (int i = PointIndex::BASE;
-             i < surfgi.size() + PointIndex::BASE; i++)
+        Array<PointGeomInfo> surfgi(8 * mesh.GetNP());
+        for (int i = 0; i < surfgi.size(); i++) {
             surfgi[i].trignum = -1;
+        }
 
         oldnf = mesh.GetNSE();
         for (SurfaceElementIndex sei = 0; sei < oldnf; sei++) {
@@ -228,7 +229,7 @@ namespace meshit {
 
         // update identification tables
         for (int i = 1; i <= mesh.GetIdentifications().GetMaxNr(); i++) {
-            Array<int, PointIndex::BASE> identmap;
+            Array<int> identmap;
             mesh.GetIdentifications().GetMap(i, identmap);
 
             for (int j = 1; j <= between.GetNBags(); j++)

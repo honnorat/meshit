@@ -171,20 +171,6 @@ namespace meshit {
             i_--;
             return *this;
         }
-
-#ifdef BASE0
-
-        enum : int
-        {
-            BASE = 0
-        };
-#else
-
-        enum : int
-        {
-            BASE = 1
-        };
-#endif
     };
 
     inline std::istream& operator>>(std::istream& ist, PointIndex& pi)
@@ -355,7 +341,7 @@ namespace meshit {
 
     };
 
-    typedef Array<MeshPoint, PointIndex::BASE, PointIndex> T_POINTS;
+    typedef Array<MeshPoint, 0, PointIndex> T_POINTS;
 
     /**
        Triangle element for surface mesh generation.
@@ -510,8 +496,6 @@ namespace meshit {
         size_t GetNIP() const;
         void GetIntegrationPoint(int ip, Point2d& p, double& weight) const;
 
-        void GetTransformation(int ip, const Array<Point2d>& points,
-                               class DenseMatrix& trans) const;
         void GetTransformation(int ip, class DenseMatrix& pmat,
                                class DenseMatrix& trans) const;
 
@@ -532,7 +516,7 @@ namespace meshit {
         void Delete()
         {
             deleted = 1;
-            pnum[0] = pnum[1] = pnum[2] = pnum[3] = PointIndex::BASE - 1;
+            pnum[0] = pnum[1] = pnum[2] = pnum[3] = -1;
         }
 
         bool IsDeleted() const
@@ -934,7 +918,7 @@ namespace meshit {
                    identifiedpoints->Used(INDEX_2(pi2, pi1));
         }
 
-        void GetMap(int identnr, Array<int, PointIndex::BASE>& identmap, bool symmetric = false) const;
+        void GetMap(int identnr, Array<int>& identmap, bool symmetric = false) const;
 
         ID_TYPE GetType(int identnr) const
         {

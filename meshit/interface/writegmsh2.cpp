@@ -67,7 +67,7 @@ namespace meshit {
         /// Write nodes
         os << "$Nodes\n";
         os << np << "\n";
-        int cnt = PointIndex::BASE;
+        int cnt = 0;
         for (PointIndex i = 0; i < np; i++) {
             const Point3d& p = mesh.Point(i);
             os << cnt++ << " "; /// node number
@@ -85,7 +85,7 @@ namespace meshit {
         os << "$Elements\n";
         os << nse + ns << "\n";
 
-        cnt = PointIndex::BASE;
+        cnt = 0;
         for (SegmentIndex i = 0; i < ns; i++) {
             const Segment& seg = mesh.LineSegment(i);
             os << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;

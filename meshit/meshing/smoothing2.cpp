@@ -322,9 +322,8 @@ namespace meshit {
 
             for (size_t k = 1; k <= bel.GetNP(); k++) {
                 PointIndex pi = bel.PNum(k);
-                pts2d[pi] = Point2d(
-                        ld.t1 * (mesh.Point(pi) - ld.sp1),
-                        ld.t2 * (mesh.Point(pi) - ld.sp1));
+                pts2d[pi] = Point2d(ld.t1 * (mesh.Point(pi) - ld.sp1),
+                                    ld.t2 * (mesh.Point(pi) - ld.sp1));
             }
             pts2d[gpi] = Point2d(x(0), x(1));
 
@@ -362,9 +361,8 @@ namespace meshit {
 
             for (size_t k = 1; k <= bel.GetNP(); k++) {
                 PointIndex pi = bel.PNum(k);
-                pts2d[pi] = Point2d(
-                        ld.t1 * (mesh.Point(pi) - ld.sp1),
-                        ld.t2 * (mesh.Point(pi) - ld.sp1));
+                pts2d[pi] = Point2d(ld.t1 * (mesh.Point(pi) - ld.sp1),
+                                    ld.t2 * (mesh.Point(pi) - ld.sp1));
             }
             pts2d[gpi] = Point2d(x(0), x(1));
 
@@ -414,11 +412,11 @@ namespace meshit {
 
         Vector x(2);
 
-        Array<MeshPoint, PointIndex::BASE> savepoints(mesh.GetNP());
+        Array<MeshPoint> savepoints(mesh.GetNP());
 
         ld.uselocalh = mp.uselocalh;
 
-        Array<int, PointIndex::BASE> compress(mesh.GetNP());
+        Array<int> compress(mesh.GetNP());
         Array<PointIndex> icompress;
         for (int i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);

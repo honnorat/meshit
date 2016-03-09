@@ -385,10 +385,13 @@ namespace meshit {
                             double elerr = 0;
                             for (int i = 1; i <= elements.size(); i++) {
                                 double hf;
-                                if (!mp.quad)
+                                if (!mp.quad) {
                                     hf = CalcElementBadness(lpoints, elements[i - 1]);
-                                else
-                                    hf = elements[i - 1].CalcJacobianBadness(lpoints) * 5;
+                                } else {
+                                    // FIXME: this seems to be bugged
+//                                    hf = elements[i - 1].CalcJacobianBadness(lpoints) * 5;
+                                    hf = 1.0;
+                                }
 
                                 if (hf > elerr) elerr = hf;
                             }

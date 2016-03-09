@@ -320,23 +320,6 @@ namespace meshit {
         weight = pp[2];
     }
 
-    void Element2d::GetTransformation(int ip, const Array<Point2d>& points, DenseMatrix& trans) const
-    {
-        int np = GetNP();
-        DenseMatrix pmat(2, np), dshape(2, np);
-        pmat.SetSize(2, np);
-        dshape.SetSize(2, np);
-
-        Point2d p;
-        double w;
-
-        GetPointMatrix(points, pmat);
-        GetIntegrationPoint(ip, p, w);
-        GetDShape(p, dshape);
-
-        CalcABt(pmat, dshape, trans);
-    }
-
     void Element2d::GetTransformation(int ip, class DenseMatrix& pmat, class DenseMatrix& trans) const
     {
         ComputeIntegrationPointData();
@@ -814,7 +797,7 @@ namespace meshit {
             return 0;
     }
 
-    void Identifications::GetMap(int identnr, Array<int, PointIndex::BASE>& identmap, bool symmetric) const
+    void Identifications::GetMap(int identnr, Array<int>& identmap, bool symmetric) const
     {
         identmap.resize(mesh.GetNP());
         identmap = 0;

@@ -206,8 +206,8 @@ namespace meshit {
             }
         }
 
-        TABLE<int, PointIndex::BASE> elonnode(np);
-        Array<int, PointIndex::BASE> nelonnode(np);
+        TABLE<int> elonnode(np);
+        Array<int> nelonnode(np);
         TABLE<SurfaceElementIndex> nbels(ne);
 
         nelonnode = -4;
