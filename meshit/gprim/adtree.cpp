@@ -154,8 +154,8 @@ namespace meshit {
         int stacks = 1;
 
         while (stacks) {
-            node = stack.Get(stacks);
-            int dir = stackdir.Get(stacks);
+            node = stack[stacks-1];
+            int dir = stackdir[stacks-1];
             stacks--;
 
             if (node->pi != -1) {

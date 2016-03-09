@@ -64,13 +64,6 @@ namespace meshit {
             return IndirectArray<FlatArray, FlatArray<T2, B2> >(*this, ia);
         }
 
-        /// Access array, one-based  (old fashioned)
-
-        const T& Get(int i) const
-        {
-            return _data[i - 1];
-        }
-
         /// access first element
 
         T& First() const

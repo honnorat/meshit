@@ -279,18 +279,18 @@ namespace meshit {
         for (int i = 1; i <= mesh.GetNSeg(); i++) {
             const Segment& seg = mesh.LineSegment(i);
             if (seg.edgenr == from) {
-                mappoints[seg[0]-1] = 1;
-                param[seg[0]-1] = seg.epgeominfo[0].dist;
+                mappoints[seg[0] - 1] = 1;
+                param[seg[0] - 1] = seg.epgeominfo[0].dist;
 
-                mappoints[seg[1]-1] = 1;
-                param[seg[1]-1] = seg.epgeominfo[1].dist;
+                mappoints[seg[1] - 1] = 1;
+                param[seg[1] - 1] = seg.epgeominfo[1].dist;
             }
         }
 
         bool mapped = false;
         for (int i = 1; i <= mappoints.size(); i++) {
-            if (mappoints[i-1] != -1) {
-                Point<2> newp = splines[to + 1]->GetPoint(param[i-1]);
+            if (mappoints[i - 1] != -1) {
+                Point<2> newp = splines[to + 1]->GetPoint(param[i - 1]);
                 Point<3> newp3(newp(0), newp(1), 0);
 
                 int npi = -1;
@@ -306,7 +306,7 @@ namespace meshit {
                     searchtree.Insert(newp3, npi);
                 }
 
-                mappoints[i-1] = npi;
+                mappoints[i - 1] = npi;
 
                 mesh.GetIdentifications().Add(i, npi, to);
                 mapped = true;
@@ -323,15 +323,15 @@ namespace meshit {
                 Segment nseg;
                 nseg.edgenr = to;
                 nseg.si = GetSpline(to - 1).bc;
-                nseg[0] = mappoints.Get(seg[0]);
-                nseg[1] = mappoints.Get(seg[1]);
+                nseg[0] = mappoints[seg[0] - 1];
+                nseg[1] = mappoints[seg[1] - 1];
                 nseg.domin = GetSpline(to - 1).leftdom;
                 nseg.domout = GetSpline(to - 1).rightdom;
 
                 nseg.epgeominfo[0].edgenr = to;
-                nseg.epgeominfo[0].dist = param.Get(seg[0]);
+                nseg.epgeominfo[0].dist = param[seg[0] - 1];
                 nseg.epgeominfo[1].edgenr = to;
-                nseg.epgeominfo[1].dist = param.Get(seg[1]);
+                nseg.epgeominfo[1].dist = param[seg[1] - 1];
                 mesh.AddSegment(nseg);
             }
         }

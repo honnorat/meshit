@@ -100,7 +100,7 @@ namespace meshit {
         inline void Add1(int i, const T& acont)
         {
             IncSize(i - 1, sizeof(T));
-            ((T*) data[i-1].col)[data[i-1].size - 1] = acont;
+            ((T*) data[i - 1].col)[data[i - 1].size - 1] = acont;
         }
 
         void IncSizePrepare(int i)
@@ -125,14 +125,14 @@ namespace meshit {
           Does not check for overflow. */
         inline void Set(int i, int nr, const T& acont)
         {
-            ((T*) data.Get(i).col)[nr - 1] = acont;
+            ((T*) data[i - 1].col)[nr - 1] = acont;
         }
 
         /** Returns the nr-th element in the i-th row.
           Does not check for overflow. */
         inline const T& Get(int i, int nr) const
         {
-            return ((T*) data.Get(i).col)[nr - 1];
+            return ((T*) data[i - 1].col)[nr - 1];
         }
 
         /// Returns size of the table.
@@ -144,7 +144,7 @@ namespace meshit {
         /// Returns size of the i-th row.
         inline int EntrySize(int i) const
         {
-            return data.Get(i).size;
+            return data[i - 1].size;
         }
 
         void AllocateElementsOneBlock()

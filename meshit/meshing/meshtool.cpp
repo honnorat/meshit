@@ -115,10 +115,10 @@ namespace meshit {
         MESHIT_LOG_INFO("Points:           " << mesh.GetNP());
         MESHIT_LOG_INFO("Surface Elements: " << mesh.GetNSE());
         MESHIT_LOG_INFO("\nElements in qualityclasses:");
-        for (i = 1; i <= ncl; i++) {
+        for (i = 0; i < ncl; i++) {
             MESHIT_LOG_INFO(std::fixed << std::setprecision(2) <<
-                            std::setw(4) << double(i - 1) / ncl << " - " <<
-                            std::setw(4) << double(i) / ncl << ": " << incl.Get(i));
+                            std::setw(4) << static_cast<double>(i) / ncl << " - " <<
+                            std::setw(4) << static_cast<double>(i+1) / ncl << ": " << incl[i]);
         }
     }
 

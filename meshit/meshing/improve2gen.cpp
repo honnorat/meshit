@@ -322,16 +322,16 @@ namespace meshit {
                     mapped[ri]++;
 
                     olddef = 0;
-                    for (int j = 1; j <= pmap.size(); j++) {
-                        int ii = nelonnode[pmap.Get(j)];
+                    for (int j = 0; j < pmap.size(); j++) {
+                        int ii = nelonnode[pmap[j]];
                         olddef += ii * ii;
                     }
                     olddef += rule.bonus;
 
                     newdef = 0;
-                    for (int j = 1; j <= pmap.size(); j++) {
-                        if (rule.reused.Get(j)) {
-                            int ii = nelonnode[pmap.Get(j)] + rule.incelsonnode.Get(j);
+                    for (int j = 0; j < pmap.size(); j++) {
+                        if (rule.reused[j]) {
+                            int ii = nelonnode[pmap[j]] + rule.incelsonnode[j];
                             newdef += ii * ii;
                         }
                     }
@@ -343,18 +343,18 @@ namespace meshit {
                     double bad1 = 0, bad2 = 0;
                     Vec3d n;
 
-                    GetNormalVector(surfnr, mesh.Point(pmap.Get(1)), pgi[0], n);
+                    GetNormalVector(surfnr, mesh.Point(pmap[0]), pgi[0], n);
 
-                    for (int j = 1; j <= rule.oldels.size(); j++)
-                        bad1 += mesh.SurfaceElement(elmap.Get(j)).CalcJacobianBadness(mesh.Points(), n);
-
+                    for (int j = 0; j < rule.oldels.size(); j++) {
+                        bad1 += mesh.SurfaceElement(elmap[j]).CalcJacobianBadness(mesh.Points(), n);
+                    }
                     // check new element:
-                    for (int j = 1; j <= rule.newels.size(); j++) {
-                        const Element2d& rnel = rule.newels.Get(j);
+                    for (int j = 0; j < rule.newels.size(); j++) {
+                        const Element2d& rnel = rule.newels[j];
                         Element2d nel(rnel.GetNP());
-                        for (size_t k = 1; k <= rnel.GetNP(); k++)
-                            nel.PNum(k) = pmap.Get(rnel.PNum(k));
-
+                        for (size_t k = 1; k <= rnel.GetNP(); k++) {
+                            nel.PNum(k) = pmap[rnel.PNum(k) - 1];
+                        }
                         bad2 += nel.CalcJacobianBadness(mesh.Points(), n);
                     }
 
@@ -363,23 +363,22 @@ namespace meshit {
                     if (newdef == olddef && bad2 > bad1) continue;
 
                     // generate new element:
-                    for (int j = 1; j <= rule.newels.size(); j++) {
-                        const Element2d& rnel = rule.newels.Get(j);
+                    for (int j = 0; j < rule.newels.size(); j++) {
+                        const Element2d& rnel = rule.newels[j];
                         Element2d nel(rnel.GetNP());
                         nel.SetIndex(faceindex);
                         for (size_t k = 1; k <= rnel.GetNP(); k++) {
-                            nel.PNum(k) = pmap.Get(rnel.PNum(k));
-                            nel.GeomInfoPi(k) = pgi.Get(rnel.PNum(k));
+                            nel.PNum(k) = pmap[rnel.PNum(k) - 1];
+                            nel.GeomInfoPi(k) = pgi[rnel.PNum(k) - 1];
                         }
-
                         mesh.AddSurfaceElement(nel);
                     }
 
                     for (int j = 0; j < rule.oldels.size(); j++)
                         mesh.DeleteSurfaceElement(elmap[j]);
 
-                    for (int j = 1; j <= pmap.size(); j++)
-                        nelonnode[pmap.Get(j)] += rule.incelsonnode.Get(j);
+                    for (int j = 0; j < pmap.size(); j++)
+                        nelonnode[pmap[j]] += rule.incelsonnode[j];
 
                     used[ri]++;
                 }

@@ -305,7 +305,7 @@ namespace meshit {
 
         int UsedPos(int pos) const
         {
-            return hash.Get(pos).I1() != invalid;
+            return hash[pos - 1].I1() != invalid;
         }
 
         int UsedElements() const;
@@ -319,8 +319,8 @@ namespace meshit {
         {
             int i = HashValue(ind);
             while (1) {
-                if (hash.Get(i) == ind) return i;
-                if (hash.Get(i).I1() == invalid) return 0;
+                if (hash[i - 1] == ind) return i;
+                if (hash[i - 1].I1() == invalid) return 0;
                 i++;
                 if (i > hash.size()) i = 1;
             }
@@ -331,11 +331,11 @@ namespace meshit {
         int PositionCreate(const INDEX_2& ind, int& apos)
         {
             int i = HashValue(ind);
-            if (hash.Get(i) == ind) {
+            if (hash[i - 1] == ind) {
                 apos = i;
                 return 0;
             }
-            if (hash.Get(i).I1() == invalid) {
+            if (hash[i - 1].I1() == invalid) {
                 hash[i - 1] = ind;
                 apos = i;
                 return 1;
@@ -610,7 +610,7 @@ namespace meshit {
     Get(const INDEX_2& ahash) const
     {
         int pos = Position(ahash);
-        return cont.Get(pos);
+        return cont[pos - 1];
     }
 
     template<class T>
@@ -625,8 +625,8 @@ namespace meshit {
     inline void INDEX_2_CLOSED_HASHTABLE<T>::
     GetData(int pos, INDEX_2& ahash, T& acont) const
     {
-        ahash = hash.Get(pos);
-        acont = cont.Get(pos);
+        ahash = hash[pos - 1];
+        acont = cont[pos - 1];
     }
 
     template<class T>

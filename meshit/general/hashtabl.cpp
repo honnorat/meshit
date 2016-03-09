@@ -85,11 +85,11 @@ namespace meshit {
         while (1) {
             i++;
             if (i > hash.size()) i = 1;
-            if (hash.Get(i) == ind) {
+            if (hash[i - 1] == ind) {
                 apos = i;
                 return 0;
             }
-            if (hash.Get(i).I1() == invalid) {
+            if (hash[i - 1].I1() == invalid) {
                 hash[i - 1] = ind;
                 apos = i;
                 return 1;
@@ -104,7 +104,7 @@ namespace meshit {
         int n = hash.size();
         int cnt = 0;
         for (int i = 1; i <= n; i++)
-            if (hash.Get(i).I1() != invalid)
+            if (hash[i - 1].I1() != invalid)
                 cnt++;
         return cnt;
     }

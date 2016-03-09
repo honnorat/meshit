@@ -383,7 +383,7 @@ namespace meshit {
                 for (size_t i = 1; i <= noldl; i++) {
                     minn = 1000;
                     for (int j = 1; j <= 2; j++) {
-                        minn = std::min(minn, pnearness.Get(GetPointNr(i, j)));
+                        minn = std::min(minn, pnearness[GetPointNr(i, j) - 1]);
                     }
                     for (int j = 1; j <= 2; j++) {
                         if (pnearness[GetPointNr(i, j) - 1] > minn + 1) {
@@ -399,7 +399,7 @@ namespace meshit {
             for (size_t i = 0; i < noldl; i++) {
                 lnearness[i] = 0;
                 for (int j = 1; j <= 2; j++) {
-                    lnearness[i] += pnearness.Get(GetPointNr(i + 1, j));
+                    lnearness[i] += pnearness[GetPointNr(i + 1, j) - 1];
                 }
             }
         }

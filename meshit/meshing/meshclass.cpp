@@ -540,11 +540,11 @@ namespace meshit {
             outfile << cnt << "\n";
             for (int i = 1; i <= ident->GetMaxNr(); i++) {
                 ident->GetPairs(i, identpairs);
-                for (int j = 1; j <= identpairs.size(); j++) {
+                for (int j = 0; j < identpairs.size(); j++) {
                     outfile.width(8);
-                    outfile << identpairs.Get(j).I1();
+                    outfile << identpairs[j].I1();
                     outfile.width(8);
-                    outfile << identpairs.Get(j).I2();
+                    outfile << identpairs[j].I2();
                     outfile.width(8);
                     outfile << i << "\n";
                 }
@@ -560,17 +560,17 @@ namespace meshit {
         }
 
         int cntmat = 0;
-        for (int i = 1; i <= materials.size(); i++) {
-            if (materials.Get(i) && strlen(materials.Get(i)))
+        for (int i = 0; i < materials.size(); i++) {
+            if (materials[i] && strlen(materials[i]))
                 cntmat++;
         }
 
         if (cntmat) {
             outfile << "materials" << std::endl;
             outfile << cntmat << std::endl;
-            for (int i = 1; i <= materials.size(); i++) {
-                if (materials.Get(i) && strlen(materials.Get(i)))
-                    outfile << i << " " << materials.Get(i) << std::endl;
+            for (int i = 0; i < materials.size(); i++) {
+                if (materials[i] && strlen(materials[i]))
+                    outfile << i + 1 << " " << materials[i] << std::endl;
             }
         }
 
@@ -1231,8 +1231,8 @@ namespace meshit {
 
         BuildBoundaryEdges();
 
-        for (int i = 1; i <= openelements.size(); i++) {
-            const Element2d& sel = openelements.Get(i);
+        for (int i = 0; i < openelements.size(); i++) {
+            const Element2d& sel = openelements[i];
 
             if (boundaryedges)
                 for (size_t j = 1; j <= sel.GetNP(); j++) {
@@ -1440,7 +1440,7 @@ namespace meshit {
     double Mesh::MaxHDomain(int dom) const
     {
         if (maxhdomain.size())
-            return maxhdomain.Get(dom);
+            return maxhdomain[dom - 1];
         else
             return 1e10;
     }
@@ -2004,8 +2004,8 @@ namespace meshit {
 
             setree.GetIntersecting(tpmin, tpmax, inters);
 
-            for (int j = 1; j <= inters.size(); j++) {
-                const Element2d& tri2 = SurfaceElement(inters.Get(j));
+            for (int j = 0; j < inters.size(); j++) {
+                const Element2d& tri2 = SurfaceElement(inters[j]);
 
                 if (points[tri[0]].GetLayer() != points[tri2[0]].GetLayer())
                     continue;
@@ -2025,7 +2025,7 @@ namespace meshit {
 
                 if (IntersectTriangleTriangle(&trip1[0], &trip2[0])) {
                     overlap = 1;
-                    MESHIT_LOG_WARNING("Intersecting elements " << i << " and " << inters.Get(j));
+                    MESHIT_LOG_WARNING("Intersecting elements " << i << " and " << inters[j]);
                     MESHIT_LOG_DEBUG(" el1 = " << tri);
                     MESHIT_LOG_DEBUG(" el2 = " << tri2);
 
@@ -2278,14 +2278,12 @@ namespace meshit {
 
             return false;
 
-        }
-        else {
-            //	  SurfaceElement(element).GetTets (loctets);
+        } else {
             loctrigs.resize(1);
             loctrigs[0] = SurfaceElement(element);
 
-            for (int j = 1; j <= loctrigs.size(); j++) {
-                const Element2d& el = loctrigs.Get(j);
+            for (int j = 0; j < loctrigs.size(); j++) {
+                const Element2d& el = loctrigs[j];
 
 
                 const Point3d& p1 = Point(el.PNum(1));
@@ -2295,7 +2293,6 @@ namespace meshit {
                 col1 = p2 - p1;
                 col2 = p3 - p1;
                 col3 = Cross(col1, col2);
-                //col3 = Vec3d(0, 0, 1);
                 rhs = p - p1;
 
                 SolveLinearSystem(col1, col2, col3, rhs, sol);
@@ -2460,13 +2457,6 @@ namespace meshit {
         }
         materials[domnr - 1] = new char[strlen(mat) + 1];
         strcpy(materials[domnr - 1], mat);
-    }
-
-    const char* Mesh::GetMaterial(int domnr) const
-    {
-        if (domnr <= materials.size())
-            return materials.Get(domnr);
-        return 0;
     }
 
     void Mesh::SetNBCNames(int nbcn)

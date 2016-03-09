@@ -115,12 +115,12 @@ namespace meshit {
                                      el.GeomInfoPi(betw[j][1]),
                                      pb, pgi);
 
-                        pgis[4 + j - 1] = pgi;
+                        pgis[3 + j] = pgi;
                         if (between.Used(i2))
-                            pnums[4 + j - 1] = between.Get(i2);
+                            pnums[3 + j] = between.Get(i2);
                         else {
-                            pnums[4 + j - 1] = mesh.AddPoint(pb);
-                            between.Set(i2, pnums.Get(4 + j));
+                            pnums[3 + j] = mesh.AddPoint(pb);
+                            between.Set(i2, pnums[3 + j]);
                         }
 
                         if (surfgi.size() < pnums[4 + j - 1])
@@ -139,8 +139,8 @@ namespace meshit {
                     for (j = 0; j < 4; j++) {
                         Element2d nel(TRIG);
                         for (k = 1; k <= 3; k++) {
-                            nel.PNum(k) = pnums.Get(reftab[j][k - 1]);
-                            nel.GeomInfoPi(k) = pgis.Get(reftab[j][k - 1]);
+                            nel.PNum(k) = pnums[reftab[j][k - 1] - 1];
+                            nel.GeomInfoPi(k) = pgis[reftab[j][k - 1] - 1];
                         }
                         nel.SetIndex(ind);
 
@@ -179,7 +179,7 @@ namespace meshit {
 
                         if (between.Used(i2)) {
                             pnums[4 + j] = between.Get(i2);
-                            pgis[4 + j] = surfgi.Get(pnums[4 + j - 1]);
+                            pgis[4 + j] = surfgi[pnums[4 + j - 1] - 1];
                         }
                         else {
                             Point<3> pb;
@@ -191,7 +191,7 @@ namespace meshit {
 
                             pnums[4 + j] = mesh.AddPoint(pb);
 
-                            between.Set(i2, pnums.Get(5 + j));
+                            between.Set(i2, pnums[4 + j]);
 
                             if (surfgi.size() < pnums[4 + j])
                                 surfgi.resize(pnums[4 + j]);
@@ -210,8 +210,8 @@ namespace meshit {
                     for (j = 0; j < 4; j++) {
                         Element2d nel(QUAD);
                         for (k = 1; k <= 4; k++) {
-                            nel.PNum(k) = pnums.Get(reftab[j][k - 1]);
-                            nel.GeomInfoPi(k) = pgis.Get(reftab[j][k - 1]);
+                            nel.PNum(k) = pnums[reftab[j][k - 1] - 1];
+                            nel.GeomInfoPi(k) = pgis[reftab[j][k - 1] - 1];
                         }
                         nel.SetIndex(ind);
 
@@ -237,8 +237,7 @@ namespace meshit {
                     INDEX_2 i2;
                     PointIndex newpi;
                     between.GetData(j, k, i2, newpi);
-                    INDEX_2 oi2(identmap.Get(i2.I1()),
-                                identmap.Get(i2.I2()));
+                    INDEX_2 oi2(identmap[i2.I1() - 1], identmap[i2.I2() - 1]);
                     oi2.Sort();
                     if (between.Used(oi2)) {
                         PointIndex onewpi = between.Get(oi2);

@@ -198,9 +198,9 @@ namespace meshit {
 
     void Element2d::GetBox(const T_POINTS& points, Box3d& box) const
     {
-        box.SetPoint(points.Get(pnum[0]));
+        box.SetPoint(points[pnum[0] - 1]);
         for (unsigned i = 1; i < np; i++) {
-            box.AddPoint(points.Get(pnum[i]));
+            box.AddPoint(points[pnum[i] - 1]);
         }
     }
 
@@ -326,10 +326,10 @@ namespace meshit {
         DenseMatrix* dshapep = NULL;
         switch (typ) {
             case TRIG:
-                dshapep = &ipdtrig.Get(ip)->dshape;
+                dshapep = &ipdtrig[ip - 1]->dshape;
                 break;
             case QUAD:
-                dshapep = &ipdquad.Get(ip)->dshape;
+                dshapep = &ipdquad[ip - 1]->dshape;
                 break;
             default:
                 MESHIT_LOG_ERROR("Element2d::GetTransformation, illegal type " << typ);

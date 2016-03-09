@@ -49,9 +49,13 @@ namespace meshit {
 
      public:
         /// Creates a symboltable
-        inline SYMBOLTABLE();
+        SYMBOLTABLE() { }
+
         /// Returns size of symboltable
-        inline INDEX Size() const;
+        INDEX Size() const
+        {
+            return data.size();
+        }
 
         /// Returns element, error if not used
         inline const T& Get(const char* name) const;
@@ -73,35 +77,17 @@ namespace meshit {
         SYMBOLTABLE<T>& operator=(SYMBOLTABLE<T>&) { return *this; }
     };
 
-
-    template<class T>
-    inline SYMBOLTABLE<T>::SYMBOLTABLE()
-    {
-        ;
-    }
-
-
-    template<class T>
-    inline INDEX SYMBOLTABLE<T>::Size() const
-    {
-        return data.size();
-    }
-
     template<class T>
     inline const T& SYMBOLTABLE<T>::Get(const char* name) const
     {
-        int i;
-        i = Index(name);
-        if (i)
-            return data.Get(i);
-        else
-            return data.Get(1);
+        int i = Index(name);
+        return data[std::max(0, i - 1)];
     }
 
     template<class T>
     inline const T& SYMBOLTABLE<T>::Get(int i) const
     {
-        return data.Get(i);
+        return data[i - 1];
     }
 
     template<class T>

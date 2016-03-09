@@ -156,7 +156,7 @@ namespace meshit {
 
         const MeshPoint& Point(int i) const
         {
-            return points.Get(i);
+            return points[i - 1];
         }
 
         const MeshPoint& Point(PointIndex pi) const
@@ -244,7 +244,7 @@ namespace meshit {
 
         const Element2d& SurfaceElement(int i) const
         {
-            return surfelements.Get(i);
+            return surfelements[i - 1];
         }
 
         Element2d& SurfaceElement(SurfaceElementIndex i)
@@ -303,7 +303,7 @@ namespace meshit {
 
         const Segment& GetOpenSegment(int nr)
         {
-            return opensegments.Get(nr);
+            return opensegments[nr - 1];
         }
 
         /**
@@ -353,7 +353,7 @@ namespace meshit {
 
         const Element2d& OpenElement(int i) const
         {
-            return openelements.Get(i);
+            return openelements[i - 1];
         }
 
         /// are also quads open elements
@@ -395,7 +395,6 @@ namespace meshit {
         }
 
         void SetMaterial(int domnr, const char* mat);
-        const char* GetMaterial(int domnr) const;
         void SetNBCNames(int nbcn);
         void SetBCName(int bcnr, const std::string& abcname);
 
@@ -413,7 +412,7 @@ namespace meshit {
 
         const FaceDescriptor& GetFaceDescriptor(int i) const
         {
-            return facedecoding.Get(i);
+            return facedecoding[i - 1];
         }
 
         FaceDescriptor& GetFaceDescriptor(int i)

@@ -315,9 +315,9 @@ namespace meshit {
 
         grad = 0;
 
-        for (int j = 1; j <= ld.locelements.size(); j++) {
-            const Element2d& bel = mesh.SurfaceElement(ld.locelements.Get(j));
-            lpi = ld.locrots.Get(j);
+        for (int j = 0; j < ld.locelements.size(); j++) {
+            const Element2d& bel = mesh.SurfaceElement(ld.locelements[j]);
+            lpi = ld.locrots[j];
             gpi = bel.PNum(lpi);
 
             for (size_t k = 1; k <= bel.GetNP(); k++) {
@@ -352,10 +352,9 @@ namespace meshit {
         badness = 0;
         deriv = 0;
 
-        for (j = 1; j <= ld.locelements.size(); j++) {
-            lpi = ld.locrots.Get(j);
-            const Element2d& bel =
-                    mesh.SurfaceElement(ld.locelements.Get(j));
+        for (j = 0; j < ld.locelements.size(); j++) {
+            lpi = ld.locrots[j];
+            const Element2d& bel = mesh.SurfaceElement(ld.locelements[j]);
 
             gpi = bel.PNum(lpi);
 
