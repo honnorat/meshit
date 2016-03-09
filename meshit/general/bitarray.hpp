@@ -92,10 +92,9 @@ namespace meshit {
        Test returns the state of the accoring bit.
        No range checking is done.
      */
-    template<int BASE = 1>
     class BitArrayChar
     {
-        Array<char, BASE> data;
+        Array<char> data;
 
      public:
         BitArrayChar() { }
@@ -109,8 +108,6 @@ namespace meshit {
         {
             return data.size();
         }
-
-        void Set();
 
         inline void Set(int i)
         {
@@ -136,12 +133,11 @@ namespace meshit {
         BitArrayChar(const BitArrayChar&) { }
     };
 
-    template<int BASE>
-    inline std::ostream& operator<<(std::ostream& s, const BitArrayChar<BASE>& a)
+    inline std::ostream& operator<<(std::ostream& s, const BitArrayChar& a)
     {
-        for (int i = BASE; i < a.Size() + BASE; i++) {
+        for (int i = 0; i < a.Size(); i++) {
             s << a.Test(i);
-            if ((i - BASE) % 40 == 39) s << "\n";
+            if (i % 40 == 39) s << "\n";
         }
         if (a.Size() % 40 != 0) s << "\n";
         return s;

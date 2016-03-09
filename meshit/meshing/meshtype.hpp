@@ -189,8 +189,8 @@ namespace meshit {
     class SurfaceElementIndex
     {
         int i;
-     public:
 
+     public:
         SurfaceElementIndex() { }
 
         SurfaceElementIndex(int ai) : i(ai) { }
@@ -341,7 +341,7 @@ namespace meshit {
 
     };
 
-    typedef Array<MeshPoint, 0, PointIndex> T_POINTS;
+    typedef Array<MeshPoint> T_POINTS;
 
     /**
        Triangle element for surface mesh generation.

@@ -348,8 +348,6 @@ namespace meshit {
                                   const double* bmax,
                                   Array<int>& pis) const
     {
-        // static Array<inttn6> stack(10000);
-        // stack.SetSize (10000);
         ArrayMem<inttn6, 10000> stack(10000);
         pis.resize(0);
 

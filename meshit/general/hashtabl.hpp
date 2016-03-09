@@ -442,7 +442,7 @@ namespace meshit {
     template<class T>
     class INDEX_3_CLOSED_HASHTABLE : public BASE_INDEX_3_CLOSED_HASHTABLE
     {
-        Array<T, 0> cont;
+        Array<T> cont;
 
      public:
         explicit INDEX_3_CLOSED_HASHTABLE(int size)

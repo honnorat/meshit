@@ -154,11 +154,6 @@ namespace meshit {
             return points[pi];
         }
 
-        const MeshPoint& Point(int i) const
-        {
-            return points[i - 1];
-        }
-
         const MeshPoint& Point(PointIndex pi) const
         {
             return points[pi];

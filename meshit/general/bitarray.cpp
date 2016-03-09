@@ -53,22 +53,8 @@ namespace meshit {
             data[i] = 0;
     }
 
-    template<int BASE>
-    void BitArrayChar<BASE>::Set()
-    {
-        data = 1;
-    }
-
-    template<int BASE>
-    void BitArrayChar<BASE>::Clear()
+    void BitArrayChar::Clear()
     {
         data = 0;
     }
-
-    template
-    class BitArrayChar<0>;
-
-    template
-    class BitArrayChar<1>;
-
 }  // namespace meshit

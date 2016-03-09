@@ -264,9 +264,7 @@ namespace meshit {
             }
         }
 
-        // static Array<int> invpindex;
         invpindex.resize(points.size());
-        // invpindex = -1;
         for (int i = 0; i < nearpoints.size(); i++) {
             invpindex[nearpoints[i]] = -1;
         }

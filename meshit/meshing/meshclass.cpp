@@ -870,7 +870,7 @@ namespace meshit {
             if (strcmp(str, "bcnames") == 0) {
                 infile >> n;
                 MESHIT_LOG_DEBUG(n << " bcnames");
-                Array<int, 0> bcnrs(n);
+                Array<int> bcnrs(n);
                 SetNBCNames(n);
                 for (int i = 1; i <= n; i++) {
                     std::string nextbcname;
@@ -972,7 +972,6 @@ namespace meshit {
         boundaryedges = new INDEX_2_CLOSED_HASHTABLE<int>
                 (3 * (GetNSE() + GetNOpenElements()) + GetNSeg() + 1);
 
-
         for (SurfaceElementIndex sei = 0; sei < GetNSE(); sei++) {
             const Element2d& sel = surfelements[sei];
             if (sel.IsDeleted()) continue;
@@ -1000,7 +999,6 @@ namespace meshit {
                 std::cerr << "illegal elemenet for buildboundaryedges" << std::endl;
         }
 
-
         for (int i = 0; i < openelements.size(); i++) {
             const Element2d& sel = openelements[i];
             for (size_t j = 0; j < sel.GetNP(); j++) {
@@ -1020,10 +1018,7 @@ namespace meshit {
             i2.Sort();
 
             boundaryedges->Set(i2, 2);
-            //segmentht -> Set (i2, i);
         }
-
-
     }
 
     void Mesh::CalcSurfacesOfNode()
@@ -1117,11 +1112,11 @@ namespace meshit {
 
         numonpoint = 0;
 
-        Array<char, 1> hasface(GetNFD());
+        Array<char> hasface(GetNFD());
 
-        for (int i = 1; i <= GetNFD(); i++) {
-            int domin = GetFaceDescriptor(i).DomainIn();
-            int domout = GetFaceDescriptor(i).DomainOut();
+        for (int i = 0; i < GetNFD(); i++) {
+            int domin = GetFaceDescriptor(i+1).DomainIn();
+            int domout = GetFaceDescriptor(i+1).DomainOut();
             hasface[i] =
                     (dom == 0 && (domin != 0 || domout != 0)) ||
                     (dom != 0 && (domin == dom || domout == dom));
@@ -1131,7 +1126,7 @@ namespace meshit {
         for (SurfaceElementIndex sii = 0; sii < nse; sii++) {
             int ind = surfelements[sii].GetIndex();
 
-            if (hasface[ind]) {
+            if (hasface[ind-1]) {
                 const Element2d& hel = surfelements[sii];
                 int mini = 0;
                 for (size_t j = 1; j < hel.GetNP(); j++) {
@@ -1146,7 +1141,7 @@ namespace meshit {
         for (SurfaceElementIndex sii = 0; sii < nse; sii++) {
             int ind = surfelements[sii].GetIndex();
 
-            if (hasface[ind]) {
+            if (hasface[ind-1]) {
                 const Element2d& hel = surfelements[sii];
                 int mini = 0;
                 for (size_t j = 1; j < hel.GetNP(); j++) {
@@ -1620,12 +1615,12 @@ namespace meshit {
                         pi4++;
                     pi4 = elother.PNum(pi4);
 
-                    double rad = ComputeCylinderRadius(Point(i2.I1()),
-                                                       Point(i2.I2()),
-                                                       Point(pi3),
-                                                       Point(pi4));
+                    double rad = ComputeCylinderRadius(points[i2.I1() - 1],
+                                                       points[i2.I2() - 1],
+                                                       points[pi3 - 1],
+                                                       points[pi4 - 1]);
 
-                    RestrictLocalHLine(Point(i2.I1()), Point(i2.I2()), rad / elperr);
+                    RestrictLocalHLine(points[i2.I1() - 1], points[i2.I2() - 1], rad / elperr);
                 }
                 else
                     edges.Set(i2, i);
@@ -1664,7 +1659,7 @@ namespace meshit {
                 break;
             }
             case RESTRICTH_POINT: {
-                RestrictLocalH(Point(nr), loch);
+                RestrictLocalH(points[nr - 1], loch);
                 break;
             }
 
@@ -1817,9 +1812,9 @@ namespace meshit {
 
     void Mesh::Compress()
     {
-        Array<PointIndex, 0, PointIndex> op2np(GetNP());
+        Array<PointIndex> op2np(GetNP());
         Array<MeshPoint> hpoints;
-        BitArrayChar<0> pused(GetNP());
+        BitArrayChar pused(GetNP());
 
         for (int i = 0; i < surfelements.size(); i++) {
             if (surfelements[i].IsDeleted()) {

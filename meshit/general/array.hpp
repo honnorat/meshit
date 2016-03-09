@@ -58,10 +58,10 @@ namespace meshit {
             return _data[i - BASE];
         }
 
-        template<typename T2, int B2>
-        IndirectArray<FlatArray, FlatArray<T2, B2> > operator[](const FlatArray<T2, B2>& ia) const
+        template<typename T2>
+        IndirectArray<FlatArray, FlatArray<T2> > operator[](const FlatArray<T2>& ia) const
         {
-            return IndirectArray<FlatArray, FlatArray<T2, B2> >(*this, ia);
+            return IndirectArray<FlatArray, FlatArray<T2> >(*this, ia);
         }
 
         /// access first element
