@@ -85,7 +85,7 @@ namespace meshit {
         os << nse + ns << "\n";
 
         cnt = 0;
-        for (SegmentIndex i = 0; i < ns; i++) {
+        for (size_t i = 0; i < ns; i++) {
             const Segment& seg = mesh.LineSegment(i);
             os << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;
         }

@@ -242,61 +242,6 @@ namespace meshit {
         return (ost << int(pi));
     }
 
-    class SegmentIndex
-    {
-        int i;
-
-     public:
-
-        SegmentIndex() { }
-
-        SegmentIndex(int ai) : i(ai) { }
-
-        explicit SegmentIndex(size_t ai) { i = static_cast<int>(ai); }
-
-        SegmentIndex& operator=(const SegmentIndex& ai)
-        {
-            i = ai.i;
-            return *this;
-        }
-
-        SegmentIndex& operator=(int ai)
-        {
-            i = ai;
-            return *this;
-        }
-
-        operator int() const
-        {
-            return i;
-        }
-
-        SegmentIndex& operator++(int)
-        {
-            i++;
-            return *this;
-        }
-
-        SegmentIndex& operator--(int)
-        {
-            i--;
-            return *this;
-        }
-    };
-
-    inline std::istream& operator>>(std::istream& ist, SegmentIndex& pi)
-    {
-        int i;
-        ist >> i;
-        pi = i;
-        return ist;
-    }
-
-    inline std::ostream& operator<<(std::ostream& ost, const SegmentIndex& pi)
-    {
-        return (ost << int(pi));
-    }
-
     /**
        Point in the mesh.
        Contains layer (a new feature in 4.3 for overlapping meshes.

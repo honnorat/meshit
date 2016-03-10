@@ -153,7 +153,7 @@ namespace meshit {
         }
 
         /// Access entry.
-        FlatArray<T> operator[](int i) const
+        FlatArray<T> operator[](size_t i) const
         {
 #ifdef DEBUG
             if (i < 0 || i >= data.size())

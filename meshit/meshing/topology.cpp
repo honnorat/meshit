@@ -92,14 +92,14 @@ namespace meshit {
         }
 
         cnt = 0;
-        for (size_t i = 1; i <= nseg; i++) {
+        for (size_t i = 0; i < nseg; i++) {
             const Segment& seg = mesh.LineSegment(i);
             cnt[seg[0]]++;
             cnt[seg[1]]++;
         }
 
         vert2segment = new TABLE<size_t>(cnt);
-        for (size_t i = 1; i <= nseg; i++) {
+        for (size_t i = 0; i < nseg; i++) {
             const Segment& seg = mesh.LineSegment(i);
             vert2segment->AddSave(seg[0], i);
             vert2segment->AddSave(seg[1], i);

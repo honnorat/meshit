@@ -34,7 +34,7 @@ namespace meshit {
         Array<EdgePointGeomInfo> epgi;
 
         oldns = mesh.GetNSeg();
-        for (SegmentIndex si = 0; si < oldns; si++) {
+        for (size_t si = 0; si < oldns; si++) {
             const Segment& el = mesh.LineSegment(si);
 
             INDEX_2 i2 = INDEX_2::Sort(el[0], el[1]);

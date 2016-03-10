@@ -273,7 +273,7 @@ namespace meshit {
         MESHIT_LOG_DEBUG("copy edge, from = " << from << " to " << to);
 
         for (size_t i = 0; i < mesh.GetNSeg(); i++) {
-            const Segment& seg = mesh.LineSegment(i + 1);
+            const Segment& seg = mesh.LineSegment(i);
             if (seg.edgenr == static_cast<int>(from)) {
                 mappoints[seg[0] - 1] = 1;
                 mappoints[seg[1] - 1] = 1;
@@ -314,7 +314,7 @@ namespace meshit {
         // copy segments
         size_t oldnseg = mesh.GetNSeg();
         for (size_t i = 0; i < oldnseg; i++) {
-            const Segment& seg = mesh.LineSegment(i + 1);
+            const Segment& seg = mesh.LineSegment(i);
             if (seg.edgenr == static_cast<int>(from)) {
                 Segment nseg;
                 nseg.edgenr = to;

@@ -170,7 +170,7 @@ namespace meshit {
             return points;
         }
 
-        SegmentIndex AddSegment(const Segment& s);
+        void AddSegment(const Segment& s);
 
         size_t GetNSeg() const
         {
@@ -179,35 +179,15 @@ namespace meshit {
 
         Segment& LineSegment(size_t i)
         {
-            return segments[i - 1];
+            return segments[i];
         }
 
         const Segment& LineSegment(size_t i) const
         {
-            return segments[i - 1];
+            return segments[i];
         }
 
-        Segment& LineSegment(SegmentIndex si)
-        {
-            return segments[si];
-        }
-
-        const Segment& LineSegment(SegmentIndex si) const
-        {
-            return segments[si];
-        }
-
-        const Segment& operator[](SegmentIndex si) const
-        {
-            return segments[si];
-        }
-
-        Segment& operator[](SegmentIndex si)
-        {
-            return segments[si];
-        }
-
-        SurfaceElementIndex AddSurfaceElement(const Element2d& el);
+        void AddSurfaceElement(const Element2d& el);
 
         void DeleteSurfaceElement(int eli)
         {
@@ -444,22 +424,15 @@ namespace meshit {
             void Add(const Element2d& sel)
             {
                 if (sel.GetNP() == 3) {
-                    area += Cross(
-                            mesh.Point(sel[1]) - mesh.Point(sel[0]),
-                            mesh.Point(sel[2]) - mesh.Point(sel[0])).Length() / 2;
-                }
-                else {
-                    area += Cross(
-                            Vec3d(mesh.Point(sel.PNum(1)), mesh.Point(sel.PNum(3))),
-                            Vec3d(mesh.Point(sel.PNum(1)), mesh.Point(sel.PNum(4)))
-                    ).Length() / 2;
+                    area += Cross(mesh.Point(sel[1]) - mesh.Point(sel[0]),
+                                  mesh.Point(sel[2]) - mesh.Point(sel[0])).Length() / 2;
+                } else {
+                    area += Cross(Vec3d(mesh.Point(sel.PNum(1)), mesh.Point(sel.PNum(3))),
+                                  Vec3d(mesh.Point(sel.PNum(1)), mesh.Point(sel.PNum(4)))).Length() / 2;
                 }
             }
 
-            operator double() const
-            {
-                return area;
-            }
+            double Area() const { return area; }
 
             bool Valid() const
             {
@@ -469,9 +442,9 @@ namespace meshit {
 
         CSurfaceArea surfarea;
 
-        CSurfaceArea& SurfaceArea()
+        double SurfaceArea()
         {
-            return surfarea;
+            return surfarea.Area();
         }
 
         int GetTimeStamp() const

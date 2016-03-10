@@ -25,23 +25,10 @@ namespace meshit {
 
         virtual ~SplineGeometry();
 
-        int Load(const Array<double>& raw_data, const int startpos = 0);
-
         const std::vector<SplineSeg<D>*>& GetSplines() const
         {
             return splines;
         }
-
-        SplineSeg<D>& GetSpline(const int i)
-        {
-            return *splines[i];
-        }
-
-        const SplineSeg<D>& GetSpline(const int i) const
-        {
-            return *splines[i];
-        }
-
         void GetBoundingBox(Box<D>& box) const;
 
         Box<D> GetBoundingBox() const
@@ -51,12 +38,12 @@ namespace meshit {
             return box;
         }
 
-        int GetNP() const
+        size_t GetNP() const
         {
             return geompoints.size();
         }
 
-        const GeomPoint<D>& GetPoint(int i) const
+        const GeomPoint<D>& GetPoint(size_t i) const
         {
             return geompoints[i];
         }

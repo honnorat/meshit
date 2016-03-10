@@ -93,13 +93,13 @@ namespace meshit {
         geometry.PartitionBoundary(mp, h, *this);
 
         // marks mesh points for hp-refinement
-        for (int i = 0; i < geometry.GetNP(); i++) {
+        for (size_t i = 0; i < geometry.GetNP(); i++) {
             if (geometry.GetPoint(i).hpref) {
                 double mindist = 1e99;
-                PointIndex mpi(0);
+                size_t mpi = 0;
                 ::meshit::Point<2> gp = geometry.GetPoint(i);
                 ::meshit::Point<3> gp3(gp(0), gp(1), 0);
-                for (PointIndex pi = 0; pi < GetNP(); pi++) {
+                for (size_t pi = 0; pi < GetNP(); pi++) {
                     if (Dist2(gp3, points[pi]) < mindist) {
                         mpi = pi;
                         mindist = Dist2(gp3, points[pi]);
@@ -110,7 +110,7 @@ namespace meshit {
         }
 
         int maxdomnr = 0;
-        for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+        for (size_t si = 0; si < GetNSeg(); si++) {
             if (segments[si].domin > maxdomnr) maxdomnr = segments[si].domin;
             if (segments[si].domout > maxdomnr) maxdomnr = segments[si].domout;
         }
@@ -121,7 +121,7 @@ namespace meshit {
         }
 
         int maxsegmentindex = 0;
-        for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+        for (size_t si = 0; si < GetNSeg(); si++) {
             if (segments[si].si > maxsegmentindex) maxsegmentindex = segments[si].si;
         }
 
@@ -131,7 +131,7 @@ namespace meshit {
             SetBCName(sindex, geometry.GetBCName(sindex + 1));
         }
 
-        for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+        for (size_t si = 0; si < GetNSeg(); si++) {
             segments[si].SetBCName(bcnames[segments[si].si - 1]);
         }
 
@@ -151,7 +151,7 @@ namespace meshit {
             nextpi = -1;
             si1 = -1;
             si2 = -1;
-            for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+            for (size_t si = 0; si < GetNSeg(); si++) {
                 int p1 = -1, p2 = -2;
 
                 if (segments[si].domin == domnr) {
@@ -179,7 +179,7 @@ namespace meshit {
             }
 
             PointIndex c1(0), c2, c3, c4;  // 4 corner points
-            int nex = 1, ney = 1;
+            size_t nex = 1, ney = 1;
 
             for (PointIndex pi = 1; pi <= si2.size(); pi++) {
                 if (si2[pi] != -1) {
@@ -214,15 +214,14 @@ namespace meshit {
                 }
             }
 
-            for (int i = 0; i < ney; i++) {
-                for (int j = 0; j < nex; j++) {
+            for (size_t i = 0; i < ney; i++) {
+                for (size_t j = 0; j < nex; j++) {
                     Element2d el(QUAD);
                     el[0] = pts[i * (nex + 1) + j];
                     el[1] = pts[i * (nex + 1) + j + 1];
                     el[2] = pts[(i + 1) * (nex + 1) + j + 1];
                     el[3] = pts[(i + 1) * (nex + 1) + j];
                     el.SetIndex(domnr);
-
                     AddSurfaceElement(el);
                 }
             }
@@ -255,7 +254,7 @@ namespace meshit {
             }
             PointGeomInfo gi;
             gi.trignum = 1;
-            for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+            for (size_t si = 0; si < GetNSeg(); si++) {
                 if (segments[si].domin == domnr) {
                     meshing.AddBoundaryElement(
                             compress[segments[si][0]],
@@ -271,7 +270,7 @@ namespace meshit {
             mp.checkoverlap = 0;
             meshing.GenerateMesh(*this, mp, h, domnr);
 
-            for (SurfaceElementIndex sei = oldnf; sei < GetNSE(); sei++) {
+            for (size_t sei = oldnf; sei < GetNSE(); sei++) {
                 surfelements[sei].SetIndex(domnr);
             }
 
@@ -315,27 +314,20 @@ namespace meshit {
         return pi;
     }
 
-    SegmentIndex Mesh::AddSegment(const Segment& s)
+    void Mesh::AddSegment(const Segment& s)
     {
         timestamp = NextTimeStamp();
 
-        int maxn = std::max(s[0], s[1]);
-        maxn += 1;
+        size_t maxn = std::max(s[0], s[1]);
 
-        if (maxn <= points.size()) {
-            if (points[s[0]].Type() > EDGEPOINT)
-                points[s[0]].SetType(EDGEPOINT);
-            if (points[s[1]].Type() > EDGEPOINT)
-                points[s[1]].SetType(EDGEPOINT);
+        if (maxn < points.size()) {
+            if (points[s[0]].Type() > EDGEPOINT) points[s[0]].SetType(EDGEPOINT);
+            if (points[s[1]].Type() > EDGEPOINT) points[s[1]].SetType(EDGEPOINT);
         }
-
-        SegmentIndex si = segments.size();
         segments.push_back(s);
-
-        return si;
     }
 
-    SurfaceElementIndex Mesh::AddSurfaceElement(const Element2d& el)
+    void Mesh::AddSurfaceElement(const Element2d& el)
     {
         timestamp = NextTimeStamp();
 
@@ -352,20 +344,19 @@ namespace meshit {
             }
         }
 
-        SurfaceElementIndex si = surfelements.size();
+        size_t si = surfelements.size();
         surfelements.push_back(el);
 
-        if (el.index > facedecoding.size())
-            std::cerr << "has no facedecoding: fd.size = " << facedecoding.size() << ", ind = " << el.index <<
-            std::endl;
+        if (el.index > facedecoding.size()) {
+            MESHIT_LOG_ERROR("has no facedecoding: fd.size = " << facedecoding.size() << ", ind = " << el.index);
+        }
 
         surfelements.Last().next = facedecoding[el.index - 1].firstelement;
         facedecoding[el.index - 1].firstelement = si;
 
-        if (SurfaceArea().Valid())
-            SurfaceArea().Add(el);
-
-        return si;
+        if (surfarea.Valid()) {
+            surfarea.Add(el);
+        }
     }
 
     void Mesh::Export(const std::string& filetype, const std::string& filename) const
@@ -434,7 +425,7 @@ namespace meshit {
         outfile << "edgesegmentsgi2" << "\n";
         outfile << GetNSeg() << "\n";
 
-        for (int i = 1; i <= GetNSeg(); i++) {
+        for (int i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
             outfile.width(8);
             outfile << seg.si;  // 2D: bc number, 3D: wievielte Kante
@@ -565,27 +556,28 @@ namespace meshit {
         }
 
         cnt_sing = 0;
-        for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+        for (size_t si = 0; si < GetNSeg(); si++) {
             if (segments[si].singedge_left) cnt_sing++;
         }
         if (cnt_sing) {
             outfile << "singular_edge_left" << std::endl << cnt_sing << std::endl;
-            for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+            for (size_t si = 0; si < GetNSeg(); si++) {
                 if (segments[si].singedge_left) {
-                    outfile << int(si) << "\t" << segments[si].singedge_left << std::endl;
+                    outfile << si << "\t" << segments[si].singedge_left << std::endl;
                 }
             }
         }
 
         cnt_sing = 0;
-        for (SegmentIndex si = 0; si < GetNSeg(); si++) {
+        for (size_t si = 0; si < GetNSeg(); si++) {
             if (segments[si].singedge_right) cnt_sing++;
         }
         if (cnt_sing) {
             outfile << "singular_edge_right" << std::endl << cnt_sing << std::endl;
-            for (SegmentIndex si = 0; si < GetNSeg(); si++) {
-                if (segments[si].singedge_right)
-                    outfile << int(si) << "\t" << segments[si].singedge_right << std::endl;
+            for (size_t si = 0; si < GetNSeg(); si++) {
+                if (segments[si].singedge_right) {
+                    outfile << si << "\t" << segments[si].singedge_right << std::endl;
+                }
             }
         }
 
@@ -805,7 +797,7 @@ namespace meshit {
                     bcnames[bcnrs[i - 1] - 1] = new std::string(nextbcname);
                 }
                 if (GetDimension() == 2) {
-                    for (int i = 1; i <= GetNSeg(); i++) {
+                    for (int i = 0; i < GetNSeg(); i++) {
                         Segment& seg = LineSegment(i);
                         if (seg.si <= n)
                             seg.SetBCName(bcnames[seg.si - 1]);
@@ -838,7 +830,7 @@ namespace meshit {
             if (strcmp(str, "singular_edge_left") == 0) {
                 infile >> n;
                 for (int i = 1; i <= n; i++) {
-                    SegmentIndex si;
+                    size_t si;
                     double s;
                     infile >> si;
                     infile >> s;
@@ -848,7 +840,7 @@ namespace meshit {
             if (strcmp(str, "singular_edge_right") == 0) {
                 infile >> n;
                 for (int i = 1; i <= n; i++) {
-                    SegmentIndex si;
+                    size_t si;
                     double s;
                     infile >> si;
                     infile >> s;
@@ -1167,12 +1159,12 @@ namespace meshit {
         INDEX_2_HASHTABLE<INDEX_2> faceht(4 * GetNSE() + GetNSeg() + 1);
 
         MESHIT_LOG_DEBUG("Test Opensegments");
-        for (int i = 1; i <= GetNSeg(); i++) {
+        for (int i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
 
             if (surfnr == 0 || seg.si == surfnr) {
                 INDEX_2 key(seg[0], seg[1]);
-                INDEX_2 data(seg.si, -i);
+                INDEX_2 data(seg.si, -(i+1));
 
                 if (faceht.Used(key)) {
                     std::cerr << "ERROR: Segment " << seg << " already used" << std::endl;
@@ -1182,7 +1174,7 @@ namespace meshit {
             }
         }
 
-        for (int i = 1; i <= GetNSeg(); i++) {
+        for (int i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
 
             if (surfnr == 0 || seg.si == surfnr) {
@@ -1255,7 +1247,7 @@ namespace meshit {
                     }
                     else {
                         // segment due to line
-                        const Segment& lseg = LineSegment(-data.I2());
+                        const Segment& lseg = LineSegment(-(data.I2()-1));
                         seg.geominfo[0] = lseg.geominfo[0];
                         seg.geominfo[1] = lseg.geominfo[1];
                         std::cerr << "line seg: ";
@@ -1279,7 +1271,7 @@ namespace meshit {
             points[i].SetType(SURFACEPOINT);
         }
 
-        for (int i = 1; i <= GetNSeg(); i++) {
+        for (int i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
             points[seg[0]].SetType(EDGEPOINT);
             points[seg[1]].SetType(EDGEPOINT);
@@ -1489,7 +1481,7 @@ namespace meshit {
         INDEX_2_HASHTABLE<int> bedges(GetNSeg() + 2);
         int i, j;
 
-        for (i = 1; i <= GetNSeg(); i++) {
+        for (i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
             INDEX_2 i2(seg[0], seg[1]);
             i2.Sort();
@@ -1536,7 +1528,7 @@ namespace meshit {
 
         // Restrict h due to line segments
 
-        for (i = 1; i <= GetNSeg(); i++) {
+        for (i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
             const Point3d& p1 = Point(seg[0]);
             const Point3d& p2 = Point(seg[1]);
@@ -1557,10 +1549,10 @@ namespace meshit {
                 break;
             }
             case RESTRICTH_EDGE: {
-                for (i = 1; i <= GetNSeg(); i++) {
+                for (i = 0; i < GetNSeg(); i++) {
                     const Segment& seg = LineSegment(i);
                     if (seg.edgenr == nr)
-                        RestrictLocalH(RESTRICTH_SEGMENT, i, loch);
+                        RestrictLocalH(RESTRICTH_SEGMENT, i+1, loch);
                 }
                 break;
             }
@@ -1578,7 +1570,7 @@ namespace meshit {
                 break;
             }
             case RESTRICTH_SEGMENT: {
-                const Segment& seg = LineSegment(nr);
+                const Segment& seg = LineSegment(nr+1);
                 RestrictLocalHLine(Point(seg[0]), Point(seg[1]), loch);
                 break;
             }

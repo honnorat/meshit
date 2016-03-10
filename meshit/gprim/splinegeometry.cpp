@@ -15,47 +15,6 @@ namespace meshit {
     }
 
     template<int D>
-    int SplineGeometry<D>::Load(const Array<double>& raw_data, const int startpos)
-    {
-        int pos = startpos;
-        if (raw_data[pos] != D)
-            throw std::runtime_error("wrong dimension of spline raw_data");
-
-        pos++;
-
-        splines.resize(static_cast<size_t>(raw_data[pos]));
-        pos++;
-
-        Array<Point<D> > pts(3);
-
-        for (size_t i = 0; i < splines.size(); i++) {
-            int type = static_cast<int>(raw_data[pos]);
-            pos++;
-
-            for (int j = 0; j < type; j++) {
-                for (int k = 0; k < D; k++) {
-                    pts[j](k) = raw_data[pos];
-                    pos++;
-                }
-            }
-            if (type == 2) {
-                splines[i] = new LineSeg<D>(
-                        GeomPoint<D>(pts[0], 1),
-                        GeomPoint<D>(pts[1], 1));
-            }
-            else if (type == 3) {
-                splines[i] = new SplineSeg3<D>(
-                        GeomPoint<D>(pts[0], 1),
-                        GeomPoint<D>(pts[1], 1),
-                        GeomPoint<D>(pts[2], 1));
-            }
-            else
-                throw std::runtime_error("something wrong with spline raw data");
-        }
-        return pos;
-    }
-
-    template<int D>
     void SplineGeometry<D>::GetBoundingBox(Box<D>& box) const
     {
         if (!splines.size()) {
