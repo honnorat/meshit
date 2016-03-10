@@ -517,7 +517,6 @@ namespace meshit {
 
         int m = pts.size() + ORDER;
         ti.resize(m);
-        // b.SetSize(m-1);
         ti = 0;
         //    b=0.0;
         for (int i = ORDER; i < m - ORDER + 1; i++)

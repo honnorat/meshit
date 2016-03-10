@@ -38,7 +38,6 @@ namespace meshit {
     {
      public:
         typedef ::meshit::T_POINTS T_POINTS;
-        typedef Array<Element2d> T_SURFELEMENTS;
 
      private:
         /// point coordinates
@@ -47,7 +46,7 @@ namespace meshit {
         /// line-segments at edges
         Array<Segment> segments;
         /// surface elements, 2d-inner elements
-        T_SURFELEMENTS surfelements;
+        Array<Element2d> surfelements;
         /// points will be fixed forever
         Array<PointIndex> lockedpoints;
 

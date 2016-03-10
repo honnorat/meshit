@@ -79,9 +79,9 @@ namespace meshit {
         }
 
         oldnf = mesh.GetNSE();
-        for (SurfaceElementIndex sei = 0; sei < oldnf; sei++) {
+        for (size_t sei = 0; sei < oldnf; sei++) {
             int j, k;
-            const Element2d& el = mesh.SurfaceElement(sei);
+            const Element2d& el = mesh.SurfaceElement(sei + 1);
 
             switch (el.GetType()) {
                 case TRIG:
@@ -145,7 +145,7 @@ namespace meshit {
                         nel.SetIndex(ind);
 
                         if (j == 0)
-                            mesh.SurfaceElement(sei) = nel;
+                            mesh.SurfaceElement(sei + 1) = nel;
                         else
                             mesh.AddSurfaceElement(nel);
                     }
@@ -228,12 +228,12 @@ namespace meshit {
         }
 
         // update identification tables
-        for (size_t i = 1; i <= mesh.GetIdentifications().GetMaxNr(); i++) {
+        for (size_t i = 0; i < mesh.GetIdentifications().GetMaxNr(); i++) {
             Array<int> identmap;
-            mesh.GetIdentifications().GetMap(i, identmap);
+            mesh.GetIdentifications().GetMap(i+1, identmap);
 
-            for (int j = 1; j <= between.GetNBags(); j++)
-                for (int k = 1; k <= between.GetBagSize(j); k++) {
+            for (size_t j = 0; j < between.GetNBags(); j++)
+                for (size_t k = 0; k < between.GetBagSize(j); k++) {
                     INDEX_2 i2;
                     PointIndex newpi;
                     between.GetData(j, k, i2, newpi);
@@ -241,7 +241,7 @@ namespace meshit {
                     oi2.Sort();
                     if (between.Used(oi2)) {
                         PointIndex onewpi = between.Get(oi2);
-                        mesh.GetIdentifications().Add(newpi, onewpi, i);
+                        mesh.GetIdentifications().Add(newpi, onewpi, i+1);
                     }
                 }
 

@@ -90,8 +90,8 @@ namespace meshit {
             os << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;
         }
         //            cnt += ns;
-        for (SurfaceElementIndex k = 0; k < nse; k++) {
-            const Element2d& el = mesh.SurfaceElement(k);
+        for (size_t k = 0; k < nse; k++) {
+            const Element2d& el = mesh.SurfaceElement(k+1);
 
             int elType = 0;
             if (el.GetNP() == 3) elType = GMSH_TRIG;   // GMSH Type for a 3 node triangle

@@ -111,24 +111,6 @@ namespace meshit {
         line.size++;
     }
 
-    void BASE_TABLE::AllocateElementsOneBlock(size_t elemsize)
-    {
-        size_t cnt = 0;
-        size_t n = data.size();
-
-        for (size_t i = 0; i < n; i++) {
-            cnt += data[i].maxsize;
-        }
-        oneblock = new char[elemsize * cnt];
-
-        cnt = 0;
-        for (size_t i = 0; i < n; i++) {
-            data[i].size = 0;
-            data[i].col = &oneblock[elemsize * cnt];
-            cnt += data[i].maxsize;
-        }
-    }
-
     size_t BASE_TABLE::AllocatedElements() const
     {
         size_t els = 0;

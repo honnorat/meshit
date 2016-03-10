@@ -49,8 +49,6 @@ namespace meshit {
 
         void IncSize2(size_t i, size_t elsize);
 
-        void AllocateElementsOneBlock(size_t elemsize);
-
         size_t AllocatedElements() const;
         size_t UsedElements() const;
     };
@@ -88,14 +86,7 @@ namespace meshit {
         inline void Add(size_t i, const T& acont)
         {
             IncSize(i, sizeof(T));
-            ((T*) data[i].col)[data[i].size - 1] = acont;
-        }
-
-        /// Inserts element acont into row i, 1-based. Does not test if already used.
-        inline void Add1(size_t i, const T& acont)
-        {
-            IncSize(i - 1, sizeof(T));
-            ((T*) data[i - 1].col)[data[i - 1].size - 1] = acont;
+            static_cast<T*>(data[i].col)[data[i].size - 1] = acont;
         }
 
         void IncSizePrepare(size_t i)
@@ -106,7 +97,7 @@ namespace meshit {
         /// Inserts element acont into row i. Does not test if already used, assumes to have enough memory
         inline void AddSave(size_t i, const T& acont)
         {
-            ((T*) data[i].col)[data[i].size] = acont;
+            static_cast<T*>(data[i].col)[data[i].size] = acont;
             data[i].size++;
         }
 
@@ -114,14 +105,14 @@ namespace meshit {
           Does not check for overflow. */
         inline void Set(size_t i, size_t nr, const T& acont)
         {
-            ((T*) data[i - 1].col)[nr - 1] = acont;
+            static_cast<T*>(data[i].col)[nr] = acont;
         }
 
         /** Returns the nr-th element in the i-th row.
           Does not check for overflow. */
         inline const T& Get(size_t i, size_t nr) const
         {
-            return ((T*) data[i - 1].col)[nr - 1];
+            return static_cast<T*>(data[i].col)[nr];
         }
 
         /// Returns size of the table.
@@ -133,12 +124,7 @@ namespace meshit {
         /// Returns size of the i-th row.
         inline size_t EntrySize(int i) const
         {
-            return data[i - 1].size;
-        }
-
-        void AllocateElementsOneBlock()
-        {
-            BASE_TABLE::AllocateElementsOneBlock(sizeof(T));
+            return data[i].size;
         }
 
         inline void PrintMemInfo(std::ostream& ost) const

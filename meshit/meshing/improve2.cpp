@@ -477,10 +477,10 @@ namespace meshit {
                     Element2d* el1p(NULL);
                     size_t l = 0;
                     while (mesh.SurfaceElement(elementsonnode[pi1][l]).IsDeleted() &&
-                           l < elementsonnode.EntrySize(pi1)) {
+                           l < elementsonnode.EntrySize(pi1-1)) {
                         l++;
                     }
-                    if (l < elementsonnode.EntrySize(pi1)) {
+                    if (l < elementsonnode.EntrySize(pi1-1)) {
                         el1p = &mesh.SurfaceElement(elementsonnode[pi1][l]);
                     } else {
                         MESHIT_LOG_ERROR("MeshOptimize2d::CombineImprove: OOPS!");

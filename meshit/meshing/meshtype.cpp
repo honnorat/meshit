@@ -774,8 +774,8 @@ namespace meshit {
             }
         } else {
             MESHIT_LOG_DEBUG("getmap, identnr = " << identnr);
-            for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++) {
-                for (int j = 1; j <= identifiedpoints_nr->GetBagSize(i); j++) {
+            for (int i = 0; i < identifiedpoints_nr->GetNBags(); i++) {
+                for (int j = 0; j < identifiedpoints_nr->GetBagSize(i); j++) {
                     INDEX_3 i3;
                     int dummy;
                     identifiedpoints_nr->GetData(i, j, i3, dummy);
@@ -796,8 +796,8 @@ namespace meshit {
         identpairs.resize(0);
 
         if (identnr == 0) {
-            for (int i = 1; i <= identifiedpoints->GetNBags(); i++) {
-                for (int j = 1; j <= identifiedpoints->GetBagSize(i); j++) {
+            for (size_t i = 0; i < identifiedpoints->GetNBags(); i++) {
+                for (size_t j = 0; j < identifiedpoints->GetBagSize(i); j++) {
                     INDEX_2 i2;
                     int nr;
                     identifiedpoints->GetData(i, j, i2, nr);
@@ -806,8 +806,8 @@ namespace meshit {
             }
         }
         else {
-            for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++) {
-                for (int j = 1; j <= identifiedpoints_nr->GetBagSize(i); j++) {
+            for (size_t i = 0; i < identifiedpoints_nr->GetNBags(); i++) {
+                for (size_t j = 0; j < identifiedpoints_nr->GetBagSize(i); j++) {
                     INDEX_3 i3;
                     int dummy;
                     identifiedpoints_nr->GetData(i, j, i3, dummy);
@@ -821,15 +821,15 @@ namespace meshit {
 
     void Identifications::SetMaxPointNr(int maxpnum)
     {
-        for (int i = 1; i <= identifiedpoints->GetNBags(); i++) {
-            for (int j = 1; j <= identifiedpoints->GetBagSize(i); j++) {
+        for (size_t i = 0; i < identifiedpoints->GetNBags(); i++) {
+            for (size_t j = 0; j < identifiedpoints->GetBagSize(i); j++) {
                 INDEX_2 i2;
                 int nr;
                 identifiedpoints->GetData(i, j, i2, nr);
 
                 if (i2.I1() > maxpnum || i2.I2() > maxpnum) {
                     i2.I1() = i2.I2() = -1;
-                    identifiedpoints->SetData(i, j, i2, -1);
+                    identifiedpoints->SetData(i+1, j+1, i2, -1);
                 }
             }
         }

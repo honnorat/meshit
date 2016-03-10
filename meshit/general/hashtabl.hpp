@@ -25,14 +25,15 @@ namespace meshit {
 
         int HashValue(const INDEX_2& ind) const
         {
-            return (ind.I1() + ind.I2()) % hash.Size() + 1;
+            return (ind.I1() + ind.I2()) % hash.Size();
         }
 
         size_t Position(int bnr, const INDEX_2& ind) const
         {
-            for (size_t i = 1; i <= hash.EntrySize(bnr); i++) {
-                if (hash.Get(bnr, i) == ind)
-                    return i;
+            for (size_t i = 0; i < hash.EntrySize(bnr); i++) {
+                if (hash.Get(bnr, i) == ind) {
+                    return i + 1;
+                }
             }
             return 0;
         }
@@ -52,10 +53,10 @@ namespace meshit {
             int bnr = HashValue(ahash);
             int pos = Position(bnr, ahash);
             if (pos) {
-                cont.Set(bnr, pos, acont);
+                cont.Set(bnr, pos - 1, acont);
             } else {
-                hash.Add1(bnr, ahash);
-                cont.Add1(bnr, acont);
+                hash.Add(bnr, ahash);
+                cont.Add(bnr, acont);
             }
         }
 
@@ -63,7 +64,7 @@ namespace meshit {
         {
             int bnr = HashValue(ahash);
             int pos = Position(bnr, ahash);
-            return cont.Get(bnr, pos);
+            return cont.Get(bnr, pos - 1);
         }
 
         bool Used(const INDEX_2& ahash) const
@@ -71,99 +72,29 @@ namespace meshit {
             return Position(HashValue(ahash), ahash) > 0;
         }
 
-        int GetNBags() const
+        size_t GetNBags() const
         {
             return cont.Size();
         }
 
-        int GetBagSize(int bnr) const
+        size_t GetBagSize(size_t bnr) const
         {
             return cont.EntrySize(bnr);
         }
 
-        void GetData(int bnr, int colnr,
-                     INDEX_2& ahash, T& acont) const
+        void GetData(size_t bnr, size_t colnr, INDEX_2& ahash, T& acont) const
         {
             ahash = hash.Get(bnr, colnr);
             acont = cont.Get(bnr, colnr);
         }
 
-        void SetData(int bnr, int colnr,
-                     const INDEX_2& ahash, const T& acont)
+        void SetData(size_t bnr, size_t colnr, const INDEX_2& ahash, const T& acont)
         {
-            hash.Set(bnr, colnr, ahash);
-            cont.Set(bnr, colnr, acont);
-        }
-
-        class Iterator
-        {
-            const INDEX_2_HASHTABLE& ht;
-            int bagnr, pos;
-
-         public:
-            Iterator(const INDEX_2_HASHTABLE& aht,
-                     int abagnr, int apos)
-                    : ht(aht), bagnr(abagnr), pos(apos) { }
-
-            int BagNr() const
-            {
-                return bagnr;
-            }
-
-            int Pos() const
-            {
-                return pos;
-            }
-
-            void operator++(int)
-            {
-                pos++;
-                while (bagnr < ht.GetNBags() &&
-                       pos == ht.GetBagSize(bagnr + 1)) {
-                    pos = 0;
-                    bagnr++;
-                }
-            }
-
-            bool operator!=(int i) const
-            {
-                return bagnr != i;
-            }
-        };
-
-        Iterator Begin() const
-        {
-            Iterator it(*this, 0, -1);
-            it++;
-            return it;
-        }
-
-        int End() const
-        {
-            return GetNBags();
-        }
-
-        const INDEX_2& GetHash(const Iterator& it) const
-        {
-            return hash[it.BagNr()][it.Pos()];
-        }
-
-        const T& GetData(const Iterator& it) const
-        {
-            return cont[it.BagNr()][it.Pos()];
+            hash.Set(bnr - 1, colnr - 1, ahash);
+            cont.Set(bnr - 1, colnr - 1, acont);
         }
     };
 
-    template<typename T>
-    inline std::ostream& operator<<(std::ostream& ost, const INDEX_2_HASHTABLE<T>& ht)
-    {
-        for (typename INDEX_2_HASHTABLE<T>::Iterator it = ht.Begin();
-             it != ht.End(); it++) {
-            ost << ht.GetHash(it) << ": " << ht.GetData(it) << std::endl;
-        }
-
-        return ost;
-    }
 
     class BASE_INDEX_3_HASHTABLE
     {
@@ -177,18 +108,17 @@ namespace meshit {
      protected:
         int HashValue(const INDEX_3& ind) const
         {
-            return (ind.I1() + ind.I2() + ind.I3()) % hash.Size() + 1;
+            return (ind.I1() + ind.I2() + ind.I3()) % hash.Size();
         }
 
         int Position(int bnr, const INDEX_3& ind) const
         {
-            const INDEX_3* pi = &hash.Get(bnr, 1);
+            const INDEX_3* pi = &hash.Get(bnr, 0);
             int n = hash.EntrySize(bnr);
             for (int i = 1; i <= n; ++i, ++pi) {
                 if (*pi == ind)
                     return i;
             }
-
             return 0;
         }
     };
@@ -199,23 +129,15 @@ namespace meshit {
         TABLE<T> cont;
 
      public:
-        explicit INDEX_3_HASHTABLE(int size)
+        explicit INDEX_3_HASHTABLE(size_t size)
                 : BASE_INDEX_3_HASHTABLE(size), cont(size) { }
 
         inline void Set(const INDEX_3& ahash, const T& acont);
         inline const T& Get(const INDEX_3& ahash) const;
         inline bool Used(const INDEX_3& ahash) const;
-        inline int GetNBags() const;
-        inline int GetBagSize(int bnr) const;
-        inline void SetData(int bnr, int colnr, const INDEX_3& ahash, const T& acont);
-        inline void GetData(int bnr, int colnr, INDEX_3& ahash, T& acont) const;
-        inline void SetSize(int size);
-
-        inline void PrepareSet(const INDEX_3& ahash);
-        inline void AllocateElements();
-
-        inline void PrintMemInfo(std::ostream& ost) const;
-        inline void DeleteData();
+        inline size_t GetNBags() const;
+        inline size_t GetBagSize(size_t bnr) const;
+        inline void GetData(size_t bnr, size_t colnr, INDEX_3& ahash, T& acont) const;
 
         class Iterator
         {
@@ -241,7 +163,7 @@ namespace meshit {
             {
                 pos++;
                 while (bagnr < ht.GetNBags() &&
-                       pos == ht.GetBagSize(bagnr + 1)) {
+                       pos == ht.GetBagSize(bagnr)) {
                     pos = 0;
                     bagnr++;
                 }
@@ -317,7 +239,7 @@ namespace meshit {
         size_t Position(const INDEX_2& ind) const
         {
             size_t i = HashValue(ind);
-            while(true) {
+            while (true) {
                 if (hash[i - 1] == ind) return i;
                 if (hash[i - 1].I1() == invalid) return 0;
                 i++;
@@ -499,11 +421,11 @@ namespace meshit {
     {
         int bnr = HashValue(ahash);
         int pos = Position(bnr, ahash);
-        if (pos) {
-            cont.Set(bnr, pos, acont);
+        if (pos > 0) {
+            cont.Set(bnr, pos - 1, acont);
         } else {
-            hash.Add1(bnr, ahash);
-            cont.Add1(bnr, acont);
+            hash.Add(bnr, ahash);
+            cont.Add(bnr, acont);
         }
     }
 
@@ -512,78 +434,32 @@ namespace meshit {
     {
         int bnr = HashValue(ahash);
         int pos = Position(bnr, ahash);
-        return cont.Get(bnr, pos);
+        return cont.Get(bnr, pos - 1);
     }
 
     template<class T>
     inline bool INDEX_3_HASHTABLE<T>::Used(const INDEX_3& ahash) const
     {
-        return static_cast<bool>(Position(HashValue(ahash), ahash));
+        return (Position(HashValue(ahash), ahash) > 0);
     }
 
     template<class T>
-    inline int INDEX_3_HASHTABLE<T>::GetNBags() const
+    inline size_t INDEX_3_HASHTABLE<T>::GetNBags() const
     {
         return cont.Size();
     }
 
     template<class T>
-    inline int INDEX_3_HASHTABLE<T>::GetBagSize(int bnr) const
+    inline size_t INDEX_3_HASHTABLE<T>::GetBagSize(size_t bnr) const
     {
         return cont.EntrySize(bnr);
     }
 
     template<class T>
-    inline void INDEX_3_HASHTABLE<T>::GetData(int bnr, int colnr, INDEX_3& ahash, T& acont) const
+    inline void INDEX_3_HASHTABLE<T>::GetData(size_t bnr, size_t colnr, INDEX_3& ahash, T& acont) const
     {
         ahash = hash.Get(bnr, colnr);
         acont = cont.Get(bnr, colnr);
-    }
-
-    template<class T>
-    inline void INDEX_3_HASHTABLE<T>::SetData(int bnr, int colnr, const INDEX_3& ahash, const T& acont)
-    {
-        hash.Set(bnr, colnr, ahash);
-        cont.Set(bnr, colnr, acont);
-    }
-
-    template<class T>
-    inline void INDEX_3_HASHTABLE<T>::SetSize(int size)
-    {
-        hash.SetSize(size);
-        cont.SetSize(size);
-    }
-
-    template<class T>
-    inline void INDEX_3_HASHTABLE<T>::DeleteData()
-    {
-        int n = hash.Size();
-        hash.SetSize(n);
-        cont.SetSize(n);
-    }
-
-    template<class T>
-    inline void INDEX_3_HASHTABLE<T>::PrepareSet(const INDEX_3& ahash)
-    {
-        int bnr = HashValue(ahash);
-        hash.IncSizePrepare(bnr - 1);
-        cont.IncSizePrepare(bnr - 1);
-    }
-
-    template<class T>
-    inline void INDEX_3_HASHTABLE<T>::AllocateElements()
-    {
-        hash.AllocateElementsOneBlock();
-        cont.AllocateElementsOneBlock();
-    }
-
-    template<class T>
-    inline void INDEX_3_HASHTABLE<T>::PrintMemInfo(std::ostream& ost) const
-    {
-        ost << "Hash: " << std::endl;
-        hash.PrintMemInfo(ost);
-        ost << "Cont: " << std::endl;
-        cont.PrintMemInfo(ost);
     }
 
     /* *********** Closed Hashing ************************* */
