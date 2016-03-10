@@ -38,58 +38,20 @@ namespace meshit {
     class PointGeomInfo
     {
      public:
-        int trignum; // for STL Meshing
-        double u, v; // for OCC Meshing
+        int trignum;  // for STL Meshing
+        double u, v;  // for OCC Meshing
 
         PointGeomInfo()
                 : trignum(-1), u(0), v(0) { }
-    };
-
-    inline std::ostream& operator<<(std::ostream& ost, const PointGeomInfo& gi)
-    {
-        return (ost << gi.trignum << " " << gi.u << " " << gi.v);
-    }
-
-    inline std::istream& operator>>(std::istream& ist, PointGeomInfo& gi)
-    {
-        return (ist >> gi.trignum >> gi.u >> gi.v);
-    }
-
-#define MULTIPOINTGEOMINFO_MAX 100
-
-    class MultiPointGeomInfo
-    {
-        size_t cnt;
-        PointGeomInfo mgi[MULTIPOINTGEOMINFO_MAX];
-
-     public:
-        MultiPointGeomInfo() : cnt{0} { }
-
-        int AddPointGeomInfo(const PointGeomInfo& gi);
-
-        void Init()
-        {
-            cnt = 0;
-        }
-
-        size_t GetNPGI() const
-        {
-            return cnt;
-        }
-
-        const PointGeomInfo& GetPGI(size_t i) const
-        {
-            return mgi[i];
-        }
     };
 
     class EdgePointGeomInfo
     {
      public:
         int edgenr;
-        int body; // for ACIS
-        double dist; // for 2d meshing
-        double u, v; // for OCC Meshing
+        int body;     // for ACIS
+        double dist;  // for 2d meshing
+        double u, v;  // for OCC Meshing
 
      public:
 
@@ -106,12 +68,6 @@ namespace meshit {
             return *this;
         }
     };
-
-    inline std::ostream& operator<<(std::ostream& ost, const EdgePointGeomInfo& gi)
-    {
-        ost << "epgi: edgnr=" << gi.edgenr << ", dist=" << gi.dist;
-        return ost;
-    }
 
     class PointIndex
     {

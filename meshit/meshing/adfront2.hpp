@@ -33,21 +33,14 @@ namespace meshit {
         /// distance to original boundary
         int frontnr;
 
-        bool onsurface;
-
      public:
-        MultiPointGeomInfo* mgi;
-
         FrontPoint2()
         {
             nlinetopoint = 0;
             frontnr = INT_MAX - 10; // attention: overflow on calculating  INT_MAX + 1
-            mgi = NULL;
-            onsurface = true;
         }
 
-        FrontPoint2(const Point3d& ap, PointIndex agi,
-                    MultiPointGeomInfo* amgi, bool aonsurface = true);
+        FrontPoint2(const Point3d& ap, PointIndex agi);
 
         ~FrontPoint2() { }
 
@@ -81,11 +74,6 @@ namespace meshit {
         bool Valid() const
         {
             return nlinetopoint >= 0;
-        }
-
-        bool OnSurface() const
-        {
-            return onsurface;
         }
 
         void DecFrontNr(int afrontnr)
@@ -205,7 +193,6 @@ namespace meshit {
 
         int GetLocals(int baseline,
                       Array<Point3d>& locpoints,
-                      Array<MultiPointGeomInfo>& pgeominfo,
                       Array<INDEX_2>& loclines, // local index
                       Array<int>& pindex,
                       Array<int>& lindex,
@@ -213,7 +200,7 @@ namespace meshit {
 
         void DeleteLine(int li);
 
-        int AddPoint(const Point3d& p, PointIndex globind, MultiPointGeomInfo* mgi = NULL, bool pointonsurface = true);
+        int AddPoint(const Point3d& p, PointIndex globind);
 
         int AddLine(int pi1, int pi2, const PointGeomInfo& gi1, const PointGeomInfo& gi2);
 

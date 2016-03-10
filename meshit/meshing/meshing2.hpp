@@ -51,8 +51,7 @@ namespace meshit {
 
         MESHING2_RESULT GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr);
 
-        void AddPoint(const Point3d& p, PointIndex globind, MultiPointGeomInfo* mgi = NULL,
-                      bool pointonsurface = true);
+        void AddPoint(const Point3d& p, PointIndex globind);
 
         void AddBoundaryElement(INDEX i1, INDEX i2,
                                 const PointGeomInfo& gi1, const PointGeomInfo& gi2);
@@ -65,8 +64,7 @@ namespace meshit {
         virtual double CalcLocalH(const Point3d& p, double gh) const;
 
         virtual void DefineTransformation(const Point3d& p1, const Point3d& p2);
-        virtual void TransformToPlain(const Point3d& locpoint, const MultiPointGeomInfo& geominfo,
-                                      Point2d& plainpoint, double h, int& zone);
+        virtual void TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h, int& zone);
         /// return 0 .. ok
         /// return >0 .. cannot transform point to true surface
         virtual int TransformFromPlain(Point2d& plainpoint,
@@ -84,11 +82,6 @@ namespace meshit {
         virtual int ComputePointGeomInfo(const Point3d& p,
                                          PointGeomInfo& gi);
 
-        /// Tries to select unique geominfo on active chart
-        /// return 0: success
-        /// return 1: failed
-        virtual int ChooseChartPointGeomInfo(const MultiPointGeomInfo& mpgi, PointGeomInfo& pgi);
-
         /*
           tests, whether endpoint (= 1 or 2) of line segment p1-p2
           is inside of the selected chart. The endpoint must be on the
@@ -99,7 +92,7 @@ namespace meshit {
         /*
           get (projected) boundary of current chart
          */
-        virtual void GetChartBoundary(Array <Point2d>& points, Array <Point3d>& points3d, Array <INDEX_2>& lines) const;
+        virtual void GetChartBoundary(Array<Point2d>& points, Array<Point3d>& points3d, Array<INDEX_2>& lines) const;
 
         virtual double Area() const;
 

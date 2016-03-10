@@ -484,10 +484,6 @@ namespace meshit {
                     BFGS(x, surfminf, par, 1e-6);
                 }
 
-                Point3d origp = mesh[pi];
-                int loci = 1;
-                double fact = 1;
-                int moveisok = 0;
 
                 // restore other points
                 for (size_t j = 0; j < ld.locelements.size(); j++) {
@@ -498,29 +494,19 @@ namespace meshit {
                     }
                 }
 
-                // optimizer loop (if whole distance is not possible, move only a bit!!!!)
-                while (loci <= 5 && !moveisok) {
-                    loci++;
+                // optimizer pass (if whole distance is not possible, move only a bit!!!!)
+                Vec3d hv = x(0) * ld.t1 + x(1) * ld.t2;
+                Point3d origp = mesh[pi];
+                Point3d hnp = origp + Vec3d(hv);
+                mesh.Point(pi).X() = hnp.X();
+                mesh.Point(pi).Y() = hnp.Y();
+                mesh.Point(pi).Z() = hnp.Z();
 
-                    Vec3d hv = x(0) * ld.t1 + x(1) * ld.t2;
-                    Point3d hnp = origp + Vec3d(hv);
-                    mesh.Point(pi).X() = hnp.X();
-                    mesh.Point(pi).Y() = hnp.Y();
-                    mesh.Point(pi).Z() = hnp.Z();
-
-                    fact /= 2.;
-
-                    PointGeomInfo ngi;
-                    ngi = ld.gi1;
-                    moveisok = ProjectPointGI(ld.surfi, mesh.Point(pi), ngi);
-                    // point lies on same chart in stlsurface
-                    if (moveisok) {
-                        for (size_t j = 0; j < ld.locelements.size(); j++) {
-                            mesh.SurfaceElement(ld.locelements[j]).GeomInfoPi(ld.locrots[j]) = ngi;
-                        }
-                    } else {
-                        mesh.Point(pi) = origp;
-                    }
+                PointGeomInfo ngi;
+                ngi = ld.gi1;
+                ngi.trignum = 1;
+                for (size_t j = 0; j < ld.locelements.size(); j++) {
+                    mesh.SurfaceElement(ld.locelements[j]).GeomInfoPi(ld.locrots[j]) = ngi;
                 }
             }
         }

@@ -5,21 +5,6 @@
 
 namespace meshit {
 
-    int MultiPointGeomInfo::AddPointGeomInfo(const PointGeomInfo& gi)
-    {
-        for (size_t k = 0; k < cnt; k++) {
-            if (mgi[k].trignum == gi.trignum) {
-                return 0;
-            }
-        }
-        if (cnt < MULTIPOINTGEOMINFO_MAX) {
-            mgi[cnt] = gi;
-            cnt++;
-            return 0;
-        }
-        throw std::runtime_error("Please report error: MPGI Size too small\n");
-    }
-
     Segment::Segment()
     {
         pnums[0] = -1;

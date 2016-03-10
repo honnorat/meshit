@@ -382,7 +382,7 @@ namespace meshit {
             return (Position(ahash) != -1);
         }
 
-        void GetData(int pos, INDEX_3& ahash, T& acont) const
+        void GetData(size_t pos, INDEX_3& ahash, T& acont) const
         {
             ahash = hash[pos];
             acont = cont[pos];

@@ -1006,8 +1006,8 @@ namespace meshit {
 
     void Mesh::FindOpenElements(int dom)
     {
-        int np = GetNP();
-        int nse = GetNSE();
+        size_t np = GetNP();
+        size_t nse = GetNSE();
 
         Array<int> numonpoint(np);
 
@@ -1097,7 +1097,7 @@ namespace meshit {
                         }
                     }
                 }
-                for (int i = 0; i < faceht.Size(); i++) {
+                for (size_t i = 0; i < faceht.Size(); i++) {
                     if (faceht.UsedPos(i)) {
                         INDEX_3 i3;
                         INDEX_2 i2;
@@ -1118,17 +1118,19 @@ namespace meshit {
         }
 
         int cnt3 = 0;
-        for (int i = 0; i < openelements.size(); i++) {
-            if (openelements[i].GetNP() == 3)
+        for (size_t i = 0; i < openelements.size(); i++) {
+            if (openelements[i].GetNP() == 3) {
                 cnt3++;
+            }
         }
         int cnt4 = openelements.size() - cnt3;
-        if (openelements.size() > 0)
+        if (openelements.size() > 0) {
             MESHIT_LOG_WARNING(openelements.size() << " (" << cnt3 << " + " << cnt4 << ")" << " open elements");
+        }
 
         BuildBoundaryEdges();
 
-        for (int i = 0; i < openelements.size(); i++) {
+        for (size_t i = 0; i < openelements.size(); i++) {
             const Element2d& sel = openelements[i];
 
             if (boundaryedges)
@@ -1140,10 +1142,11 @@ namespace meshit {
                     boundaryedges->Set(i2, 1);
                 }
 
-            for (int j = 1; j <= 3; j++) {
+            for (size_t j = 1; j <= 3; j++) {
                 PointIndex pi = sel.PNum(j);
-                if (pi < points.End())
+                if (pi < points.End()) {
                     points[pi].SetType(FIXEDPOINT);
+                }
             }
         }
     }
@@ -1226,7 +1229,7 @@ namespace meshit {
         std::cerr << "open segments: " << std::endl;
         opensegments.resize(0);
         for (size_t i = 0; i < faceht.GetNBags(); i++) {
-            for (size_t j = 0; j < faceht.GetBagSize(i); j++) {
+            for (int j = 0; j < faceht.GetBagSize(i); j++) {
                 INDEX_2 i2;
                 INDEX_2 data;
                 faceht.GetData(i, j, i2, data);

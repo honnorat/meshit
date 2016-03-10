@@ -25,11 +25,9 @@ namespace meshit {
         }
     }
 
-    void Meshing2::AddPoint(const Point3d& p, PointIndex globind,
-                            MultiPointGeomInfo* mgi,
-                            bool pointonsurface)
+    void Meshing2::AddPoint(const Point3d& p, PointIndex globind)
     {
-        adfront->AddPoint(p, globind, mgi, pointonsurface);
+        adfront->AddPoint(p, globind);
     }
 
     void Meshing2::AddBoundaryElement(int i1, int i2,
@@ -79,10 +77,7 @@ namespace meshit {
         ey.Z() = 0;
     }
 
-    void Meshing2::TransformToPlain(
-            const Point3d& locpoint,
-            const MultiPointGeomInfo& geominf,
-            Point2d& plainpoint, double h, int& zone)
+    void Meshing2::TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h, int& zone)
     {
         Vec3d p1p(globp1, locpoint);
 
@@ -118,12 +113,6 @@ namespace meshit {
         return 0;
     }
 
-    int Meshing2::ChooseChartPointGeomInfo(const MultiPointGeomInfo& mpgi, PointGeomInfo& pgi)
-    {
-        pgi = mpgi.GetPGI(0);
-        return 0;
-    }
-
     int Meshing2::IsLineVertexOnChart(const Point3d& p1, const Point3d& p2, const PointGeomInfo& geominfo)
     {
         return 1;
@@ -147,8 +136,6 @@ namespace meshit {
         Array<int> delpoints, dellines;
 
         Array<PointGeomInfo> upgeominfo; // unique info
-        Array<MultiPointGeomInfo> mpgeominfo; // multiple info
-
         Array<Element2d> locelements;
 
         int z1, z2, oldnp(-1);
@@ -241,7 +228,6 @@ namespace meshit {
 
             // unique-pgi, multi-pgi
             upgeominfo.resize(0);
-            mpgeominfo.resize(0);
 
             nfaces = adfront->GetNFL();
             trials++;
@@ -271,7 +257,7 @@ namespace meshit {
 
             double hinner = (3 + qualclass) * std::max(his, hshould);
 
-            adfront->GetLocals(baselineindex, locpoints, mpgeominfo, loclines, pindex, lindex, 2 * hinner);
+            adfront->GetLocals(baselineindex, locpoints, loclines, pindex, lindex, 2 * hinner);
 
             if (qualclass > mp.giveuptol2d) {
                 MESHIT_LOG_WARNING("give up with qualclass " << qualclass <<
@@ -318,8 +304,7 @@ namespace meshit {
                 }
 
                 for (int i = 0; i < locpoints.size(); i++) {
-                    TransformToPlain(locpoints[i], mpgeominfo[i],
-                                     plainpoints[i], h, plainzones[i]);
+                    TransformToPlain(locpoints[i], plainpoints[i], h, plainzones[i]);
                 }
 
                 p12d = plainpoints[0];
@@ -337,33 +322,33 @@ namespace meshit {
                                                 locpoints[loclines[i].I2() - 1],
                                                 adfront->GetLineGeomInfo(lindex[i], innerp))) {
 
-                                // use one end of line
-                                int pini, pouti;
-                                Vec2d v;
+                            // use one end of line
+                            int pini, pouti;
+                            Vec2d v;
 
-                                pini = loclines[i].I(innerp);
-                                pouti = loclines[i].I(3 - innerp);
+                            pini = loclines[i].I(innerp);
+                            pouti = loclines[i].I(3 - innerp);
 
-                                Point2d pin(plainpoints[pini - 1]);
-                                Point2d pout(plainpoints[pouti - 1]);
-                                v = pout - pin;
-                                double len = v.Length();
-                                if (len <= 1e-6)
-                                    std::cerr << "WARNING(js): inner-outer: short vector" << std::endl;
-                                else
-                                    v /= len;
+                            Point2d pin(plainpoints[pini - 1]);
+                            Point2d pout(plainpoints[pouti - 1]);
+                            v = pout - pin;
+                            double len = v.Length();
+                            if (len <= 1e-6)
+                                std::cerr << "WARNING(js): inner-outer: short vector" << std::endl;
+                            else
+                                v /= len;
 
-                                Point2d newpout = pin + 1000 * v;
-                                newpout = pout;
+                            Point2d newpout = pin + 1000 * v;
+                            newpout = pout;
 
-                                plainpoints.push_back(newpout);
-                                Point3d pout3d = locpoints[pouti - 1];
-                                locpoints.push_back(pout3d);
+                            plainpoints.push_back(newpout);
+                            Point3d pout3d = locpoints[pouti - 1];
+                            locpoints.push_back(pout3d);
 
-                                plainzones.push_back(0);
-                                pindex.push_back(-1);
-                                oldnp++;
-                                loclines[i - 1].I(3 - innerp) = oldnp;
+                            plainzones.push_back(0);
+                            pindex.push_back(-1);
+                            oldnp++;
+                            loclines[i - 1].I(3 - innerp) = oldnp;
                         } else {
                             // remove line
                             loclines.Delete(i - 1);
@@ -517,28 +502,6 @@ namespace meshit {
 
                     if (debugflag || debugparam.haltnosuccess)
                         MESHIT_LOG_ERROR("meshing2, maxh too large");
-                }
-            }
-
-            // changed for OCC meshing
-            if (found) {
-                // take geominfo from dellines
-
-                for (size_t i = 0; i < locelements.size(); i++) {
-                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
-                        int pi = locelements[i].PNum(j);
-                        if (pi <= oldnp) {
-
-                            if (ChooseChartPointGeomInfo(mpgeominfo[pi - 1], upgeominfo[pi - 1])) {
-                                // cannot select, compute new one
-                                MESHIT_LOG_WARNING("calc point geominfo instead of using");
-                                if (ComputePointGeomInfo(locpoints[pi - 1], upgeominfo[pi - 1])) {
-                                    found = false;
-                                    MESHIT_LOG_ERROR("meshing2d, geominfo failed");
-                                }
-                            }
-                        }
-                    }
                 }
             }
 

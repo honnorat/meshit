@@ -6,25 +6,12 @@
 
 namespace meshit {
 
-    FrontPoint2::FrontPoint2(const Point3d& ap, PointIndex agi,
-                             MultiPointGeomInfo* amgi, bool aonsurface)
+    FrontPoint2::FrontPoint2(const Point3d& ap, PointIndex agi)
             : globalindex(agi)
     {
         p = ap;
         nlinetopoint = 0;
         frontnr = INT_MAX - 10;
-        onsurface = aonsurface;
-
-        if (amgi) {
-            mgi = new MultiPointGeomInfo(*amgi);
-            for (size_t i = 0; i < mgi->GetNPGI(); i++) {
-                if (mgi->GetPGI(i).trignum <= 0) {
-                    std::cout << "Add FrontPoint2, illegal geominfo = " << mgi->GetPGI(i).trignum << std::endl;
-                }
-            }
-        } else {
-            mgi = nullptr;
-        }
     }
 
     AdFront2::AdFront2(const Box3d& aboundingbox)
@@ -57,10 +44,7 @@ namespace meshit {
         }
     }
 
-    int AdFront2::AddPoint(
-            const Point3d& p, PointIndex globind,
-            MultiPointGeomInfo* mgi,
-            bool pointonsurface)
+    int AdFront2::AddPoint(const Point3d& p, PointIndex globind)
     {
         // inserts at empty position or resizes array
         int pi;
@@ -69,17 +53,13 @@ namespace meshit {
             pi = delpointl.Last();
             delpointl.DeleteLast();
 
-            points[pi] = FrontPoint2(p, globind, mgi, pointonsurface);
+            points[pi] = FrontPoint2(p, globind);
         } else {
-            points.push_back(FrontPoint2(p, globind, mgi, pointonsurface));
+            points.push_back(FrontPoint2(p, globind));
             pi = points.size() - 1;
         }
 
-        if (mgi)
-            cpointsearchtree.Insert(p, pi);
-
-        if (pointonsurface)
-            pointsearchtree.Insert(p, pi);
+        pointsearchtree.Insert(p, pi);
 
         return pi;
     }
@@ -148,12 +128,6 @@ namespace meshit {
 
             if (!points[pi].Valid()) {
                 delpointl.push_back(pi);
-                if (points[pi].mgi) {
-                    cpointsearchtree.DeleteElement(pi);
-                    delete points[pi].mgi;
-                    points[pi].mgi = NULL;
-                }
-
                 pointsearchtree.DeleteElement(pi);
             }
         }
@@ -226,14 +200,12 @@ namespace meshit {
         return baselineindex;
     }
 
-    int AdFront2::GetLocals(
-            int baselineindex,
-            Array<Point3d>& locpoints,
-            Array<MultiPointGeomInfo>& pgeominfo,
-            Array<INDEX_2>& loclines,  // local index
-            Array<INDEX>& pindex,
-            Array<INDEX>& lindex,
-            double xh)
+    int AdFront2::GetLocals(int baselineindex,
+                            Array<Point3d>& locpoints,
+                            Array<INDEX_2>& loclines,  // local index
+                            Array<INDEX>& pindex,
+                            Array<INDEX>& lindex,
+                            double xh)
     {
         int pstind;
         Point<3> p0;
@@ -287,32 +259,10 @@ namespace meshit {
 
         for (size_t ii = 0; ii < nearpoints.size(); ii++) {
             size_t i = nearpoints[ii];
-            if (points[i].Valid() && points[i].OnSurface() && invpindex[i] <= 0) {
+            if (points[i].Valid() && invpindex[i] <= 0) {
                 locpoints.push_back(points[i].P());
                 invpindex[i] = locpoints.size();
                 pindex.push_back(i);
-            }
-        }
-
-        pgeominfo.resize(locpoints.size());
-        for (size_t i = 0; i < pgeominfo.size(); i++) {
-            pgeominfo[i].Init();
-        }
-
-        for (size_t i = 0; i < loclines.size(); i++) {
-            for (int j = 0; j < 2; j++) {
-                const PointGeomInfo& gi = lines[lindex[i]].GetGeomInfo(j + 1);
-                pgeominfo[loclines[i][j] - 1].AddPointGeomInfo(gi);
-            }
-        }
-
-        for (size_t i = 0; i < locpoints.size(); i++) {
-            int pi = pindex[i];
-
-            if (points[pi].mgi) {
-                for (size_t j = 0; j < points[pi].mgi->GetNPGI(); j++) {
-                    pgeominfo[i].AddPointGeomInfo(points[pi].mgi->GetPGI(j));
-                }
             }
         }
         return lines[baselineindex].LineClass();

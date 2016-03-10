@@ -40,25 +40,6 @@ namespace meshit {
             writestatus = ws;
         }
 
-        /// project point, use gi as initial value, and compute new gi
-        int ProjectPointGI(INDEX surfind, Point3d& p, PointGeomInfo& gi) const
-        {
-            return CalcPointGeomInfo(surfind, gi, p);
-        }
-
-        /// liefert zu einem 3d-Punkt die geominfo (Dreieck) und liefert 1, wenn erfolgreich,
-        /// 0, wenn nicht (Punkt ausserhalb von chart)
-        int CalcPointGeomInfo(PointGeomInfo& gi, const Point3d& /*p3*/) const
-        {
-            gi.trignum = 1;
-            return 1;
-        };
-
-        int CalcPointGeomInfo(int /* surfind */, PointGeomInfo& gi, const Point3d& p3) const
-        {
-            return CalcPointGeomInfo(gi, p3);
-        }
-
         void GetNormalVector(INDEX surfind, const Point3d& p, PointGeomInfo& gi, Vec3d& n) const;
         void GetNormalVector(INDEX surfind, const Point3d& p, Vec3d& n) const;
 
