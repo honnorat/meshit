@@ -46,7 +46,7 @@ namespace meshit {
             return CalcPointGeomInfo(surfind, gi, p);
         }
 
-        /// liefert zu einem 3d-Punkt die geominfo (Dreieck) und liefert 1, wenn erfolgreich, 
+        /// liefert zu einem 3d-Punkt die geominfo (Dreieck) und liefert 1, wenn erfolgreich,
         /// 0, wenn nicht (Punkt ausserhalb von chart)
         int CalcPointGeomInfo(PointGeomInfo& gi, const Point3d& /*p3*/) const
         {
@@ -65,12 +65,6 @@ namespace meshit {
         friend class Opti2SurfaceMinFunction;
     };
 
-    void CalcTriangleBadness(
-            double x2, double x3, double y3,
-            double metricweight,
-            double h, double& badness,
-            double& g1x, double& g1y);
-
     double CalcTriangleBadness(
             const Point3d& p1,
             const Point3d& p2,
@@ -85,7 +79,7 @@ namespace meshit {
             const Vec3d& n,
             double metricweight,
             double h);
-}
+}  // namespace meshit
 
 #endif
 

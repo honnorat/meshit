@@ -51,12 +51,12 @@ namespace meshit {
     {
         if (timestamp > mesh.GetTimeStamp()) return;
 
-        int nse = mesh.GetNSE();
-        int nseg = mesh.GetNSeg();
-        int np = mesh.GetNP();
-        int nv = mesh.GetNV();
-        int nfa = 0;
-        int ned = edge2vert.size();
+        size_t nse = mesh.GetNSE();
+        size_t nseg = mesh.GetNSeg();
+        size_t np = mesh.GetNP();
+        size_t nv = mesh.GetNV();
+        size_t nfa = 0;
+        size_t ned = edge2vert.size();
 
         std::cerr << " UPDATE MESH TOPOLOGY " << std::endl;
         std::cerr << "nse  = " << nse << std::endl;
@@ -68,7 +68,6 @@ namespace meshit {
         delete vert2segment;
 
         Array<int> cnt(nv);
-        Array<int> vnums;
 
         /*
           generate:
@@ -77,28 +76,30 @@ namespace meshit {
           vertex to segment 
          */
         cnt = 0;
-        for (SurfaceElementIndex sei = 0; sei < nse; sei++) {
-            const Element2d& el = mesh.SurfaceElement(sei);
-            for (int j = 0; j < el.GetNV(); j++)
+        for (size_t i = 0; i < nse; i++) {
+            const Element2d& el = mesh.SurfaceElement(i + 1);
+            for (size_t j = 0; j < el.GetNV(); j++) {
                 cnt[el[j]]++;
+            }
         }
 
         vert2surfelement = new TABLE<int>(cnt);
-        for (SurfaceElementIndex sei = 0; sei < nse; sei++) {
-            const Element2d& el = mesh.SurfaceElement(sei);
-            for (int j = 0; j < el.GetNV(); j++)
-                vert2surfelement->AddSave(el[j], sei + 1);
+        for (size_t i = 0; i < nse; i++) {
+            const Element2d& el = mesh.SurfaceElement(i + 1);
+            for (size_t j = 0; j < el.GetNV(); j++) {
+                vert2surfelement->AddSave(el[j], i + 1);
+            }
         }
 
         cnt = 0;
-        for (int i = 1; i <= nseg; i++) {
+        for (size_t i = 1; i <= nseg; i++) {
             const Segment& seg = mesh.LineSegment(i);
             cnt[seg[0]]++;
             cnt[seg[1]]++;
         }
 
-        vert2segment = new TABLE<int>(cnt);
-        for (int i = 1; i <= nseg; i++) {
+        vert2segment = new TABLE<size_t>(cnt);
+        for (size_t i = 1; i <= nseg; i++) {
             const Segment& seg = mesh.LineSegment(i);
             vert2segment->AddSave(seg[0], i);
             vert2segment->AddSave(seg[1], i);
@@ -107,22 +108,26 @@ namespace meshit {
         if (buildedges) {
             // keep existing edges
             cnt = 0;
-            for (int i = 0; i < edge2vert.size(); i++)
+            for (size_t i = 0; i < edge2vert.size(); i++) {
                 cnt[edge2vert[i][0]]++;
-            TABLE<int> vert2edge(cnt);
-            for (int i = 0; i < edge2vert.size(); i++)
+            }
+            TABLE<size_t> vert2edge(cnt);
+            for (size_t i = 0; i < edge2vert.size(); i++) {
                 vert2edge.AddSave(edge2vert[i][0], i);
+            }
 
             // ensure all coarse grid and intermediate level edges
             cnt = 0;
-            for (int i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
+            for (size_t i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
                 INDEX_2 parents = Sort(mesh.mlbetweennodes[i]);
-                if (parents[0] >= 0) cnt[parents[0]]++;
+                if (parents[0] >= 0)
+                    cnt[parents[0]]++;
             }
-            TABLE<int> vert2vertcoarse(cnt);
-            for (int i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
+            TABLE<size_t> vert2vertcoarse(cnt);
+            for (size_t i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
                 INDEX_2 parents = Sort(mesh.mlbetweennodes[i]);
-                if (parents[0] > 0) vert2vertcoarse.AddSave(parents[0], parents[1]);
+                if (parents[0] > 0)
+                    vert2vertcoarse.AddSave(parents[0], parents[1]);
             }
 
             Array<int> edgenr(nv);
@@ -133,17 +138,17 @@ namespace meshit {
 
             ned = edge2vert.size();
 
-            for (int i = 0; i < nv; i++) {
+            for (size_t i = 0; i < nv; i++) {
                 vertex2.resize(0);
 
-                for (int j = 0; j < vert2edge[i].size(); j++) {
+                for (size_t j = 0; j < vert2edge[i].size(); j++) {
                     int ednr = vert2edge[i][j];
                     int i2 = edge2vert[ednr][1];
                     edgeflag[i2] = i;
                     edgenr[i2] = ednr;
                 }
 
-                for (int j = 0; j < vert2vertcoarse[i].size(); j++) {
+                for (size_t j = 0; j < vert2vertcoarse[i].size(); j++) {
                     int v2 = vert2vertcoarse[i][j];
                     if (edgeflag[v2] < i) {
                         edgeflag[v2] = i;
@@ -151,14 +156,14 @@ namespace meshit {
                     }
                 }
 
-                for (int j = 0; j < (*vert2surfelement)[i].size(); j++) {
+                for (size_t j = 0; j < (*vert2surfelement)[i].size(); j++) {
                     int elnr = (*vert2surfelement)[i][j];
                     const Element2d& el = mesh.SurfaceElement(elnr);
 
-                    int neledges = GetNEdges(el.GetType());
+                    size_t neledges = GetNEdges(el.GetType());
                     const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
 
-                    for (int k = 0; k < neledges; k++) {
+                    for (size_t k = 0; k < neledges; k++) {
                         INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
                         edge.Sort();
                         if (edge.I1() != i) continue;
@@ -170,7 +175,7 @@ namespace meshit {
                     }
                 }
 
-                for (int j = 0; j < (*vert2segment)[i].size(); j++) {
+                for (size_t j = 0; j < (*vert2segment)[i].size(); j++) {
                     int elnr = (*vert2segment)[i][j];
                     const Segment& el = mesh.LineSegment(elnr);
 
@@ -185,29 +190,28 @@ namespace meshit {
                 }
 
                 QuickSort(vertex2);
-                for (int j = 0; j < vertex2.size(); j++) {
+                for (size_t j = 0; j < vertex2.size(); j++) {
                     edgenr[vertex2[j]] = ++ned;
                     edge2vert.push_back(INDEX_2(i, vertex2[j]));
                 }
 
-                for (int j = 0; j < (*vert2surfelement)[i].size(); j++) {
+                for (size_t j = 0; j < (*vert2surfelement)[i].size(); j++) {
                     int elnr = (*vert2surfelement)[i][j];
                     const Element2d& el = mesh.SurfaceElement(elnr);
 
-                    int neledges = GetNEdges(el.GetType());
+                    size_t neledges = GetNEdges(el.GetType());
                     const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
 
-                    for (int k = 0; k < neledges; k++) {
+                    for (size_t k = 0; k < neledges; k++) {
                         INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
 
                         int edgedir = (edge.I1() > edge.I2());
                         if (edgedir) std::swap(edge.I1(), edge.I2());
-
                         if (edge.I1() != i) continue;
                     }
                 }
 
-                for (int j = 0; j < (*vert2segment)[i].size(); j++) {
+                for (size_t j = 0; j < (*vert2segment)[i].size(); j++) {
                     int elnr = (*vert2segment)[i][j];
                     const Segment& el = mesh.LineSegment(elnr);
 
@@ -215,7 +219,6 @@ namespace meshit {
 
                     int edgedir = (edge.I1() > edge.I2());
                     if (edgedir) std::swap(edge.I1(), edge.I2());
-
                     if (edge.I1() != i) continue;
                 }
             }
@@ -224,29 +227,29 @@ namespace meshit {
         // generate faces
         if (buildfaces) {
 
-            int oldnfa = face2vert.size();
+            size_t oldnfa = face2vert.size();
 
             cnt = 0;
-            for (int i = 0; i < face2vert.size(); i++) {
+            for (size_t i = 0; i < face2vert.size(); i++) {
                 cnt[face2vert[i][0]]++;
             }
-            TABLE<int> vert2oldface(cnt);
-            for (int i = 0; i < face2vert.size(); i++)
+            TABLE<size_t> vert2oldface(cnt);
+            for (size_t i = 0; i < face2vert.size(); i++)
                 vert2oldface.AddSave(face2vert[i][0], i);
 
-            int max_face_on_vertex = 0;
-            for (int i = 0; i < nv; i++) {
-                int onv = vert2oldface[i].size() + (*vert2surfelement)[i].size();
+            size_t max_face_on_vertex = 0;
+            for (size_t i = 0; i < nv; i++) {
+                size_t onv = vert2oldface[i].size() + (*vert2surfelement)[i].size();
                 max_face_on_vertex = std::max(onv, max_face_on_vertex);
             }
 
             nfa = oldnfa;
-            for (int v = 0; v < nv; v++) {
-                int first_fa = nfa;
+            for (size_t v = 0; v < nv; v++) {
+                size_t first_fa = nfa;
 
                 INDEX_3_CLOSED_HASHTABLE<int> vert2face(2 * max_face_on_vertex + 10);
 
-                for (int j = 0; j < vert2oldface[v].size(); j++) {
+                for (size_t j = 0; j < vert2oldface[v].size(); j++) {
                     int fnr = vert2oldface[v][j];
                     INDEX_3 face(face2vert[fnr].I1(),
                                  face2vert[fnr].I2(),
@@ -254,10 +257,10 @@ namespace meshit {
                     vert2face.Set(face, fnr + 1);
                 }
 
-                for (int pass = 1; pass <= 2; pass++) {
+                for (size_t pass = 1; pass <= 2; pass++) {
 
                     if (pass == 2) {
-                        for (int j = first_fa; j < face2vert.size(); j++) {
+                        for (size_t j = first_fa; j < face2vert.size(); j++) {
                             if (face2vert[j][0] == v) {
                                 INDEX_3 face(face2vert[j].I1(),
                                              face2vert[j].I2(),
@@ -269,10 +272,9 @@ namespace meshit {
                         }
                     }
 
-                    for (int j = 0; j < (*vert2surfelement)[v].size(); j++) {
+                    for (size_t j = 0; j < (*vert2surfelement)[v].size(); j++) {
                         int elnr = (*vert2surfelement)[v][j];
                         const Element2d& el = mesh.SurfaceElement(elnr);
-
                         const ELEMENT_FACE* elfaces = GetFaces(el.GetType());
 
                         if (elfaces[0][3] == 0) { // triangle
@@ -282,8 +284,6 @@ namespace meshit {
                             INDEX_3 face(el.PNum(elfaces[0][0]),
                                          el.PNum(elfaces[0][1]),
                                          el.PNum(elfaces[0][2]));
-
-                            // std::cout << "face = " << face <<std::endl;
 
                             facedir = 0;
                             if (face.I1() > face.I2()) {
@@ -350,8 +350,8 @@ namespace meshit {
 
                     // sort faces
                     if (pass == 1) {
-                        for (int i = 0; i < nfa - first_fa; i++) {
-                            for (int j = first_fa + 1; j < nfa - i; j++) {
+                        for (size_t i = 0; i < std::max(0UL, nfa - first_fa); i++) {
+                            for (size_t j = first_fa + 1; j < nfa - i; j++) {
                                 if (face2vert[j] < face2vert[j - 1]) {
                                     std::swap(face2vert[j - 1], face2vert[j]);
                                 }

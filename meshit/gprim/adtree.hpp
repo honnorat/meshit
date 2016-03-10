@@ -50,9 +50,9 @@ namespace meshit {
         ADTree3(const double* acmin, const double* acmax);
         ~ADTree3();
 
-        void Insert(const double* p, int pi);
-        void GetIntersecting(const double* bmin, const double* bmax,
-                             Array<int>& pis) const;
+        void Insert(const Point<3>& p, int pi);
+
+        void GetIntersecting(const double* bmin, const double* bmax, Array<size_t>& pis) const;
 
         void DeleteElement(int pi);
 
@@ -89,9 +89,8 @@ namespace meshit {
                 const double* acmax);
         ~ADTree6();
 
-        void Insert(const double* p, int pi);
-        void GetIntersecting(const double* bmin, const double* bmax,
-                             Array<int>& pis) const;
+        void Insert(const Point<3>& bmin, const Point<3>& bmax, int pi);
+        void GetIntersecting(const double* bmin, const double* bmax, Array<size_t>& pis) const;
 
         void DeleteElement(int pi);
 
@@ -131,7 +130,7 @@ namespace meshit {
             tree->DeleteElement(pi);
         }
 
-        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<int>& pis) const;
+        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const;
     };
 
     class Box3dTree
@@ -157,15 +156,9 @@ namespace meshit {
             tree->DeleteElement(pi);
         }
 
-        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax,
-                             Array<int>& pis) const;
-
-        const ADTree6& Tree() const
-        {
-            return *tree;
-        };
+        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const;
     };
 
-}
+}  // namespace meshit
 
 #endif

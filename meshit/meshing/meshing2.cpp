@@ -20,7 +20,7 @@ namespace meshit {
     Meshing2::~Meshing2()
     {
         delete adfront;
-        for (int i = 0; i < rules.size(); i++) {
+        for (size_t i = 0; i < rules.size(); i++) {
             delete rules[i];
         }
     }
@@ -54,7 +54,7 @@ namespace meshit {
 
     void Meshing2::EndMesh()
     {
-        for (int i = 0; i < ruleused.size(); i++) {
+        for (size_t i = 0; i < ruleused.size(); i++) {
             MESHIT_LOG_DEBUG(std::setw(5) << ruleused[i] << " times used rule " << rules[i]->Name());
         }
     }
@@ -120,7 +120,7 @@ namespace meshit {
 
     int Meshing2::ChooseChartPointGeomInfo(const MultiPointGeomInfo& mpgi, PointGeomInfo& pgi)
     {
-        pgi = mpgi.GetPGI(1);
+        pgi = mpgi.GetPGI(0);
         return 0;
     }
 
@@ -159,7 +159,6 @@ namespace meshit {
         const PointGeomInfo* blgeominfo1;
         const PointGeomInfo* blgeominfo2;
 
-        bool morerisc;
         bool debugflag;
 
         double h, his, hshould;
@@ -176,7 +175,7 @@ namespace meshit {
         // test for 3d overlaps
         Box3dTree surfeltree(boundingbox.PMin(), boundingbox.PMax());
 
-        Array<int> intersecttrias;
+        Array<size_t> intersecttrias;
         Array<Point3d> critpoints;
 
         // test for doubled edges
@@ -203,7 +202,7 @@ namespace meshit {
 
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(facenr, seia);
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
 
             if (sel.IsDeleted()) continue;
@@ -248,7 +247,7 @@ namespace meshit {
             trials++;
 
             if (trials % 1000 == 0) {
-                for (int i = 0; i < canuse.size(); i++) {
+                for (size_t i = 0; i < canuse.size(); i++) {
                     MESHIT_LOG_DEBUG(" "
                                      << std::setw(4) << foundmap[i] << "/"
                                      << std::setw(4) << canuse[i] << "/"
@@ -259,7 +258,7 @@ namespace meshit {
 
             int baselineindex = adfront->SelectBaseLine(p1, p2, blgeominfo1, blgeominfo2, qualclass);
 
-            found = 1;
+            found = true;
             his = Dist(p1, p2);
 
             Point3d pmid = Center(p1, p2);
@@ -280,7 +279,6 @@ namespace meshit {
                 break;
             }
 
-            morerisc = 0;
             PointIndex gpi1 = adfront->GetGlobalIndex(pindex[loclines[0].I1() - 1]);
             PointIndex gpi2 = adfront->GetGlobalIndex(pindex[loclines[0].I2() - 1]);
 
@@ -296,8 +294,9 @@ namespace meshit {
 
             // problem recognition !
             if (found && (gpi1 < illegalpoint.size()) && (gpi2 < illegalpoint.size())) {
-                if (illegalpoint[gpi1] || illegalpoint[gpi2])
-                    found = 0;
+                if (illegalpoint[gpi1] || illegalpoint[gpi2]) {
+                    found = false;
+                }
             }
 
             Point2d p12d, p22d;
@@ -338,7 +337,6 @@ namespace meshit {
                                                 locpoints[loclines[i].I2() - 1],
                                                 adfront->GetLineGeomInfo(lindex[i], innerp))) {
 
-                            if (!morerisc) {
                                 // use one end of line
                                 int pini, pouti;
                                 Vec2d v;
@@ -366,20 +364,14 @@ namespace meshit {
                                 pindex.push_back(-1);
                                 oldnp++;
                                 loclines[i - 1].I(3 - innerp) = oldnp;
-                            }
-                            else
-                                plainzones[loclines[i].I(3 - innerp) - 1] = 0;
-                        }
-                        else {
+                        } else {
                             // remove line
                             loclines.Delete(i - 1);
                             lindex.Delete(i - 1);
                             oldnl--;
                             i--;
                         }
-                    }
-
-                    else if ((z1 > 0 && z2 > 0 && (z1 != z2)) || ((z1 < 0) && (z2 < 0))) {
+                    } else if ((z1 > 0 && z2 > 0 && (z1 != z2)) || ((z1 < 0) && (z2 < 0))) {
                         loclines.Delete(i - 1);
                         lindex.Delete(i - 1);
                         oldnl--;
@@ -437,23 +429,21 @@ namespace meshit {
             }
 
             if (found) {
-                rulenr = ApplyRules(
-                        plainpoints, legalpoints, maxlegalpoint,
-                        loclines, maxlegalline, locelements,
-                        dellines, qualclass, mp);
-
+                rulenr = ApplyRules(plainpoints, legalpoints, maxlegalpoint,
+                                    loclines, maxlegalline, locelements,
+                                    dellines, qualclass, mp);
                 if (!rulenr) {
-                    found = 0;
+                    found = false;
                     if (debugflag || debugparam.haltnosuccess)
                         MESHIT_LOG_WARNING("no rule found");
                 }
             }
 
-            for (int i = 0; i < locelements.size() && found; i++) {
+            for (size_t i = 0; i < locelements.size() && found; i++) {
                 const Element2d& el = locelements[i];
                 for (size_t j = 1; j <= el.GetNP(); j++) {
                     if (el.PNum(j) <= oldnp && pindex[el.PNum(j) - 1] == -1) {
-                        found = 0;
+                        found = false;
                         MESHIT_LOG_ERROR("meshing2, index missing");
                     }
                 }
@@ -463,11 +453,11 @@ namespace meshit {
                 locpoints.resize(plainpoints.size());
                 upgeominfo.resize(locpoints.size());
 
-                for (int i = oldnp; i < plainpoints.size(); i++) {
+                for (size_t i = oldnp; i < plainpoints.size(); i++) {
                     int err = TransformFromPlain(plainpoints[i], locpoints[i], upgeominfo[i], h);
 
                     if (err) {
-                        found = 0;
+                        found = false;
 
                         if (debugflag || debugparam.haltnosuccess)
                             MESHIT_LOG_ERROR("meshing2, Backtransformation failed");
@@ -481,7 +471,7 @@ namespace meshit {
                 double violateminh = 3 + 0.1 * qualclass * qualclass;
                 double minh = 1e8;
                 double newedgemaxh = 0;
-                for (int i = oldnl; i < loclines.size(); i++) {
+                for (size_t i = oldnl; i < loclines.size(); i++) {
                     double eh = Dist(locpoints[loclines[i].I1() - 1],
                                      locpoints[loclines[i].I2() - 1]);
 
@@ -494,7 +484,7 @@ namespace meshit {
                         newedgemaxh = eh;
                 }
 
-                for (int i = 0; i < locelements.size(); i++) {
+                for (size_t i = 0; i < locelements.size(); i++) {
                     Point3d pmin = locpoints[locelements[i].PNum(1) - 1];
                     Point3d pmax = pmin;
                     for (size_t j = 2; j <= locelements[i].GetNP(); j++) {
@@ -508,10 +498,10 @@ namespace meshit {
                         minh = eh;
                 }
 
-                for (int i = 0; i < locelements.size(); i++) {
+                for (size_t i = 0; i < locelements.size(); i++) {
                     for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
                         if (Dist2(locpoints[locelements[i].PNum(j) - 1], pmid) > hinner * hinner)
-                            found = 0;
+                            found = false;
                     }
                 }
 
@@ -534,7 +524,7 @@ namespace meshit {
             if (found) {
                 // take geominfo from dellines
 
-                for (int i = 0; i < locelements.size(); i++) {
+                for (size_t i = 0; i < locelements.size(); i++) {
                     for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
                         int pi = locelements[i].PNum(j);
                         if (pi <= oldnp) {
@@ -543,7 +533,7 @@ namespace meshit {
                                 // cannot select, compute new one
                                 MESHIT_LOG_WARNING("calc point geominfo instead of using");
                                 if (ComputePointGeomInfo(locpoints[pi - 1], upgeominfo[pi - 1])) {
-                                    found = 0;
+                                    found = false;
                                     MESHIT_LOG_ERROR("meshing2d, geominfo failed");
                                 }
                             }
@@ -557,7 +547,7 @@ namespace meshit {
                 Point3d hullmin(1e10, 1e10, 1e10);
                 Point3d hullmax(-1e10, -1e10, -1e10);
 
-                for (int i = 0; i < locelements.size(); i++) {
+                for (size_t i = 0; i < locelements.size(); i++) {
                     for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
                         const Point3d& p = locpoints[locelements[i].PNum(j) - 1];
                         hullmin.SetToMin(p);
@@ -570,11 +560,10 @@ namespace meshit {
                 surfeltree.GetIntersecting(hullmin, hullmax, intersecttrias);
 
                 critpoints.resize(0);
-                for (int i = oldnp; i < locpoints.size(); i++) {
+                for (size_t i = oldnp; i < locpoints.size(); i++) {
                     critpoints.push_back(locpoints[i]);
                 }
-
-                for (int i = 0; i < locelements.size(); i++) {
+                for (size_t i = 0; i < locelements.size(); i++) {
                     const Element2d& tri = locelements[i];
                     if (tri.GetNP() == 3) {
                         const Point3d& tp1 = locpoints[tri.PNum(1) - 1];
@@ -591,8 +580,7 @@ namespace meshit {
                                 critpoints.push_back(hp);
                             }
                         }
-                    }
-                    else if (tri.GetNP() == 4) {
+                    } else if (tri.GetNP() == 4) {
                         const Point3d& tp1 = locpoints[tri.PNum(1) - 1];
                         const Point3d& tp2 = locpoints[tri.PNum(2) - 1];
                         const Point3d& tp3 = locpoints[tri.PNum(3) - 1];
@@ -602,22 +590,18 @@ namespace meshit {
                         for (l1 = 0.1; l1 <= 0.9; l1 += 0.1) {
                             for (l2 = 0.1; l2 <= 0.9; l2 += 0.1) {
                                 Point3d hp;
-                                hp.X() =
-                                        (1 - l1) * (1 - l2) * tp1.X() +
-                                        l1 * (1 - l2) * tp2.X() +
-                                        l1 * l2 * tp3.X() +
-                                        (1 - l1) * l2 * tp4.X();
-                                hp.Y() =
-                                        (1 - l1) * (1 - l2) * tp1.Y() +
-                                        l1 * (1 - l2) * tp2.Y() +
-                                        l1 * l2 * tp3.Y() +
-                                        (1 - l1) * l2 * tp4.Y();
-                                hp.Z() =
-                                        (1 - l1) * (1 - l2) * tp1.Z() +
-                                        l1 * (1 - l2) * tp2.Z() +
-                                        l1 * l2 * tp3.Z() +
-                                        (1 - l1) * l2 * tp4.Z();
-
+                                hp.X() = (1 - l1) * (1 - l2) * tp1.X() +
+                                         l1 * (1 - l2) * tp2.X() +
+                                         l1 * l2 * tp3.X() +
+                                         (1 - l1) * l2 * tp4.X();
+                                hp.Y() = (1 - l1) * (1 - l2) * tp1.Y() +
+                                         l1 * (1 - l2) * tp2.Y() +
+                                         l1 * l2 * tp3.Y() +
+                                         (1 - l1) * l2 * tp4.Y();
+                                hp.Z() = (1 - l1) * (1 - l2) * tp1.Z() +
+                                         l1 * (1 - l2) * tp2.Z() +
+                                         l1 * l2 * tp3.Z() +
+                                         (1 - l1) * l2 * tp4.Z();
 
                                 critpoints.push_back(hp);
                             }
@@ -625,10 +609,10 @@ namespace meshit {
                     }
                 }
 
-                for (int i = 0; i < critpoints.size(); i++) {
+                for (size_t i = 0; i < critpoints.size(); i++) {
                     const Point3d& p = critpoints[i];
 
-                    for (int jj = 0; jj < intersecttrias.size(); jj++) {
+                    for (size_t jj = 0; jj < intersecttrias.size(); jj++) {
                         SurfaceElementIndex j = intersecttrias[jj];
                         const Element2d& el = mesh.SurfaceElement(j);
 
@@ -671,7 +655,7 @@ namespace meshit {
                                 for (int k = 1; k <= 5; k++) {
                                     adfront->IncrementClass(lindex[0]);
                                 }
-                                found = 0;
+                                found = false;
 
                                 if (debugflag || debugparam.haltnosuccess)
                                     MESHIT_LOG_WARNING("overlapping");
@@ -695,7 +679,7 @@ namespace meshit {
                         if (exval) {
                             std::cout << "ERROR: new line exits, val = " << exval << std::endl;
                             std::cerr << "ERROR: new line exits, val = " << exval << std::endl;
-                            found = 0;
+                            found = false;
                         }
                     }
                 }
@@ -708,12 +692,12 @@ namespace meshit {
 
                 pindex.resize(locpoints.size());
 
-                for (int i = oldnp; i < locpoints.size(); i++) {
+                for (size_t i = oldnp; i < locpoints.size(); i++) {
                     PointIndex globind = mesh.AddPoint(locpoints[i]);
                     pindex[i] = adfront->AddPoint(locpoints[i], globind);
                 }
 
-                for (int i = oldnl; i < loclines.size(); i++) {
+                for (size_t i = oldnl; i < loclines.size(); i++) {
 
                     if (pindex[loclines[i].I1() - 1] == -1 ||
                         pindex[loclines[i].I2() - 1] == -1) {
@@ -728,7 +712,7 @@ namespace meshit {
                                      upgeominfo[loclines[i].I1() - 1],
                                      upgeominfo[loclines[i].I2() - 1]);
                 }
-                for (int i = 0; i < locelements.size(); i++) {
+                for (size_t i = 0; i < locelements.size(); i++) {
                     Element2d mtri(locelements[i].GetNP());
                     mtri = locelements[i];
                     mtri.SetIndex(facenr);
@@ -800,12 +784,8 @@ namespace meshit {
                     }
                 }
 
-                for (int i = 0; i < dellines.size(); i++) {
+                for (size_t i = 0; i < dellines.size(); i++) {
                     adfront->DeleteLine(lindex[dellines[i] - 1]);
-                }
-
-                if (morerisc) {
-                    std::cout << "generated due to morerisc" << std::endl;
                 }
 
                 if (debugparam.haltsuccess || debugflag) {
@@ -817,9 +797,9 @@ namespace meshit {
                         std::cerr << adfront->GetGlobalIndex(pindex[i]) << std::endl;
                     }
                     std::cerr << "old number of lines = " << oldnl << std::endl;
-                    for (int i = 0; i < loclines.size(); i++) {
+                    for (size_t i = 0; i < loclines.size(); i++) {
                         std::cerr << "line ";
-                        for (int j = 1; j <= 2; j++) {
+                        for (size_t j = 1; j <= 2; j++) {
                             int hi = 0;
                             if (loclines[i].I(j) >= 1 &&
                                 loclines[i].I(j) <= pindex.size())
@@ -841,9 +821,9 @@ namespace meshit {
                     std::cerr << "Problem with seg " << gpi1 << " - " << gpi2
                     << ", class = " << qualclass << std::endl;
 
-                    for (int i = 0; i < loclines.size(); i++) {
+                    for (size_t i = 0; i < loclines.size(); i++) {
                         std::cerr << "line ";
-                        for (int j = 1; j <= 2; j++) {
+                        for (size_t j = 1; j <= 2; j++) {
                             int hi = 0;
                             if (loclines[i].I(j) >= 1 &&
                                 loclines[i].I(j) <= pindex.size())

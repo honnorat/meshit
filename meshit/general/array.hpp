@@ -119,7 +119,7 @@ namespace meshit {
             _ownmem = 1;
         }
 
-        explicit Array(int asize)
+        explicit Array(size_t asize)
                 : FlatArray<T>(asize, new T[asize])
         {
             _allocsize = asize;
@@ -128,7 +128,7 @@ namespace meshit {
 
         /// Generate array in user data
 
-        Array(int asize, T* adata)
+        Array(size_t asize, T* adata)
                 : FlatArray<T>(asize, adata)
         {
             _allocsize = asize;
@@ -142,8 +142,9 @@ namespace meshit {
         {
             _allocsize = _size;
             _ownmem = 1;
-            for (int i = 0; i < (int) _size; i++)
+            for (size_t i = 0; i < _size; i++) {
                 (*this)[i] = a2[i];
+            }
         }
 
         ~Array()
@@ -171,7 +172,7 @@ namespace meshit {
 
 
         /// Add element at end of array. reallocation if necessary.
-        int push_back(const T& el)
+        size_t push_back(const T& el)
         {
             if (_size == _allocsize)
                 ReSize(_size + 1);
@@ -185,7 +186,7 @@ namespace meshit {
         {
             if (_size + a2.size() > _allocsize)
                 ReSize(_size + a2.size());
-            for (int i = 0; i < a2.size(); i++)
+            for (size_t i = 0; i < a2.size(); i++)
                 _data[_size + i] = a2[i];
             _size += a2.size();
         }
@@ -206,7 +207,7 @@ namespace meshit {
         }
 
         /// Delete element i (0-based). Move last element to position i.
-        void Delete(int i)
+        void Delete(size_t i)
         {
             _data[i] = _data[_size - 1];
             _size--;
@@ -277,7 +278,7 @@ namespace meshit {
         }
     };
 
-    template<class T, int S>
+    template<class T, size_t S>
     class ArrayMem : public Array<T>
     {
         using Array<T>::_size;
@@ -290,7 +291,7 @@ namespace meshit {
 
      public:
         /// Generate array of logical and physical size asize
-        explicit ArrayMem(int asize = 0)
+        explicit ArrayMem(size_t asize = 0)
                 : Array<T>(S, reinterpret_cast<T*>(mem))
         {
             _size = asize;
@@ -298,7 +299,6 @@ namespace meshit {
                 _data = new T[asize];
                 _ownmem = 1;
             }
-            // SetSize (asize);
         }
 
         ArrayMem& operator=(const T& val)
@@ -308,7 +308,6 @@ namespace meshit {
         }
 
         /// array copy
-
         ArrayMem& operator=(const FlatArray<T>& a2)
         {
             this->resize(a2.size());
@@ -328,22 +327,22 @@ namespace meshit {
         IndirectArray(const TA1& aa, const TA2& aia)
                 : array(aa), ia(aia) { }
 
-        int size() const
+        size_t size() const
         {
             return ia.Size();
         }
 
-        int Begin() const
+        size_t Begin() const
         {
             return ia.Begin();
         }
 
-        int End() const
+        size_t End() const
         {
             return ia.End();
         }
 
-        const typename TA1::TELEM& operator[](int i) const
+        const typename TA1::TELEM& operator[](size_t i) const
         {
             return array[ia[i]];
         }

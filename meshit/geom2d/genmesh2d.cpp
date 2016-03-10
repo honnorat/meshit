@@ -115,7 +115,7 @@ namespace meshit {
                    MeshingParameters& mp, double elto0,
                    Mesh& mesh, Point3dTree& searchtree, int segnr)
     {
-        int n = 100;
+        size_t n = 100;
 
         Point<2> mark, oldmark;
         Array<double> curvepoints;
@@ -125,69 +125,65 @@ namespace meshit {
 
         double dt = 1.0 / n;
 
-        int j = 1;
+        size_t j = 1;
 
         Point<2> pold = spline.GetPoint(0);
-        double lold = 0;
+        double lold = 0.0;
         oldmark = pold;
         edgelengthold = 0;
-        Array<int> locsearch;
+        Array<size_t> locsearch;
 
-        for (int i = 1; i <= n; i++) {
-            Point<2> p = spline.GetPoint(i * dt);
+        for (size_t i = 1; i <= n; i++) {
+            double t = static_cast<double>(i) * dt;
+            Point<2> p = spline.GetPoint(t);
             double l = lold + Dist(p, pold);
             while (j < curvepoints.size() && (l >= curvepoints[j] || i == n)) {
-                double frac = (curvepoints[j] - lold) / (l - lold);
-                edgelength = i * dt + (frac - 1) * dt;
+                double frac = (curvepoints[j] - l) / (l - lold);
+                edgelength = t + frac * dt;
                 mark = spline.GetPoint(edgelength);
 
-                {
-                    PointIndex pi1{-1}, pi2{-1};
+                PointIndex pi1{-1}, pi2{-1};
+                Point3d mark3(mark(0), mark(1), 0);
+                Point3d oldmark3(oldmark(0), oldmark(1), 0);
 
-                    Point3d mark3(mark(0), mark(1), 0);
-                    Point3d oldmark3(oldmark(0), oldmark(1), 0);
+                double h = mesh.GetH(Point<3>(oldmark(0), oldmark(1), 0));
+                Vec<3> v(1e-4 * h, 1e-4 * h, 1e-4 * h);
+                searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
 
-                    double h = mesh.GetH(Point<3>(oldmark(0), oldmark(1), 0));
-                    Vec<3> v(1e-4 * h, 1e-4 * h, 1e-4 * h);
-                    searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
-
-                    for (int k = 0; k < locsearch.size(); k++) {
-                        if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
-                            pi1 = locsearch[k];
-                        }
+                for (size_t k = 0; k < locsearch.size(); k++) {
+                    if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
+                        pi1 = locsearch[k];
                     }
-
-                    searchtree.GetIntersecting(mark3 - v, mark3 + v, locsearch);
-                    for (int k = 0; k < locsearch.size(); k++) {
-                        if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
-                            pi2 = locsearch[k];
-                        }
-                    }
-
-                    if (pi1 == -1) {
-                        pi1 = mesh.AddPoint(oldmark3, spline.layer);
-                        searchtree.Insert(oldmark3, pi1);
-                    }
-                    if (pi2 == -1) {
-                        pi2 = mesh.AddPoint(mark3, spline.layer);
-                        searchtree.Insert(mark3, pi2);
-                    }
-
-                    Segment seg;
-                    seg.edgenr = segnr;
-                    seg.si = spline.bc;  // segnr;
-                    seg[0] = pi1;
-                    seg[1] = pi2;
-                    seg.domin = spline.leftdom;
-                    seg.domout = spline.rightdom;
-                    seg.epgeominfo[0].edgenr = segnr;
-                    seg.epgeominfo[0].dist = edgelengthold;
-                    seg.epgeominfo[1].edgenr = segnr;
-                    seg.epgeominfo[1].dist = edgelength;
-                    seg.singedge_left = spline.hpref_left;
-                    seg.singedge_right = spline.hpref_right;
-                    mesh.AddSegment(seg);
                 }
+                searchtree.GetIntersecting(mark3 - v, mark3 + v, locsearch);
+                for (size_t k = 0; k < locsearch.size(); k++) {
+                    if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
+                        pi2 = locsearch[k];
+                    }
+                }
+                if (pi1 == -1) {
+                    pi1 = mesh.AddPoint(oldmark3, spline.layer);
+                    searchtree.Insert(oldmark3, pi1);
+                }
+                if (pi2 == -1) {
+                    pi2 = mesh.AddPoint(mark3, spline.layer);
+                    searchtree.Insert(mark3, pi2);
+                }
+
+                Segment seg;
+                seg.edgenr = segnr;
+                seg.si = spline.bc;  // segnr;
+                seg[0] = pi1;
+                seg[1] = pi2;
+                seg.domin = spline.leftdom;
+                seg.domout = spline.rightdom;
+                seg.epgeominfo[0].edgenr = segnr;
+                seg.epgeominfo[0].dist = edgelengthold;
+                seg.epgeominfo[1].edgenr = segnr;
+                seg.epgeominfo[1].dist = edgelength;
+                seg.singedge_left = spline.hpref_left;
+                seg.singedge_right = spline.hpref_right;
+                mesh.AddSegment(seg);
 
                 oldmark = mark;
                 edgelengthold = edgelength;
@@ -258,12 +254,12 @@ namespace meshit {
             if (GetSpline(i).copyfrom == -1) {
                 Partition(GetSpline(i), mp, elto0, mesh2d, searchtree, i + 1);
             } else {
-                CopyEdgeMesh(GetSpline(i).copyfrom, i + 1, mesh2d, searchtree);
+                CopyEdgeMesh(static_cast<size_t>(GetSpline(i).copyfrom), i + 1, mesh2d, searchtree);
             }
         }
     }
 
-    void SplineGeometry2d::CopyEdgeMesh(int from, int to, Mesh& mesh, Point3dTree& searchtree)
+    void SplineGeometry2d::CopyEdgeMesh(size_t from, size_t to, Mesh& mesh, Point3dTree& searchtree)
     {
         Array<int> mappoints(mesh.GetNP());
         Array<double> param(mesh.GetNP());
@@ -276,27 +272,26 @@ namespace meshit {
 
         MESHIT_LOG_DEBUG("copy edge, from = " << from << " to " << to);
 
-        for (int i = 1; i <= mesh.GetNSeg(); i++) {
-            const Segment& seg = mesh.LineSegment(i);
-            if (seg.edgenr == from) {
+        for (size_t i = 0; i < mesh.GetNSeg(); i++) {
+            const Segment& seg = mesh.LineSegment(i + 1);
+            if (seg.edgenr == static_cast<int>(from)) {
                 mappoints[seg[0] - 1] = 1;
-                param[seg[0] - 1] = seg.epgeominfo[0].dist;
-
                 mappoints[seg[1] - 1] = 1;
+                param[seg[0] - 1] = seg.epgeominfo[0].dist;
                 param[seg[1] - 1] = seg.epgeominfo[1].dist;
             }
         }
 
         bool mapped = false;
-        for (int i = 1; i <= mappoints.size(); i++) {
-            if (mappoints[i - 1] != -1) {
-                Point<2> newp = splines[to + 1]->GetPoint(param[i - 1]);
+        for (size_t i = 0; i < mappoints.size(); i++) {
+            if (mappoints[i] != -1) {
+                Point<2> newp = splines[to + 1]->GetPoint(param[i]);
                 Point<3> newp3(newp(0), newp(1), 0);
 
                 int npi = -1;
 
-                for (PointIndex pi = 0; pi < mesh.GetNP(); pi++) {
-                    if (Dist2(mesh.Point(pi), newp3) < 1e-12 * diam2) {
+                for (size_t pi = 0; pi < mesh.GetNP(); pi++) {
+                    if (Dist2(mesh.Point(pi+1), newp3) < 1e-12 * diam2) {
                         npi = pi;
                     }
                 }
@@ -306,20 +301,21 @@ namespace meshit {
                     searchtree.Insert(newp3, npi);
                 }
 
-                mappoints[i - 1] = npi;
+                mappoints[i] = npi;
 
-                mesh.GetIdentifications().Add(i, npi, to);
+                mesh.GetIdentifications().Add(i + 1, npi, to);
                 mapped = true;
             }
         }
-        if (mapped)
+        if (mapped) {
             mesh.GetIdentifications().SetType(to, Identifications::PERIODIC);
+        }
 
         // copy segments
-        int oldnseg = mesh.GetNSeg();
-        for (int i = 1; i <= oldnseg; i++) {
-            const Segment& seg = mesh.LineSegment(i);
-            if (seg.edgenr == from) {
+        size_t oldnseg = mesh.GetNSeg();
+        for (size_t i = 0; i < oldnseg; i++) {
+            const Segment& seg = mesh.LineSegment(i + 1);
+            if (seg.edgenr == static_cast<int>(from)) {
                 Segment nseg;
                 nseg.edgenr = to;
                 nseg.si = GetSpline(to - 1).bc;

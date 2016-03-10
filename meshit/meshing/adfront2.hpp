@@ -212,13 +212,11 @@ namespace meshit {
                       double xh);
 
         void DeleteLine(int li);
-        int AddPoint(
-                const Point3d& p, PointIndex globind,
-                MultiPointGeomInfo* mgi = NULL,
-                bool pointonsurface = true);
-        int AddLine(
-                int pi1, int pi2,
-                const PointGeomInfo& gi1, const PointGeomInfo& gi2);
+
+        int AddPoint(const Point3d& p, PointIndex globind, MultiPointGeomInfo* mgi = NULL, bool pointonsurface = true);
+
+        int AddLine(int pi1, int pi2, const PointGeomInfo& gi1, const PointGeomInfo& gi2);
+
         int ExistsLine(int gpi1, int gpi2);
 
         void IncrementClass(int li)

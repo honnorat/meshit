@@ -40,8 +40,9 @@ namespace meshit {
         char ch;
         Point2d p;
         INDEX_2 lin;
-        DenseMatrix tempoldutonewu(20, 20), tempoldutofreearea(20, 20),
-                tempoldutofreearealimit(20, 20);
+        DenseMatrix tempoldutonewu(20, 20);
+        DenseMatrix tempoldutofreearea(20, 20);
+        DenseMatrix tempoldutofreearealimit(20, 20);
 
         tempoldutonewu = 0;
         tempoldutofreearea = 0;
@@ -55,7 +56,6 @@ namespace meshit {
         ist.get(buf, sizeof(buf), '"');
         ist.get(ch);
 
-        // if(name != NULL) 
         delete[] name;
         name = new char[strlen(buf) + 1];
         strcpy(name, buf);
@@ -65,16 +65,13 @@ namespace meshit {
 
             if (strcmp(buf, "quality") == 0) {
                 ist >> quality;
-            }
-
-            else if (strcmp(buf, "mappoints") == 0) {
+            } else if (strcmp(buf, "mappoints") == 0) {
                 ist >> ch;
-
                 while (ch == '(') {
                     ist >> p.X();
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> p.Y();
-                    ist >> ch; // ')'
+                    ist >> ch;  // ')'
 
                     points.push_back(p);
                     noldp++;
@@ -88,36 +85,27 @@ namespace meshit {
                     while (ch != ';') {
                         if (ch == '{') {
                             ist >> tolerances[noldp - 1].f1;
-                            ist >> ch; // ','
+                            ist >> ch;  // ','
                             ist >> tolerances[noldp - 1].f2;
-                            ist >> ch; // ','
+                            ist >> ch;  // ','
                             ist >> tolerances[noldp - 1].f3;
-                            ist >> ch; // '}'
+                            ist >> ch;  // '}'
+                        } else if (ch == 'd') {
+                            ist >> ch;  // 'e'
+                            ist >> ch;  // 'l'
                         }
-                        else if (ch == 'd') {
-                            //            delpoints.Append (noldp);
-                            ist >> ch; // 'e'
-                            ist >> ch; // 'l'
-                        }
-
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
                 ist.putback(ch);
-            }
-
-
-            else if (strcmp(buf, "maplines") == 0) {
+            } else if (strcmp(buf, "maplines") == 0) {
                 ist >> ch;
-
                 while (ch == '(') {
                     ist >> lin.I1();
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> lin.I2();
-                    ist >> ch; // ')'
+                    ist >> ch;  // ')'
 
                     lines.push_back(lin);
                     linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
@@ -131,217 +119,154 @@ namespace meshit {
                     while (ch != ';') {
                         if (ch == '{') {
                             ist >> linetolerances[noldl - 1].f1;
-                            ist >> ch; // ','
+                            ist >> ch;  // ','
                             ist >> linetolerances[noldl - 1].f2;
-                            ist >> ch; // ','
+                            ist >> ch;  // ','
                             ist >> linetolerances[noldl - 1].f3;
-                            ist >> ch; // '}'
-                        }
-                        else if (ch == 'd') {
+                            ist >> ch;  // '}'
+                        } else if (ch == 'd') {
                             dellines.push_back(noldl);
-                            ist >> ch; // 'e'
-                            ist >> ch; // 'l'
+                            ist >> ch;  // 'e'
+                            ist >> ch;  // 'l'
                         }
-
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
                 ist.putback(ch);
-            }
-
-            else if (strcmp(buf, "newpoints") == 0) {
+            } else if (strcmp(buf, "newpoints") == 0) {
                 ist >> ch;
-
                 while (ch == '(') {
                     ist >> p.X();
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> p.Y();
-                    ist >> ch; // ')'
-
+                    ist >> ch;  // ')'
                     points.push_back(p);
-
                     ist >> ch;
                     while (ch != ';') {
                         if (ch == '{') {
-                            LoadMatrixLine(ist, tempoldutonewu,
-                                           2 * (points.size() - noldp) - 1);
-
-                            ist >> ch; // '{'
-                            LoadMatrixLine(ist, tempoldutonewu,
-                                           2 * (points.size() - noldp));
+                            LoadMatrixLine(ist, tempoldutonewu, 2 * (points.size() - noldp) - 1);
+                            ist >> ch;  // '{'
+                            LoadMatrixLine(ist, tempoldutonewu, 2 * (points.size() - noldp));
                         }
-
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
                 ist.putback(ch);
-            }
-
-            else if (strcmp(buf, "newlines") == 0) {
+            } else if (strcmp(buf, "newlines") == 0) {
                 ist >> ch;
-
                 while (ch == '(') {
                     ist >> lin.I1();
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> lin.I2();
-                    ist >> ch; // ')'
-
+                    ist >> ch;  // ')'
                     lines.push_back(lin);
                     linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
-
                     ist >> ch;
                     while (ch != ';') {
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
                 ist.putback(ch);
-            }
-
-            else if (strcmp(buf, "freearea") == 0) {
+            } else if (strcmp(buf, "freearea") == 0) {
                 ist >> ch;
-
                 while (ch == '(') {
                     ist >> p.X();
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> p.Y();
-                    ist >> ch; // ')'
-
+                    ist >> ch;  // ')'
                     freezone.push_back(p);
                     freezonelimit.push_back(p);
-
                     ist >> ch;
                     while (ch != ';') {
                         if (ch == '{') {
-                            LoadMatrixLine(ist, tempoldutofreearea,
-                                           2 * freezone.size() - 1);
-
-                            ist >> ch; // '{'
-                            LoadMatrixLine(ist, tempoldutofreearea,
-                                           2 * freezone.size());
+                            LoadMatrixLine(ist, tempoldutofreearea, 2 * freezone.size() - 1);
+                            ist >> ch;  // '{'
+                            LoadMatrixLine(ist, tempoldutofreearea, 2 * freezone.size());
                         }
-
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
-                for (size_t i = 1; i <= tempoldutofreearealimit.Height(); i++)
-                    for (size_t j = 1; j <= tempoldutofreearealimit.Width(); j++)
-                        tempoldutofreearealimit.Elem(i, j) =
-                                tempoldutofreearea.Elem(i, j);
-
-
+                for (size_t i = 1; i <= tempoldutofreearealimit.Height(); i++) {
+                    for (size_t j = 1; j <= tempoldutofreearealimit.Width(); j++) {
+                        tempoldutofreearealimit.Elem(i, j) = tempoldutofreearea.Elem(i, j);
+                    }
+                }
                 ist.putback(ch);
-            }
-            else if (strcmp(buf, "freearea2") == 0) {
+            } else if (strcmp(buf, "freearea2") == 0) {
                 ist >> ch;
                 int freepi = 0;
                 tempoldutofreearealimit = 0;
-
                 while (ch == '(') {
                     freepi++;
-
                     ist >> p.X();
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> p.Y();
-                    ist >> ch; // ')'
-
+                    ist >> ch;  // ')'
                     freezonelimit[freepi - 1] = p;
-
                     ist >> ch;
                     while (ch != ';') {
                         if (ch == '{') {
-                            LoadMatrixLine(ist, tempoldutofreearealimit,
-                                           2 * freepi - 1);
-
-                            ist >> ch; // '{'
-                            LoadMatrixLine(ist, tempoldutofreearealimit,
-                                           2 * freepi);
+                            LoadMatrixLine(ist, tempoldutofreearealimit, 2 * freepi - 1);
+                            ist >> ch;  // '{'
+                            LoadMatrixLine(ist, tempoldutofreearealimit, 2 * freepi);
                         }
-
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
                 ist.putback(ch);
-            }
-
-            else if (strcmp(buf, "elements") == 0) {
+            } else if (strcmp(buf, "elements") == 0) {
                 ist >> ch;
-
                 while (ch == '(') {
                     elements.push_back(Element2d());
-                    //                    Element2d & last = *elements.end();
                     Element2d& last = elements[elements.size() - 1];
 
                     ist >> last.PNum(1);
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
 
                     if (ch == COMMASIGN) {
                         ist >> last.PNum(2);
-                        ist >> ch; // ','
+                        ist >> ch;  // ','
                     }
                     if (ch == COMMASIGN) {
                         ist >> last.PNum(3);
-                        ist >> ch; // ','
+                        ist >> ch;  // ','
                     }
                     if (ch == COMMASIGN) {
                         last.SetType(QUAD);
                         ist >> last.PNum(4);
                         ist >> ch; // ','
                     }
-
                     ist >> ch;
                     while (ch != ';') {
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
                 ist.putback(ch);
-            }
-
-            else if (strcmp(buf, "orientations") == 0) {
+            } else if (strcmp(buf, "orientations") == 0) {
                 ist >> ch;
-
                 while (ch == '(') {
-                    //        threeint a = threeint();
                     orientations.push_back(threeint());
-                    //                    threeint & last = *orientations.end();
                     threeint& last = orientations[orientations.size() - 1];
-
                     ist >> last.i1;
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> last.i2;
-                    ist >> ch; // ','
+                    ist >> ch;  // ','
                     ist >> last.i3;
-                    ist >> ch; // ','
-
+                    ist >> ch;  // ','
                     ist >> ch;
                     while (ch != ';') {
                         ist >> ch;
                     }
-
                     ist >> ch;
                 }
-
                 ist.putback(ch);
-            }
-
-            else if (strcmp(buf, "endrule") != 0) {
+            } else if (strcmp(buf, "endrule") != 0) {
                 MESHIT_LOG_ERROR("Parser error, unknown token " << buf);
             }
         } while (!ist.eof() && strcmp(buf, "endrule") != 0);
@@ -350,45 +275,47 @@ namespace meshit {
         oldutofreearea.SetSize(2 * freezone.size(), 2 * noldp);
         oldutofreearealimit.SetSize(2 * freezone.size(), 2 * noldp);
 
-        for (size_t i = 1; i <= oldutonewu.Height(); i++)
-            for (size_t j = 1; j <= oldutonewu.Width(); j++)
+        for (size_t i = 1; i <= oldutonewu.Height(); i++) {
+            for (size_t j = 1; j <= oldutonewu.Width(); j++) {
                 oldutonewu.Elem(i, j) = tempoldutonewu.Elem(i, j);
-
-        for (size_t i = 1; i <= oldutofreearea.Height(); i++)
-            for (size_t j = 1; j <= oldutofreearea.Width(); j++)
+            }
+        }
+        for (size_t i = 1; i <= oldutofreearea.Height(); i++) {
+            for (size_t j = 1; j <= oldutofreearea.Width(); j++) {
                 oldutofreearea.Elem(i, j) = tempoldutofreearea.Elem(i, j);
-
-        for (size_t i = 1; i <= oldutofreearea.Height(); i++)
-            for (size_t j = 1; j <= oldutofreearea.Width(); j++)
+            }
+        }
+        for (size_t i = 1; i <= oldutofreearea.Height(); i++) {
+            for (size_t j = 1; j <= oldutofreearea.Width(); j++) {
                 oldutofreearealimit.Elem(i, j) = tempoldutofreearealimit.Elem(i, j);
+            }
+        }
 
         freesetinequ.SetSize(freezone.size());
 
         {
-            char ok;
-            int minn;
             Array<int> pnearness(noldp);
 
-            for (int i = 0; i < pnearness.size(); i++) {
+            for (size_t i = 0; i < pnearness.size(); i++) {
                 pnearness[i] = 1000;
             }
-
             for (int j = 1; j <= 2; j++) {
                 pnearness[GetPointNr(1, j) - 1] = 0;
             }
 
+            bool ok;
             do {
-                ok = 1;
+                ok = true;
 
                 for (size_t i = 1; i <= noldl; i++) {
-                    minn = 1000;
+                    int minn = 1000;
                     for (int j = 1; j <= 2; j++) {
                         minn = std::min(minn, pnearness[GetPointNr(i, j) - 1]);
                     }
                     for (int j = 1; j <= 2; j++) {
                         if (pnearness[GetPointNr(i, j) - 1] > minn + 1) {
-                            ok = 0;
                             pnearness[GetPointNr(i, j) - 1] = minn + 1;
+                            ok = false;
                         }
                     }
                 }
@@ -434,16 +361,14 @@ namespace meshit {
 
         if (filename) {
             ist = new std::ifstream(filename);
-        }
-        else {
+        } else {
             /* connect tetrules to one string */
             const char** hcp;
 
             if (!quad) {
                 hcp = triarules;
                 MESHIT_LOG_DEBUG("load internal triangle rules");
-            }
-            else {
+            } else {
                 hcp = quadrules;
                 MESHIT_LOG_DEBUG("load internal quad rules");
             }
@@ -493,5 +418,4 @@ namespace meshit {
         }
         delete ist;
     }
-
-}
+}  // namespace meshit

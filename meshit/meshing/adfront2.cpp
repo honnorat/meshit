@@ -17,12 +17,14 @@ namespace meshit {
 
         if (amgi) {
             mgi = new MultiPointGeomInfo(*amgi);
-            for (int i = 1; i <= mgi->GetNPGI(); i++)
-                if (mgi->GetPGI(i).trignum <= 0)
+            for (size_t i = 0; i < mgi->GetNPGI(); i++) {
+                if (mgi->GetPGI(i).trignum <= 0) {
                     std::cout << "Add FrontPoint2, illegal geominfo = " << mgi->GetPGI(i).trignum << std::endl;
+                }
+            }
+        } else {
+            mgi = nullptr;
         }
-        else
-            mgi = NULL;
     }
 
     AdFront2::AdFront2(const Box3d& aboundingbox)
@@ -140,7 +142,7 @@ namespace meshit {
 
         nfl--;
 
-        for (int i = 1; i <= 2; i++) {
+        for (size_t i = 1; i <= 2; i++) {
             pi = lines[li].L().I(i);
             points[pi].RemoveLine();
 
@@ -197,10 +199,9 @@ namespace meshit {
                 }
             }
         }
-
         if (baselineindex == -1) {
             minval = INT_MAX;
-            for (size_t i = 0; i < lines.size(); i++)
+            for (size_t i = 0; i < lines.size(); i++) {
                 if (lines[i].Valid()) {
                     int hi = lines[i].LineClass() +
                              points[lines[i].L().I1()].FrontNr() +
@@ -211,6 +212,7 @@ namespace meshit {
                         baselineindex = i;
                     }
                 }
+            }
         }
         starti = baselineindex + 1;
 
@@ -242,21 +244,16 @@ namespace meshit {
         loclines.push_back(lines[baselineindex].L());
         lindex.push_back(baselineindex);
 
-        ArrayMem<int, 1000> nearlines(0);
-        ArrayMem<int, 1000> nearpoints(0);
+        ArrayMem<size_t, 1000> nearlines(0);
+        ArrayMem<size_t, 1000> nearpoints(0);
 
         // dominating costs !!
-        linesearchtree.GetIntersecting(
-                p0 - Vec3d(xh, xh, xh),
-                p0 + Vec3d(xh, xh, xh),
-                nearlines);
+        const Point<3> pmin = p0 - Vec3d(xh, xh, xh);
+        const Point<3> pmax = p0 + Vec3d(xh, xh, xh);
+        linesearchtree.GetIntersecting(pmin, pmax, nearlines);
+        pointsearchtree.GetIntersecting(pmin, pmax, nearpoints);
 
-        pointsearchtree.GetIntersecting(
-                p0 - Vec3d(xh, xh, xh),
-                p0 + Vec3d(xh, xh, xh),
-                nearpoints);
-
-        for (int ii = 0; ii < nearlines.size(); ii++) {
+        for (size_t ii = 0; ii < nearlines.size(); ii++) {
             int i = nearlines[ii];
             if (lines[i].Valid() && i != baselineindex) {
                 loclines.push_back(lines[i].L());
@@ -265,17 +262,17 @@ namespace meshit {
         }
 
         invpindex.resize(points.size());
-        for (int i = 0; i < nearpoints.size(); i++) {
+        for (size_t i = 0; i < nearpoints.size(); i++) {
             invpindex[nearpoints[i]] = -1;
         }
 
-        for (int i = 0; i < loclines.size(); i++) {
+        for (size_t i = 0; i < loclines.size(); i++) {
             invpindex[loclines[i].I1()] = 0;
             invpindex[loclines[i].I2()] = 0;
         }
 
-        for (int i = 0; i < loclines.size(); i++) {
-            for (int j = 0; j < 2; j++) {
+        for (size_t i = 0; i < loclines.size(); i++) {
+            for (size_t j = 0; j < 2; j++) {
                 int pi = loclines[i][j];
                 if (invpindex[pi] == 0) {
                     pindex.push_back(pi);
@@ -288,9 +285,8 @@ namespace meshit {
             }
         }
 
-        // double xh2 = xh*xh;
-        for (int ii = 0; ii < nearpoints.size(); ii++) {
-            int i = nearpoints[ii];
+        for (size_t ii = 0; ii < nearpoints.size(); ii++) {
+            size_t i = nearpoints[ii];
             if (points[i].Valid() && points[i].OnSurface() && invpindex[i] <= 0) {
                 locpoints.push_back(points[i].P());
                 invpindex[i] = locpoints.size();
@@ -299,22 +295,22 @@ namespace meshit {
         }
 
         pgeominfo.resize(locpoints.size());
-        for (int i = 0; i < pgeominfo.size(); i++) {
+        for (size_t i = 0; i < pgeominfo.size(); i++) {
             pgeominfo[i].Init();
         }
 
-        for (int i = 0; i < loclines.size(); i++) {
+        for (size_t i = 0; i < loclines.size(); i++) {
             for (int j = 0; j < 2; j++) {
                 const PointGeomInfo& gi = lines[lindex[i]].GetGeomInfo(j + 1);
-                pgeominfo[loclines[i][j]-1].AddPointGeomInfo(gi);
+                pgeominfo[loclines[i][j] - 1].AddPointGeomInfo(gi);
             }
         }
 
-        for (int i = 0; i < locpoints.size(); i++) {
+        for (size_t i = 0; i < locpoints.size(); i++) {
             int pi = pindex[i];
 
             if (points[pi].mgi) {
-                for (int j = 1; j <= points[pi].mgi->GetNPGI(); j++) {
+                for (size_t j = 0; j < points[pi].mgi->GetNPGI(); j++) {
                     pgeominfo[i].AddPointGeomInfo(points[pi].mgi->GetPGI(j));
                 }
             }
@@ -326,7 +322,7 @@ namespace meshit {
     {
         for (size_t i = 0; i < lines.size(); i++) {
             if (lines[i].Valid()) {
-                for (int j = 1; j <= 2; j++) {
+                for (size_t j = 1; j <= 2; j++) {
                     points[lines[i].L().I(j)].DecFrontNr(0);
                 }
             }

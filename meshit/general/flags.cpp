@@ -23,10 +23,12 @@ namespace meshit {
 
     void Flags::DeleteFlags()
     {
-        for (int i = 0; i < strflags.Size(); i++)
+        for (size_t i = 0; i < strflags.Size(); i++) {
             delete[] strflags[i];
-        for (int i = 0; i < numlistflags.Size(); i++)
+        }
+        for (size_t i = 0; i < numlistflags.Size(); i++) {
             delete numlistflags[i];
+        }
         strflags.DeleteAll();
         numflags.DeleteAll();
         defflags.DeleteAll();

@@ -463,11 +463,14 @@ namespace meshit {
     Point<D> DiscretePointsSeg<D>::GetPoint(double t) const
     {
         double t1 = t * (pts.size() - 1);
-        int segnr = int(t1);
-        if (segnr < 0) segnr = 0;
+
+        size_t segnr;
+        if ( t1 < 0.0 ) segnr = 0;
+        else            segnr = static_cast<size_t>(t1);
+
         if (segnr >= pts.size()) segnr = pts.size() - 1;
 
-        double rest = t1 - segnr;
+        double rest = t1 - static_cast<double>(segnr);
 
         return pts[segnr] + rest * Vec<D>(pts[segnr + 1] - pts[segnr]);
     }

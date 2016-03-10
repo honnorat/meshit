@@ -61,7 +61,7 @@ namespace meshit {
 
         // check every rule
 
-        int found = 0;  // rule number
+        size_t found = 0;  // rule number
 
         pnearness = 1000;
 
@@ -135,7 +135,7 @@ namespace meshit {
         lused = 0;
         pused = 0;
 
-        for (int ri = 0; ri < rules.size(); ri++) {
+        for (size_t ri = 0; ri < rules.size(); ri++) {
             netrule* rule = rules[ri];
 
             if (rule->GetQuality() > tolerance) continue;
@@ -231,7 +231,7 @@ namespace meshit {
                     int incnpok = 1;
 
                     pfixed.resize(pmap.size());
-                    for (int i = 0; i < pmap.size(); i++) {
+                    for (size_t i = 0; i < pmap.size(); i++) {
                         pfixed[i] = (pmap[i] >= 1);
                     }
 
@@ -283,7 +283,6 @@ namespace meshit {
                             ok = 1;
 
                             // check orientations
-
                             for (size_t i = 1; i <= rule->GetNOrientations(); i++) {
                                 if (CW(lpoints[pmap[rule->GetOrientation(i).i1 - 1] - 1],
                                        lpoints[pmap[rule->GetOrientation(i).i2 - 1] - 1],
@@ -308,25 +307,24 @@ namespace meshit {
                             if (!rule->ConvexFreeZone()) {
                                 ok = 0;
                             }
-
-                            // check freezone:
                             if (!ok) continue;
-                            for (int i = 0; i < maxlegalpoint && ok; i++) {
+
+                            for (size_t i = 0; i < maxlegalpoint; i++) {
                                 if (!pused[i] && rule->IsInFreeZone(lpoints[i])) {
                                     ok = 0;
                                     break;
                                 }
                             }
-
                             if (!ok) continue;
+
                             for (int i = maxlegalpoint; i < lpoints.size(); i++) {
                                 if (rule->IsInFreeZone(lpoints[i])) {
                                     ok = 0;
                                     break;
                                 }
                             }
-
                             if (!ok) continue;
+
                             for (int i = 0; i < maxlegalline; i++) {
                                 if (!lused[i] && rule->IsLineInFreeZone(lpoints[llines[i].I1() - 1],
                                                                         lpoints[llines[i].I2() - 1])) {
@@ -334,7 +332,6 @@ namespace meshit {
                                     break;
                                 }
                             }
-
                             if (!ok) continue;
 
                             for (int i = maxlegalline; i < llines.size(); i++) {
@@ -382,7 +379,7 @@ namespace meshit {
                             }
 
                             double elerr = 0;
-                            for (int i = 1; i <= elements.size(); i++) {
+                            for (size_t i = 1; i <= elements.size(); i++) {
                                 double hf;
                                 if (!mp.quad) {
                                     hf = CalcElementBadness(lpoints, elements[i - 1]);

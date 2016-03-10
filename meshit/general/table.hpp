@@ -20,8 +20,8 @@ namespace meshit {
         class linestruct
         {
          public:
-            int size;
-            int maxsize;
+            size_t size;
+            size_t maxsize;
             void* col;
         };
 
@@ -29,30 +29,30 @@ namespace meshit {
         char* oneblock;
 
      public:
-        explicit BASE_TABLE(int size);
-        BASE_TABLE(const FlatArray<int>& entrysizes, int elemsize);
+        explicit BASE_TABLE(size_t size);
+        BASE_TABLE(const FlatArray<int>& entrysizes, size_t elemsize);
         ~BASE_TABLE();
 
-        void SetSize(int size);
-        void ChangeSize(int size);
+        void SetSize(size_t size);
+        void ChangeSize(size_t size);
 
         /// increment size of entry i by one, i is 0-based
 
-        void IncSize(int i, int elsize)
+        void IncSize(size_t i, size_t elsize)
         {
-            if (data[i].size < data[i].maxsize)
+            if (data[i].size < data[i].maxsize) {
                 data[i].size++;
-            else
+            } else {
                 IncSize2(i, elsize);
+            }
         }
 
-        void IncSize2(int i, int elsize);
-        void SetEntrySize2(int i, int newsize, int elsize);
+        void IncSize2(size_t i, size_t elsize);
 
-        void AllocateElementsOneBlock(int elemsize);
+        void AllocateElementsOneBlock(size_t elemsize);
 
-        int AllocatedElements() const;
-        int UsedElements() const;
+        size_t AllocatedElements() const;
+        size_t UsedElements() const;
     };
 
     /** 
@@ -66,47 +66,45 @@ namespace meshit {
     {
      public:
         /// Creates table of size size
-        explicit TABLE(int size=0) : BASE_TABLE(size) { }
+        explicit TABLE(size_t size = 0) : BASE_TABLE(size) { }
 
         /// Creates fixed maximal element size table
         explicit TABLE(const FlatArray<int>& entrysizes)
-                : BASE_TABLE(FlatArray<int>(entrysizes.size(), const_cast<int*> (&entrysizes[0])), sizeof(T))
-        {
-        }
+                : BASE_TABLE(FlatArray<int>(entrysizes.size(), const_cast<int*> (&entrysizes[0])), sizeof(T)) { }
 
         /// Changes Size of table to size, deletes data
-        inline void SetSize(int size)
+        inline void SetSize(size_t size)
         {
             BASE_TABLE::SetSize(size);
         }
 
         /// Changes Size of table to size, keep data
-        inline void ChangeSize(int size)
+        inline void ChangeSize(size_t size)
         {
             BASE_TABLE::ChangeSize(size);
         }
 
         /// Inserts element acont into row i. Does not test if already used.
-        inline void Add(int i, const T& acont)
+        inline void Add(size_t i, const T& acont)
         {
             IncSize(i, sizeof(T));
             ((T*) data[i].col)[data[i].size - 1] = acont;
         }
 
         /// Inserts element acont into row i, 1-based. Does not test if already used.
-        inline void Add1(int i, const T& acont)
+        inline void Add1(size_t i, const T& acont)
         {
             IncSize(i - 1, sizeof(T));
             ((T*) data[i - 1].col)[data[i - 1].size - 1] = acont;
         }
 
-        void IncSizePrepare(int i)
+        void IncSizePrepare(size_t i)
         {
             data[i].maxsize++;
         }
 
         /// Inserts element acont into row i. Does not test if already used, assumes to have enough memory
-        inline void AddSave(int i, const T& acont)
+        inline void AddSave(size_t i, const T& acont)
         {
             ((T*) data[i].col)[data[i].size] = acont;
             data[i].size++;
@@ -114,26 +112,26 @@ namespace meshit {
 
         /** Set the nr-th element in the i-th row to acont.
           Does not check for overflow. */
-        inline void Set(int i, int nr, const T& acont)
+        inline void Set(size_t i, size_t nr, const T& acont)
         {
             ((T*) data[i - 1].col)[nr - 1] = acont;
         }
 
         /** Returns the nr-th element in the i-th row.
           Does not check for overflow. */
-        inline const T& Get(int i, int nr) const
+        inline const T& Get(size_t i, size_t nr) const
         {
             return ((T*) data[i - 1].col)[nr - 1];
         }
 
         /// Returns size of the table.
-        inline int Size() const
+        inline size_t Size() const
         {
             return data.size();
         }
 
         /// Returns size of the i-th row.
-        inline int EntrySize(int i) const
+        inline size_t EntrySize(int i) const
         {
             return data[i - 1].size;
         }

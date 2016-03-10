@@ -132,19 +132,15 @@ namespace meshit {
 
         void BuildFromSpline2D(SplineGeometry2d& geometry, MeshingParameters& mp);
 
-        void DeleteMesh();
-
-        void ClearSurfaceElements();
-
         PointIndex AddPoint(const Point3d& p, int layer = 1);
         PointIndex AddPoint(const Point3d& p, int layer, POINTTYPE type);
 
-        int GetNP() const
+        size_t GetNP() const
         {
             return points.size();
         }
 
-        MeshPoint& Point(int i)
+        MeshPoint& Point(size_t i)
         {
             return points[i - 1];
         }
@@ -176,17 +172,17 @@ namespace meshit {
 
         SegmentIndex AddSegment(const Segment& s);
 
-        int GetNSeg() const
+        size_t GetNSeg() const
         {
             return segments.size();
         }
 
-        Segment& LineSegment(int i)
+        Segment& LineSegment(size_t i)
         {
             return segments[i - 1];
         }
 
-        const Segment& LineSegment(int i) const
+        const Segment& LineSegment(size_t i) const
         {
             return segments[i - 1];
         }
@@ -227,17 +223,17 @@ namespace meshit {
             DeleteSurfaceElement(int(eli) + 1);
         }
 
-        int GetNSE() const
+        size_t GetNSE() const
         {
             return surfelements.size();
         }
 
-        Element2d& SurfaceElement(int i)
+        Element2d& SurfaceElement(size_t i)
         {
             return surfelements[i - 1];
         }
 
-        const Element2d& SurfaceElement(int i) const
+        const Element2d& SurfaceElement(size_t i) const
         {
             return surfelements[i - 1];
         }
@@ -427,7 +423,7 @@ namespace meshit {
         /// find number of vertices
         void ComputeNVertices();
         /// number of vertices (no edge-midpoints)
-        int GetNV() const;
+        size_t GetNV() const;
         /// remove edge points
         void SetNP(int np);
 
@@ -442,7 +438,6 @@ namespace meshit {
             double area;
 
          public:
-
             CSurfaceArea(const Mesh& amesh)
                     : mesh(amesh), valid(false) { }
 

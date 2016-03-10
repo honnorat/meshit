@@ -29,8 +29,9 @@ namespace meshit {
         ~BASE_SYMBOLTABLE();
 
         void DelNames();
+
         /// Index of symbol name, returns 0 if not used.
-        int Index(const char* name) const;
+        size_t Index(const char* name) const;
     };
 
 
@@ -52,25 +53,38 @@ namespace meshit {
         SYMBOLTABLE() { }
 
         /// Returns size of symboltable
-        INDEX Size() const
+        size_t Size() const
         {
             return data.size();
         }
 
         /// Returns element, error if not used
-        inline const T& Get(const char* name) const;
+        const T& Get(const char* name) const
+        {
+            size_t i = Index(name);
+            return data[std::max(0UL, i - 1)];
+        }
+
         /// Returns i-th element
-        inline const T& Get(int i) const;
+        const T& Get(size_t i) const
+        {
+            return data[i - 1];
+        }
+
         /// Associates el to the string name, overrides if name is used
         inline void Set(const char* name, const T& el);
+
         /// Checks whether name is used
-        inline bool Used(const char* name) const;
+        bool Used(const char* name) const
+        {
+            return (Index(name) > 0);
+        }
         /// Deletes symboltable
         inline void DeleteAll();
 
-        inline T& operator[](int i) { return data[i]; }
+        inline T& operator[](size_t i) { return data[i]; }
 
-        inline const T& operator[](int i) const { return data[i]; }
+        inline const T& operator[](size_t i) const { return data[i]; }
 
      private:
         /// Prevents from copying symboltable by pointer assignment
@@ -78,22 +92,9 @@ namespace meshit {
     };
 
     template<class T>
-    inline const T& SYMBOLTABLE<T>::Get(const char* name) const
-    {
-        int i = Index(name);
-        return data[std::max(0, i - 1)];
-    }
-
-    template<class T>
-    inline const T& SYMBOLTABLE<T>::Get(int i) const
-    {
-        return data[i - 1];
-    }
-
-    template<class T>
     inline void SYMBOLTABLE<T>::Set(const char* name, const T& el)
     {
-        int i = Index(name);
+        size_t i = Index(name);
         if (i) {
             data[i - 1] = el;
         } else {
@@ -102,12 +103,6 @@ namespace meshit {
             strcpy(hname, name);
             names.push_back(hname);
         }
-    }
-
-    template<class T>
-    inline bool SYMBOLTABLE<T>::Used(const char* name) const
-    {
-        return static_cast<bool>(Index(name));
     }
 
     template<class T>

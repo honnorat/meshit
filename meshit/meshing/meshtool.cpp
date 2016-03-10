@@ -1,7 +1,5 @@
 #include "meshtool.hpp"
 
-#include <iomanip>
-
 #include "../gprim/geomtest3d.hpp"
 
 namespace meshit {
@@ -94,9 +92,8 @@ namespace meshit {
 
     void MeshQuality2d(const Mesh& mesh)
     {
-        int ncl = 20, cl;
+        size_t ncl = 20, cl;
         Array<INDEX> incl(ncl);
-        INDEX i;
         double qual;
 
         incl = 0;
@@ -107,7 +104,7 @@ namespace meshit {
                     mesh[mesh.SurfaceElement(sei)[1]],
                     mesh[mesh.SurfaceElement(sei)[2]]);
 
-            cl = static_cast<int>((ncl - 1e-3) * qual);
+            cl = static_cast<size_t>((ncl - 1e-3) * qual);
             incl[cl]++;
         }
 
@@ -115,7 +112,7 @@ namespace meshit {
         MESHIT_LOG_INFO("Points:           " << mesh.GetNP());
         MESHIT_LOG_INFO("Surface Elements: " << mesh.GetNSE());
         MESHIT_LOG_INFO("\nElements in qualityclasses:");
-        for (i = 0; i < ncl; i++) {
+        for (size_t i = 0; i < ncl; i++) {
             MESHIT_LOG_INFO(std::fixed << std::setprecision(2) <<
                             std::setw(4) << static_cast<double>(i) / ncl << " - " <<
                             std::setw(4) << static_cast<double>(i+1) / ncl << ": " << incl[i]);

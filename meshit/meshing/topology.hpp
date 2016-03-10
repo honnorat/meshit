@@ -17,6 +17,8 @@
 
 namespace meshit {
 
+    class Mesh;
+
     class MeshTopology
     {
         const Mesh& mesh;
@@ -26,7 +28,7 @@ namespace meshit {
         std::vector<INDEX_2> edge2vert;
         std::vector<INDEX_4> face2vert;
         TABLE<int>* vert2surfelement;
-        TABLE<int>* vert2segment;
+        TABLE<size_t>* vert2segment;
         int timestamp;
 
      public:
@@ -35,27 +37,24 @@ namespace meshit {
 
         void Update();
 
-        int GetNEdges() const
+        size_t GetNEdges() const
         {
             return edge2vert.size();
         }
 
-        int GetNFaces() const
+        size_t GetNFaces() const
         {
             return face2vert.size();
         }
 
-        static inline int GetNVertices(ELEMENT_TYPE et);
-        static inline int GetNEdges(ELEMENT_TYPE et);
+        static inline size_t GetNVertices(ELEMENT_TYPE et);
+        static inline size_t GetNEdges(ELEMENT_TYPE et);
 
         inline static const ELEMENT_EDGE* GetEdges(ELEMENT_TYPE et);
         inline static const ELEMENT_FACE* GetFaces(ELEMENT_TYPE et);
-
-        void GetSurfaceElementEdges(int elnr, Array<int>& edges) const;
-
     };
 
-    inline int MeshTopology::GetNVertices(ELEMENT_TYPE et)
+    inline size_t MeshTopology::GetNVertices(ELEMENT_TYPE et)
     {
         switch (et) {
             case SEGMENT:
@@ -77,7 +76,7 @@ namespace meshit {
         }
     }
 
-    inline int MeshTopology::GetNEdges(ELEMENT_TYPE et)
+    inline size_t MeshTopology::GetNEdges(ELEMENT_TYPE et)
     {
         switch (et) {
             case SEGMENT:

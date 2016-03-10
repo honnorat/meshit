@@ -58,7 +58,7 @@ namespace meshit {
             return *this;
         }
 
-        static INDEX_2 Sort(int i1, int i2)
+        static INDEX_2 Sort(INDEX i1, INDEX i2)
         {
             if (i1 > i2)
                 return INDEX_2(i2, i1);
@@ -76,7 +76,7 @@ namespace meshit {
             return i[1];
         }
 
-        INDEX& I(int j)
+        INDEX& I(size_t j)
         {
             return i[j - 1];
         }
@@ -91,17 +91,17 @@ namespace meshit {
             return i[1];
         }
 
-        const INDEX& I(int j) const
+        const INDEX& I(size_t j) const
         {
             return i[j - 1];
         }
 
-        int& operator[](int j)
+        int& operator[](size_t j)
         {
             return i[j];
         }
 
-        const int& operator[](int j) const
+        const int& operator[](size_t j) const
         {
             return i[j];
         }
@@ -178,7 +178,7 @@ namespace meshit {
             return i[2];
         }
 
-        INDEX& I(int j)
+        INDEX& I(size_t j)
         {
             return i[j - 1];
         }
@@ -198,17 +198,17 @@ namespace meshit {
             return i[2];
         }
 
-        const INDEX& I(int j) const
+        const INDEX& I(size_t j) const
         {
             return i[j - 1];
         }
 
-        int& operator[](int j)
+        int& operator[](size_t j)
         {
             return i[j];
         }
 
-        const int& operator[](int j) const
+        const int& operator[](size_t j) const
         {
             return i[j];
         }
@@ -243,9 +243,8 @@ namespace meshit {
 
         int operator==(const INDEX_4& in2) const
         {
-            return
-                    i[0] == in2.i[0] && i[1] == in2.i[1] &&
-                    i[2] == in2.i[2] && i[3] == in2.i[3];
+            return i[0] == in2.i[0] && i[1] == in2.i[1] &&
+                   i[2] == in2.i[2] && i[3] == in2.i[3];
         }
 
         INDEX& I1()
@@ -293,17 +292,17 @@ namespace meshit {
             return i[3];
         }
 
-        const INDEX& I(int j) const
+        const INDEX& I(size_t j) const
         {
             return i[j - 1];
         }
 
-        int& operator[](int j)
+        int& operator[](size_t j)
         {
             return i[j];
         }
 
-        const int& operator[](int j) const
+        const int& operator[](size_t j) const
         {
             return i[j];
         }
@@ -364,7 +363,7 @@ namespace meshit {
             return i[3];
         }
 
-        INDEX& I(int j)
+        INDEX& I(size_t j)
         {
             return i[j - 1];
         }
@@ -389,7 +388,7 @@ namespace meshit {
             return i[3];
         }
 
-        const INDEX& I(int j) const
+        const INDEX& I(size_t j) const
         {
             return i[j - 1];
         }
@@ -399,7 +398,7 @@ namespace meshit {
 
     inline bool operator<(const INDEX_4& a, const INDEX_4& b)
     {
-        for (int j = 0; j < 4; j++) {
+        for (size_t j = 0; j < 4; j++) {
             if (a[j] < b[j]) return true;
             if (a[j] > b[j]) return false;
         }

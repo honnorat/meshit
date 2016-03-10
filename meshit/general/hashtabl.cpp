@@ -60,74 +60,74 @@ namespace meshit {
     }
 
     BASE_INDEX_2_CLOSED_HASHTABLE::
-    BASE_INDEX_2_CLOSED_HASHTABLE(int size)
+    BASE_INDEX_2_CLOSED_HASHTABLE(size_t size)
             : hash(size)
     {
         invalid = -1;
-        for (int i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             hash[i].I1() = invalid;
         }
     }
 
     void BASE_INDEX_2_CLOSED_HASHTABLE::
-    BaseSetSize(int size)
+    BaseSetSize(size_t size)
     {
         hash.resize(size);
-        for (int i = 0; i < size; i++)
+        for (size_t i = 0; i < size; i++) {
             hash[i].I1() = invalid;
+        }
     }
 
-    int BASE_INDEX_2_CLOSED_HASHTABLE::
-    PositionCreate2(const INDEX_2& ind, int& apos)
+    bool BASE_INDEX_2_CLOSED_HASHTABLE::
+    PositionCreate2(const INDEX_2& ind, size_t& apos)
     {
-        int i = HashValue(ind);
-        int startpos = i;
-        while (1) {
+        size_t i = HashValue(ind);
+        size_t startpos = i;
+        while (true) {
             i++;
             if (i > hash.size()) i = 1;
             if (hash[i - 1] == ind) {
                 apos = i;
-                return 0;
+                return false;
             }
             if (hash[i - 1].I1() == invalid) {
                 hash[i - 1] = ind;
                 apos = i;
-                return 1;
+                return true;
             }
-            if (i == startpos)
+            if (i == startpos) {
                 throw std::runtime_error("Try to set new element in full closed hashtable");
+            }
         }
     }
 
-    int BASE_INDEX_2_CLOSED_HASHTABLE::UsedElements() const
+    size_t BASE_INDEX_2_CLOSED_HASHTABLE::UsedElements() const
     {
-        int n = hash.size();
-        int cnt = 0;
-        for (int i = 1; i <= n; i++)
-            if (hash[i - 1].I1() != invalid)
+        size_t n = hash.size();
+        size_t cnt = 0;
+        for (size_t i = 0; i < n; i++) {
+            if (hash[i].I1() != invalid) {
                 cnt++;
+            }
+        }
         return cnt;
     }
 
-
     void BASE_INDEX_3_CLOSED_HASHTABLE::
-    BaseSetSize(int size)
+    BaseSetSize(size_t size)
     {
         hash.resize(size);
-        for (int i = 0; i < size; i++)
+        for (size_t i = 0; i < size; i++) {
             hash[i].I1() = invalid;
+        }
     }
 
     bool BASE_INDEX_3_CLOSED_HASHTABLE::
-    PositionCreate2(const INDEX_3& ind, int& apos)
+    PositionCreate2(const INDEX_3& ind, size_t& apos)
     {
-        int i = HashValue(ind);
-        int startpos = i;
-        while (1) {
-            /*
-        i++;
-        if (i >= hash.Size()) i = 0;
-            */
+        size_t i = HashValue(ind);
+        size_t startpos = i;
+        while (true) {
             i = (i + 1) % hash.size();
             if (hash[i] == ind) {
                 apos = i;

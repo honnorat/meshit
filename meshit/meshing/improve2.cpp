@@ -21,12 +21,12 @@ namespace meshit {
             return nr[side];
         }
 
-        void SetOrientation(int side, int aorient)
+        void SetOrientation(size_t side, int aorient)
         {
             orient[side] = aorient;
         }
 
-        int GetOrientation(int side)
+        int GetOrientation(size_t side)
         {
             return orient[side];
         }
@@ -35,20 +35,12 @@ namespace meshit {
     class trionedge
     {
      public:
-        int tnr;
-        int sidenr;
+        size_t tnr;
+        size_t sidenr;
 
-        trionedge()
-        {
-            tnr = 0;
-            sidenr = 0;
-        }
+        trionedge() : tnr{0}, sidenr{0} { }
 
-        trionedge(int atnr, int asidenr)
-        {
-            tnr = atnr;
-            sidenr = asidenr;
-        }
+        trionedge(size_t atnr, size_t asidenr) : tnr{atnr}, sidenr{asidenr} { }
     };
 
     void MeshOptimize2d::EdgeSwapping(Mesh& mesh, int usemetric)
@@ -71,7 +63,7 @@ namespace meshit {
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             if (mesh.SurfaceElement(seia[i]).GetNP() != 3) {
                 GenericImprove(mesh);
                 return;
@@ -88,7 +80,7 @@ namespace meshit {
 
         static const double minangle[] = {0, 1.481, 2.565, 3.627, 4.683, 5.736, 7, 9};
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (int j = 0; j < 3; j++) {
                 pangle[sel[j]] = 0.0;
@@ -96,9 +88,9 @@ namespace meshit {
         }
         // pangle = 0;
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < 3; j++) {
+            for (size_t j = 0; j < 3; j++) {
                 POINTTYPE typ = mesh.Point(sel[j]).Type();
                 if (typ == FIXEDPOINT || typ == EDGEPOINT) {
                     pangle[sel[j]] += Angle(
@@ -108,9 +100,9 @@ namespace meshit {
             }
         }
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < 3; j++) {
+            for (size_t j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
                 if (mesh.Point(pi).Type() == INNERPOINT || mesh.Point(pi).Type() == SURFACEPOINT) {
                     pdef[pi] = -6;
@@ -124,23 +116,23 @@ namespace meshit {
             }
         }
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
-            for (int j = 0; j < 3; j++)
+            for (size_t j = 0; j < 3; j++)
                 pdef[sel[j]]++;
         }
 
-        for (int i = 0; i < seia.size(); i++) {
-            for (int j = 0; j < 3; j++) {
+        for (size_t i = 0; i < seia.size(); i++) {
+            for (size_t j = 0; j < 3; j++) {
                 neighbors[seia[i]].SetNr(j, -1);
                 neighbors[seia[i]].SetOrientation(j, 0);
             }
         }
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
 
-            for (int j = 0; j < 3; j++) {
+            for (size_t j = 0; j < 3; j++) {
                 PointIndex pi1 = sel.PNumMod(j + 2);
                 PointIndex pi2 = sel.PNumMod(j + 3);
 
@@ -152,8 +144,8 @@ namespace meshit {
 
                 INDEX_2 ii2(pi1, pi2);
                 if (other.Used(ii2)) {
-                    int i2 = other.Get(ii2).tnr;
-                    int j2 = other.Get(ii2).sidenr;
+                    size_t i2 = other.Get(ii2).tnr;
+                    size_t j2 = other.Get(ii2).sidenr;
                     neighbors[seia[i]].SetNr(j, i2);
                     neighbors[seia[i]].SetOrientation(j, j2);
                     neighbors[i2].SetNr(j2, seia[i]);
@@ -163,14 +155,13 @@ namespace meshit {
                 }
             }
         }
-
-        for (int i = 0; i < seia.size(); i++)
+        for (size_t i = 0; i < seia.size(); i++) {
             swapped[seia[i]] = 0;
-
+        }
         int t = 4;
-        int done = 0;
+        bool done = false;
         while (!done && t >= 2) {
-            for (int i = 0; i < seia.size(); i++) {
+            for (size_t i = 0; i < seia.size(); i++) {
                 SurfaceElementIndex t1 = seia[i];
 
                 if (mesh.SurfaceElement(t1).IsDeleted())
@@ -179,11 +170,11 @@ namespace meshit {
                 if (mesh.SurfaceElement(t1).GetIndex() != faceindex)
                     continue;
 
-                for (int o1 = 0; o1 < 3; o1++) {
+                for (size_t o1 = 0; o1 < 3; o1++) {
                     bool should;
 
                     SurfaceElementIndex t2 = neighbors[t1].GetNr(o1);
-                    int o2 = neighbors[t1].GetOrientation(o1);
+                    size_t o2 = neighbors[t1].GetOrientation(o1);
 
                     if (t2 == -1) continue;
                     if (swapped[t1] || swapped[t2]) continue;
@@ -269,8 +260,7 @@ namespace meshit {
 
                         if (should) {
                             // do swapping !
-
-                            done = 1;
+                            done = true;
 
                             mesh.SurfaceElement(t1).PNum(1) = pi1;
                             mesh.SurfaceElement(t1).PNum(2) = pi4;
@@ -320,9 +310,9 @@ namespace meshit {
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             if (mesh.SurfaceElement(seia[i]).GetNP() != 3) {
-                std::cerr << "exit from CombineImprove " << i << std::endl;
+                MESHIT_LOG_ERROR("exit from CombineImprove ");
                 return;
             }
         }
@@ -334,12 +324,12 @@ namespace meshit {
         double bad1, bad2;
         Vec3d nv;
 
-        int np = mesh.GetNP();
+        size_t np = mesh.GetNP();
 
         TABLE<SurfaceElementIndex> elementsonnode(np);
         Array<SurfaceElementIndex> hasonepi, hasbothpi;
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             Element2d& el = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < el.GetNP(); j++)
                 elementsonnode.Add(el[j], seia[i]);
@@ -348,7 +338,7 @@ namespace meshit {
         Array<bool> fixed(np);
         fixed = false;
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < sel.GetNP(); j++) {
                 PointIndex pi1 = sel.PNumMod(j + 2);
@@ -359,16 +349,16 @@ namespace meshit {
                 }
             }
         }
-
-        for (int i = 0; i < mesh.LockedPoints().size(); i++)
+        for (size_t i = 0; i < mesh.LockedPoints().size(); i++) {
             fixed[mesh.LockedPoints()[i]] = true;
+        }
 
         Array<Vec3d> normals(np);
 
         for (PointIndex pi = mesh.Points().Begin(); pi < mesh.Points().End(); pi++) {
             if (elementsonnode[pi].size()) {
                 Element2d& hel = mesh.SurfaceElement(elementsonnode[pi][0]);
-                for (int k = 0; k < 3; k++) {
+                for (size_t k = 0; k < 3; k++) {
                     if (hel[k] == pi) {
                         GetNormalVector(surfnr, mesh.Point(pi), hel.GeomInfoPi(k + 1), normals[pi]);
                         break;
@@ -377,12 +367,12 @@ namespace meshit {
             }
         }
 
-        for (int i = 0; i < seia.size(); i++) {
+        for (size_t i = 0; i < seia.size(); i++) {
             SurfaceElementIndex sei = seia[i];
             Element2d& elem = mesh.SurfaceElement(sei);
             if (elem.IsDeleted()) continue;
 
-            for (int j = 0; j < 3; j++) {
+            for (size_t j = 0; j < 3; j++) {
                 PointIndex pi1 = elem[j];
                 PointIndex pi2 = elem[(j + 1) % 3];
 
@@ -390,11 +380,12 @@ namespace meshit {
                     continue;
 
                 // more general
-                if (fixed[pi2])
+                if (fixed[pi2]) {
                     std::swap(pi1, pi2);
-
-                if (fixed[pi2])
+                }
+                if (fixed[pi2]) {
                     continue;
+                }
 
                 double loch = mesh.GetH(mesh.Point(pi1));
 
@@ -404,7 +395,7 @@ namespace meshit {
                 hasonepi.resize(0);
                 hasbothpi.resize(0);
 
-                for (int k = 0; k < elementsonnode[pi1].size(); k++) {
+                for (size_t k = 0; k < elementsonnode[pi1].size(); k++) {
                     const Element2d& el2 = mesh.SurfaceElement(elementsonnode[pi1][k]);
 
                     if (el2.IsDeleted()) continue;
@@ -420,29 +411,29 @@ namespace meshit {
                 }
 
                 Element2d& hel = mesh.SurfaceElement(hasbothpi[0]);
-                for (int k = 0; k < 3; k++)
+                for (size_t k = 0; k < 3; k++)
                     if (hel[k] == pi1) {
                         GetNormalVector(surfnr, mesh.Point(pi1), hel.GeomInfoPi(k + 1), nv);
                         break;
                     }
 
-                for (int k = 0; k < elementsonnode[pi2].size(); k++) {
+                for (size_t k = 0; k < elementsonnode[pi2].size(); k++) {
                     const Element2d& el2 = mesh.SurfaceElement(elementsonnode[pi2][k]);
                     if (el2.IsDeleted()) continue;
 
-                    if (el2[0] == pi1 || el2[1] == pi1 || el2[2] == pi1);
-                    else
+                    if (el2[0] != pi1 && el2[1] != pi1 && el2[2] != pi1) {
                         hasonepi.push_back(elementsonnode[pi2][k]);
+                    }
                 }
 
                 bad1 = 0;
-                for (int k = 0; k < hasonepi.size(); k++) {
+                for (size_t k = 0; k < hasonepi.size(); k++) {
                     const Element2d& el = mesh.SurfaceElement(hasonepi[k]);
                     bad1 += CalcTriangleBadness(
                             mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
                 }
 
-                for (int k = 0; k < hasbothpi.size(); k++) {
+                for (size_t k = 0; k < hasbothpi.size(); k++) {
                     const Element2d& el = mesh.SurfaceElement(hasbothpi[k]);
                     bad1 += CalcTriangleBadness(
                             mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
@@ -457,21 +448,21 @@ namespace meshit {
                 mesh[pi2] = pnew;
 
                 bad2 = 0;
-                for (int k = 0; k < hasonepi.size(); k++) {
+                for (size_t k = 0; k < hasonepi.size(); k++) {
                     Element2d& el = mesh.SurfaceElement(hasonepi[k]);
-                    double err = CalcTriangleBadness(
-                            mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
-                    bad2 += err;
+                    bad2 += CalcTriangleBadness(mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]),
+                                                nv, -1, loch);
 
-                    Vec3d hnv = Cross(
-                            mesh.Point(el[1]) - mesh.Point(el[0]),
-                            mesh.Point(el[2]) - mesh.Point(el[0]));
-                    if (hnv * nv < 0)
+                    Vec3d hnv = Cross(mesh.Point(el[1]) - mesh.Point(el[0]),
+                                      mesh.Point(el[2]) - mesh.Point(el[0]));
+                    if (hnv * nv < 0) {
                         bad2 += 1e10;
-
-                    for (int l = 0; l < 3; l++)
-                        if ((normals[el[l]] * nv) < 0.5)
+                    }
+                    for (size_t l = 0; l < 3; l++) {
+                        if ((normals[el[l]] * nv) < 0.5) {
                             bad2 += 1e10;
+                        }
+                    }
                 }
                 bad2 /= hasonepi.size();
 
@@ -483,22 +474,24 @@ namespace meshit {
                 if (should) {
                     mesh[pi1] = pnew;
                     PointGeomInfo gi;
-
                     Element2d* el1p(NULL);
-                    int l = 0;
-                    while (mesh.SurfaceElement(elementsonnode[pi1][l]).IsDeleted() && l < elementsonnode.EntrySize(pi1))
+                    size_t l = 0;
+                    while (mesh.SurfaceElement(elementsonnode[pi1][l]).IsDeleted() &&
+                           l < elementsonnode.EntrySize(pi1)) {
                         l++;
-                    if (l < elementsonnode.EntrySize(pi1))
+                    }
+                    if (l < elementsonnode.EntrySize(pi1)) {
                         el1p = &mesh.SurfaceElement(elementsonnode[pi1][l]);
-                    else
-                        std::cerr << "OOPS!" << std::endl;
+                    } else {
+                        MESHIT_LOG_ERROR("MeshOptimize2d::CombineImprove: OOPS!");
+                    }
 
                     for (size_t l = 0; l < el1p->GetNP(); l++) {
                         if ((*el1p)[l] == pi1) {
                             gi = el1p->GeomInfoPi(l + 1);
                         }
                     }
-                    for (int k = 0; k < elementsonnode[pi2].size(); k++) {
+                    for (size_t k = 0; k < elementsonnode[pi2].size(); k++) {
                         Element2d& el = mesh.SurfaceElement(elementsonnode[pi2][k]);
                         if (el.IsDeleted()) continue;
                         elementsonnode.Add(pi1, elementsonnode[pi2][k]);
@@ -518,7 +511,7 @@ namespace meshit {
                             fixed[el[l]] = true;
                         }
                     }
-                    for (int k = 0; k < hasbothpi.size(); k++) {
+                    for (size_t k = 0; k < hasbothpi.size(); k++) {
                         mesh.SurfaceElement(hasbothpi[k]).Delete();
                     }
                 }

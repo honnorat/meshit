@@ -69,7 +69,7 @@ namespace meshit {
             splines[i]->GetPoints(20, points);
 
             if (i == 0) box.Set(points[0]);
-            for (int j = 0; j < points.size(); j++) {
+            for (size_t j = 0; j < points.size(); j++) {
                 box.Add(points[j]);
             }
         }

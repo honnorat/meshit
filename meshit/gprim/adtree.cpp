@@ -58,12 +58,12 @@ namespace meshit {
         delete root;
     }
 
-    void ADTree3::Insert(const double* p, int pi)
+    void ADTree3::Insert(const Point<3>& p, int pi)
     {
-        ADTreeNode3* node(NULL);
-        ADTreeNode3* next;
-        int dir;
-        int lr(0);
+        ADTreeNode3* node = nullptr;
+        ADTreeNode3* next = root;
+        int dir = 0;
+        bool lr = false;
 
         double bmin[3];
         double bmax[3];
@@ -71,17 +71,18 @@ namespace meshit {
         memcpy(bmin, cmin, 3 * sizeof(double));
         memcpy(bmax, cmax, 3 * sizeof(double));
 
-        next = root;
-        dir = 0;
         while (next) {
             node = next;
 
             if (node->pi == -1) {
-                memcpy(node->data, p, 3 * sizeof(double));
+                node->data[0] = p[0];
+                node->data[1] = p[1];
+                node->data[2] = p[2];
                 node->pi = pi;
 
-                if (ela.size() < pi + 1)
+                if (ela.size() < static_cast<size_t>(pi + 1)) {
                     ela.resize(pi + 1);
+                }
                 ela[pi] = node;
 
                 return;
@@ -90,25 +91,28 @@ namespace meshit {
             if (node->sep > p[dir]) {
                 next = node->left;
                 bmax[dir] = node->sep;
-                lr = 0;
+                lr = false;
             } else {
                 next = node->right;
                 bmin[dir] = node->sep;
-                lr = 1;
+                lr = true;
             }
 
-            dir++;
-            if (dir == 3)
+            if (++dir == 3) {
                 dir = 0;
+            }
         }
 
         next = new ADTreeNode3;
-        memcpy(next->data, p, 3 * sizeof(double));
+        next->data[0] = p[0];
+        next->data[1] = p[1];
+        next->data[2] = p[2];
         next->pi = pi;
         next->sep = (bmin[dir] + bmax[dir]) / 2;
 
-        if (ela.size() < pi + 1)
+        if (ela.size() < static_cast<size_t>(pi + 1)) {
             ela.resize(pi + 1);
+        }
         ela[pi] = next;
 
         if (lr)
@@ -138,10 +142,10 @@ namespace meshit {
 
     void ADTree3::GetIntersecting(const double* bmin,
                                   const double* bmax,
-                                  Array<int>& pis) const
+                                  Array<size_t>& pis) const
     {
         static Array<ADTreeNode3*> stack(1000);
-        static Array<int> stackdir(1000);
+        static Array<size_t> stackdir(1000);
         ADTreeNode3* node;
 
         stack.resize(1000);
@@ -151,12 +155,12 @@ namespace meshit {
         stack[0] = root;
         stackdir[0] = 0;
 
-        int stacks = 1;
+        size_t stacks = 1;
 
         while (stacks) {
-            node = stack[stacks-1];
-            int dir = stackdir[stacks-1];
             stacks--;
+            node = stack[stacks];
+            size_t dir = stackdir[stacks];
 
             if (node->pi != -1) {
                 if (node->data[0] >= bmin[0] && node->data[0] <= bmax[0] &&
@@ -171,14 +175,14 @@ namespace meshit {
                 ndir = 0;
 
             if (node->left && bmin[dir] <= node->sep) {
+                stack[stacks] = node->left;
+                stackdir[stacks] = ndir;
                 stacks++;
-                stack[stacks-1] = node->left;
-                stackdir[stacks-1] = ndir;
             }
             if (node->right && bmax[dir] >= node->sep) {
+                stack[stacks] = node->right;
+                stackdir[stacks] = ndir;
                 stacks++;
-                stack[stacks-1] = node->right;
-                stackdir[stacks-1] = ndir;
             }
         }
     }
@@ -253,12 +257,19 @@ namespace meshit {
         delete root;
     }
 
-    void ADTree6::Insert(const double* p, int pi)
+    void ADTree6::Insert(const Point<3>& bmin_, const Point<3>& bmax_, int pi)
     {
-        ADTreeNode6* node(NULL);
-        ADTreeNode6* next;
-        int dir;
-        int lr(0);
+        double p[6];
+
+        for (int i = 0; i < 3; i++) {
+            p[i] = bmin_(i);
+            p[i + 3] = bmax_(i);
+        }
+
+        ADTreeNode6* node = nullptr;
+        ADTreeNode6* next = root;
+        int dir = 0;
+        bool lr = false;
 
         double bmin[6];
         double bmax[6];
@@ -266,8 +277,6 @@ namespace meshit {
         memcpy(bmin, cmin, 6 * sizeof(double));
         memcpy(bmax, cmax, 6 * sizeof(double));
 
-        next = root;
-        dir = 0;
         while (next) {
             node = next;
 
@@ -275,25 +284,24 @@ namespace meshit {
                 memcpy(node->data, p, 6 * sizeof(double));
                 node->pi = pi;
 
-                if (ela.size() < pi + 1)
+                if (ela.size() < static_cast<size_t>(pi + 1)) {
                     ela.resize(pi + 1);
+                }
                 ela[pi] = node;
-
                 return;
             }
 
             if (node->sep > p[dir]) {
                 next = node->left;
                 bmax[dir] = node->sep;
-                lr = 0;
+                lr = false;
             } else {
                 next = node->right;
                 bmin[dir] = node->sep;
-                lr = 1;
+                lr = true;
             }
 
-            dir++;
-            if (dir == 6) dir = 0;
+            if (++dir == 6) dir = 0;
         }
 
         next = new ADTreeNode6;
@@ -301,8 +309,9 @@ namespace meshit {
         next->pi = pi;
         next->sep = (bmin[dir] + bmax[dir]) / 2;
 
-        if (ela.size() < pi + 1)
+        if (ela.size() < static_cast<size_t>(pi + 1)) {
             ela.resize(pi + 1);
+        }
         ela[pi] = next;
 
         if (lr)
@@ -346,20 +355,21 @@ namespace meshit {
 
     void ADTree6::GetIntersecting(const double* bmin,
                                   const double* bmax,
-                                  Array<int>& pis) const
+                                  Array<size_t>& pis) const
     {
         ArrayMem<inttn6, 10000> stack(10000);
         pis.resize(0);
 
         stack[0].node = root;
         stack[0].dir = 0;
-        int stacks = 0;
+        size_t stacks = 1;
 
-        while (stacks >= 0) {
+        while (stacks) {
+            stacks--;
+
             ADTreeNode6* node = stack[stacks].node;
             int dir = stack[stacks].dir;
 
-            stacks--;
             if (node->pi != -1) {
                 if (node->data[0] > bmax[0] ||
                     node->data[1] > bmax[1] ||
@@ -376,14 +386,14 @@ namespace meshit {
             int ndir = (dir + 1) % 6;
 
             if (node->left && bmin[dir] <= node->sep) {
-                stacks++;
                 stack[stacks].node = node->left;
                 stack[stacks].dir = ndir;
+                stacks++;
             }
             if (node->right && bmax[dir] >= node->sep) {
-                stacks++;
                 stack[stacks].node = node->right;
                 stack[stacks].dir = ndir;
+                stacks++;
             }
         }
     }
@@ -445,15 +455,14 @@ namespace meshit {
 
     void Point3dTree::Insert(const Point<3>& p, int pi)
     {
-        double pd[3];
-        pd[0] = p(0);
-        pd[1] = p(1);
-        pd[2] = p(2);
-        tree->Insert(pd, pi);
+//        double pd[3];
+//        pd[0] = p(0);
+//        pd[1] = p(1);
+//        pd[2] = p(2);
+        tree->Insert(p, pi);
     }
 
-    void Point3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax,
-                                      Array<int>& pis) const
+    void Point3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const
     {
         double pmi[3], pma[3];
         for (int i = 0; i < 3; i++) {
@@ -468,9 +477,9 @@ namespace meshit {
               boxpmax(abox.PMax())
     {
         double tpmin[6], tpmax[6];
-        for (int i = 0; i < 3; i++) {
-            tpmin[i] = tpmin[i + 3] = boxpmin(i);
-            tpmax[i] = tpmax[i + 3] = boxpmax(i);
+        for (size_t i = 0; i < 3; i++) {
+            tpmin[i] = tpmin[i + 3] = boxpmin[i];
+            tpmax[i] = tpmax[i + 3] = boxpmax[i];
         }
         tree = new ADTree6(tpmin, tpmax);
     }
@@ -494,23 +503,23 @@ namespace meshit {
 
     void Box3dTree::Insert(const Point<3>& bmin, const Point<3>& bmax, int pi)
     {
-        double tp[6];
-
-        for (int i = 0; i < 3; i++) {
-            tp[i] = bmin(i);
-            tp[i + 3] = bmax(i);
-        }
-
-        tree->Insert(tp, pi);
+//        double tp[6];
+//
+//        for (int i = 0; i < 3; i++) {
+//            tp[i] = bmin(i);
+//            tp[i + 3] = bmax(i);
+//        }
+//
+//        tree->Insert(tp, pi);
+        tree->Insert(bmin, bmax, pi);
     }
 
-    void Box3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax,
-                                    Array<int>& pis) const
+    void Box3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const
     {
         double tpmin[6];
         double tpmax[6];
 
-        for (int i = 0; i < 3; i++) {
+        for (size_t i = 0; i < 3; i++) {
             tpmin[i] = boxpmin(i);
             tpmax[i] = pmax(i);
 

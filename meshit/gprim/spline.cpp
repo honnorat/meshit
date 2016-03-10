@@ -38,13 +38,13 @@ namespace meshit {
             t.push_back((-c2 - sqrt(discr)) / (2. * c1));
         }
 
-        for (int i = 0; i < t.size(); i++) {
+        for (size_t i = 0; i < t.size(); i++) {
             Point<2> p(px - t[i] * b, py + t[i] * a);
-
             double angle = atan2(p(1), p(0)) + M_PI;
 
-            if (angle > StartAngle() - eps && angle < EndAngle() + eps)
+            if (angle > StartAngle() - eps && angle < EndAngle() + eps) {
                 points.push_back(p);
+            }
         }
     }
 

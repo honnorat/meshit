@@ -7,17 +7,16 @@ namespace meshit {
 
     int MultiPointGeomInfo::AddPointGeomInfo(const PointGeomInfo& gi)
     {
-        for (int k = 0; k < cnt; k++) {
-            if (mgi[k].trignum == gi.trignum)
+        for (size_t k = 0; k < cnt; k++) {
+            if (mgi[k].trignum == gi.trignum) {
                 return 0;
+            }
         }
-
         if (cnt < MULTIPOINTGEOMINFO_MAX) {
             mgi[cnt] = gi;
             cnt++;
             return 0;
         }
-
         throw std::runtime_error("Please report error: MPGI Size too small\n");
     }
 
@@ -142,6 +141,10 @@ namespace meshit {
                 break;
             case 8:
                 typ = QUAD8;
+                break;
+            default:
+                MESHIT_LOG_ERROR("Element2d: undefined element type. np = " << np);
+                typ = UNDEFINED;
                 break;
         }
     }
@@ -313,6 +316,7 @@ namespace meshit {
                 break;
             default:
                 MESHIT_LOG_ERROR("Element2d::GetIntegrationPoint, illegal type " << typ);
+                return;
         }
 
         p.X() = pp[0];
@@ -333,6 +337,7 @@ namespace meshit {
                 break;
             default:
                 MESHIT_LOG_ERROR("Element2d::GetTransformation, illegal type " << typ);
+                return;
         }
 
         CalcABt(pmat, *dshapep, trans);
@@ -613,14 +618,8 @@ namespace meshit {
 
     void Element2d::ComputeIntegrationPointData() const
     {
-        switch (np) {
-            case 3:
-                if (ipdtrig.size()) return;
-                break;
-            case 4:
-                if (ipdquad.size()) return;
-                break;
-        }
+        if (np == 3 && ipdtrig.size()) return;
+        if (np == 4 && ipdquad.size()) return;
 
         for (size_t i = 1; i <= GetNIP(); i++) {
             IntegrationPointData* ipd = new IntegrationPointData;
@@ -636,14 +635,8 @@ namespace meshit {
             GetShape(hp, ipd->shape);
             GetDShape(hp, ipd->dshape);
 
-            switch (np) {
-                case 3:
-                    ipdtrig.push_back(ipd);
-                    break;
-                case 4:
-                    ipdquad.push_back(ipd);
-                    break;
-            }
+            if (np == 3) ipdtrig.push_back(ipd);
+            if (np == 4) ipdquad.push_back(ipd);
         }
     }
 
@@ -660,9 +653,6 @@ namespace meshit {
     {
         surfnr = domin = domout = bcprop = 0;
         domin_singular = domout_singular = 0.;
-        // Philippose - 06/07/2009
-        // Initialise surface colour
-        surfcolour = Vec3d(0.0, 1.0, 0.0);
         tlosurf = -1;
         bcname = 0;
         firstelement = -1;
@@ -670,8 +660,7 @@ namespace meshit {
 
     FaceDescriptor::FaceDescriptor(const FaceDescriptor& other)
             : surfnr(other.surfnr), domin(other.domin), domout(other.domout),
-              tlosurf(other.tlosurf), bcprop(other.bcprop),
-              surfcolour(other.surfcolour), bcname(other.bcname),
+              tlosurf(other.tlosurf), bcprop(other.bcprop), bcname(other.bcname),
               domin_singular(other.domin_singular), domout_singular(other.domout_singular)
     {
         firstelement = -1;
@@ -682,9 +671,6 @@ namespace meshit {
         surfnr = surfnri;
         domin = domini;
         domout = domouti;
-        // Philippose - 06/07/2009
-        // Initialise surface colour
-        surfcolour = Vec3d(0.0, 1.0, 0.0);
         tlosurf = tlosurfi;
         bcprop = surfnri;
         domin_singular = domout_singular = 0.;
@@ -697,9 +683,6 @@ namespace meshit {
         surfnr = seg.si;
         domin = seg.domin + 1;
         domout = seg.domout + 1;
-        // Philippose - 06/07/2009
-        // Initialise surface colour
-        surfcolour = Vec3d(0.0, 1.0, 0.0);
         tlosurf = seg.tlosurf + 1;
         bcprop = 0;
         domin_singular = domout_singular = 0.;
@@ -716,13 +699,6 @@ namespace meshit {
                 tlosurf == seg.tlosurf + 1;
     }
 
-    const std::string& FaceDescriptor::GetBCName() const
-    {
-        static std::string defaultstring = "default";
-        if (bcname) return *bcname;
-        return defaultstring;
-    }
-
     std::ostream& operator<<(std::ostream& s, const FaceDescriptor& fd)
     {
         s << "surfnr = " << fd.SurfNr()
@@ -731,8 +707,7 @@ namespace meshit {
         << ", tlosurf = " << fd.TLOSurface()
         << ", bcprop = " << fd.BCProperty()
         << ", domin_sing = " << fd.DomainInSingular()
-        << ", domout_sing = " << fd.DomainOutSingular()
-        << ", colour = " << fd.SurfColour();
+        << ", domout_sing = " << fd.DomainOutSingular();
         return s;
     }
 
@@ -750,18 +725,8 @@ namespace meshit {
         delete identifiedpoints_nr;
     }
 
-    void Identifications::Delete()
-    {
-        delete identifiedpoints;
-        identifiedpoints = new INDEX_2_HASHTABLE<int>(100);
-        delete identifiedpoints_nr;
-        identifiedpoints_nr = new INDEX_3_HASHTABLE<int>(100);
-        maxidentnr = 0;
-    }
-
     void Identifications::Add(PointIndex pi1, PointIndex pi2, int identnr)
     {
-        //  std::cerr << "Identification::Add, pi1 = " << pi1 << ", pi2 = " << pi2 << ", identnr = " << identnr <<std::endl;
         INDEX_2 pair(pi1, pi2);
         identifiedpoints->Set(pair, identnr);
 
@@ -795,22 +760,20 @@ namespace meshit {
             return 0;
     }
 
-    void Identifications::GetMap(int identnr, Array<int>& identmap, bool symmetric) const
+    void Identifications::GetMap(size_t identnr, Array<int>& identmap, bool symmetric) const
     {
         identmap.resize(mesh.GetNP());
         identmap = 0;
 
-        if (identnr)
-            for (int i = 0; i < idpoints_table[identnr].size(); i++) {
+        if (identnr > 0) {
+            for (size_t i = 0; i < idpoints_table[identnr].size(); i++) {
                 INDEX_2 pair = idpoints_table[identnr][i];
                 identmap[pair.I1()] = pair.I2();
                 if (symmetric)
                     identmap[pair.I2()] = pair.I1();
             }
-
-        else {
-            std::cout << "getmap, identnr = " << identnr << std::endl;
-
+        } else {
+            MESHIT_LOG_DEBUG("getmap, identnr = " << identnr);
             for (int i = 1; i <= identifiedpoints_nr->GetNBags(); i++) {
                 for (int j = 1; j <= identifiedpoints_nr->GetBagSize(i); j++) {
                     INDEX_3 i3;
@@ -870,14 +833,6 @@ namespace meshit {
                 }
             }
         }
-    }
-
-    void Identifications::Print(std::ostream& ost) const
-    {
-        ost << "Identifications:" << std::endl;
-        ost << "pairs: " << std::endl << *identifiedpoints << std::endl;
-        ost << "pairs and nr: " << std::endl << *identifiedpoints_nr << std::endl;
-        ost << "table: " << std::endl << idpoints_table << std::endl;
     }
 
     MeshingParameters::MeshingParameters()

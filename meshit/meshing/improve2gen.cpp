@@ -181,7 +181,7 @@ namespace meshit {
         used = 0;
         mapped = 0;
 
-        for (int ri = 0; ri < rules.size(); ri++) {
+        for (size_t ri = 0; ri < rules.size(); ri++) {
             ImprovementRule& rule = *rules[ri];
             rule.incelsonnode.resize(rule.onp);
             rule.reused.resize(rule.onp);
@@ -191,14 +191,14 @@ namespace meshit {
                 rule.reused[j] = 0;
             }
 
-            for (int j = 0; j < rule.oldels.size(); j++) {
+            for (size_t j = 0; j < rule.oldels.size(); j++) {
                 const Element2d& el = rule.oldels[j];
                 for (size_t k = 1; k <= el.GetNP(); k++) {
                     rule.incelsonnode[el.PNum(k) - 1]--;
                 }
             }
 
-            for (int j = 0; j < rule.newels.size(); j++) {
+            for (size_t j = 0; j < rule.newels.size(); j++) {
                 const Element2d& el = rule.newels[j];
                 for (size_t k = 1; k <= el.GetNP(); k++) {
                     rule.incelsonnode[el.PNum(k) - 1]++;
@@ -230,20 +230,21 @@ namespace meshit {
             const Element2d& el = mesh.SurfaceElement(sei);
             if (el.GetIndex() == faceindex && !el.IsDeleted()) {
                 for (size_t j = 0; j < el.GetNP(); j++) {
-                    for (int k = 0; k < elonnode[el[j]].size(); k++) {
+                    for (size_t k = 0; k < elonnode[el[j]].size(); k++) {
                         int nbel = elonnode[el[j]][k];
                         bool inuse = false;
-                        for (int l = 0; l < nbels[sei].size(); l++)
-                            if (nbels[sei][l] == nbel)
+                        for (size_t l = 0; l < nbels[sei].size(); l++) {
+                            if (nbels[sei][l] == nbel) {
                                 inuse = true;
+                            }
+                        }
                         if (!inuse)
                             nbels.Add(sei, nbel);
                     }
                 }
             }
         }
-
-        for (int ri = 0; ri < rules.size(); ri++) {
+        for (size_t ri = 0; ri < rules.size(); ri++) {
             const ImprovementRule& rule = *rules[ri];
 
             elmap.resize(rule.oldels.size());
@@ -275,9 +276,8 @@ namespace meshit {
                     }
 
                     ok = 1;
-                    for (int i = 1; i < elmap.size(); i++) {
+                    for (size_t i = 1; i < elmap.size(); i++) {
                         // try to find a mapping for reference-element i
-
                         const Element2d& rel = rule.oldels[i];
                         bool possible = 0;
 
@@ -312,7 +312,7 @@ namespace meshit {
                         elmap[i] = neighbours[elmap[i]];
                     }
 
-                    for (int i = 0; ok && i < rule.deledges.size(); i++) {
+                    for (size_t i = 0; ok && i < rule.deledges.size(); i++) {
                         ok = !mesh.IsSegment(pmap[rule.deledges[i].I1() - 1],
                                              pmap[rule.deledges[i].I2() - 1]);
                     }
@@ -322,14 +322,14 @@ namespace meshit {
                     mapped[ri]++;
 
                     olddef = 0;
-                    for (int j = 0; j < pmap.size(); j++) {
+                    for (size_t j = 0; j < pmap.size(); j++) {
                         int ii = nelonnode[pmap[j]];
                         olddef += ii * ii;
                     }
                     olddef += rule.bonus;
 
                     newdef = 0;
-                    for (int j = 0; j < pmap.size(); j++) {
+                    for (size_t j = 0; j < pmap.size(); j++) {
                         if (rule.reused[j]) {
                             int ii = nelonnode[pmap[j]] + rule.incelsonnode[j];
                             newdef += ii * ii;
@@ -345,11 +345,11 @@ namespace meshit {
 
                     GetNormalVector(surfnr, mesh.Point(pmap[0]), pgi[0], n);
 
-                    for (int j = 0; j < rule.oldels.size(); j++) {
+                    for (size_t j = 0; j < rule.oldels.size(); j++) {
                         bad1 += mesh.SurfaceElement(elmap[j]).CalcJacobianBadness(mesh.Points(), n);
                     }
                     // check new element:
-                    for (int j = 0; j < rule.newels.size(); j++) {
+                    for (size_t j = 0; j < rule.newels.size(); j++) {
                         const Element2d& rnel = rule.newels[j];
                         Element2d nel(rnel.GetNP());
                         for (size_t k = 1; k <= rnel.GetNP(); k++) {
@@ -363,7 +363,7 @@ namespace meshit {
                     if (newdef == olddef && bad2 > bad1) continue;
 
                     // generate new element:
-                    for (int j = 0; j < rule.newels.size(); j++) {
+                    for (size_t j = 0; j < rule.newels.size(); j++) {
                         const Element2d& rnel = rule.newels[j];
                         Element2d nel(rnel.GetNP());
                         nel.SetIndex(faceindex);
@@ -374,10 +374,10 @@ namespace meshit {
                         mesh.AddSurfaceElement(nel);
                     }
 
-                    for (int j = 0; j < rule.oldels.size(); j++)
+                    for (size_t j = 0; j < rule.oldels.size(); j++)
                         mesh.DeleteSurfaceElement(elmap[j]);
 
-                    for (int j = 0; j < pmap.size(); j++)
+                    for (size_t j = 0; j < pmap.size(); j++)
                         nelonnode[pmap[j]] += rule.incelsonnode[j];
 
                     used[ri]++;
@@ -387,8 +387,8 @@ namespace meshit {
 
         mesh.Compress();
 
-        for (int ri = 0; ri < rules.size(); ri++) {
+        for (size_t ri = 0; ri < rules.size(); ri++) {
             MESHIT_LOG_DEBUG("rule " << ri + 1 << " " << mapped[ri] << "/" << used[ri] << " mapped/used");
         }
     }
-}
+}  // namespace meshit

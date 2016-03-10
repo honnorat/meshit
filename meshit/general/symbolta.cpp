@@ -22,18 +22,20 @@ namespace meshit {
 
     void BASE_SYMBOLTABLE::DelNames()
     {
-        for (int i = 0; i < names.size(); i++) {
+        for (size_t i = 0; i < names.size(); i++) {
             delete[] names[i];
         }
         names.resize(0);
     }
 
-    int BASE_SYMBOLTABLE::Index(const char* name) const
+    size_t BASE_SYMBOLTABLE::Index(const char* name) const
     {
-        if (!name) return 0;
-        for (int i = 0; i < names.size(); i++) {
-            if (strcmp(names[i], name) == 0)
-                return i + 1;
+        if (name) {
+            for (size_t i = 0; i < names.size(); i++) {
+                if (strcmp(names[i], name) == 0) {
+                    return i + 1;
+                }
+            }
         }
         return 0;
     }

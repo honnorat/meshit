@@ -20,7 +20,7 @@ namespace meshit {
         TABLE<INDEX_2> hash;
 
      public:
-        explicit BASE_INDEX_2_HASHTABLE(int size)
+        explicit BASE_INDEX_2_HASHTABLE(size_t size)
                 : hash(size) { }
 
         int HashValue(const INDEX_2& ind) const
@@ -28,9 +28,9 @@ namespace meshit {
             return (ind.I1() + ind.I2()) % hash.Size() + 1;
         }
 
-        int Position(int bnr, const INDEX_2& ind) const
+        size_t Position(int bnr, const INDEX_2& ind) const
         {
-            for (int i = 1; i <= hash.EntrySize(bnr); i++) {
+            for (size_t i = 1; i <= hash.EntrySize(bnr); i++) {
                 if (hash.Get(bnr, i) == ind)
                     return i;
             }
@@ -44,7 +44,7 @@ namespace meshit {
         TABLE<T> cont;
 
      public:
-        explicit INDEX_2_HASHTABLE(int size)
+        explicit INDEX_2_HASHTABLE(size_t size)
                 : BASE_INDEX_2_HASHTABLE(size), cont(size) { }
 
         void Set(const INDEX_2& ahash, const T& acont)
@@ -291,34 +291,33 @@ namespace meshit {
     class BASE_INDEX_2_CLOSED_HASHTABLE
     {
      protected:
-        // MoveableArray<INDEX_2> hash;
         Array<INDEX_2> hash;
-        int invalid;
+        INDEX invalid;
 
      public:
-        explicit BASE_INDEX_2_CLOSED_HASHTABLE(int size);
+        explicit BASE_INDEX_2_CLOSED_HASHTABLE(size_t size);
 
-        int Size() const
+        size_t Size() const
         {
             return hash.size();
         }
 
-        int UsedPos(int pos) const
+        size_t UsedPos(size_t pos) const
         {
             return hash[pos - 1].I1() != invalid;
         }
 
-        int UsedElements() const;
+        size_t UsedElements() const;
 
-        int HashValue(const INDEX_2& ind) const
+        size_t HashValue(const INDEX_2& ind) const
         {
             return (ind.I1() + 71 * ind.I2()) % hash.size() + 1;
         }
 
-        int Position(const INDEX_2& ind) const
+        size_t Position(const INDEX_2& ind) const
         {
-            int i = HashValue(ind);
-            while (1) {
+            size_t i = HashValue(ind);
+            while(true) {
                 if (hash[i - 1] == ind) return i;
                 if (hash[i - 1].I1() == invalid) return 0;
                 i++;
@@ -327,25 +326,24 @@ namespace meshit {
         }
 
         // returns 1, if new postion is created
-
-        int PositionCreate(const INDEX_2& ind, int& apos)
+        bool PositionCreate(const INDEX_2& ind, size_t& apos)
         {
-            int i = HashValue(ind);
+            size_t i = HashValue(ind);
             if (hash[i - 1] == ind) {
                 apos = i;
-                return 0;
+                return false;
             }
             if (hash[i - 1].I1() == invalid) {
                 hash[i - 1] = ind;
                 apos = i;
-                return 1;
+                return true;
             }
             return PositionCreate2(ind, apos);
         }
 
      protected:
-        int PositionCreate2(const INDEX_2& ind, int& apos);
-        void BaseSetSize(int asize);
+        bool PositionCreate2(const INDEX_2& ind, size_t& apos);
+        void BaseSetSize(size_t asize);
     };
 
     template<class T>
@@ -382,46 +380,47 @@ namespace meshit {
     {
      protected:
         Array<INDEX_3> hash;
-        int invalid;
+        INDEX invalid;
 
      protected:
-        explicit BASE_INDEX_3_CLOSED_HASHTABLE(int size)
+        explicit BASE_INDEX_3_CLOSED_HASHTABLE(size_t size)
                 : hash(size)
         {
             invalid = -1;
-            for (int i = 0; i < size; i++)
+            for (size_t i = 0; i < size; i++) {
                 hash[i].I1() = invalid;
+            }
         }
 
      public:
-        int Size() const
+        size_t Size() const
         {
             return hash.size();
         }
 
-        bool UsedPos(int pos) const
+        bool UsedPos(size_t pos) const
         {
             return hash[pos].I1() != invalid;
         }
 
-        int HashValue(const INDEX_3& ind) const
+        size_t HashValue(const INDEX_3& ind) const
         {
             return (ind.I1() + 15 * ind.I2() + 41 * ind.I3()) % hash.size();
         }
 
         int Position(const INDEX_3& ind) const
         {
-            int i = HashValue(ind);
-            while (1) {
+            size_t i = HashValue(ind);
+            while (true) {
                 if (hash[i] == ind) return i;
                 if (hash[i].I1() == invalid) return -1;
                 i = (i + 1) % hash.size();
             }
         }
 
-        bool PositionCreate(const INDEX_3& ind, int& apos)
+        bool PositionCreate(const INDEX_3& ind, size_t& apos)
         {
-            int i = HashValue(ind);
+            size_t i = HashValue(ind);
             if (hash[i] == ind) {
                 apos = i;
                 return false;
@@ -435,8 +434,8 @@ namespace meshit {
         }
 
      protected:
-        bool PositionCreate2(const INDEX_3& ind, int& apos);
-        void BaseSetSize(int asize);
+        bool PositionCreate2(const INDEX_3& ind, size_t& apos);
+        void BaseSetSize(size_t asize);
     };
 
     template<class T>
@@ -450,15 +449,10 @@ namespace meshit {
 
         void Set(const INDEX_3& ahash, const T& acont)
         {
-            int pos;
+            size_t pos;
             PositionCreate(ahash, pos);
             hash[pos] = ahash;
             cont[pos] = acont;
-        }
-
-        const T& Get(const INDEX_3& ahash) const
-        {
-            return cont[Position(ahash)];
         }
 
         bool Used(const INDEX_3& ahash) const
@@ -472,7 +466,7 @@ namespace meshit {
             acont = cont[pos];
         }
 
-        void SetSize(int size)
+        void SetSize(size_t size)
         {
             BaseSetSize(size);
             cont.resize(size);
@@ -483,21 +477,20 @@ namespace meshit {
             std::cout << "Hashtable: " << Size()
             << " entries of size " << sizeof(INDEX_3) << " + " << sizeof(T)
             << " = " << Size() * (sizeof(INDEX_3) + sizeof(T)) << " bytes" << std::endl;
-
         }
-
     };
 
     template<typename T>
     inline std::ostream& operator<<(std::ostream& ost, const INDEX_3_CLOSED_HASHTABLE<T>& ht)
     {
-        for (int i = 0; i < ht.Size(); i++)
+        for (int i = 0; i < ht.Size(); i++) {
             if (ht.UsedPos(i)) {
                 INDEX_3 hash;
                 T data;
                 ht.GetData(i, hash, data);
                 ost << "hash = " << hash << ", data = " << data << std::endl;
             }
+        }
         return ost;
     }
 
@@ -599,7 +592,7 @@ namespace meshit {
     inline void INDEX_2_CLOSED_HASHTABLE<T>::
     Set(const INDEX_2& ahash, const T& acont)
     {
-        int pos;
+        size_t pos;
         PositionCreate(ahash, pos);
         hash[pos - 1] = ahash;
         cont[pos - 1] = acont;

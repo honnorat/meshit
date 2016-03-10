@@ -228,7 +228,7 @@ namespace meshit {
         }
 
         // update identification tables
-        for (int i = 1; i <= mesh.GetIdentifications().GetMaxNr(); i++) {
+        for (size_t i = 1; i <= mesh.GetIdentifications().GetMaxNr(); i++) {
             Array<int> identmap;
             mesh.GetIdentifications().GetMap(i, identmap);
 

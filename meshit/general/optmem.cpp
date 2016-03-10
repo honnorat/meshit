@@ -24,7 +24,7 @@ namespace meshit {
 
     BlockAllocator::~BlockAllocator()
     {
-        for (int i = 0; i < bablocks.size(); i++)
+        for (size_t i = 0; i < bablocks.size(); i++)
             delete[] bablocks[i];
     }
 

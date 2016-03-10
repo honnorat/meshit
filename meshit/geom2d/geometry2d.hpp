@@ -129,7 +129,7 @@ namespace meshit {
 
         void PartitionBoundary(MeshingParameters& mp, double h, Mesh& mesh2d);
 
-        void CopyEdgeMesh(int from, int to, Mesh& mesh2d, Point3dTree& searchtree);
+        void CopyEdgeMesh(size_t from, size_t to, Mesh& mesh2d, Point3dTree& searchtree);
 
         void GetMaterial(const int domnr, char*& material);
 
