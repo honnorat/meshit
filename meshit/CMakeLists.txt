@@ -9,7 +9,6 @@ SET(src_GENERAL
 
 SET(src_GEOM2D
     geom2d/genmesh2d.cpp
-    geom2d/geom2dmesh.cpp
     geom2d/geometry2d.cpp)
 
 SET(src_GPRIM

@@ -440,14 +440,6 @@ namespace meshit {
         return "default";
     }
 
-    std::string* SplineGeometry2d::BCNamePtr(const int bcnr)
-    {
-        if (bcnr > (int) bcnames.size())
-            return 0;
-        else
-            return bcnames[bcnr - 1];
-    }
-
     void SplineGeometry2d::GetMaterial(const int domnr, char*& material)
     {
         if ((int) materials.size() >= domnr)
@@ -470,8 +462,4 @@ namespace meshit {
         return 0;
     }
 
-    Refinement& SplineGeometry2d::GetRefinement() const
-    {
-        return *new Refinement2d(*this);
-    }
 }  // namespace meshit

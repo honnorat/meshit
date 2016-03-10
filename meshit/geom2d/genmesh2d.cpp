@@ -4,6 +4,7 @@
 
 #include "../meshing/meshing2.hpp"
 #include "../meshing/global.hpp"
+#include "../meshing/refine.hpp"
 
 namespace meshit {
 

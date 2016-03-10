@@ -13,7 +13,8 @@
 
 #include "../gprim/spline.hpp"
 #include "../gprim/splinegeometry.hpp"
-#include "geom2dmesh.hpp"
+#include "../gprim/geomobjects.hpp"
+#include "../meshing/refine.hpp"
 
 namespace meshit {
 
@@ -159,10 +160,6 @@ namespace meshit {
         }
 
         std::string GetBCName(const int bcnr) const;
-
-        std::string* BCNamePtr(const int bcnr);
-
-        Refinement& GetRefinement() const;
     };
 
 }  // namespace meshit
