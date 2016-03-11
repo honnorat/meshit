@@ -120,7 +120,6 @@ namespace meshit {
                 bool consider3D = false) const;
 
      public:
-
         /// refinement hierarchy
         Array<INDEX_2> mlbetweennodes;
 
@@ -190,16 +189,11 @@ namespace meshit {
 
         void DeleteSurfaceElement(int eli)
         {
-            surfelements[eli - 1].Delete();
-            surfelements[eli - 1].PNum(1) = -1;
-            surfelements[eli - 1].PNum(2) = -1;
-            surfelements[eli - 1].PNum(3) = -1;
+            surfelements[eli].Delete();
+            surfelements[eli].PNum(1) = -1;
+            surfelements[eli].PNum(2) = -1;
+            surfelements[eli].PNum(3) = -1;
             timestamp = NextTimeStamp();
-        }
-
-        void DeleteSurfaceElement(SurfaceElementIndex eli)
-        {
-            DeleteSurfaceElement(int(eli) + 1);
         }
 
         size_t GetNSE() const
@@ -209,20 +203,10 @@ namespace meshit {
 
         Element2d& SurfaceElement(size_t i)
         {
-            return surfelements[i - 1];
-        }
-
-        const Element2d& SurfaceElement(size_t i) const
-        {
-            return surfelements[i - 1];
-        }
-
-        Element2d& SurfaceElement(SurfaceElementIndex i)
-        {
             return surfelements[i];
         }
 
-        const Element2d& SurfaceElement(SurfaceElementIndex i) const
+        const Element2d& SurfaceElement(size_t i) const
         {
             return surfelements[i];
         }
@@ -270,7 +254,7 @@ namespace meshit {
 
         const Segment& GetOpenSegment(int nr)
         {
-            return opensegments[nr - 1];
+            return opensegments[nr];
         }
 
         /**

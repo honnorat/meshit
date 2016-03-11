@@ -103,7 +103,7 @@ namespace meshit {
             lineclass = 1;
         }
 
-        FrontLine(const INDEX_2& al)
+        explicit FrontLine(const INDEX_2& al)
         {
             l = al;
             lineclass = 1;
@@ -152,19 +152,19 @@ namespace meshit {
 
     class AdFront2
     {
-        std::vector<FrontPoint2> points; // front points
-        std::vector<FrontLine> lines;    // front lines
+        std::vector<FrontPoint2> points;  // front points
+        std::vector<FrontLine> lines;     // front lines
 
         Box3d boundingbox;
-        Box3dTree linesearchtree;     // search tree for lines
-        Point3dTree pointsearchtree;  // search tree for points
-        Point3dTree cpointsearchtree; // search tree for cone points (not used ???)
+        Box3dTree linesearchtree;      // search tree for lines
+        Point3dTree pointsearchtree;   // search tree for points
+        Point3dTree cpointsearchtree;  // search tree for cone points (not used ???)
 
         Array<int> delpointl;  // list of deleted front points
         Array<int> dellinel;   // list of deleted front lines
 
-        int nfl; /// number of front lines;
-        INDEX_2_HASHTABLE<int>* allflines; /// all front lines ever have been
+        int nfl;  // number of front lines;
+        INDEX_2_HASHTABLE<int>* allflines;  // all front lines ever have been
 
         std::vector<int> invpindex;
 
@@ -172,8 +172,7 @@ namespace meshit {
         int starti;
 
      public:
-
-        AdFront2(const Box3d& aboundingbox);
+        explicit AdFront2(const Box3d& aboundingbox);
         ~AdFront2();
 
         bool Empty() const
@@ -193,7 +192,7 @@ namespace meshit {
 
         int GetLocals(int baseline,
                       Array<Point3d>& locpoints,
-                      Array<INDEX_2>& loclines, // local index
+                      Array<INDEX_2>& loclines,  // local index
                       Array<int>& pindex,
                       Array<int>& lindex,
                       double xh);
@@ -224,8 +223,7 @@ namespace meshit {
         void SetStartFront();
         void PrintOpenSegments(std::ostream& ost) const;
     };
-
-}
+}  // namespace meshit
 
 #endif
 

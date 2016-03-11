@@ -675,15 +675,6 @@ namespace meshit {
         firstelement = -1;
     }
 
-    int FaceDescriptor::SegmentFits(const Segment& seg)
-    {
-        return
-                surfnr == seg.si &&
-                domin == seg.domin + 1 &&
-                domout == seg.domout + 1 &&
-                tlosurf == seg.tlosurf + 1;
-    }
-
     std::ostream& operator<<(std::ostream& s, const FaceDescriptor& fd)
     {
         s << "surfnr = " << fd.SurfNr()

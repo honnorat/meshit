@@ -81,7 +81,7 @@ namespace meshit {
         oldnf = mesh.GetNSE();
         for (size_t sei = 0; sei < oldnf; sei++) {
             int j, k;
-            const Element2d& el = mesh.SurfaceElement(sei + 1);
+            const Element2d& el = mesh.SurfaceElement(sei);
 
             switch (el.GetType()) {
                 case TRIG:
@@ -145,7 +145,7 @@ namespace meshit {
                         nel.SetIndex(ind);
 
                         if (j == 0)
-                            mesh.SurfaceElement(sei + 1) = nel;
+                            mesh.SurfaceElement(sei) = nel;
                         else
                             mesh.AddSurfaceElement(nel);
                     }

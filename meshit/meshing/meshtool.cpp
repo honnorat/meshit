@@ -13,8 +13,8 @@ namespace meshit {
         INDEX_2 i2;
         int cnt1 = 0, cnt2 = 0;
 
-        for (int i = 1; i <= nf; i++) {
-            for (int j = 1; j <= 3; j++) {
+        for (size_t i = 0; i < nf; i++) {
+            for (size_t j = 1; j <= 3; j++) {
                 i2.I1() = mesh.SurfaceElement(i).PNumMod(j);
                 i2.I2() = mesh.SurfaceElement(i).PNumMod(j + 1);
                 if (edges.Used(i2)) {

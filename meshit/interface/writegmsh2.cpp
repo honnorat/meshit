@@ -91,7 +91,7 @@ namespace meshit {
         }
         //            cnt += ns;
         for (size_t k = 0; k < nse; k++) {
-            const Element2d& el = mesh.SurfaceElement(k+1);
+            const Element2d& el = mesh.SurfaceElement(k);
 
             int elType = 0;
             if (el.GetNP() == 3) elType = GMSH_TRIG;   // GMSH Type for a 3 node triangle

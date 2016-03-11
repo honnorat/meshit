@@ -77,7 +77,7 @@ namespace meshit {
          */
         cnt = 0;
         for (size_t i = 0; i < nse; i++) {
-            const Element2d& el = mesh.SurfaceElement(i + 1);
+            const Element2d& el = mesh.SurfaceElement(i);
             for (size_t j = 0; j < el.GetNV(); j++) {
                 cnt[el[j]]++;
             }
@@ -85,7 +85,7 @@ namespace meshit {
 
         vert2surfelement = new TABLE<int>(cnt);
         for (size_t i = 0; i < nse; i++) {
-            const Element2d& el = mesh.SurfaceElement(i + 1);
+            const Element2d& el = mesh.SurfaceElement(i);
             for (size_t j = 0; j < el.GetNV(); j++) {
                 vert2surfelement->AddSave(el[j], i + 1);
             }
@@ -158,7 +158,7 @@ namespace meshit {
 
                 for (size_t j = 0; j < (*vert2surfelement)[i].size(); j++) {
                     int elnr = (*vert2surfelement)[i][j];
-                    const Element2d& el = mesh.SurfaceElement(elnr);
+                    const Element2d& el = mesh.SurfaceElement(elnr-1);
 
                     size_t neledges = GetNEdges(el.GetType());
                     const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
@@ -197,7 +197,7 @@ namespace meshit {
 
                 for (size_t j = 0; j < (*vert2surfelement)[i].size(); j++) {
                     int elnr = (*vert2surfelement)[i][j];
-                    const Element2d& el = mesh.SurfaceElement(elnr);
+                    const Element2d& el = mesh.SurfaceElement(elnr-1);
 
                     size_t neledges = GetNEdges(el.GetType());
                     const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
@@ -274,29 +274,21 @@ namespace meshit {
 
                     for (size_t j = 0; j < (*vert2surfelement)[v].size(); j++) {
                         int elnr = (*vert2surfelement)[v][j];
-                        const Element2d& el = mesh.SurfaceElement(elnr);
+                        const Element2d& el = mesh.SurfaceElement(elnr-1);
                         const ELEMENT_FACE* elfaces = GetFaces(el.GetType());
 
                         if (elfaces[0][3] == 0) { // triangle
-
-                            int facedir;
-
                             INDEX_3 face(el.PNum(elfaces[0][0]),
                                          el.PNum(elfaces[0][1]),
                                          el.PNum(elfaces[0][2]));
-
-                            facedir = 0;
                             if (face.I1() > face.I2()) {
                                 std::swap(face.I1(), face.I2());
-                                facedir += 1;
                             }
                             if (face.I2() > face.I3()) {
                                 std::swap(face.I2(), face.I3());
-                                facedir += 2;
                             }
                             if (face.I1() > face.I2()) {
                                 std::swap(face.I1(), face.I2());
-                                facedir += 4;
                             }
 
                             if (face.I1() != v) continue;
@@ -310,28 +302,21 @@ namespace meshit {
                             }
                         } else {
                             // quad
-                            int facedir;
-
                             INDEX_4Q face4(el.PNum(elfaces[0][0]),
                                            el.PNum(elfaces[0][1]),
                                            el.PNum(elfaces[0][2]),
                                            el.PNum(elfaces[0][3]));
-
-                            facedir = 0;
                             if (std::min(face4.I1(), face4.I2()) > std::min(face4.I4(), face4.I3())) {
                                 // z - orientation
-                                facedir += 1;
                                 std::swap(face4.I1(), face4.I4());
                                 std::swap(face4.I2(), face4.I3());
                             }
                             if (std::min(face4.I1(), face4.I4()) > std::min(face4.I2(), face4.I3())) {
                                 // x - orientation
-                                facedir += 2;
                                 std::swap(face4.I1(), face4.I2());
                                 std::swap(face4.I3(), face4.I4());
                             }
                             if (face4.I2() > face4.I4()) {
-                                facedir += 4;
                                 std::swap(face4.I2(), face4.I4());
                             }
 

@@ -475,17 +475,18 @@ namespace meshit {
                     mesh[pi1] = pnew;
                     PointGeomInfo gi;
                     Element2d* el1p(NULL);
-                    size_t l = 0;
-                    while (mesh.SurfaceElement(elementsonnode[pi1][l]).IsDeleted() &&
-                           l < elementsonnode.EntrySize(pi1-1)) {
-                        l++;
+                    {
+                        size_t l = 0;
+                        while (mesh.SurfaceElement(elementsonnode[pi1][l]).IsDeleted() &&
+                               l < elementsonnode.EntrySize(pi1 - 1)) {
+                            l++;
+                        }
+                        if (l < elementsonnode.EntrySize(pi1 - 1)) {
+                            el1p = &mesh.SurfaceElement(elementsonnode[pi1][l]);
+                        } else {
+                            MESHIT_LOG_ERROR("MeshOptimize2d::CombineImprove: OOPS!");
+                        }
                     }
-                    if (l < elementsonnode.EntrySize(pi1-1)) {
-                        el1p = &mesh.SurfaceElement(elementsonnode[pi1][l]);
-                    } else {
-                        MESHIT_LOG_ERROR("MeshOptimize2d::CombineImprove: OOPS!");
-                    }
-
                     for (size_t l = 0; l < el1p->GetNP(); l++) {
                         if ((*el1p)[l] == pi1) {
                             gi = el1p->GeomInfoPi(l + 1);

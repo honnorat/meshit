@@ -35,7 +35,7 @@ namespace meshit {
         int olddef, newdef;
 
         Array<ImprovementRule*> rules;
-        Array<SurfaceElementIndex> elmap;
+        Array<size_t> elmap;
         Array<size_t> elrot;
         Array<PointIndex> pmap;
         Array<PointGeomInfo> pgi;
@@ -252,15 +252,15 @@ namespace meshit {
             pmap.resize(rule.onp);
             pgi.resize(rule.onp);
 
-            for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
+            for (size_t sei = 0; sei < ne; sei++) {
 
-                if (mesh.SurfaceElement(sei).IsDeleted()) continue;
+                if (mesh.SurfaceElement(sei+1).IsDeleted()) continue;
 
                 elmap[0] = sei;
                 FlatArray<SurfaceElementIndex> neighbours = nbels[sei];
 
-                for (elrot[0] = 0; elrot[0] < mesh.SurfaceElement(sei).GetNP(); elrot[0]++) {
-                    const Element2d& el0 = mesh.SurfaceElement(sei);
+                for (elrot[0] = 0; elrot[0] < mesh.SurfaceElement(sei+1).GetNP(); elrot[0]++) {
+                    const Element2d& el0 = mesh.SurfaceElement(sei+1);
                     const Element2d& rel0 = rule.oldels[0];
 
                     if (el0.GetIndex() != faceindex) continue;
@@ -346,7 +346,7 @@ namespace meshit {
                     GetNormalVector(surfnr, mesh.Point(pmap[0]), pgi[0], n);
 
                     for (size_t j = 0; j < rule.oldels.size(); j++) {
-                        bad1 += mesh.SurfaceElement(elmap[j]).CalcJacobianBadness(mesh.Points(), n);
+                        bad1 += mesh.SurfaceElement(elmap[j]+1).CalcJacobianBadness(mesh.Points(), n);
                     }
                     // check new element:
                     for (size_t j = 0; j < rule.newels.size(); j++) {

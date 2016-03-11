@@ -138,65 +138,7 @@ namespace meshit {
         return (ost << int(pi));
     }
 
-    class SurfaceElementIndex
-    {
-        int i;
-
-     public:
-        SurfaceElementIndex() { }
-
-        SurfaceElementIndex(int ai) : i{ai} { }
-
-        explicit SurfaceElementIndex(size_t ai) { i = static_cast<int>(ai); }
-
-        SurfaceElementIndex& operator=(const SurfaceElementIndex& ai)
-        {
-            i = ai.i;
-            return *this;
-        }
-
-        SurfaceElementIndex& operator=(int ai)
-        {
-            i = ai;
-            return *this;
-        }
-
-        operator int() const
-        {
-            return i;
-        }
-
-        SurfaceElementIndex& operator++(int)
-        {
-            i++;
-            return *this;
-        }
-
-        SurfaceElementIndex& operator+=(int inc)
-        {
-            i += inc;
-            return *this;
-        }
-
-        SurfaceElementIndex& operator--(int)
-        {
-            i--;
-            return *this;
-        }
-    };
-
-    inline std::istream& operator>>(std::istream& ist, SurfaceElementIndex& pi)
-    {
-        int i;
-        ist >> i;
-        pi = i;
-        return ist;
-    }
-
-    inline std::ostream& operator<<(std::ostream& ost, const SurfaceElementIndex& pi)
-    {
-        return (ost << int(pi));
-    }
+    typedef int SurfaceElementIndex;
 
     /**
        Point in the mesh.
@@ -532,8 +474,6 @@ namespace meshit {
         FaceDescriptor(const FaceDescriptor& other);
 
         ~FaceDescriptor() { }
-
-        int SegmentFits(const Segment& seg);
 
         int SurfNr() const
         {
