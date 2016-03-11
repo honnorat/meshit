@@ -282,6 +282,55 @@ namespace meshit {
                 infile.get(ch);
                 infile.putback(ch);
             }
+            else if (keyword == "materials") {
+                TestComment(infile);
+                int domainnr;
+                char material[100];
+
+                if (!infile.good())
+                    return;
+
+                materials.resize(numdomains);
+                maxh.resize(numdomains);
+                for (int i = 0; i < numdomains; i++)
+                    maxh[i] = 1000;
+                quadmeshing.resize(numdomains, false);
+                tensormeshing.resize(numdomains, false);
+                layer.resize(numdomains, 1);
+
+                TestComment(infile);
+
+                for (int i = 0; i < numdomains; i++)
+                    materials[i] = new char[100];
+
+                for (int i = 0; i < numdomains && infile.good(); i++) {
+                    TestComment(infile);
+                    infile >> domainnr;
+                    infile >> material;
+
+                    strcpy(materials[domainnr - 1], material);
+
+                    Flags flags;
+                    ch = 'a';
+                    infile >> ch;
+                    while (ch == '-') {
+                        char flag[100];
+                        flag[0] = '-';
+                        infile >> (flag + 1);
+                        flags.SetCommandLineFlag(flag);
+                        ch = 'a';
+                        infile >> ch;
+                    }
+
+                    if (infile.good())
+                        infile.putback(ch);
+
+                    maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
+                    if (flags.GetDefineFlag("quad")) quadmeshing[domainnr - 1] = true;
+                    if (flags.GetDefineFlag("tensor")) tensormeshing[domainnr - 1] = true;
+                    layer[domainnr - 1] = static_cast<int>(flags.GetNumFlag("layer", 1));
+                }
+            }
         }
         return;
     }

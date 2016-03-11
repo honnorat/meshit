@@ -22,13 +22,22 @@ int main(int argc, char ** argv) {
     ss << "2    1   -1" << std::endl;
     ss << "3    1    1" << std::endl;
     ss << "4   -1    1" << std::endl;
+    ss << "5   -0.5   -0.5" << std::endl;
+    ss << "6    0.5   -0.5" << std::endl;
+    ss << "7    0.5    0.5" << std::endl;
+    ss << "8   -0.5    0.5" << std::endl;
     ss << "segments" << std::endl;
     ss << "1    0    2    1    2  -bc=1 -maxh=0.05" << std::endl;
     ss << "1    0    2    2    3  -bc=2 " << std::endl;
     ss << "1    0    2    3    4  -bc=3 " << std::endl;
     ss << "1    0    2    4    1  -bc=4 " << std::endl;
+    ss << "2    1    2    5    6  -bc=5 " << std::endl;
+    ss << "2    1    2    6    7  -bc=6 " << std::endl;
+    ss << "2    1    2    7    8  -bc=7 " << std::endl;
+    ss << "2    1    2    8    5  -bc=8 " << std::endl;
     ss << "materials" << std::endl;
-    ss << "1    domain1   -maxh=0.5" << std::endl;
+    ss << "1    domain1   -maxh=0.25" << std::endl;
+    ss << "2    domain2   -maxh=0.08" << std::endl;
     geom.LoadData(ss);
 
     std::cout << "start meshing" << std::endl;
@@ -38,7 +47,7 @@ int main(int argc, char ** argv) {
     mesh.BuildFromSpline2D(geom, mp);
     std::cout << "meshing done" << std::endl;
     meshit::MeshQuality2d(mesh);
-    mesh.Export("square_istream.msh", "Gmsh2 Format");
+    mesh.Export("square_istream.msh");
     mesh.Save("square_istream.meshit");
 
     return 0;
