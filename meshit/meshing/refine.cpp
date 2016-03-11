@@ -24,16 +24,12 @@ namespace meshit {
         // reduce 2nd order
         mesh.ComputeNVertices();
         mesh.SetNP(mesh.GetNV());
-
         INDEX_2_HASHTABLE<PointIndex> between(mesh.GetNP() + 5);
 
-        int oldns, oldnf;
-
         // refine edges
-
         Array<EdgePointGeomInfo> epgi;
 
-        oldns = mesh.GetNSeg();
+        size_t oldns = mesh.GetNSeg();
         for (size_t si = 0; si < oldns; si++) {
             const Segment& el = mesh.LineSegment(si);
 
@@ -44,8 +40,7 @@ namespace meshit {
             if (between.Used(i2)) {
                 pinew = between.Get(i2);
                 ngi = epgi[pinew];
-            }
-            else {
+            } else {
                 Point<3> pnew;
                 PointBetween(mesh.Point(el[0]),
                              mesh.Point(el[1]), 0.5,
@@ -78,7 +73,7 @@ namespace meshit {
             surfgi[i].trignum = -1;
         }
 
-        oldnf = mesh.GetNSE();
+        size_t oldnf = mesh.GetNSE();
         for (size_t sei = 0; sei < oldnf; sei++) {
             int j, k;
             const Element2d& el = mesh.SurfaceElement(sei);
@@ -116,9 +111,9 @@ namespace meshit {
                                      pb, pgi);
 
                         pgis[3 + j] = pgi;
-                        if (between.Used(i2))
+                        if (between.Used(i2)) {
                             pnums[3 + j] = between.Get(i2);
-                        else {
+                        } else {
                             pnums[3 + j] = mesh.AddPoint(pb);
                             between.Set(i2, pnums[3 + j]);
                         }
@@ -230,7 +225,7 @@ namespace meshit {
         // update identification tables
         for (size_t i = 0; i < mesh.GetIdentifications().GetMaxNr(); i++) {
             Array<int> identmap;
-            mesh.GetIdentifications().GetMap(i+1, identmap);
+            mesh.GetIdentifications().GetMap(i + 1, identmap);
 
             for (size_t j = 0; j < between.GetNBags(); j++)
                 for (size_t k = 0; k < between.GetBagSize(j); k++) {
@@ -241,7 +236,7 @@ namespace meshit {
                     oi2.Sort();
                     if (between.Used(oi2)) {
                         PointIndex onewpi = between.Get(oi2);
-                        mesh.GetIdentifications().Add(newpi, onewpi, i+1);
+                        mesh.GetIdentifications().Add(newpi, onewpi, i + 1);
                     }
                 }
 

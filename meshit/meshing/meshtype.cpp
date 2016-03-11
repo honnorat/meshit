@@ -25,8 +25,6 @@ namespace meshit {
         surfnr2 = -1;
         pnums[2] = -1;
         meshdocval = 0;
-
-        bcname = 0;
     }
 
     Segment::Segment(const Segment& other) :
@@ -53,7 +51,6 @@ namespace meshit {
         geominfo[1] = other.geominfo[1];
         epgeominfo[0] = other.epgeominfo[0];
         epgeominfo[1] = other.epgeominfo[1];
-        bcname = other.bcname;
     }
 
     Segment& Segment::operator=(const Segment& other)
@@ -78,7 +75,6 @@ namespace meshit {
             pnums[2] = other.pnums[2];
             meshdocval = other.meshdocval;
             hp_elnr = other.hp_elnr;
-            bcname = other.bcname;
         }
 
         return *this;
@@ -184,7 +180,7 @@ namespace meshit {
         deleted = 0;
     }
 
-    void Element2d::GetBox(const T_POINTS& points, Box3d& box) const
+    void Element2d::GetBox(const Array<MeshPoint>& points, Box3d& box) const
     {
         box.SetPoint(points[pnum[0] - 1]);
         for (unsigned i = 1; i < np; i++) {
@@ -560,7 +556,7 @@ namespace meshit {
         return err;
     }
 
-    double Element2d::CalcJacobianBadness(const T_POINTS& points, const Vec3d& n) const
+    double Element2d::CalcJacobianBadness(const Array<MeshPoint>& points, const Vec3d& n) const
     {
         size_t nip = GetNIP();
         DenseMatrix trans(2, 2);
@@ -639,13 +635,12 @@ namespace meshit {
         surfnr = domin = domout = bcprop = 0;
         domin_singular = domout_singular = 0.;
         tlosurf = -1;
-        bcname = 0;
         firstelement = -1;
     }
 
     FaceDescriptor::FaceDescriptor(const FaceDescriptor& other)
             : surfnr(other.surfnr), domin(other.domin), domout(other.domout),
-              tlosurf(other.tlosurf), bcprop(other.bcprop), bcname(other.bcname),
+              tlosurf(other.tlosurf), bcprop(other.bcprop),
               domin_singular(other.domin_singular), domout_singular(other.domout_singular)
     {
         firstelement = -1;
@@ -659,7 +654,6 @@ namespace meshit {
         tlosurf = tlosurfi;
         bcprop = surfnri;
         domin_singular = domout_singular = 0.;
-        bcname = 0;
         firstelement = -1;
     }
 
@@ -671,7 +665,6 @@ namespace meshit {
         tlosurf = seg.tlosurf + 1;
         bcprop = 0;
         domin_singular = domout_singular = 0.;
-        bcname = 0;
         firstelement = -1;
     }
 
@@ -750,8 +743,8 @@ namespace meshit {
             }
         } else {
             MESHIT_LOG_DEBUG("getmap, identnr = " << identnr);
-            for (int i = 0; i < identifiedpoints_nr->GetNBags(); i++) {
-                for (int j = 0; j < identifiedpoints_nr->GetBagSize(i); j++) {
+            for (size_t i = 0; i < identifiedpoints_nr->GetNBags(); i++) {
+                for (size_t j = 0; j < identifiedpoints_nr->GetBagSize(i); j++) {
                     INDEX_3 i3;
                     int dummy;
                     identifiedpoints_nr->GetData(i, j, i3, dummy);

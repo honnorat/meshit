@@ -36,9 +36,6 @@ namespace meshit {
 
     class Mesh
     {
-     public:
-        typedef ::meshit::T_POINTS T_POINTS;
-
      private:
         /// point coordinates
         T_POINTS points;
@@ -79,9 +76,6 @@ namespace meshit {
         /// sub-domain materials
         Array<char*> materials;
 
-        /// labels for boundary conditions
-        Array<std::string*> bcnames;
-
         /// Periodic surface, close surface, etc. identifications
         Identifications* ident;
 
@@ -96,18 +90,12 @@ namespace meshit {
         /// element -> face, element -> edge etc ...
         class MeshTopology* topology;
 
-        /// space dimension (2 or 3)
-        int dimension;
-
         /// changed by every minor modification (addpoint, ...)
         int timestamp;
 
-        SYMBOLTABLE<Array<int>*> userdata_int;
-        SYMBOLTABLE<Array<double>*> userdata_double;
-
-        mutable Array<Point3d> pointcurves;
-        mutable Array<int> pointcurves_startpoint;
-        mutable Array<double> pointcurves_red, pointcurves_green, pointcurves_blue;
+     public:
+        /// refinement hierarchy
+        Array<INDEX_2> mlbetweennodes;
 
      private:
         void BuildBoundaryEdges(void);
@@ -120,9 +108,6 @@ namespace meshit {
                 bool consider3D = false) const;
 
      public:
-        /// refinement hierarchy
-        Array<INDEX_2> mlbetweennodes;
-
         Mesh();
         ~Mesh();
 
@@ -224,11 +209,6 @@ namespace meshit {
 
         /// Returns number of domains
         int GetNDomains() const;
-
-        int GetDimension() const
-        {
-            return dimension;
-        }
 
         /// sets internal tables
         void CalcSurfacesOfNode();
@@ -343,10 +323,6 @@ namespace meshit {
         }
 
         void SetMaterial(int domnr, const char* mat);
-        void SetNBCNames(int nbcn);
-        void SetBCName(int bcnr, const std::string& abcname);
-
-        const std::string& GetBCName(int bcnr) const;
 
         void ClearFaceDescriptors()
         {
@@ -375,13 +351,6 @@ namespace meshit {
             return *ident;
         }
         /// return periodic, close surface etc. identifications
-
-        void InitPointCurve(double red = 1, double green = 0, double blue = 0) const;
-        void AddPointCurvePoint(const Point3d& pt) const;
-        int GetNumPointCurves(void) const;
-        int GetNumPointsOfPointCurve(int curve) const;
-        Point3d& GetPointCurvePoint(int curve, int n) const;
-        void GetPointCurveColor(int curve, double& red, double& green, double& blue) const;
 
         /// find number of vertices
         void ComputeNVertices();

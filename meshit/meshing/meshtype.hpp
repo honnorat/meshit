@@ -324,7 +324,7 @@ namespace meshit {
             return index;
         };
 
-        void GetBox(const T_POINTS& points, Box3d& box) const;
+        void GetBox(const Array<MeshPoint>& points, Box3d& box) const;
         /// invert orientation
         inline void Invert();
         void Invert2();
@@ -352,7 +352,7 @@ namespace meshit {
         void ComputeIntegrationPointData() const;
 
         double CalcJacobianBadness(const Array<Point2d>& points) const;
-        double CalcJacobianBadness(const T_POINTS& points, const Vec3d& n) const;
+        double CalcJacobianBadness(const Array<MeshPoint>& points, const Vec3d& n) const;
         double CalcJacobianBadnessDirDeriv(const Array<Point2d>& points,
                                            int pi, const Vec2d& dir, double& dd) const;
 
@@ -421,18 +421,10 @@ namespace meshit {
         // int pmid; // for second order
         int meshdocval;
 
-     private:
-        std::string* bcname;
-
      public:
         Segment& operator=(const Segment& other);
 
         int hp_elnr;
-
-        void SetBCName(std::string* abcname)
-        {
-            bcname = abcname;
-        }
 
         PointIndex& operator[](int i)
         {
@@ -460,7 +452,6 @@ namespace meshit {
         /// boundary condition property
         int bcprop;
 
-        std::string* bcname;
         /// root of linked list
         SurfaceElementIndex firstelement;
 
@@ -513,11 +504,6 @@ namespace meshit {
         void SetBCProperty(int bc)
         {
             bcprop = bc;
-        }
-
-        void SetBCName(std::string* bcn)
-        {
-            bcname = bcn;
         }
 
         friend class Mesh;

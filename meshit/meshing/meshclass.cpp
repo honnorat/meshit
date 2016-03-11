@@ -40,15 +40,6 @@ namespace meshit {
         for (size_t i = 0; i < materials.size(); i++) {
             delete[] materials[i];
         }
-        for (size_t i = 0; i < userdata_int.Size(); i++) {
-            delete userdata_int[i];
-        }
-        for (size_t i = 0; i < userdata_double.Size(); i++) {
-            delete userdata_double[i];
-        }
-        for (size_t i = 0; i < bcnames.size(); i++) {
-            if (bcnames[i]) delete bcnames[i];
-        }
     }
 
     Mesh& Mesh::operator=(const Mesh& mesh2)
@@ -58,15 +49,6 @@ namespace meshit {
         surfelements = mesh2.surfelements;
         lockedpoints = mesh2.lockedpoints;
         facedecoding = mesh2.facedecoding;
-
-        bcnames.resize(mesh2.bcnames.size());
-        for (size_t i = 0; i < mesh2.bcnames.size(); i++) {
-            if (mesh2.bcnames[i]) {
-                bcnames[i] = new std::string(*mesh2.bcnames[i]);
-            } else {
-                bcnames[i] = nullptr;
-            }
-        }
 
         return *this;
     }
@@ -123,16 +105,6 @@ namespace meshit {
         int maxsegmentindex = 0;
         for (size_t si = 0; si < GetNSeg(); si++) {
             if (segments[si].si > maxsegmentindex) maxsegmentindex = segments[si].si;
-        }
-
-        SetNBCNames(maxsegmentindex);
-
-        for (int sindex = 0; sindex < maxsegmentindex; sindex++) {
-            SetBCName(sindex, geometry.GetBCName(sindex + 1));
-        }
-
-        for (size_t si = 0; si < GetNSeg(); si++) {
-            segments[si].SetBCName(bcnames[segments[si].si - 1]);
         }
 
         CalcLocalH();
@@ -391,7 +363,7 @@ namespace meshit {
         int invertsurf = 0;  // globflags.GetDefineFlag ("invertsurfacemesh");
 
         outfile << "mesh3d" << "\n";
-        outfile << "dimension\n" << GetDimension() << "\n";
+        outfile << "dimension\n" << 2 << "\n";
         outfile << "geomtype\n" << 0 << "\n";
         outfile << "\n";
         outfile << "# surfnr    bcnr   domin  domout      np      p1      p2      p3" << "\n";
@@ -425,7 +397,7 @@ namespace meshit {
         outfile << "edgesegmentsgi2" << "\n";
         outfile << GetNSeg() << "\n";
 
-        for (int i = 0; i < GetNSeg(); i++) {
+        for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
             outfile.width(8);
             outfile << seg.si;  // 2D: bc number, 3D: wievielte Kante
@@ -527,19 +499,6 @@ namespace meshit {
                 if (materials[i] && strlen(materials[i]))
                     outfile << i + 1 << " " << materials[i] << std::endl;
             }
-        }
-
-        int cntbcnames = 0;
-        for (int ii = 0; ii < bcnames.size(); ii++) {
-            if (bcnames[ii]) cntbcnames++;
-        }
-
-        if (cntbcnames) {
-            outfile << "\n\nbcnames" << std::endl << bcnames.size() << std::endl;
-            for (int i = 0; i < bcnames.size(); i++) {
-                outfile << i + 1 << "\t" << GetBCName(i) << std::endl;
-            }
-            outfile << std::endl << std::endl;
         }
 
         int cnt_sing = 0;
@@ -787,36 +746,6 @@ namespace meshit {
                     std::string mat;
                     infile >> nr >> mat;
                     SetMaterial(nr, mat.c_str());
-                }
-            }
-            if (strcmp(str, "bcnames") == 0) {
-                infile >> n;
-                MESHIT_LOG_DEBUG(n << " bcnames");
-                Array<int> bcnrs(n);
-                SetNBCNames(n);
-                for (int i = 1; i <= n; i++) {
-                    std::string nextbcname;
-                    infile >> bcnrs[i - 1] >> nextbcname;
-                    bcnames[bcnrs[i - 1] - 1] = new std::string(nextbcname);
-                }
-                if (GetDimension() == 2) {
-                    for (int i = 0; i < GetNSeg(); i++) {
-                        Segment& seg = LineSegment(i);
-                        if (seg.si <= n)
-                            seg.SetBCName(bcnames[seg.si - 1]);
-                        else
-                            seg.SetBCName(0);
-                    }
-                } else {
-                    for (size_t sei = 0; sei < GetNSE(); sei++) {
-                        if (surfelements[sei].GetIndex()) {
-                            int bcp = GetFaceDescriptor(surfelements[sei].GetIndex()).BCProperty();
-                            if (bcp <= n)
-                                GetFaceDescriptor(surfelements[sei].GetIndex()).SetBCName(bcnames[bcp - 1]);
-                            else
-                                GetFaceDescriptor(surfelements[sei].GetIndex()).SetBCName(0);
-                        }
-                    }
                 }
             }
             if (strcmp(str, "singular_points") == 0) {
@@ -1692,13 +1621,13 @@ namespace meshit {
         Array<MeshPoint> hpoints;
         BitArrayChar pused(GetNP());
 
-        for (int i = 0; i < surfelements.size(); i++) {
+        for (size_t i = 0; i < surfelements.size(); i++) {
             if (surfelements[i].IsDeleted()) {
                 surfelements.Delete(i);
                 i--;
             }
         }
-        for (int i = 0; i < segments.size(); i++) {
+        for (size_t i = 0; i < segments.size(); i++) {
             if (segments[i][0] <= -1) {
                 segments.Delete(i);
                 i--;
@@ -1706,33 +1635,33 @@ namespace meshit {
         }
         pused.Clear();
 
-        for (int i = 0; i < surfelements.size(); i++) {
+        for (size_t i = 0; i < surfelements.size(); i++) {
             const Element2d& el = surfelements[i];
             for (size_t j = 0; j < el.GetNP(); j++) {
                 pused.Set(el[j]);
             }
         }
 
-        for (int i = 0; i < segments.size(); i++) {
+        for (size_t i = 0; i < segments.size(); i++) {
             const Segment& seg = segments[i];
             pused.Set(seg[0]);
             pused.Set(seg[1]);
         }
 
-        for (int i = 0; i < openelements.size(); i++) {
+        for (size_t i = 0; i < openelements.size(); i++) {
             const Element2d& el = openelements[i];
             for (size_t j = 0; j < el.GetNP(); j++) {
                 pused.Set(el[j]);
             }
         }
 
-        for (int i = 0; i < lockedpoints.size(); i++) {
+        for (size_t i = 0; i < lockedpoints.size(); i++) {
             pused.Set(lockedpoints[i]);
         }
 
         int npi = -1;
 
-        for (PointIndex pi = points.Begin(); pi < points.End(); pi++) {
+        for (size_t pi = points.Begin(); pi < points.End(); pi++) {
             if (pused.Test(pi)) {
                 npi++;
                 op2np[pi] = npi;
@@ -1875,7 +1804,7 @@ namespace meshit {
 
             setree.GetIntersecting(tpmin, tpmax, inters);
 
-            for (int j = 0; j < inters.size(); j++) {
+            for (size_t j = 0; j < inters.size(); j++) {
                 const Element2d& tri2 = SurfaceElement(inters[j] - 1);
 
                 if (points[tri[0]].GetLayer() != points[tri2[0]].GetLayer())
@@ -1895,7 +1824,7 @@ namespace meshit {
 
                 if (IntersectTriangleTriangle(&trip1[0], &trip2[0])) {
                     overlap = 1;
-                    MESHIT_LOG_WARNING("Intersecting elements " << i+1 << " and " << inters[j]);
+                    MESHIT_LOG_WARNING("Intersecting elements " << i + 1 << " and " << inters[j]);
                     MESHIT_LOG_DEBUG(" el1 = " << tri);
                     MESHIT_LOG_DEBUG(" el2 = " << tri2);
 
@@ -1929,7 +1858,7 @@ namespace meshit {
     {
         int ndom = 0;
 
-        for (int k = 0; k < facedecoding.size(); k++) {
+        for (size_t k = 0; k < facedecoding.size(); k++) {
             if (facedecoding[k].DomainIn() > ndom)
                 ndom = facedecoding[k].DomainIn();
             if (facedecoding[k].DomainOut() > ndom)
@@ -1952,23 +1881,20 @@ namespace meshit {
                 delete elementsearchtree;
                 elementsearchtree = NULL;
 
-                int ne = GetNSE();
+                size_t ne = GetNSE();
 
                 if (ne) {
-                    if (dimension == 2) {
-                        Box<3> box(Box<3>::EMPTY_BOX);
-                        for (size_t sei = 0; sei < ne; sei++) {
-                            box.Add(points[surfelements[sei].PNums()]);
-                        }
-                        box.Increase(1.01 * box.Diam());
-                        elementsearchtree = new Box3dTree(box);
-
-                        for (size_t sei = 0; sei < ne; sei++) {
-                            box.Set(points[surfelements[sei].PNums()]);
-                            elementsearchtree->Insert(box, sei + 1);
-                        }
+                    Box<3> box(Box<3>::EMPTY_BOX);
+                    for (size_t sei = 0; sei < ne; sei++) {
+                        box.Add(points[surfelements[sei].PNums()]);
                     }
+                    box.Increase(1.01 * box.Diam());
+                    elementsearchtree = new Box3dTree(box);
 
+                    for (size_t sei = 0; sei < ne; sei++) {
+                        box.Set(points[surfelements[sei].PNums()]);
+                        elementsearchtree->Insert(box, sei + 1);
+                    }
                     elementsearchtreets = GetTimeStamp();
                 }
             }
@@ -2076,7 +2002,7 @@ namespace meshit {
             loctrigs.resize(1);
             loctrigs[0] = SurfaceElement(element);
 
-            for (int j = 0; j < loctrigs.size(); j++) {
+            for (size_t j = 0; j < loctrigs.size(); j++) {
                 const Element2d& el = loctrigs[j];
 
 
@@ -2108,7 +2034,7 @@ namespace meshit {
 
     void Mesh::RebuildSurfaceElementLists()
     {
-        for (int i = 0; i < facedecoding.size(); i++) {
+        for (size_t i = 0; i < facedecoding.size(); i++) {
             facedecoding[i].firstelement = -1;
         }
         for (int i = surfelements.size() - 1; i >= 0; i--) {
@@ -2132,44 +2058,6 @@ namespace meshit {
             }
             si = se.next;
         }
-    }
-
-    void Mesh::InitPointCurve(double red, double green, double blue) const
-    {
-        pointcurves_startpoint.push_back(pointcurves.size());
-        pointcurves_red.push_back(red);
-        pointcurves_green.push_back(green);
-        pointcurves_blue.push_back(blue);
-    }
-
-    void Mesh::AddPointCurvePoint(const Point3d& pt) const
-    {
-        pointcurves.push_back(pt);
-    }
-
-    int Mesh::GetNumPointCurves(void) const
-    {
-        return pointcurves_startpoint.size();
-    }
-
-    int Mesh::GetNumPointsOfPointCurve(int curve) const
-    {
-        if (curve == pointcurves_startpoint.size() - 1)
-            return (pointcurves.size() - pointcurves_startpoint.Last());
-        else
-            return (pointcurves_startpoint[curve + 1] - pointcurves_startpoint[curve]);
-    }
-
-    Point3d& Mesh::GetPointCurvePoint(int curve, int n) const
-    {
-        return pointcurves[pointcurves_startpoint[curve] + n];
-    }
-
-    void Mesh::GetPointCurveColor(int curve, double& red, double& green, double& blue) const
-    {
-        red = pointcurves_red[curve];
-        green = pointcurves_green[curve];
-        blue = pointcurves_blue[curve];
     }
 
     void Mesh::ComputeNVertices()
@@ -2243,38 +2131,6 @@ namespace meshit {
         }
         materials[domnr - 1] = new char[strlen(mat) + 1];
         strcpy(materials[domnr - 1], mat);
-    }
-
-    void Mesh::SetNBCNames(int nbcn)
-    {
-        for (size_t i = 0; i < bcnames.size(); i++) {
-            if (bcnames[i]) {
-                delete bcnames[i];
-            }
-        }
-        bcnames.resize(nbcn);
-        bcnames = 0;
-    }
-
-    void Mesh::SetBCName(int bcnr, const std::string& abcname)
-    {
-        if (bcnames[bcnr]) delete bcnames[bcnr];
-        if (abcname != "default")
-            bcnames[bcnr] = new std::string(abcname);
-        else
-            bcnames[bcnr] = 0;
-    }
-
-    const std::string& Mesh::GetBCName(int bcnr) const
-    {
-        static std::string defaultstring = "default";
-
-        if (!bcnames.size())
-            return defaultstring;
-        if (bcnames[bcnr])
-            return *bcnames[bcnr];
-        else
-            return defaultstring;
     }
 
     void Mesh::PrintMemInfo(std::ostream& ost) const

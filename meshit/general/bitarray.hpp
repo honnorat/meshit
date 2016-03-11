@@ -30,17 +30,17 @@ namespace meshit {
      public:
         BitArrayChar() { }
 
-        explicit BitArrayChar(int asize)
+        explicit BitArrayChar(size_t asize)
                 : data(asize) { }
 
         ~BitArrayChar() { }
 
-        inline int Size() const
+        inline size_t Size() const
         {
             return data.size();
         }
 
-        inline void Set(int i)
+        inline void Set(size_t i)
         {
             data[i] = 1;
         }
@@ -50,7 +50,7 @@ namespace meshit {
             data = 0;
         }
 
-        inline int Test(int i) const
+        inline int Test(size_t i) const
         {
             return data[i];
         }
@@ -69,7 +69,7 @@ namespace meshit {
 
     inline std::ostream& operator<<(std::ostream& s, const BitArrayChar& a)
     {
-        for (int i = 0; i < a.Size(); i++) {
+        for (size_t i = 0; i < a.Size(); i++) {
             s << a.Test(i);
             if (i % 40 == 39) s << "\n";
         }

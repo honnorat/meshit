@@ -99,7 +99,6 @@ namespace meshit {
         std::vector<bool> quadmeshing;
         std::vector<bool> tensormeshing;
         std::vector<int> layer;
-        std::vector<std::string*> bcnames;
         double elto0;
 
      public:
@@ -158,8 +157,6 @@ namespace meshit {
         {
             elto0 = grading;
         }
-
-        std::string GetBCName(const int bcnr) const;
     };
 
 }  // namespace meshit

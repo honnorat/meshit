@@ -28,8 +28,8 @@ namespace meshit {
             faceindex = 0;
         }
 
-        int np = mesh.GetNP();
-        int ne = mesh.GetNSE();
+        size_t np = mesh.GetNP();
+        size_t ne = mesh.GetNSE();
 
         bool ok;
         int olddef, newdef;
@@ -207,13 +207,13 @@ namespace meshit {
             }
         }
 
-        TABLE<int> elonnode(np);
+        TABLE<size_t> elonnode(np);
         Array<int> nelonnode(np);
-        TABLE<SurfaceElementIndex> nbels(ne);
+        TABLE<size_t> nbels(ne);
 
         nelonnode = -4;
 
-        for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
+        for (size_t sei = 0; sei < ne; sei++) {
             const Element2d& el = mesh.SurfaceElement(sei);
 
             if (el.GetIndex() == faceindex && !el.IsDeleted()) {
@@ -226,7 +226,7 @@ namespace meshit {
             }
         }
 
-        for (SurfaceElementIndex sei = 0; sei < ne; sei++) {
+        for (size_t sei = 0; sei < ne; sei++) {
             const Element2d& el = mesh.SurfaceElement(sei);
             if (el.GetIndex() == faceindex && !el.IsDeleted()) {
                 for (size_t j = 0; j < el.GetNP(); j++) {
@@ -257,7 +257,7 @@ namespace meshit {
                 if (mesh.SurfaceElement(sei+1).IsDeleted()) continue;
 
                 elmap[0] = sei;
-                FlatArray<SurfaceElementIndex> neighbours = nbels[sei];
+                FlatArray<size_t> neighbours = nbels[sei];
 
                 for (elrot[0] = 0; elrot[0] < mesh.SurfaceElement(sei+1).GetNP(); elrot[0]++) {
                     const Element2d& el0 = mesh.SurfaceElement(sei+1);

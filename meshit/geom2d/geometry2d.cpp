@@ -15,9 +15,6 @@ namespace meshit {
 
     SplineGeometry2d::~SplineGeometry2d()
     {
-        for (size_t i = 0; i < bcnames.size(); i++) {
-            delete bcnames[i];
-        }
         for (size_t i = 0; i < materials.size(); i++) {
             delete[] materials[i];
         }
@@ -177,7 +174,6 @@ namespace meshit {
             else if (keyword == "segments") {
                 MESHIT_LOG_DEBUG("load segments");
 
-                bcnames.resize(0);
                 infile.get(ch);
                 infile.putback(ch);
                 int i = 0;
@@ -279,69 +275,12 @@ namespace meshit {
                     spex->hmax = flags.GetNumFlag("maxh", 1e99);
                     if (hd != 1) spex->reffak = hd;
 
-                    if (flags.StringFlagDefined("bcname")) {
-                        int mybc = spex->bc - 1;
-                        for (int ii = bcnames.size(); ii <= mybc; ii++)
-                            bcnames.push_back(new std::string("default"));
-                        if (bcnames[mybc]) delete bcnames[mybc];
-                        bcnames[mybc] = new std::string(flags.GetStringFlag("bcname", ""));
-                    }
-
                     TestComment(infile);
                     infile.get(ch);
                     infile.putback(ch);
                 }
                 infile.get(ch);
                 infile.putback(ch);
-            }
-            else if (keyword == "materials") {
-                TestComment(infile);
-                int domainnr;
-                char material[100];
-
-                if (!infile.good())
-                    return;
-
-                materials.resize(numdomains);
-                maxh.resize(numdomains);
-                for (int i = 0; i < numdomains; i++)
-                    maxh[i] = 1000;
-                quadmeshing.resize(numdomains, false);
-                tensormeshing.resize(numdomains, false);
-                layer.resize(numdomains, 1);
-
-                TestComment(infile);
-
-                for (int i = 0; i < numdomains; i++)
-                    materials[i] = new char[100];
-
-                for (int i = 0; i < numdomains && infile.good(); i++) {
-                    TestComment(infile);
-                    infile >> domainnr;
-                    infile >> material;
-
-                    strcpy(materials[domainnr - 1], material);
-
-                    Flags flags;
-                    ch = 'a';
-                    infile >> ch;
-                    while (ch == '-') {
-                        char flag[100];
-                        flag[0] = '-';
-                        infile >> (flag + 1);
-                        flags.SetCommandLineFlag(flag);
-                        ch = 'a';
-                        infile >> ch;
-                    }
-
-                    if (infile.good())
-                        infile.putback(ch);
-
-                    maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
-                    if (flags.GetDefineFlag("quad")) quadmeshing[domainnr - 1] = true;
-                    if (flags.GetDefineFlag("tensor")) tensormeshing[domainnr - 1] = true;
-                    layer[domainnr - 1] = static_cast<int>(flags.GetNumFlag("layer", 1));
-                }
             }
         }
         return;
@@ -431,13 +370,6 @@ namespace meshit {
             materials[i] = new char[1];
             materials[i][0] = '\0';
         }
-    }
-
-    std::string SplineGeometry2d::GetBCName(const int bcnr) const
-    {
-        if ((int) bcnames.size() >= bcnr) if (bcnames[bcnr - 1])
-            return *bcnames[bcnr - 1];
-        return "default";
     }
 
     void SplineGeometry2d::GetMaterial(const int domnr, char*& material)

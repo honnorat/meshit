@@ -98,7 +98,7 @@ namespace meshit {
 
         incl = 0;
 
-        for (SurfaceElementIndex sei = 0; sei < mesh.GetNSE(); sei++) {
+        for (size_t sei = 0; sei < mesh.GetNSE(); sei++) {
             qual = TriangleQualityInst(
                     mesh[mesh.SurfaceElement(sei)[0]],
                     mesh[mesh.SurfaceElement(sei)[1]],
