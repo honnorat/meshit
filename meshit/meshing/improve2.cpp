@@ -355,7 +355,7 @@ namespace meshit {
 
         Array<Vec3d> normals(np);
 
-        for (PointIndex pi = mesh.Points().Begin(); pi < mesh.Points().End(); pi++) {
+        for (PointIndex pi = 0; pi < mesh.Points().size(); pi++) {
             if (elementsonnode[pi].size()) {
                 Element2d& hel = mesh.SurfaceElement(elementsonnode[pi][0]);
                 for (size_t k = 0; k < 3; k++) {

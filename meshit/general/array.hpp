@@ -36,16 +36,6 @@ namespace meshit {
             return _size;
         }
 
-        size_t Begin() const
-        {
-            return 0;
-        }
-
-        size_t End() const
-        {
-            return _size;
-        }
-
         /// Access array.
         T& operator[](size_t i)
         {
@@ -61,13 +51,6 @@ namespace meshit {
         IndirectArray<FlatArray, FlatArray<T2> > operator[](const FlatArray<T2>& ia) const
         {
             return IndirectArray<FlatArray, FlatArray<T2> >(*this, ia);
-        }
-
-        /// access first element
-
-        T& First() const
-        {
-            return _data[0];
         }
 
         /// access last element. check by macro CHECK_RANGE
@@ -182,7 +165,7 @@ namespace meshit {
         }
 
         template<typename T2>
-        void Append(FlatArray<T2> a2)
+        void Append(FlatArray<T2>& a2)
         {
             if (_size + a2.size() > _allocsize)
                 ReSize(_size + a2.size());
@@ -214,7 +197,7 @@ namespace meshit {
         }
 
         /// Delete last element.
-        void DeleteLast()
+        void pop_back()
         {
             _size--;
         }
@@ -329,17 +312,7 @@ namespace meshit {
 
         size_t size() const
         {
-            return ia.Size();
-        }
-
-        size_t Begin() const
-        {
-            return ia.Begin();
-        }
-
-        size_t End() const
-        {
-            return ia.End();
+            return ia.size();
         }
 
         const typename TA1::TELEM& operator[](size_t i) const

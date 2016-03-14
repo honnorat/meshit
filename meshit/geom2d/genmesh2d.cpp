@@ -132,7 +132,7 @@ namespace meshit {
         double lold = 0.0;
         oldmark = pold;
         edgelengthold = 0;
-        Array<size_t> locsearch;
+        std::vector<size_t> locsearch;
 
         for (size_t i = 1; i <= n; i++) {
             double t = static_cast<double>(i) * dt;

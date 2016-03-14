@@ -359,15 +359,15 @@ namespace meshit {
         template<typename T1, typename T2>
         void Set(const IndirectArray<T1, T2>& points)
         {
-            Set(points[points.Begin()]);
-            for (size_t i = points.Begin() + 1; i < points.End(); i++)
+            Set(points[0]);
+            for (size_t i = 1; i < points.size(); i++)
                 Add(points[i]);
         }
 
         template<typename T1, typename T2>
         void Add(const IndirectArray<T1, T2>& points)
         {
-            for (size_t i = points.Begin(); i < points.End(); i++) {
+            for (size_t i = 0; i < points.size(); i++) {
                 Add(points[i]);
             }
         }

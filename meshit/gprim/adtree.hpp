@@ -52,7 +52,7 @@ namespace meshit {
 
         void Insert(const Point<3>& p, int pi);
 
-        void GetIntersecting(const double* bmin, const double* bmax, Array<size_t>& pis) const;
+        void GetIntersecting(const double* bmin, const double* bmax, std::vector<size_t>& pis) const;
 
         void DeleteElement(int pi);
 
@@ -90,7 +90,7 @@ namespace meshit {
         ~ADTree6();
 
         void Insert(const Point<3>& bmin, const Point<3>& bmax, int pi);
-        void GetIntersecting(const double* bmin, const double* bmax, Array<size_t>& pis) const;
+        void GetIntersecting(const double* bmin, const double* bmax, std::vector<size_t>& pis) const;
 
         void DeleteElement(int pi);
 
@@ -130,7 +130,7 @@ namespace meshit {
             tree->DeleteElement(pi);
         }
 
-        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const;
+        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const;
     };
 
     class Box3dTree
@@ -156,7 +156,7 @@ namespace meshit {
             tree->DeleteElement(pi);
         }
 
-        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const;
+        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const;
     };
 
 }  // namespace meshit

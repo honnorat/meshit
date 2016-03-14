@@ -51,14 +51,12 @@ namespace meshit {
 
         if (delpointl.size() != 0) {
             pi = delpointl.Last();
-            delpointl.DeleteLast();
-
+            delpointl.pop_back();
             points[pi] = FrontPoint2(p, globind);
         } else {
             points.push_back(FrontPoint2(p, globind));
             pi = points.size() - 1;
         }
-
         pointsearchtree.Insert(p, pi);
 
         return pi;
@@ -84,7 +82,7 @@ namespace meshit {
 
         if (dellinel.size() != 0) {
             li = dellinel.Last();
-            dellinel.DeleteLast();
+            dellinel.pop_back();
             lines[li] = FrontLine(INDEX_2(pi1, pi2));
         } else {
             lines.push_back(FrontLine(INDEX_2(pi1, pi2)));
@@ -216,8 +214,11 @@ namespace meshit {
         loclines.push_back(lines[baselineindex].L());
         lindex.push_back(baselineindex);
 
-        ArrayMem<size_t, 1000> nearlines(0);
-        ArrayMem<size_t, 1000> nearpoints(0);
+        std::vector<size_t> nearlines;
+        std::vector<size_t> nearpoints;
+
+        nearlines.reserve(1000);
+        nearpoints.reserve(1000);
 
         // dominating costs !!
         const Point<3> pmin = p0 - Vec3d(xh, xh, xh);

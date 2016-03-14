@@ -162,7 +162,7 @@ namespace meshit {
         // test for 3d overlaps
         Box3dTree surfeltree(boundingbox.PMin(), boundingbox.PMax());
 
-        Array<size_t> intersecttrias;
+        std::vector<size_t> intersecttrias;
         Array<Point3d> critpoints;
 
         // test for doubled edges

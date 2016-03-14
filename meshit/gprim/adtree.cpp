@@ -142,7 +142,7 @@ namespace meshit {
 
     void ADTree3::GetIntersecting(const double* bmin,
                                   const double* bmax,
-                                  Array<size_t>& pis) const
+                                  std::vector<size_t>& pis) const
     {
         static Array<ADTreeNode3*> stack(1000);
         static Array<size_t> stackdir(1000);
@@ -355,11 +355,11 @@ namespace meshit {
 
     void ADTree6::GetIntersecting(const double* bmin,
                                   const double* bmax,
-                                  Array<size_t>& pis) const
+                                  std::vector<size_t>& pis) const
     {
-        ArrayMem<inttn6, 10000> stack(10000);
         pis.resize(0);
 
+        std::vector<inttn6> stack(100);
         stack[0].node = root;
         stack[0].dir = 0;
         size_t stacks = 1;
@@ -455,14 +455,10 @@ namespace meshit {
 
     void Point3dTree::Insert(const Point<3>& p, int pi)
     {
-//        double pd[3];
-//        pd[0] = p(0);
-//        pd[1] = p(1);
-//        pd[2] = p(2);
         tree->Insert(p, pi);
     }
 
-    void Point3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const
+    void Point3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const
     {
         double pmi[3], pma[3];
         for (int i = 0; i < 3; i++) {
@@ -503,18 +499,10 @@ namespace meshit {
 
     void Box3dTree::Insert(const Point<3>& bmin, const Point<3>& bmax, int pi)
     {
-//        double tp[6];
-//
-//        for (int i = 0; i < 3; i++) {
-//            tp[i] = bmin(i);
-//            tp[i + 3] = bmax(i);
-//        }
-//
-//        tree->Insert(tp, pi);
         tree->Insert(bmin, bmax, pi);
     }
 
-    void Box3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, Array<size_t>& pis) const
+    void Box3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const
     {
         double tpmin[6];
         double tpmax[6];

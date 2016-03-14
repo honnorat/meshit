@@ -38,7 +38,7 @@ namespace meshit {
     {
      private:
         /// point coordinates
-        T_POINTS points;
+        Array<MeshPoint> points;
 
         /// line-segments at edges
         Array<Segment> segments;
@@ -148,7 +148,7 @@ namespace meshit {
             return points[pi];
         }
 
-        T_POINTS& Points()
+        Array<MeshPoint>& Points()
         {
             return points;
         }
@@ -317,17 +317,7 @@ namespace meshit {
         /// build box-search tree
         void BuildElementSearchTree();
 
-        int AddFaceDescriptor(const FaceDescriptor& fd)
-        {
-            return facedecoding.push_back(fd);
-        }
-
         void SetMaterial(int domnr, const char* mat);
-
-        void ClearFaceDescriptors()
-        {
-            facedecoding.resize(0);
-        }
 
         int GetNFD() const
         {

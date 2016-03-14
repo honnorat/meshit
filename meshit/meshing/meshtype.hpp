@@ -69,75 +69,7 @@ namespace meshit {
         }
     };
 
-    class PointIndex
-    {
-        int i_;
-
-     public:
-
-        PointIndex() : i_{-1} { }
-
-        PointIndex(int ai) : i_{ai} { }
-
-        explicit PointIndex(size_t ai) { i_ = static_cast<int>(ai); }
-
-        PointIndex& operator=(const PointIndex& ai)
-        {
-            i_ = ai.i_;
-            return *this;
-        }
-
-        PointIndex& operator=(int ai)
-        {
-            i_ = ai;
-            return *this;
-        }
-
-        operator int() const
-        {
-            return i_;
-        }
-
-        PointIndex operator++(int)
-        {
-            PointIndex hi(*this);
-            i_++;
-            return hi;
-        }
-
-        PointIndex operator--(int)
-        {
-            PointIndex hi(*this);
-            i_--;
-            return hi;
-        }
-
-        PointIndex operator++()
-        {
-            i_++;
-            return *this;
-        }
-
-        PointIndex operator--()
-        {
-            i_--;
-            return *this;
-        }
-    };
-
-    inline std::istream& operator>>(std::istream& ist, PointIndex& pi)
-    {
-        int i;
-        ist >> i;
-        pi = i;
-        return ist;
-    }
-
-    inline std::ostream& operator<<(std::ostream& ost, const PointIndex& pi)
-    {
-        return (ost << int(pi));
-    }
-
+    typedef int PointIndex;
     typedef int SurfaceElementIndex;
 
     /**
@@ -183,8 +115,6 @@ namespace meshit {
         }
 
     };
-
-    typedef Array<MeshPoint> T_POINTS;
 
     /**
        Triangle element for surface mesh generation.

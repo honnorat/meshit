@@ -44,12 +44,8 @@ namespace meshit {
         double maxerr = 0.5 + 0.3 * tolerance;
         double minelerr = 2 + 0.5 * tolerance * tolerance;
 
-        int noldlp = lpoints.size();
-        int noldll = llines1.size();
-
-        ArrayMem<int, 100> pused(maxlegalpoint), lused(maxlegalline);
-        ArrayMem<int, 100> pnearness(noldlp), lnearness(llines1.size());
-        ArrayMem<int, 20> pmap, pfixed, lmap;
+        size_t noldlp = lpoints.size();
+        size_t noldll = llines1.size();
 
         ArrayMem<Point2d, 100> tempnewpoints;
         ArrayMem<INDEX_2, 100> tempnewlines;
@@ -63,7 +59,8 @@ namespace meshit {
 
         size_t found = 0;  // rule number
 
-        pnearness = 1000;
+        std::vector<int> pnearness(noldlp, 1000);
+        std::vector<int> lnearness(llines1.size());
 
         for (int j = 0; j < 2; j++) {
             pnearness[llines1[0][j] - 1] = 0;
@@ -94,7 +91,7 @@ namespace meshit {
 
         // resort lines after lnearness
         Array<INDEX_2> llines(llines1.size());
-        Array<int> sortlines(llines1.size());
+        std::vector<int> sortlines(llines1.size());
         int lnearness_class[MAX_NEARNESS];
 
         for (int j = 0; j < MAX_NEARNESS; j++) {
@@ -132,19 +129,17 @@ namespace meshit {
             lnearness[i] = pnearness[llines[i][0] - 1] + pnearness[llines[i][1] - 1];
         }
 
-        lused = 0;
-        pused = 0;
-
+        std::vector<int> pused(maxlegalpoint, 0);
+        std::vector<int> lused(maxlegalline, 0);
+        std::vector<int> pmap, pfixed, lmap;
+        
         for (size_t ri = 0; ri < rules.size(); ri++) {
             netrule* rule = rules[ri];
 
             if (rule->GetQuality() > tolerance) continue;
 
-            pmap.resize(rule->GetNP());
-            lmap.resize(rule->GetNL());
-
-            pmap = 0;
-            lmap = 0;
+            pmap.assign(rule->GetNP(), 0);
+            lmap.assign(rule->GetNL(), 0);
 
             lused[0] = 1;
             lmap[0] = 1;
@@ -433,6 +428,11 @@ namespace meshit {
             llines1.Append(tempnewlines);
             dellines.Append(tempdellines);
             elements.Append(tempelements);
+
+//            lpoints.insert( lpoints.end(), tempnewpoints.begin(), tempnewpoints.end() );
+//            llines1.insert( llines1.end(), tempnewlines.begin(), tempnewlines.end() );
+//            dellines.insert( dellines.end(), tempdellines.begin(), tempdellines.end() );
+//            elements.insert( elements.end(), tempelements.begin(), tempelements.end() );
         }
 
         return found;

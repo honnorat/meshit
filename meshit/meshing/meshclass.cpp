@@ -97,9 +97,9 @@ namespace meshit {
             if (segments[si].domout > maxdomnr) maxdomnr = segments[si].domout;
         }
 
-        ClearFaceDescriptors();
+        facedecoding.resize(0);
         for (int i = 1; i <= maxdomnr; i++) {
-            AddFaceDescriptor(FaceDescriptor(i, 0, 0, i));
+            facedecoding.push_back(FaceDescriptor(i, 0, 0, i));
         }
 
         int maxsegmentindex = 0;
@@ -280,7 +280,7 @@ namespace meshit {
     {
         timestamp = NextTimeStamp();
 
-        PointIndex pi = points.End();
+        PointIndex pi = points.size();
         points.push_back(MeshPoint(p, layer, type));
 
         return pi;
@@ -502,13 +502,13 @@ namespace meshit {
         }
 
         int cnt_sing = 0;
-        for (PointIndex pi = points.Begin(); pi < points.End(); pi++) {
+        for (PointIndex pi = 0; pi < points.size(); pi++) {
             if (points[pi].Singularity() >= 1.) cnt_sing++;
         }
 
         if (cnt_sing) {
             outfile << "singular_points" << std::endl << cnt_sing << std::endl;
-            for (PointIndex pi = points.Begin(); pi < points.End(); pi++) {
+            for (PointIndex pi = 0; pi < points.size(); pi++) {
                 if (points[pi].Singularity() >= 1.)
                     outfile << int(pi) << "\t" << points[pi].Singularity() << std::endl;
             }
@@ -628,7 +628,8 @@ namespace meshit {
                         }
                     }
                     if (!faceind) {
-                        faceind = AddFaceDescriptor(FaceDescriptor(surfnr, domin, domout, 0));
+                        facedecoding.push_back(FaceDescriptor(surfnr, domin, domout, 0));
+                        faceind = facedecoding.size();
                         GetFaceDescriptor(faceind).SetBCProperty(bcp);
                     }
 
@@ -988,7 +989,7 @@ namespace meshit {
         INDEX_3_CLOSED_HASHTABLE<INDEX_2> faceht(100);
         openelements.resize(0);
 
-        for (PointIndex pi = points.Begin(); pi < points.End(); pi++) {
+        for (PointIndex pi = 0; pi < points.size(); pi++) {
             if (selsonpoint[pi].size()) {
 
                 faceht.SetSize(2 * selsonpoint[pi].size());
@@ -1071,7 +1072,7 @@ namespace meshit {
             }
             for (size_t j = 1; j <= 3; j++) {
                 PointIndex pi = sel.PNum(j);
-                if (pi < points.End()) {
+                if (pi < points.size()) {
                     points[pi].SetType(FIXEDPOINT);
                 }
             }
@@ -1565,7 +1566,7 @@ namespace meshit {
         pmin = Point3d(1e10, 1e10, 1e10);
         pmax = Point3d(-1e10, -1e10, -1e10);
         if (dom <= 0) {
-            for (PointIndex pi = points.Begin(); pi < points.End(); pi++) {
+            for (PointIndex pi = 0; pi < points.size(); pi++) {
                 pmin.SetToMin(points[pi]);
                 pmax.SetToMax(points[pi]);
             }
@@ -1597,7 +1598,7 @@ namespace meshit {
         pmin = Point3d(1e10, 1e10, 1e10);
         pmax = Point3d(-1e10, -1e10, -1e10);
 
-        for (PointIndex pi = points.Begin(); pi < points.End(); pi++) {
+        for (PointIndex pi = 0; pi < points.size(); pi++) {
             if (points[pi].Type() <= ptyp) {
                 pmin.SetToMin(points[pi]);
                 pmax.SetToMax(points[pi]);
@@ -1661,7 +1662,7 @@ namespace meshit {
 
         int npi = -1;
 
-        for (size_t pi = points.Begin(); pi < points.End(); pi++) {
+        for (size_t pi = 0; pi < points.size(); pi++) {
             if (pused.Test(pi)) {
                 npi++;
                 op2np[pi] = npi;
@@ -1768,7 +1769,7 @@ namespace meshit {
         Point3d pmin, pmax;
         GetBox(pmin, pmax);
         Box3dTree setree(pmin, pmax);
-        Array<size_t> inters;
+        std::vector<size_t> inters;
 
         bool overlap = 0;
         bool incons_layers = 0;

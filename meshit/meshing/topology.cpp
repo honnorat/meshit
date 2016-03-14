@@ -118,13 +118,13 @@ namespace meshit {
 
             // ensure all coarse grid and intermediate level edges
             cnt = 0;
-            for (size_t i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
+            for (size_t i = 0; i < mesh.mlbetweennodes.size(); i++) {
                 INDEX_2 parents = Sort(mesh.mlbetweennodes[i]);
                 if (parents[0] >= 0)
                     cnt[parents[0]]++;
             }
             TABLE<size_t> vert2vertcoarse(cnt);
-            for (size_t i = mesh.mlbetweennodes.Begin(); i < mesh.mlbetweennodes.End(); i++) {
+            for (size_t i = 0; i < mesh.mlbetweennodes.size(); i++) {
                 INDEX_2 parents = Sort(mesh.mlbetweennodes[i]);
                 if (parents[0] > 0)
                     vert2vertcoarse.AddSave(parents[0], parents[1]);
