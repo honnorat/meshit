@@ -83,82 +83,9 @@ namespace meshit {
 
     Element2d::Element2d()
     {
-        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
+        for (int i = 0; i < 3; i++) {
             pnum[i] = 0;
         }
-        np = 3;
-        index = 0;
-        deleted = 0;
-        typ = TRIG;
-    }
-
-    Element2d::Element2d(int anp)
-    {
-        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
-            pnum[i] = 0;
-        }
-        np = anp;
-        index = 0;
-        deleted = 0;
-        switch (np) {
-            case 3:
-                typ = TRIG;
-                break;
-            case 4:
-                typ = QUAD;
-                break;
-            case 6:
-                typ = TRIG6;
-                break;
-            case 8:
-                typ = QUAD8;
-                break;
-            default:
-                MESHIT_LOG_ERROR("Element2d: undefined element type. np = " << np);
-                typ = UNDEFINED;
-                break;
-        }
-    }
-
-    Element2d::Element2d(ELEMENT_TYPE atyp)
-    {
-        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
-            pnum[i] = 0;
-        }
-
-        SetType(atyp);
-
-        index = 0;
-        deleted = 0;
-    }
-
-    Element2d::Element2d(int pi1, int pi2, int pi3)
-    {
-        pnum[0] = pi1;
-        pnum[1] = pi2;
-        pnum[2] = pi3;
-        np = 3;
-        typ = TRIG;
-        pnum[3] = 0;
-        pnum[4] = 0;
-        pnum[5] = 0;
-
-        index = 0;
-        deleted = 0;
-    }
-
-    Element2d::Element2d(int pi1, int pi2, int pi3, int pi4)
-    {
-        pnum[0] = pi1;
-        pnum[1] = pi2;
-        pnum[2] = pi3;
-        pnum[3] = pi4;
-        np = 4;
-        typ = QUAD;
-
-        pnum[4] = 0;
-        pnum[5] = 0;
-
         index = 0;
         deleted = 0;
     }
@@ -166,445 +93,95 @@ namespace meshit {
     void Element2d::GetBox(const Array<MeshPoint>& points, Box3d& box) const
     {
         box.SetPoint(points[pnum[0] - 1]);
-        for (unsigned i = 1; i < np; i++) {
+        for (unsigned i = 1; i < 3; i++) {
             box.AddPoint(points[pnum[i] - 1]);
         }
     }
 
     bool Element2d::operator==(const Element2d& el2) const
     {
-        bool retval = (el2.GetNP() == np);
-        for (int i = 0; retval && i < np; i++) {
+        bool retval = true;
+        for (int i = 0; retval && i < 3; i++) {
             retval = (el2[i] == (*this)[i]);
         }
 
         return retval;
     }
 
-    void Element2d::Invert2()
-    {
-        switch (typ) {
-            case TRIG: {
-                std::swap(pnum[1], pnum[2]);
-                break;
-            }
-            case TRIG6: {
-                std::swap(pnum[1], pnum[2]);
-                std::swap(pnum[4], pnum[5]);
-                break;
-            }
-            case QUAD: {
-                std::swap(pnum[0], pnum[3]);
-                std::swap(pnum[1], pnum[2]);
-                break;
-            }
-            default: {
-                std::cerr << "Element2d::Invert2, illegal element type " << int(typ) << std::endl;
-            }
-        }
-    }
-
-    void Element2d::NormalizeNumbering2()
-    {
-        if (GetNP() == 3) {
-            if (PNum(1) < PNum(2) && PNum(1) < PNum(3))
-                return;
-            else {
-                if (PNum(2) < PNum(3)) {
-                    PointIndex pi1 = PNum(2);
-                    PNum(2) = PNum(3);
-                    PNum(3) = PNum(1);
-                    PNum(1) = pi1;
-                }
-                else {
-                    PointIndex pi1 = PNum(3);
-                    PNum(3) = PNum(2);
-                    PNum(2) = PNum(1);
-                    PNum(1) = pi1;
-                }
-            }
-        }
-        else {
-            int mini = 1;
-            for (size_t i = 2; i <= GetNP(); i++) {
-                if (PNum(i) < PNum(mini)) mini = i;
-            }
-
-            Element2d hel = (*this);
-            for (size_t i = 1; i <= GetNP(); i++) {
-                PNum(i) = hel.PNumMod(i + mini - 1);
-            }
-        }
-    }
-
     Array<IntegrationPointData*> ipdtrig;
-    Array<IntegrationPointData*> ipdquad;
 
-    size_t Element2d::GetNIP() const
-    {
-        size_t nip;
-        switch (np) {
-            case 3:
-                nip = 1;
-                break;
-            case 4:
-                nip = 4;
-                break;
-            default:
-                nip = 0;
-                break;
-        }
-        return nip;
-    }
-
-    void Element2d::GetIntegrationPoint(int ip, Point2d& p, double& weight) const
-    {
-        static double eltriqp[1][3] = {
-                {1.0 / 3.0, 1.0 / 3.0, 0.5}
-        };
-
-        static double elquadqp[4][3] = {
-                {0, 0, 0.25},
-                {0, 1, 0.25},
-                {1, 0, 0.25},
-                {1, 1, 0.25}
-        };
-
-        double* pp = 0;
-        switch (typ) {
-            case TRIG:
-                pp = &eltriqp[0][0];
-                break;
-            case QUAD:
-                pp = &elquadqp[ip - 1][0];
-                break;
-            default:
-                MESHIT_LOG_ERROR("Element2d::GetIntegrationPoint, illegal type " << typ);
-                return;
-        }
-
-        p.X() = pp[0];
-        p.Y() = pp[1];
-        weight = pp[2];
-    }
-
-    void Element2d::GetTransformation(int ip, class DenseMatrix& pmat, class DenseMatrix& trans) const
+    void Element2d::GetTransformation(class DenseMatrix& pmat, class DenseMatrix& trans) const
     {
         ComputeIntegrationPointData();
-        DenseMatrix* dshapep = NULL;
-        switch (typ) {
-            case TRIG:
-                dshapep = &ipdtrig[ip - 1]->dshape;
-                break;
-            case QUAD:
-                dshapep = &ipdquad[ip - 1]->dshape;
-                break;
-            default:
-                MESHIT_LOG_ERROR("Element2d::GetTransformation, illegal type " << typ);
-                return;
-        }
+        DenseMatrix* dshapep = &ipdtrig[0]->dshape;
 
         CalcABt(pmat, *dshapep, trans);
     }
 
-    void Element2d::GetShape(const Point2d& p, Vector& shape) const
-    {
-        if (shape.Size() != GetNP()) {
-            std::cerr << "Element::GetShape: Length not fitting" << std::endl;
-            return;
-        }
-
-        switch (typ) {
-            case TRIG:
-                shape(0) = 1 - p.X() - p.Y();
-                shape(1) = p.X();
-                shape(2) = p.Y();
-                break;
-            case QUAD:
-                shape(0) = (1 - p.X()) * (1 - p.Y());
-                shape(1) = p.X() * (1 - p.Y());
-                shape(2) = p.X() * p.Y();
-                shape(3) = (1 - p.X()) * p.Y();
-                break;
-            default:
-                MESHIT_LOG_ERROR("Element2d::GetShape, illegal type " << typ);
-        }
-    }
-
-    void Element2d::GetDShape(const Point2d& p, DenseMatrix& dshape) const
-    {
-        switch (typ) {
-            case TRIG:
-                dshape.Elem(0, 0) = -1;
-                dshape.Elem(0, 1) = 1;
-                dshape.Elem(0, 2) = 0;
-                dshape.Elem(1, 0) = -1;
-                dshape.Elem(1, 1) = 0;
-                dshape.Elem(1, 2) = 1;
-                break;
-            case QUAD:
-                dshape.Elem(0, 0) = -(1 - p.Y());
-                dshape.Elem(0, 1) = (1 - p.Y());
-                dshape.Elem(0, 2) = p.Y();
-                dshape.Elem(0, 3) = -p.Y();
-                dshape.Elem(1, 0) = -(1 - p.X());
-                dshape.Elem(1, 1) = -p.X();
-                dshape.Elem(1, 2) = p.X();
-                dshape.Elem(1, 3) = (1 - p.X());
-                break;
-
-            default:
-                MESHIT_LOG_ERROR("Element2d::GetDShape, illegal type " << typ);
-        }
-    }
-
-    void Element2d::GetPointMatrix(const Array<Point2d>& points, DenseMatrix& pmat) const
-    {
-        for (size_t i = 0; i < np; i++) {
-            const Point2d& p = points[pnum[i]];
-            pmat.Elem(0, i) = p.X();
-            pmat.Elem(1, i) = p.Y();
-        }
-    }
-
-    double Element2d::CalcJacobianBadness(const Array<Point2d>& points) const
-    {
-        int i, j;
-        int nip = GetNIP();
-        DenseMatrix trans(2, 2);
-        DenseMatrix pmat;
-
-        pmat.SetSize(2, GetNP());
-        GetPointMatrix(points, pmat);
-
-        double err = 0;
-        for (i = 1; i <= nip; i++) {
-            GetTransformation(i, pmat, trans);
-
-            // Frobenius norm
-            double frob = 0;
-            for (j = 1; j <= 4; j++) {
-                double d = trans.Get(j);
-                frob += d * d;
-            }
-            frob = 0.5 * sqrt(frob);
-
-            double det = trans.Det();
-
-            if (det <= 0)
-                err += 1e12;
-            else
-                err += frob * frob / det;
-        }
-
-        err /= nip;
-        return err;
-    }
-
-    static const int qip_table[4][4] = {
-            {0, 1, 0, 3},
-            {0, 1, 1, 2},
-            {3, 2, 0, 3},
-            {3, 2, 1, 2}
-    };
-
-    double Element2d::CalcJacobianBadnessDirDeriv(const Array<Point2d>& points,
-                                                  int pi, const Vec2d& dir, double& dd) const
-    {
-        if (typ == QUAD) {
-            Mat<2, 2> trans, dtrans;
-            Mat<2, 4> vmat, pmat;
-
-            for (int j = 0; j < 4; j++) {
-                const Point2d& p = points[pnum[j]];
-                pmat(0, j) = p.X();
-                pmat(1, j) = p.Y();
-            }
-
-            vmat = 0.0;
-            vmat(0, pi - 1) = dir.X();
-            vmat(1, pi - 1) = dir.Y();
-
-            double err = 0;
-            dd = 0;
-
-            for (int i = 0; i < 4; i++) {
-                int ix1 = qip_table[i][0];
-                int ix2 = qip_table[i][1];
-                int iy1 = qip_table[i][2];
-                int iy2 = qip_table[i][3];
-
-                trans(0, 0) = pmat(0, ix2) - pmat(0, ix1);
-                trans(1, 0) = pmat(1, ix2) - pmat(1, ix1);
-                trans(0, 1) = pmat(0, iy2) - pmat(0, iy1);
-                trans(1, 1) = pmat(1, iy2) - pmat(1, iy1);
-
-                double det = trans(0, 0) * trans(1, 1) - trans(1, 0) * trans(0, 1);
-
-                if (det <= 0) {
-                    dd = 0;
-                    return 1e12;
-                }
-
-                dtrans(0, 0) = vmat(0, ix2) - vmat(0, ix1);
-                dtrans(1, 0) = vmat(1, ix2) - vmat(1, ix1);
-                dtrans(0, 1) = vmat(0, iy2) - vmat(0, iy1);
-                dtrans(1, 1) = vmat(1, iy2) - vmat(1, iy1);
-
-                // Frobenius norm
-                double frob = 0;
-                for (int j = 0; j < 4; j++) {
-                    double d = trans(j);
-                    frob += d * d;
-                }
-                frob = sqrt(frob);
-
-                double dfrob = 0;
-                for (int j = 0; j < 4; j++) {
-                    dfrob += trans(j) * dtrans(j);
-                }
-                dfrob = dfrob / frob;
-
-                frob /= 2;
-                dfrob /= 2;
-
-                // ddet = \sum_j det (m_j)   with m_j = trans, except col j = dtrans
-                double ddet
-                        = dtrans(0, 0) * trans(1, 1) - trans(0, 1) * dtrans(1, 0)
-                          + trans(0, 0) * dtrans(1, 1) - dtrans(0, 1) * trans(1, 0);
-
-                err += frob * frob / det;
-                dd += (2 * frob * dfrob * det - frob * frob * ddet) / (det * det);
-            }
-
-            err /= 4;
-            dd /= 4;
-            return err;
-        }
-
-        int nip = GetNIP();
-        DenseMatrix trans(2, 2), dtrans(2, 2);
-        DenseMatrix pmat, vmat;
-
-        pmat.SetSize(2, GetNP());
-        vmat.SetSize(2, GetNP());
-
-        GetPointMatrix(points, pmat);
-
-        vmat = 0.0;
-        vmat.Elem(0, pi - 1) = dir.X();
-        vmat.Elem(1, pi - 1) = dir.Y();
-
-        double err = 0.0;
-        dd = 0;
-
-        for (int i = 1; i <= nip; i++) {
-            GetTransformation(i, pmat, trans);
-            GetTransformation(i, vmat, dtrans);
-
-            // Frobenius norm
-            double frob = 0;
-            for (int j = 1; j <= 4; j++) {
-                double d = trans.Get(j);
-                frob += d * d;
-            }
-            frob = sqrt(frob);
-
-            double dfrob = 0;
-            for (int j = 1; j <= 4; j++) {
-                dfrob += trans.Get(j) * dtrans.Get(j);
-            }
-            dfrob = dfrob / frob;
-
-            frob /= 2;
-            dfrob /= 2;
-
-            double det = trans(0, 0) * trans(1, 1) - trans(1, 0) * trans(0, 1);
-
-            // ddet = \sum_j det (m_j)   with m_j = trans, except col j = dtrans
-            double ddet
-                    = dtrans(0, 0) * trans(1, 1) - trans(0, 1) * dtrans(1, 0)
-                      + trans(0, 0) * dtrans(1, 1) - dtrans(0, 1) * trans(1, 0);
-
-            if (det <= 0)
-                err += 1e12;
-            else {
-                err += frob * frob / det;
-                dd += (2 * frob * dfrob * det - frob * frob * ddet) / (det * det);
-            }
-        }
-
-        err /= nip;
-        dd /= nip;
-        return err;
-    }
-
     double Element2d::CalcJacobianBadness(const Array<MeshPoint>& points) const
     {
-        size_t nip = GetNIP();
         DenseMatrix trans(2, 2);
         DenseMatrix pmat;
 
-        pmat.SetSize(2, GetNP());
+        pmat.SetSize(2, 3);
 
-        for (size_t i = 0; i < GetNP(); i++) {
+        for (size_t i = 0; i < 3; i++) {
             const Point3d& p = points[PNum(i + 1)];
             pmat.Elem(0, i) = p.Y();
             pmat.Elem(1, i) = -p.X();
         }
 
-        double err = 0;
-        for (size_t i = 1; i <= nip; i++) {
-            GetTransformation(i, pmat, trans);
+        GetTransformation(pmat, trans);
 
-            // Frobenius norm
-            double frob = 0;
-            for (size_t j = 1; j <= 4; j++) {
-                double d = trans.Get(j);
-                frob += d * d;
-            }
-            frob = 0.5 * sqrt(frob);
-
-            double det = trans.Det();
-            if (det <= 0)
-                err += 1e12;
-            else
-                err += frob * frob / det;
+        // Frobenius norm
+        double frob = 0;
+        for (size_t j = 1; j <= 4; j++) {
+            double d = trans.Get(j);
+            frob += d * d;
         }
+        frob = 0.5 * sqrt(frob);
 
-        err /= nip;
+        double err;
+        double det = trans.Det();
+        if (det <= 0)
+            err = 1e12;
+        else
+            err = frob * frob / det;
+
         return err;
     }
 
     void Element2d::ComputeIntegrationPointData() const
     {
-        if (np == 3 && ipdtrig.size()) return;
-        if (np == 4 && ipdquad.size()) return;
+        if (ipdtrig.size()) return;
 
-        for (size_t i = 1; i <= GetNIP(); i++) {
-            IntegrationPointData* ipd = new IntegrationPointData;
-            Point2d hp;
-            GetIntegrationPoint(i, hp, ipd->weight);
-            ipd->p.X() = hp.X();
-            ipd->p.Y() = hp.Y();
-            ipd->p.Z() = 0;
+        IntegrationPointData* ipd = new IntegrationPointData;
+        ipd->p.X() = 1.0 / 3.0;
+        ipd->p.Y() = 1.0 / 3.0;
+        ipd->p.Z() = 0;
+        ipd->weight = 0.5;
 
-            ipd->shape.SetSize(GetNP());
-            ipd->dshape.SetSize(2, GetNP());
+        ipd->shape.SetSize(3);
+        ipd->dshape.SetSize(2, 3);
 
-            GetShape(hp, ipd->shape);
-            GetDShape(hp, ipd->dshape);
+        ipd->shape[0] = 1.0 / 3.0;
+        ipd->shape[1] = 1.0 / 3.0;
+        ipd->shape[2] = 1.0 / 3.0;
 
-            if (np == 3) ipdtrig.push_back(ipd);
-            if (np == 4) ipdquad.push_back(ipd);
-        }
+        ipd->dshape.Elem(0, 0) = -1;
+        ipd->dshape.Elem(0, 1) = 1;
+        ipd->dshape.Elem(0, 2) = 0;
+        ipd->dshape.Elem(1, 0) = -1;
+        ipd->dshape.Elem(1, 1) = 0;
+        ipd->dshape.Elem(1, 2) = 1;
+
+        ipdtrig.push_back(ipd);
     }
 
     std::ostream& operator<<(std::ostream& s, const Element2d& el)
     {
-        s << "np = " << el.GetNP();
-        for (size_t j = 1; j <= el.GetNP(); j++) {
-            s << " " << el.PNum(j);
+        for (size_t j = 0; j < 3; j++) {
+            s << " " << el.PNum(j + 1);
         }
         return s;
     }
@@ -816,7 +393,6 @@ namespace meshit {
         baseelnp = 0;
         sloppy = 1;
 
-        quad = 0;
         badellimit = 175;
         secondorder = 0;
     }
@@ -856,10 +432,7 @@ namespace meshit {
         << " sloppy = " << sloppy << std::endl
         << " badellimit = " << badellimit << std::endl
         << " secondorder = " << secondorder << std::endl
-        << " elementorder = " << elementorder << std::endl
-        << " quad = " << quad << std::endl
-        << " inverttets = " << inverttets << std::endl
-        << " inverttrigs = " << inverttrigs << std::endl;
+        << " elementorder = " << elementorder << std::endl;
     }
 
     void MeshingParameters::CopyFrom(const MeshingParameters& other)
@@ -898,9 +471,6 @@ namespace meshit {
         badellimit = other.badellimit;
         secondorder = other.secondorder;
         elementorder = other.elementorder;
-        quad = other.quad;
-        inverttets = other.inverttets;
-        inverttrigs = other.inverttrigs;
     }
 
     DebugParameters::DebugParameters()

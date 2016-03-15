@@ -17,16 +17,9 @@
 
 namespace meshit {
 
-    enum ELEMENT_TYPE
-    {
-        UNDEFINED = 0, SEGMENT = 1, SEGMENT3 = 2,
-        TRIG = 10, QUAD = 11, TRIG6 = 12, QUAD6 = 13, QUAD8 = 14,
-    };
-
     typedef int ELEMENT_EDGE[2]; // initial point, end point
-    typedef int ELEMENT_FACE[4]; // points, last one is -1 for trig
 
-#define ELEMENT2D_MAXPOINTS 8
+#define ELEMENT2D_MAXPOINTS 3
 
     enum POINTTYPE
     {
@@ -112,13 +105,11 @@ namespace meshit {
     class Element2d
     {
         /// point numbers
-        PointIndex pnum[ELEMENT2D_MAXPOINTS];
+        PointIndex pnum[3];
 
         /// surface nr
         int index : 16;
-        ELEMENT_TYPE typ : 6;
-        /// number of points
-        unsigned int np : 4;
+
         // marked for refinement
         bool deleted : 1; // element is deleted
 
@@ -129,53 +120,6 @@ namespace meshit {
 
      public:
         Element2d();
-        Element2d(int anp);
-        Element2d(ELEMENT_TYPE type);
-        Element2d(int pi1, int pi2, int pi3);
-        Element2d(int pi1, int pi2, int pi3, int pi4);
-
-        ELEMENT_TYPE GetType() const
-        {
-            return typ;
-        }
-
-        void SetType(ELEMENT_TYPE atyp)
-        {
-            typ = atyp;
-            switch (typ) {
-                case TRIG:
-                    np = 3;
-                    break;
-                case QUAD:
-                    np = 4;
-                    break;
-                case TRIG6:
-                    np = 6;
-                    break;
-                case QUAD6:
-                    np = 6;
-                    break;
-                case QUAD8:
-                    np = 8;
-                    break;
-                default:
-                    MESHIT_LOG_ERROR("Element2d::SetType, illegal type " << typ);
-            }
-        }
-
-        size_t GetNP() const
-        {
-            return np;
-        }
-
-        size_t GetNV() const
-        {
-            if (typ == TRIG || typ == TRIG6)
-                return 3;
-            else {
-                return 4;
-            }
-        }
 
         PointIndex& operator[](size_t i)
         {
@@ -189,7 +133,7 @@ namespace meshit {
 
         FlatArray<const PointIndex> PNums() const
         {
-            return FlatArray<const PointIndex>(np, &pnum[0]);
+            return FlatArray<const PointIndex>(3, &pnum[0]);
         }
 
         PointIndex& PNum(size_t i)
@@ -204,12 +148,12 @@ namespace meshit {
 
         PointIndex& PNumMod(size_t i)
         {
-            return pnum[(i - 1) % np];
+            return pnum[(i - 1) % 3];
         }
 
         const PointIndex& PNumMod(size_t i) const
         {
-            return pnum[(i - 1) % np];
+            return pnum[(i - 1) % 3];
         }
 
         void SetIndex(int si)
@@ -225,39 +169,22 @@ namespace meshit {
         void GetBox(const Array<MeshPoint>& points, Box3d& box) const;
         /// invert orientation
         inline void Invert();
-        void Invert2();
         /// first point number is smallest
         inline void NormalizeNumbering();
-        void NormalizeNumbering2();
 
         // friend ostream & operator<<(ostream  & s, const Element2d & el);
         friend class Mesh;
 
-        /// get number of 'integration points'
-        size_t GetNIP() const;
-        void GetIntegrationPoint(int ip, Point2d& p, double& weight) const;
-
-        void GetTransformation(int ip, class DenseMatrix& pmat,
-                               class DenseMatrix& trans) const;
-
-        void GetShape(const Point2d& p, class Vector& shape) const;
-        /// matrix 2 * np
-        void GetDShape(const Point2d& p, class DenseMatrix& dshape) const;
-        /// matrix 2 * np
-        void GetPointMatrix(const Array<Point2d>& points,
-                            class DenseMatrix& pmat) const;
+        void GetTransformation(class DenseMatrix& pmat, class DenseMatrix& trans) const;
 
         void ComputeIntegrationPointData() const;
 
-        double CalcJacobianBadness(const Array<Point2d>& points) const;
         double CalcJacobianBadness(const Array<MeshPoint>& points) const;
-        double CalcJacobianBadnessDirDeriv(const Array<Point2d>& points,
-                                           int pi, const Vec2d& dir, double& dd) const;
 
         void Delete()
         {
             deleted = 1;
-            pnum[0] = pnum[1] = pnum[2] = pnum[3] = -1;
+            pnum[0] = pnum[1] = pnum[2] = -1;
         }
 
         bool IsDeleted() const
@@ -498,10 +425,7 @@ namespace meshit {
         int secondorder;
         /// high order element curvature
         int elementorder;
-        /// quad-dominated surface meshing
-        int quad;
-        int inverttets;
-        int inverttrigs;
+
         MeshingParameters();
         void Print(std::ostream& ost) const;
 
@@ -521,34 +445,27 @@ namespace meshit {
 
     inline void Element2d::Invert()
     {
-        if (typ == TRIG)
-            std::swap(PNum(2), PNum(3));
-        else
-            Invert2();
+        std::swap(pnum[1], pnum[2]);
     }
 
     inline void Element2d::NormalizeNumbering()
     {
-        if (GetNP() == 3) {
-            if (PNum(1) < PNum(2) && PNum(1) < PNum(3))
-                return;
+        if (PNum(1) < PNum(2) && PNum(1) < PNum(3)) {
+            return;
+        } else {
+            if (PNum(2) < PNum(3)) {
+                PointIndex pi1 = PNum(2);
+                PNum(2) = PNum(3);
+                PNum(3) = PNum(1);
+                PNum(1) = pi1;
+            }
             else {
-                if (PNum(2) < PNum(3)) {
-                    PointIndex pi1 = PNum(2);
-                    PNum(2) = PNum(3);
-                    PNum(3) = PNum(1);
-                    PNum(1) = pi1;
-                }
-                else {
-                    PointIndex pi1 = PNum(3);
-                    PNum(3) = PNum(2);
-                    PNum(2) = PNum(1);
-                    PNum(1) = pi1;
-                }
+                PointIndex pi1 = PNum(3);
+                PNum(3) = PNum(2);
+                PNum(2) = PNum(1);
+                PNum(1) = pi1;
             }
         }
-        else
-            NormalizeNumbering2();
     }
 
     /**

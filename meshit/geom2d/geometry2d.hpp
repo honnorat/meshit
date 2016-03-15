@@ -96,8 +96,6 @@ namespace meshit {
      protected:
         std::vector<char*> materials;
         std::vector<double> maxh;
-        std::vector<bool> quadmeshing;
-        std::vector<bool> tensormeshing;
         std::vector<int> layer;
         double elto0;
 
@@ -134,18 +132,6 @@ namespace meshit {
         void GetMaterial(const int domnr, char*& material);
 
         double GetDomainMaxh(const int domnr);
-
-        bool GetDomainQuadMeshing(int domnr)
-        {
-            if (quadmeshing.size()) return quadmeshing[domnr - 1];
-            else return false;
-        }
-
-        bool GetDomainTensorMeshing(int domnr)
-        {
-            if (tensormeshing.size()) return tensormeshing[domnr - 1];
-            else return false;
-        }
 
         int GetDomainLayer(int domnr)
         {

@@ -63,16 +63,8 @@ namespace meshit {
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        for (size_t i = 0; i < seia.size(); i++) {
-            if (mesh.SurfaceElement(seia[i]).GetNP() != 3) {
-                GenericImprove(mesh);
-                return;
-            }
-        }
-
         Array<Neighbour> neighbors(mesh.GetNSE());
         INDEX_2_HASHTABLE<trionedge> other(seia.size() + 2);
-
 
         Array<char> swapped(mesh.GetNSE());
         Array<int> pdef(mesh.GetNP());
@@ -297,13 +289,6 @@ namespace meshit {
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        for (size_t i = 0; i < seia.size(); i++) {
-            if (mesh.SurfaceElement(seia[i]).GetNP() != 3) {
-                MESHIT_LOG_ERROR("exit from CombineImprove ");
-                return;
-            }
-        }
-
         double bad1, bad2;
         Vec3d nv;
 
@@ -314,7 +299,7 @@ namespace meshit {
 
         for (size_t i = 0; i < seia.size(); i++) {
             Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < el.GetNP(); j++)
+            for (size_t j = 0; j < 3; j++)
                 elementsonnode.Add(el[j], seia[i]);
         }
 
@@ -323,7 +308,7 @@ namespace meshit {
 
         for (size_t i = 0; i < seia.size(); i++) {
             Element2d& sel = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < sel.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 PointIndex pi1 = sel.PNumMod(j + 2);
                 PointIndex pi2 = sel.PNumMod(j + 3);
                 if (mesh.IsSegment(pi1, pi2)) {
@@ -439,13 +424,13 @@ namespace meshit {
                         elementsonnode.Add(pi1, elementsonnode[pi2][k]);
 
                         bool haspi1 = 0;
-                        for (size_t l = 0; l < el.GetNP(); l++) {
+                        for (size_t l = 0; l < 3; l++) {
                             if (el[l] == pi1)
                                 haspi1 = 1;
                         }
                         if (haspi1) continue;
 
-                        for (size_t l = 0; l < el.GetNP(); l++) {
+                        for (size_t l = 0; l < 3; l++) {
                             if (el[l] == pi2) {
                                 el[l] = pi1;
                             }

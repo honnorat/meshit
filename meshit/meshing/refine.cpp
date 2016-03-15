@@ -70,122 +70,55 @@ namespace meshit {
             int j, k;
             const Element2d& el = mesh.SurfaceElement(sei);
 
-            switch (el.GetType()) {
-                case TRIG:
-                case TRIG6: {
-                    ArrayMem<PointIndex, 6> pnums(6);
+            ArrayMem<PointIndex, 6> pnums(6);
 
-                    static int betw[3][3] = {
-                            {2, 3, 4},
-                            {1, 3, 5},
-                            {1, 2, 6}
-                    };
+            static int betw[3][3] = {
+                    {2, 3, 4},
+                    {1, 3, 5},
+                    {1, 2, 6}
+            };
 
-                    for (j = 1; j <= 3; j++) {
-                        pnums[j - 1] = el.PNum(j);
-                    }
+            for (j = 1; j <= 3; j++) {
+                pnums[j - 1] = el.PNum(j);
+            }
 
-                    for (j = 0; j < 3; j++) {
-                        PointIndex pi1 = pnums[betw[j][0] - 1];
-                        PointIndex pi2 = pnums[betw[j][1] - 1];
+            for (j = 0; j < 3; j++) {
+                PointIndex pi1 = pnums[betw[j][0] - 1];
+                PointIndex pi2 = pnums[betw[j][1] - 1];
 
-                        INDEX_2 i2(pi1, pi2);
-                        i2.Sort();
+                INDEX_2 i2(pi1, pi2);
+                i2.Sort();
 
-                        Point<3> pb;
-                        PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
+                Point<3> pb;
+                PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
 
-                        if (between.Used(i2)) {
-                            pnums[3 + j] = between.Get(i2);
-                        } else {
-                            pnums[3 + j] = mesh.AddPoint(pb);
-                            between.Set(i2, pnums[3 + j]);
-                        }
-                    }
-
-                    static int reftab[4][3] = {
-                            {1, 6, 5},
-                            {2, 4, 6},
-                            {3, 5, 4},
-                            {6, 4, 5}
-                    };
-
-                    int ind = el.GetIndex();
-                    for (j = 0; j < 4; j++) {
-                        Element2d nel(TRIG);
-                        for (k = 1; k <= 3; k++) {
-                            nel.PNum(k) = pnums[reftab[j][k - 1] - 1];
-                        }
-                        nel.SetIndex(ind);
-
-                        if (j == 0)
-                            mesh.SurfaceElement(sei) = nel;
-                        else
-                            mesh.AddSurfaceElement(nel);
-                    }
-                    break;
+                if (between.Used(i2)) {
+                    pnums[3 + j] = between.Get(i2);
+                } else {
+                    pnums[3 + j] = mesh.AddPoint(pb);
+                    between.Set(i2, pnums[3 + j]);
                 }
-                case QUAD:
-                case QUAD6:
-                case QUAD8: {
-                    ArrayMem<PointIndex, 9> pnums(9);
+            }
 
-                    static int betw[5][3] = {
-                            {1, 2, 5},
-                            {2, 3, 6},
-                            {3, 4, 7},
-                            {1, 4, 8},
-                            {5, 7, 9}
-                    };
+            static int reftab[4][3] = {
+                    {1, 6, 5},
+                    {2, 4, 6},
+                    {3, 5, 4},
+                    {6, 4, 5}
+            };
 
-                    for (j = 1; j <= 4; j++) {
-                        pnums[j - 1] = el.PNum(j);
-                    }
-
-                    for (j = 0; j < 5; j++) {
-                        int pi1 = pnums[betw[j][0] - 1];
-                        int pi2 = pnums[betw[j][1] - 1];
-
-                        INDEX_2 i2(pi1, pi2);
-                        i2.Sort();
-
-                        if (between.Used(i2)) {
-                            pnums[4 + j] = between.Get(i2);
-                        }
-                        else {
-                            Point<3> pb;
-                            PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
-
-                            pnums[4 + j] = mesh.AddPoint(pb);
-
-                            between.Set(i2, pnums[4 + j]);
-                        }
-                    }
-
-                    static int reftab[4][4] = {
-                            {1, 5, 9, 8},
-                            {5, 2, 6, 9},
-                            {8, 9, 7, 4},
-                            {9, 6, 3, 7}
-                    };
-
-                    int ind = el.GetIndex();
-                    for (j = 0; j < 4; j++) {
-                        Element2d nel(QUAD);
-                        for (k = 1; k <= 4; k++) {
-                            nel.PNum(k) = pnums[reftab[j][k - 1] - 1];
-                        }
-                        nel.SetIndex(ind);
-
-                        if (j == 0)
-                            mesh.SurfaceElement(sei) = nel;
-                        else
-                            mesh.AddSurfaceElement(nel);
-                    }
-                    break;
+            int ind = el.GetIndex();
+            for (j = 0; j < 4; j++) {
+                Element2d nel;
+                for (k = 1; k <= 3; k++) {
+                    nel.PNum(k) = pnums[reftab[j][k - 1] - 1];
                 }
-                default:
-                    MESHIT_LOG_ERROR("Refine: undefined surface element type " << int(el.GetType()));
+                nel.SetIndex(ind);
+
+                if (j == 0)
+                    mesh.SurfaceElement(sei) = nel;
+                else
+                    mesh.AddSurfaceElement(nel);
             }
         }
 

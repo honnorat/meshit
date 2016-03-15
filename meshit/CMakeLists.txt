@@ -33,7 +33,6 @@ SET(src_MESHING
     meshing/adfront2.cpp
     meshing/global.cpp
     meshing/improve2.cpp
-    meshing/improve2gen.cpp
     meshing/localh.cpp
     meshing/meshclass.cpp
     meshing/meshing2.cpp
@@ -42,7 +41,6 @@ SET(src_MESHING
     meshing/msghandler.cpp
     meshing/netrule2.cpp
     meshing/parser2.cpp
-    meshing/quadrls.cpp
     meshing/refine.cpp
     meshing/ruler2.cpp
     meshing/smoothing2.cpp

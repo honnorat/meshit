@@ -9,8 +9,7 @@ namespace meshit {
     {
         boundingbox = aboundingbox;
 
-        LoadRules(NULL, mp.quad);
-        // LoadRules ("rules/quad.rls");
+        LoadRules(NULL);
         // LoadRules ("rules/triangle.rls");
 
         adfront = new AdFront2(boundingbox);
@@ -411,7 +410,7 @@ namespace meshit {
 
             for (size_t i = 0; i < locelements.size() && found; i++) {
                 const Element2d& el = locelements[i];
-                for (size_t j = 1; j <= el.GetNP(); j++) {
+                for (size_t j = 1; j <= 3; j++) {
                     if (el.PNum(j) <= oldnp && pindex[el.PNum(j) - 1] == -1) {
                         found = false;
                         MESHIT_LOG_ERROR("meshing2, index missing");
@@ -456,7 +455,7 @@ namespace meshit {
                 for (size_t i = 0; i < locelements.size(); i++) {
                     Point3d pmin = locpoints[locelements[i].PNum(1) - 1];
                     Point3d pmax = pmin;
-                    for (size_t j = 2; j <= locelements[i].GetNP(); j++) {
+                    for (size_t j = 2; j <= 3; j++) {
                         const Point3d& hp =
                                 locpoints[locelements[i].PNum(j) - 1];
                         pmin.SetToMin(hp);
@@ -468,7 +467,7 @@ namespace meshit {
                 }
 
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
+                    for (size_t j = 1; j <= 3; j++) {
                         if (Dist2(locpoints[locelements[i].PNum(j) - 1], pmid) > hinner * hinner)
                             found = false;
                     }
@@ -495,7 +494,7 @@ namespace meshit {
                 Point3d hullmax(-1e10, -1e10, -1e10);
 
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
+                    for (size_t j = 1; j <= 3; j++) {
                         const Point3d& p = locpoints[locelements[i].PNum(j) - 1];
                         hullmin.SetToMin(p);
                         hullmax.SetToMax(p);
@@ -512,46 +511,18 @@ namespace meshit {
                 }
                 for (size_t i = 0; i < locelements.size(); i++) {
                     const Element2d& tri = locelements[i];
-                    if (tri.GetNP() == 3) {
-                        const Point3d& tp1 = locpoints[tri.PNum(1) - 1];
-                        const Point3d& tp2 = locpoints[tri.PNum(2) - 1];
-                        const Point3d& tp3 = locpoints[tri.PNum(3) - 1];
+                    const Point3d& tp1 = locpoints[tri.PNum(1) - 1];
+                    const Point3d& tp2 = locpoints[tri.PNum(2) - 1];
+                    const Point3d& tp3 = locpoints[tri.PNum(3) - 1];
 
-                        Vec3d tv1(tp1, tp2);
-                        Vec3d tv2(tp1, tp3);
+                    Vec3d tv1(tp1, tp2);
+                    Vec3d tv2(tp1, tp3);
 
-                        double lam1, lam2;
-                        for (lam1 = 0.2; lam1 <= 0.8; lam1 += 0.2) {
-                            for (lam2 = 0.2; lam2 + lam1 <= 0.8; lam2 += 0.2) {
-                                Point3d hp = tp1 + lam1 * tv1 + lam2 * tv2;
-                                critpoints.push_back(hp);
-                            }
-                        }
-                    } else if (tri.GetNP() == 4) {
-                        const Point3d& tp1 = locpoints[tri.PNum(1) - 1];
-                        const Point3d& tp2 = locpoints[tri.PNum(2) - 1];
-                        const Point3d& tp3 = locpoints[tri.PNum(3) - 1];
-                        const Point3d& tp4 = locpoints[tri.PNum(4) - 1];
-
-                        double l1, l2;
-                        for (l1 = 0.1; l1 <= 0.9; l1 += 0.1) {
-                            for (l2 = 0.1; l2 <= 0.9; l2 += 0.1) {
-                                Point3d hp;
-                                hp.X() = (1 - l1) * (1 - l2) * tp1.X() +
-                                         l1 * (1 - l2) * tp2.X() +
-                                         l1 * l2 * tp3.X() +
-                                         (1 - l1) * l2 * tp4.X();
-                                hp.Y() = (1 - l1) * (1 - l2) * tp1.Y() +
-                                         l1 * (1 - l2) * tp2.Y() +
-                                         l1 * l2 * tp3.Y() +
-                                         (1 - l1) * l2 * tp4.Y();
-                                hp.Z() = (1 - l1) * (1 - l2) * tp1.Z() +
-                                         l1 * (1 - l2) * tp2.Z() +
-                                         l1 * l2 * tp3.Z() +
-                                         (1 - l1) * l2 * tp4.Z();
-
-                                critpoints.push_back(hp);
-                            }
+                    double lam1, lam2;
+                    for (lam1 = 0.2; lam1 <= 0.8; lam1 += 0.2) {
+                        for (lam2 = 0.2; lam2 + lam1 <= 0.8; lam2 += 0.2) {
+                            Point3d hp = tp1 + lam1 * tv1 + lam2 * tv2;
+                            critpoints.push_back(hp);
                         }
                     }
                 }
@@ -563,42 +534,30 @@ namespace meshit {
                         SurfaceElementIndex j = intersecttrias[jj];
                         const Element2d& el = mesh.SurfaceElement(j);
 
-                        int ntrig = (el.GetNP() == 3) ? 1 : 2;
+                        Point3d tp1, tp2, tp3;
 
-                        int jl;
-                        for (jl = 1; jl <= ntrig; jl++) {
-                            Point3d tp1, tp2, tp3;
+                        tp1 = mesh.Point(el.PNum(1));
+                        tp2 = mesh.Point(el.PNum(2));
+                        tp3 = mesh.Point(el.PNum(3));
 
-                            if (jl == 1) {
-                                tp1 = mesh.Point(el.PNum(1));
-                                tp2 = mesh.Point(el.PNum(2));
-                                tp3 = mesh.Point(el.PNum(3));
+                        Vec3d e1(tp1, tp2);
+                        Vec3d e2(tp1, tp3);
+                        Vec3d n = Cross(e1, e2);
+                        n /= n.Length();
+                        double lam1, lam2, lam3;
+                        lam3 = n * Vec3d(tp1, p);
+                        LocalCoordinates(e1, e2, Vec3d(tp1, p), lam1, lam2);
+
+                        if (fabs(lam3) < 0.1 * hshould &&
+                            lam1 > 0 && lam2 > 0 && (lam1 + lam2) < 1) {
+
+                            for (int k = 1; k <= 5; k++) {
+                                adfront->IncrementClass(lindex[0]);
                             }
-                            else {
-                                tp1 = mesh.Point(el.PNum(1));
-                                tp2 = mesh.Point(el.PNum(3));
-                                tp3 = mesh.Point(el.PNum(4));
-                            }
+                            found = false;
 
-                            Vec3d e1(tp1, tp2);
-                            Vec3d e2(tp1, tp3);
-                            Vec3d n = Cross(e1, e2);
-                            n /= n.Length();
-                            double lam1, lam2, lam3;
-                            lam3 = n * Vec3d(tp1, p);
-                            LocalCoordinates(e1, e2, Vec3d(tp1, p), lam1, lam2);
-
-                            if (fabs(lam3) < 0.1 * hshould &&
-                                lam1 > 0 && lam2 > 0 && (lam1 + lam2) < 1) {
-
-                                for (int k = 1; k <= 5; k++) {
-                                    adfront->IncrementClass(lindex[0]);
-                                }
-                                found = false;
-
-                                if (debugflag || debugparam.haltnosuccess)
-                                    MESHIT_LOG_WARNING("overlapping");
-                            }
+                            if (debugflag || debugparam.haltnosuccess)
+                                MESHIT_LOG_WARNING("overlapping");
                         }
                     }
                 }
@@ -646,11 +605,11 @@ namespace meshit {
                                      pindex[loclines[i].I2() - 1]);
                 }
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    Element2d mtri(locelements[i].GetNP());
+                    Element2d mtri;
                     mtri = locelements[i];
                     mtri.SetIndex(facenr);
 
-                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
+                    for (size_t j = 1; j <= 3; j++) {
                         mtri.PNum(j) = locelements[i].PNum(j) =
                                 adfront->GetGlobalIndex(pindex[locelements[i].PNum(j) - 1]);
                     }
@@ -671,12 +630,6 @@ namespace meshit {
                     double trigarea = Cross(Vec3d(sep1, sep2),
                                             Vec3d(sep1, sep3)).Length() / 2;
 
-                    if (mtri.GetNP() == 4) {
-                        const Point3d& sep4 = mesh.Point(mtri.PNum(4));
-                        trigarea += Cross(Vec3d(sep1, sep3),
-                                          Vec3d(sep1, sep4)).Length() / 2;
-                    }
-
                     meshedarea += trigarea;
 
                     if (maxarea > 0 && meshedarea - meshedarea_before > maxarea) {
@@ -686,7 +639,7 @@ namespace meshit {
                         return MESHING2_GIVEUP;
                     }
 
-                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
+                    for (size_t j = 1; j <= 3; j++) {
 
                         int gpi = locelements[i].PNum(j);
                         int oldts = trigsonnode.size();

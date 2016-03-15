@@ -78,7 +78,7 @@ namespace meshit {
         cnt = 0;
         for (size_t i = 0; i < nse; i++) {
             const Element2d& el = mesh.SurfaceElement(i);
-            for (size_t j = 0; j < el.GetNV(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 cnt[el[j]]++;
             }
         }
@@ -86,7 +86,7 @@ namespace meshit {
         vert2surfelement = new TABLE<int>(cnt);
         for (size_t i = 0; i < nse; i++) {
             const Element2d& el = mesh.SurfaceElement(i);
-            for (size_t j = 0; j < el.GetNV(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 vert2surfelement->AddSave(el[j], i + 1);
             }
         }
@@ -158,12 +158,12 @@ namespace meshit {
 
                 for (size_t j = 0; j < (*vert2surfelement)[i].size(); j++) {
                     int elnr = (*vert2surfelement)[i][j];
-                    const Element2d& el = mesh.SurfaceElement(elnr-1);
+                    const Element2d& el = mesh.SurfaceElement(elnr - 1);
 
-                    size_t neledges = GetNEdges(el.GetType());
-                    const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
-
-                    for (size_t k = 0; k < neledges; k++) {
+                    const ELEMENT_EDGE eledges[3] = {2, 0,
+                                                     1, 2,
+                                                     0, 1};
+                    for (size_t k = 0; k < 3; k++) {
                         INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
                         edge.Sort();
                         if (edge.I1() != i) continue;
@@ -197,12 +197,11 @@ namespace meshit {
 
                 for (size_t j = 0; j < (*vert2surfelement)[i].size(); j++) {
                     int elnr = (*vert2surfelement)[i][j];
-                    const Element2d& el = mesh.SurfaceElement(elnr-1);
-
-                    size_t neledges = GetNEdges(el.GetType());
-                    const ELEMENT_EDGE* eledges = GetEdges(el.GetType());
-
-                    for (size_t k = 0; k < neledges; k++) {
+                    const Element2d& el = mesh.SurfaceElement(elnr - 1);
+                    const ELEMENT_EDGE eledges[3] = {2, 0,
+                                                     1, 2,
+                                                     0, 1};
+                    for (size_t k = 0; k < 3; k++) {
                         INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
 
                         int edgedir = (edge.I1() > edge.I2());
@@ -274,62 +273,27 @@ namespace meshit {
 
                     for (size_t j = 0; j < (*vert2surfelement)[v].size(); j++) {
                         int elnr = (*vert2surfelement)[v][j];
-                        const Element2d& el = mesh.SurfaceElement(elnr-1);
-                        const ELEMENT_FACE* elfaces = GetFaces(el.GetType());
+                        const Element2d& el = mesh.SurfaceElement(elnr - 1);
 
-                        if (elfaces[0][3] == 0) { // triangle
-                            INDEX_3 face(el.PNum(elfaces[0][0]),
-                                         el.PNum(elfaces[0][1]),
-                                         el.PNum(elfaces[0][2]));
-                            if (face.I1() > face.I2()) {
-                                std::swap(face.I1(), face.I2());
-                            }
-                            if (face.I2() > face.I3()) {
-                                std::swap(face.I2(), face.I3());
-                            }
-                            if (face.I1() > face.I2()) {
-                                std::swap(face.I1(), face.I2());
-                            }
+                        INDEX_3 face(el.PNum(1), el.PNum(2), el.PNum(3));
+                        if (face.I1() > face.I2()) {
+                            std::swap(face.I1(), face.I2());
+                        }
+                        if (face.I2() > face.I3()) {
+                            std::swap(face.I2(), face.I3());
+                        }
+                        if (face.I1() > face.I2()) {
+                            std::swap(face.I1(), face.I2());
+                        }
 
-                            if (face.I1() != v) continue;
+                        if (face.I1() != v) continue;
 
-                            if (!vert2face.Used(face)) {
-                                nfa++;
-                                vert2face.Set(face, nfa);
+                        if (!vert2face.Used(face)) {
+                            nfa++;
+                            vert2face.Set(face, nfa);
 
-                                INDEX_4 hface(face.I1(), face.I2(), face.I3(), 0);
-                                face2vert.push_back(hface);
-                            }
-                        } else {
-                            // quad
-                            INDEX_4Q face4(el.PNum(elfaces[0][0]),
-                                           el.PNum(elfaces[0][1]),
-                                           el.PNum(elfaces[0][2]),
-                                           el.PNum(elfaces[0][3]));
-                            if (std::min(face4.I1(), face4.I2()) > std::min(face4.I4(), face4.I3())) {
-                                // z - orientation
-                                std::swap(face4.I1(), face4.I4());
-                                std::swap(face4.I2(), face4.I3());
-                            }
-                            if (std::min(face4.I1(), face4.I4()) > std::min(face4.I2(), face4.I3())) {
-                                // x - orientation
-                                std::swap(face4.I1(), face4.I2());
-                                std::swap(face4.I3(), face4.I4());
-                            }
-                            if (face4.I2() > face4.I4()) {
-                                std::swap(face4.I2(), face4.I4());
-                            }
-
-                            INDEX_3 face(face4.I1(), face4.I2(), face4.I3());
-                            if (face.I1() != v) continue;
-
-                            if (!vert2face.Used(face)) {
-                                nfa++;
-                                vert2face.Set(face, nfa);
-
-                                INDEX_4 hface(face4.I1(), face4.I2(), face4.I3(), face4.I3());
-                                face2vert.push_back(hface);
-                            }
+                            INDEX_4 hface(face.I1(), face.I2(), face.I3(), 0);
+                            face2vert.push_back(hface);
                         }
                     }
 

@@ -235,91 +235,6 @@ namespace meshit {
         }
     };
 
-    class Opti2SurfaceMinFunctionJacobian : public MinFunction
-    {
-        const Mesh& mesh;
-        Opti2dLocalData& ld;
-
-     public:
-        Opti2SurfaceMinFunctionJacobian(const Mesh& amesh, Opti2dLocalData& ald)
-                : mesh(amesh), ld(ald) { }
-
-        virtual double FuncGrad(const Vector& x, Vector& g) const;
-        virtual double FuncDeriv(const Vector& x, const Vector& dir, double& deriv) const;
-        virtual double Func(const Vector& x) const;
-    };
-
-    double Opti2SurfaceMinFunctionJacobian::Func(const Vector& x) const
-    {
-        Vector g(x.Size());
-        return FuncGrad(x, g);
-    }
-
-    double Opti2SurfaceMinFunctionJacobian::FuncGrad(const Vector& x, Vector& grad) const
-    {
-        int lpi, gpi;
-        double badness;
-
-        badness = 0;
-
-        static Array<Point2d> pts2d;
-        pts2d.resize(mesh.GetNP());
-
-        grad = 0;
-
-        for (size_t j = 0; j < ld.locelements.size(); j++) {
-            const Element2d& bel = mesh.SurfaceElement(ld.locelements[j]);
-            lpi = ld.locrots[j];
-            gpi = bel.PNum(lpi);
-
-            for (size_t k = 1; k <= bel.GetNP(); k++) {
-                PointIndex pi = bel.PNum(k);
-                const MeshPoint& mpi = mesh.Point(pi);
-                pts2d[pi] = Point2d((mpi.Y() - ld.sp1.Y()), -(mpi.X() - ld.sp1.X()));
-            }
-            pts2d[gpi] = Point2d(x(0), x(1));
-
-            double hderiv_x, hderiv_y;
-            badness += bel.CalcJacobianBadnessDirDeriv(pts2d, lpi, Vec2d(1, 0), hderiv_x);
-            badness += bel.CalcJacobianBadnessDirDeriv(pts2d, lpi, Vec2d(0, 1), hderiv_y);
-            grad(0) += hderiv_x;
-            grad(1) += hderiv_y;
-        }
-        return badness;
-    }
-
-    double Opti2SurfaceMinFunctionJacobian::
-    FuncDeriv(const Vector& x, const Vector& dir, double& deriv) const
-    {
-        int lpi, gpi;
-
-        static Array<Point2d> pts2d;
-        pts2d.resize(mesh.GetNP());
-
-        double hderiv;
-        double badness = 0;
-        deriv = 0;
-
-        for (size_t j = 0; j < ld.locelements.size(); j++) {
-            lpi = ld.locrots[j];
-            const Element2d& bel = mesh.SurfaceElement(ld.locelements[j]);
-
-            gpi = bel.PNum(lpi);
-
-            for (size_t k = 1; k <= bel.GetNP(); k++) {
-                PointIndex pi = bel.PNum(k);
-                pts2d[pi] = Point2d(ld.t1 * (mesh.Point(pi) - ld.sp1),
-                                    ld.t2 * (mesh.Point(pi) - ld.sp1));
-            }
-            pts2d[gpi] = Point2d(x(0), x(1));
-
-            badness += bel.CalcJacobianBadnessDirDeriv(pts2d, lpi, Vec2d(dir(0), dir(1)), hderiv);
-            deriv += hderiv;
-        }
-
-        return badness;
-    }
-
     MeshOptimize2d::MeshOptimize2d()
     {
         SetFaceIndex(0);
@@ -345,14 +260,6 @@ namespace meshit {
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        bool mixed = 0;
-        for (size_t i = 0; i < seia.size(); i++) {
-            if (mesh.SurfaceElement(seia[i]).GetNP() != 3) {
-                mixed = 1;
-                break;
-            }
-        }
-
         Vector x(2);
 
         Array<MeshPoint> savepoints(mesh.GetNP());
@@ -363,13 +270,13 @@ namespace meshit {
         Array<PointIndex> icompress;
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 compress[el[j]] = -1;
             }
         }
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 if (compress[el[j]] == -1) {
                     compress[el[j]] = icompress.size();
                     icompress.push_back(el[j]);
@@ -380,14 +287,14 @@ namespace meshit {
         cnta = 0;
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 cnta[compress[el[j]]]++;
             }
         }
         TABLE<SurfaceElementIndex> elementsonpoint(cnta);
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 elementsonpoint.Add(compress[el[j]], seia[i]);
             }
         }
@@ -396,8 +303,6 @@ namespace meshit {
         ld.locmetricweight = metricweight;
 
         Opti2SurfaceMinFunction surfminf(mesh, ld);
-        Opti2SurfaceMinFunctionJacobian surfminfj(mesh, ld);
-
         OptiParameters par;
         par.maxit_linsearch = 8;
         par.maxit_bfgs = 5;
@@ -419,7 +324,7 @@ namespace meshit {
                     const Element2d& bel = mesh.SurfaceElement(sei);
                     ld.locelements.push_back(sei);
 
-                    for (size_t k = 1; k <= bel.GetNP(); k++) {
+                    for (size_t k = 1; k <= 3; k++) {
                         if (bel.PNum(k) == pi) {
                             ld.locrots.push_back(k);
                             ld.loc_pnts2.push_back(mesh[bel.PNumMod(k + 1)]);
@@ -440,14 +345,14 @@ namespace meshit {
                 // save points, and project to tangential plane
                 for (size_t j = 0; j < ld.locelements.size(); j++) {
                     const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
-                    for (size_t k = 0; k < el.GetNP(); k++) {
+                    for (size_t k = 0; k < 3; k++) {
                         savepoints[el[k]] = mesh[el[k]];
                     }
                 }
 
                 for (size_t j = 0; j < ld.locelements.size(); j++) {
                     const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
-                    for (size_t k = 0; k < el.GetNP(); k++) {
+                    for (size_t k = 0; k < 3; k++) {
                         PointIndex hhpi = el[k];
                         double lam = ld.normal * (mesh[hhpi] - ld.sp1);
                         mesh.Point(hhpi) -= lam * ld.normal;
@@ -456,18 +361,12 @@ namespace meshit {
 
                 x = 0;
                 par.typx = 0.3 * ld.lochs[0];
-
-                if (mixed) {
-                    BFGS(x, surfminfj, par, 1e-6);
-                } else {
-                    BFGS(x, surfminf, par, 1e-6);
-                }
-
+                BFGS(x, surfminf, par, 1e-6);
 
                 // restore other points
                 for (size_t j = 0; j < ld.locelements.size(); j++) {
                     const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
-                    for (size_t k = 0; k < el.GetNP(); k++) {
+                    for (size_t k = 0; k < 3; k++) {
                         PointIndex hhpi = el[k];
                         if (hhpi != pi) mesh[hhpi] = savepoints[hhpi];
                     }

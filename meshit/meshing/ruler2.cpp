@@ -132,7 +132,7 @@ namespace meshit {
         std::vector<int> pused(maxlegalpoint, 0);
         std::vector<int> lused(maxlegalline, 0);
         std::vector<int> pmap, pfixed, lmap;
-        
+
         for (size_t ri = 0; ri < rules.size(); ri++) {
             netrule* rule = rules[ri];
 
@@ -368,22 +368,14 @@ namespace meshit {
                             // insert new elements:
                             for (size_t i = 0; i < rule->GetNE(); i++) {
                                 elements.push_back(rule->GetElement(i + 1));
-                                for (size_t j = 1; j <= elements[i].GetNP(); j++) {
+                                for (size_t j = 1; j <= 3; j++) {
                                     elements[i].PNum(j) = pmap[elements[i].PNum(j) - 1];
                                 }
                             }
 
                             double elerr = 0;
                             for (size_t i = 1; i <= elements.size(); i++) {
-                                double hf;
-                                if (!mp.quad) {
-                                    hf = CalcElementBadness(lpoints, elements[i - 1]);
-                                } else {
-                                    // FIXME: this seems to be bugged
-//                                    hf = elements[i - 1].CalcJacobianBadness(lpoints) * 5;
-                                    hf = 1.0;
-                                }
-
+                                double hf = CalcElementBadness(lpoints, elements[i - 1]);
                                 if (hf > elerr) elerr = hf;
                             }
 

@@ -32,7 +32,7 @@ namespace meshit {
 
     class SplineGeometry2d;
 
-    /// 2d/3d mesh
+    /// 2d mesh
 
     class Mesh
     {
@@ -148,11 +148,6 @@ namespace meshit {
             return points[pi];
         }
 
-        Array<MeshPoint>& Points()
-        {
-            return points;
-        }
-
         void AddSegment(const Segment& s);
 
         size_t GetNSeg() const
@@ -171,15 +166,6 @@ namespace meshit {
         }
 
         void AddSurfaceElement(const Element2d& el);
-
-        void DeleteSurfaceElement(int eli)
-        {
-            surfelements[eli].Delete();
-            surfelements[eli].PNum(1) = -1;
-            surfelements[eli].PNum(2) = -1;
-            surfelements[eli].PNum(3) = -1;
-            timestamp = NextTimeStamp();
-        }
 
         size_t GetNSE() const
         {
@@ -274,9 +260,6 @@ namespace meshit {
         /// Find bounding box
         void GetBox(Point3d& pmin, Point3d& pmax, int dom = -1) const;
 
-        /// Find bounding box of points of typ ptyp or less
-        void GetBox(Point3d& pmin, Point3d& pmax, POINTTYPE ptyp) const;
-
         int GetNOpenElements() const
         {
             return openelements.size();
@@ -286,9 +269,6 @@ namespace meshit {
         {
             return openelements[i - 1];
         }
-
-        /// are also quads open elements
-        bool HasOpenQuads() const;
 
         /// Refines mesh and projects points to true surface
         // void Refine (int levels, const CSGeometry * geom);
@@ -349,8 +329,6 @@ namespace meshit {
         /// remove edge points
         void SetNP(int np);
 
-        bool PureTrigMesh(int faceindex = 0) const;
-
         void UpdateTopology();
 
         class CSurfaceArea
@@ -365,13 +343,8 @@ namespace meshit {
 
             void Add(const Element2d& sel)
             {
-                if (sel.GetNP() == 3) {
-                    area += Cross(mesh.Point(sel[1]) - mesh.Point(sel[0]),
-                                  mesh.Point(sel[2]) - mesh.Point(sel[0])).Length() / 2;
-                } else {
-                    area += Cross(Vec3d(mesh.Point(sel.PNum(1)), mesh.Point(sel.PNum(3))),
-                                  Vec3d(mesh.Point(sel.PNum(1)), mesh.Point(sel.PNum(4)))).Length() / 2;
-                }
+                area += Cross(mesh.Point(sel[1]) - mesh.Point(sel[0]),
+                              mesh.Point(sel[2]) - mesh.Point(sel[0])).Length() / 2;
             }
 
             double Area() const { return area; }

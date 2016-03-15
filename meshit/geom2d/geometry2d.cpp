@@ -37,9 +37,6 @@ namespace meshit {
 
         infile >> buf;  // file recognition
 
-        tensormeshing.resize(0);
-        quadmeshing.resize(0);
-
         TestComment(infile);
         if (strcmp(buf, "splinecurves2dv2") == 0) {
             LoadData(infile);
@@ -292,10 +289,9 @@ namespace meshit {
 
                 materials.resize(numdomains);
                 maxh.resize(numdomains);
-                for (int i = 0; i < numdomains; i++)
+                for (int i = 0; i < numdomains; i++) {
                     maxh[i] = 1000;
-                quadmeshing.resize(numdomains, false);
-                tensormeshing.resize(numdomains, false);
+                }
                 layer.resize(numdomains, 1);
 
                 TestComment(infile);
@@ -326,8 +322,6 @@ namespace meshit {
                         infile.putback(ch);
 
                     maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
-                    if (flags.GetDefineFlag("quad")) quadmeshing[domainnr - 1] = true;
-                    if (flags.GetDefineFlag("tensor")) tensormeshing[domainnr - 1] = true;
                     layer[domainnr - 1] = static_cast<int>(flags.GetNumFlag("layer", 1));
                 }
             }
@@ -412,7 +406,6 @@ namespace meshit {
         int numdomains = 1;
         materials.resize(numdomains);
         maxh.assign(numdomains, 1000);
-        quadmeshing.assign(numdomains, false);
         layer.assign(numdomains, 1);
 
         for (int i = 0; i < numdomains; i++) {

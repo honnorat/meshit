@@ -47,7 +47,7 @@ namespace meshit {
         virtual ~Meshing2();
 
         /// Load rules, either from file, or compiled rules
-        void LoadRules(const char* filename, bool quad);
+        void LoadRules(const char* filename);
 
         MESHING2_RESULT GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr);
 

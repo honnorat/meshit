@@ -21,8 +21,6 @@ namespace meshit {
         void EdgeSwapping(Mesh& mesh, int usemetric);
         void CombineImprove(Mesh& mesh);
 
-        void GenericImprove(Mesh& mesh);
-
         void SetFaceIndex(int fi)
         {
             faceindex = fi;

@@ -237,9 +237,8 @@ namespace meshit {
                         ist >> ch;  // ','
                     }
                     if (ch == COMMASIGN) {
-                        last.SetType(QUAD);
-                        ist >> last.PNum(4);
-                        ist >> ch; // ','
+                        MESHIT_LOG_FATAL("netrule::LoadRule has just read a QUAD elements. Not supported anymore.");
+                        exit(1);
                     }
                     ist >> ch;
                     while (ch != ';') {
@@ -351,9 +350,8 @@ namespace meshit {
     }
 
     extern const char* triarules[];
-    extern const char* quadrules[];
 
-    void Meshing2::LoadRules(const char* filename, bool quad)
+    void Meshing2::LoadRules(const char* filename)
     {
         char buf[256];
         std::istream* ist;
@@ -362,16 +360,8 @@ namespace meshit {
         if (filename) {
             ist = new std::ifstream(filename);
         } else {
-            /* connect tetrules to one string */
-            const char** hcp;
-
-            if (!quad) {
-                hcp = triarules;
-                MESHIT_LOG_DEBUG("load internal triangle rules");
-            } else {
-                hcp = quadrules;
-                MESHIT_LOG_DEBUG("load internal quad rules");
-            }
+            const char** hcp = triarules;
+            MESHIT_LOG_DEBUG("load internal triangle rules");
 
             size_t len = 0;
             while (*hcp) {
@@ -380,11 +370,7 @@ namespace meshit {
             }
             tr1.reserve(len + 1);
 
-            if (!quad)
-                hcp = triarules;
-            else
-                hcp = quadrules;
-
+            hcp = triarules;
             while (*hcp) {
                 tr1.append(*hcp);
                 hcp++;

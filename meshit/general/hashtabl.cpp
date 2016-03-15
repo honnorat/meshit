@@ -15,30 +15,6 @@
 
 namespace meshit {
 
-    void INDEX_4::Sort()
-    {
-        if (i[0] > i[1]) std::swap(i[0], i[1]);
-        if (i[2] > i[3]) std::swap(i[2], i[3]);
-        if (i[0] > i[2]) std::swap(i[0], i[2]);
-        if (i[1] > i[3]) std::swap(i[1], i[3]);
-        if (i[1] > i[2]) std::swap(i[1], i[2]);
-    }
-
-
-    void INDEX_4Q::Sort()
-    {
-        if (std::min(i[1], i[2]) < std::min(i[0], i[3])) {
-            std::swap(i[0], i[1]);
-            std::swap(i[2], i[3]);
-        }
-        if (i[3] < i[0]) {
-            std::swap(i[0], i[3]);
-            std::swap(i[1], i[2]);
-        }
-        if (i[3] < i[1]) { std::swap(i[1], i[3]); }
-    }
-
-
     std::ostream& operator<<(std::ostream& s, const INDEX_2& i2)
     {
         return s << i2.I1() << ", " << i2.I2();
@@ -47,16 +23,6 @@ namespace meshit {
     std::ostream& operator<<(std::ostream& s, const INDEX_3& i3)
     {
         return s << i3.I1() << ", " << i3.I2() << ", " << i3.I3();
-    }
-
-    std::ostream& operator<<(std::ostream& s, const INDEX_4& i4)
-    {
-        return s << i4.I1() << ", " << i4.I2() << ", " << i4.I3() << ", " << i4.I4();
-    }
-
-    std::ostream& operator<<(std::ostream& s, const INDEX_4Q& i4)
-    {
-        return s << i4.I1() << ", " << i4.I2() << ", " << i4.I3() << ", " << i4.I4();
     }
 
     BASE_INDEX_2_CLOSED_HASHTABLE::

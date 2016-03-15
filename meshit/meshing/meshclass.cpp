@@ -110,107 +110,14 @@ namespace meshit {
         CalcLocalH();
 
         int bnp = GetNP();  // boundary points
-        int hquad = mp.quad;
 
         for (int domnr = 1; domnr <= maxdomnr; domnr++) {
-            if (!geometry.GetDomainTensorMeshing(domnr))
-                continue;
-
-            // tensor product mesh
-            Array<PointIndex> nextpi(bnp);
-            Array<int> si1(bnp), si2(bnp);
-
-            nextpi = -1;
-            si1 = -1;
-            si2 = -1;
-            for (size_t si = 0; si < GetNSeg(); si++) {
-                int p1 = -1, p2 = -2;
-
-                if (segments[si].domin == domnr) {
-                    p1 = segments[si][0];
-                    p2 = segments[si][1];
-                }
-                if (segments[si].domout == domnr) {
-                    p1 = segments[si][1];
-                    p2 = segments[si][0];
-                }
-
-                if (p1 == -1) continue;
-
-                nextpi[p1] = p2;  // counter-clockwise
-
-                int index = segments[si].si;
-                if (si1[p1] != index && si2[p1] != index) {
-                    si2[p1] = si1[p1];
-                    si1[p1] = index;
-                }
-                if (si1[p2] != index && si2[p2] != index) {
-                    si2[p2] = si1[p2];
-                    si1[p2] = index;
-                }
-            }
-
-            PointIndex c1(0), c2, c3, c4;  // 4 corner points
-            size_t nex = 1, ney = 1;
-
-            for (PointIndex pi = 1; pi <= si2.size(); pi++) {
-                if (si2[pi] != -1) {
-                    c1 = pi;
-                    break;
-                }
-            }
-            for (c2 = nextpi[c1]; si2[c2] == -1; c2 = nextpi[c2], nex++) { }
-            for (c3 = nextpi[c2]; si2[c3] == -1; c3 = nextpi[c3], ney++) { }
-            for (c4 = nextpi[c3]; si2[c4] == -1; c4 = nextpi[c4]) { }
-
-            Array<PointIndex> pts((nex + 1) * (ney + 1));  // x ... inner loop
-            pts = -1;
-
-            for (PointIndex pi = c1, i = 0; pi != c2; pi = nextpi[pi], i++) {
-                pts[i] = pi;
-            }
-            for (PointIndex pi = c2, i = 0; pi != c3; pi = nextpi[pi], i++) {
-                pts[(nex + 1) * i + nex] = pi;
-            }
-            for (PointIndex pi = c3, i = 0; pi != c4; pi = nextpi[pi], i++) {
-                pts[(nex + 1) * (ney + 1) - i - 1] = pi;
-            }
-            for (PointIndex pi = c4, i = 0; pi != c1; pi = nextpi[pi], i++) {
-                pts[(nex + 1) * (ney - i)] = pi;
-            }
-
-            for (PointIndex pix = nextpi[c1], ix = 0; pix != c2; pix = nextpi[pix], ix++) {
-                for (PointIndex piy = nextpi[c2], iy = 0; piy != c3; piy = nextpi[piy], iy++) {
-                    ::meshit::Point<3> p = points[pix] + (points[piy] - points[c2]);
-                    pts[(nex + 1) * (iy + 1) + ix + 1] = AddPoint(p, 1, FIXEDPOINT);
-                }
-            }
-
-            for (size_t i = 0; i < ney; i++) {
-                for (size_t j = 0; j < nex; j++) {
-                    Element2d el(QUAD);
-                    el[0] = pts[i * (nex + 1) + j];
-                    el[1] = pts[i * (nex + 1) + j + 1];
-                    el[2] = pts[(i + 1) * (nex + 1) + j + 1];
-                    el[3] = pts[(i + 1) * (nex + 1) + j];
-                    el.SetIndex(domnr);
-                    AddSurfaceElement(el);
-                }
-            }
-        }
-
-        for (int domnr = 1; domnr <= maxdomnr; domnr++) {
-            if (geometry.GetDomainTensorMeshing(domnr))
-                continue;
-
             if (geometry.GetDomainMaxh(domnr) > 0)
                 h = geometry.GetDomainMaxh(domnr);
 
             MESHIT_LOG_DEBUG("Meshing domain " << domnr << " / " << maxdomnr);
 
             int oldnf = GetNSE();
-
-            mp.quad = hquad || geometry.GetDomainQuadMeshing(domnr);
 
             Meshing2 meshing(mp, Box<3>(pmin, pmax));
 
@@ -249,8 +156,6 @@ namespace meshit {
                 SetMaterial(domnr, material);
             }
         }
-
-        mp.quad = hquad;
 
         int hsteps = mp.optsteps2d;
 
@@ -300,13 +205,13 @@ namespace meshit {
         timestamp = NextTimeStamp();
 
         int maxn = el[0];
-        for (size_t i = 1; i < el.GetNP(); i++) {
+        for (size_t i = 1; i < 3; i++) {
             if (el[i] > maxn) maxn = el[i];
         }
         maxn += 1;
 
         if (maxn <= points.size()) {
-            for (size_t i = 0; i < el.GetNP(); i++) {
+            for (size_t i = 0; i < 3; i++) {
                 if (points[el[i]].Type() > SURFACEPOINT)
                     points[el[i]].SetType(SURFACEPOINT);
             }
@@ -380,8 +285,8 @@ namespace meshit {
             if (invertsurf)
                 sel.Invert();
 
-            outfile << " " << sel.GetNP();
-            for (size_t j = 0; j < sel.GetNP(); j++) {
+            outfile << " " << 3;
+            for (size_t j = 0; j < 3; j++) {
                 outfile << " " << sel[j];
             }
             outfile << "\n";
@@ -632,7 +537,12 @@ namespace meshit {
                     infile >> nep;
                     if (!nep) nep = 3;
 
-                    Element2d tri(nep);
+                    if ( nep != 3 ) {
+                        MESHIT_LOG_FATAL("Mesh::Load: undefined element type. nep = " << nep << ". Aborting");
+                        exit(1);
+                    }
+
+                    Element2d tri;
                     tri.SetIndex(faceind);
 
                     for (int j = 1; j <= nep; j++) {
@@ -815,32 +725,18 @@ namespace meshit {
             const Element2d& sel = surfelements[sei];
             if (sel.IsDeleted()) continue;
 
-            // int si = sel.GetIndex();
-
-            if (sel.GetNP() <= 4) {
-                for (size_t j = 0; j < sel.GetNP(); j++) {
-                    INDEX_2 i2;
-                    i2.I1() = sel.PNumMod(j + 1);
-                    i2.I2() = sel.PNumMod(j + 2);
-                    i2.Sort();
-                    boundaryedges->Set(i2, 1);
-                }
-            } else if (sel.GetType() == TRIG6) {
-                for (int j = 0; j < 3; j++) {
-                    INDEX_2 i2;
-                    i2.I1() = sel[j];
-                    i2.I2() = sel[(j + 1) % 3];
-                    i2.Sort();
-                    boundaryedges->Set(i2, 1);
-                }
-            } else {
-                MESHIT_LOG_ERROR("illegal elemenet for buildboundaryedges");
+            for (size_t j = 0; j < 3; j++) {
+                INDEX_2 i2;
+                i2.I1() = sel.PNumMod(j + 1);
+                i2.I2() = sel.PNumMod(j + 2);
+                i2.Sort();
+                boundaryedges->Set(i2, 1);
             }
         }
 
         for (int i = 0; i < openelements.size(); i++) {
             const Element2d& sel = openelements[i];
-            for (size_t j = 0; j < sel.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 INDEX_2 i2;
                 i2.I1() = sel.PNumMod(j + 1);
                 i2.I2() = sel.PNumMod(j + 2);
@@ -878,7 +774,7 @@ namespace meshit {
 
             int si = sel.GetIndex();
 
-            for (size_t j = 0; j < sel.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
                 bool found = 0;
                 for (int k = 0; k < surfacesonnode[pi].size(); k++) {
@@ -953,7 +849,7 @@ namespace meshit {
             if (hasface[ind - 1]) {
                 const Element2d& hel = surfelements[sii];
                 int mini = 0;
-                for (size_t j = 1; j < hel.GetNP(); j++) {
+                for (size_t j = 1; j < 3; j++) {
                     if (hel[j] < hel[mini]) {
                         mini = j;
                     }
@@ -969,7 +865,7 @@ namespace meshit {
             if (hasface[ind - 1]) {
                 const Element2d& hel = surfelements[sii];
                 int mini = 0;
-                for (size_t j = 1; j < hel.GetNP(); j++) {
+                for (size_t j = 1; j < 3; j++) {
                     if (hel[j] < hel[mini]) {
                         mini = j;
                     }
@@ -991,7 +887,6 @@ namespace meshit {
                 FlatArray<SurfaceElementIndex> row = selsonpoint[pi];
                 for (size_t ii = 0; ii < row.size(); ii++) {
                     hel = SurfaceElement(row[ii]);
-                    if (hel.GetType() == TRIG6) hel.SetType(TRIG);
                     int ind = hel.GetIndex();
 
                     if (GetFaceDescriptor(ind).DomainIn() &&
@@ -999,10 +894,7 @@ namespace meshit {
                         hel.NormalizeNumbering();
                         if (hel.PNum(1) == pi) {
                             INDEX_3 i3(hel[0], hel[1], hel[2]);
-                            INDEX_2 i2(GetFaceDescriptor(ind).DomainIn(),
-                                       (hel.GetNP() == 3)
-                                       ? PointIndex{-1}
-                                       : hel.PNum(4));
+                            INDEX_2 i2(GetFaceDescriptor(ind).DomainIn(), PointIndex{-1});
                             faceht.Set(i3, i2);
                         }
                     }
@@ -1012,10 +904,7 @@ namespace meshit {
                         hel.NormalizeNumbering();
                         if (hel.PNum(1) == pi) {
                             INDEX_3 i3(hel[0], hel[1], hel[2]);
-                            INDEX_2 i2(GetFaceDescriptor(ind).DomainOut(),
-                                       (hel.GetNP() == 3)
-                                       ? PointIndex{-1}
-                                       : hel.PNum(4));
+                            INDEX_2 i2(GetFaceDescriptor(ind).DomainOut(), PointIndex{-1});
                             faceht.Set(i3, i2);
                         }
                     }
@@ -1027,11 +916,9 @@ namespace meshit {
                         faceht.GetData(i, i3, i2);
                         if (i2.I1() != -1) {
                             Element2d tri;
-                            tri.SetType((i2.I2() == -1) ? TRIG : QUAD);
-                            for (int l = 0; l < 3; l++) {
+                            for (size_t l = 0; l < 3; l++) {
                                 tri[l] = i3.I(l + 1);
                             }
-                            tri.PNum(4) = i2.I2();
                             tri.SetIndex(i2.I1());
                             openelements.push_back(tri);
                         }
@@ -1042,9 +929,7 @@ namespace meshit {
 
         int cnt3 = 0;
         for (size_t i = 0; i < openelements.size(); i++) {
-            if (openelements[i].GetNP() == 3) {
-                cnt3++;
-            }
+            cnt3++;
         }
         int cnt4 = openelements.size() - cnt3;
         if (openelements.size() > 0) {
@@ -1056,7 +941,7 @@ namespace meshit {
         for (size_t i = 0; i < openelements.size(); i++) {
             const Element2d& sel = openelements[i];
             if (boundaryedges) {
-                for (size_t j = 1; j <= sel.GetNP(); j++) {
+                for (size_t j = 1; j <= 3; j++) {
                     INDEX_2 i2;
                     i2.I1() = sel.PNumMod(j);
                     i2.I2() = sel.PNumMod(j + 1);
@@ -1071,16 +956,6 @@ namespace meshit {
                 }
             }
         }
-    }
-
-    bool Mesh::HasOpenQuads() const
-    {
-        int no = GetNOpenElements();
-        for (int i = 0; i < no; i++) {
-            if (openelements[i].GetNP() == 4)
-                return true;
-        }
-        return false;
     }
 
     void Mesh::FindOpenSegments(int surfnr)
@@ -1119,7 +994,7 @@ namespace meshit {
             if (el.IsDeleted()) continue;
 
             if (surfnr == 0 || el.GetIndex() == surfnr) {
-                for (size_t j = 1; j <= el.GetNP(); j++) {
+                for (size_t j = 1; j <= 3; j++) {
                     INDEX_2 seg(el.PNumMod(j), el.PNumMod(j + 1));
                     INDEX_2 data;
 
@@ -1304,31 +1179,22 @@ namespace meshit {
 
         for (size_t i = 0; i < GetNSE(); i++) {
             const Element2d& el = surfelements[i];
-            if (el.GetNP() == 3) {
-                double hel = -1;
-                for (size_t j = 1; j <= 3; j++) {
-                    const Point3d& p1 = points[el.PNumMod(j)];
-                    const Point3d& p2 = points[el.PNumMod(j + 1)];
+            double hel = -1;
+            for (size_t j = 1; j <= 3; j++) {
+                const Point3d& p1 = points[el.PNumMod(j)];
+                const Point3d& p2 = points[el.PNumMod(j + 1)];
 
-                    if (!ident->UsedSymmetric(el.PNumMod(j), el.PNumMod(j + 1))) {
-                        double hedge = Dist(p1, p2);
-                        if (hedge > hel)
-                            hel = hedge;
-                    }
+                if (!ident->UsedSymmetric(el.PNumMod(j), el.PNumMod(j + 1))) {
+                    double hedge = Dist(p1, p2);
+                    if (hedge > hel)
+                        hel = hedge;
                 }
-                if (hel > 0) {
-                    const Point3d& p1 = points[el.PNum(1)];
-                    const Point3d& p2 = points[el.PNum(2)];
-                    const Point3d& p3 = points[el.PNum(3)];
-                    lochfunc->SetH(Center(p1, p2, p3), hel);
-                }
-            } else {
+            }
+            if (hel > 0) {
                 const Point3d& p1 = points[el.PNum(1)];
                 const Point3d& p2 = points[el.PNum(2)];
                 const Point3d& p3 = points[el.PNum(3)];
-                const Point3d& p4 = points[el.PNum(4)];
-                lochfunc->SetH(Center(p1, p2), 2 * Dist(p1, p2));
-                lochfunc->SetH(Center(p3, p4), 2 * Dist(p3, p4));
+                lochfunc->SetH(Center(p1, p2, p3), hel);
             }
         }
 
@@ -1560,24 +1426,6 @@ namespace meshit {
         }
     }
 
-    void Mesh::GetBox(Point3d& pmin, Point3d& pmax, POINTTYPE ptyp) const
-    {
-        if (points.size() == 0) {
-            pmin = pmax = Point3d(0, 0, 0);
-            return;
-        }
-
-        pmin = Point3d(1e10, 1e10, 1e10);
-        pmax = Point3d(-1e10, -1e10, -1e10);
-
-        for (PointIndex pi = 0; pi < points.size(); pi++) {
-            if (points[pi].Type() <= ptyp) {
-                pmin.SetToMin(points[pi]);
-                pmax.SetToMax(points[pi]);
-            }
-        }
-    }
-
     void Mesh::AddLockedPoint(PointIndex pi)
     {
         lockedpoints.push_back(pi);
@@ -1610,7 +1458,7 @@ namespace meshit {
 
         for (size_t i = 0; i < surfelements.size(); i++) {
             const Element2d& el = surfelements[i];
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 pused.Set(el[j]);
             }
         }
@@ -1623,7 +1471,7 @@ namespace meshit {
 
         for (size_t i = 0; i < openelements.size(); i++) {
             const Element2d& el = openelements[i];
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 pused.Set(el[j]);
             }
         }
@@ -1651,7 +1499,7 @@ namespace meshit {
 
         for (size_t i = 0; i < surfelements.size(); i++) {
             Element2d& el = SurfaceElement(i);
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 el[j] = op2np[el[j]];
             }
         }
@@ -1664,7 +1512,7 @@ namespace meshit {
 
         for (size_t i = 0; i < openelements.size(); i++) {
             Element2d& el = openelements[i];
-            for (size_t j = 0; j < el.GetNP(); j++) {
+            for (size_t j = 0; j < 3; j++) {
                 el[j] = op2np[el[j]];
             }
         }
@@ -1698,7 +1546,7 @@ namespace meshit {
         for (int i = 1; i <= nf; i++) {
             const Element2d& sel = OpenElement(i);
 
-            for (size_t j = 1; j <= sel.GetNP(); j++) {
+            for (size_t j = 1; j <= 3; j++) {
                 i2.I1() = sel.PNumMod(j);
                 i2.I2() = sel.PNumMod(j + 1);
 
@@ -1720,7 +1568,7 @@ namespace meshit {
                     i2s.Sort();
                     for (int k = 1; k <= nf; k++) {
                         const Element2d& sel = OpenElement(k);
-                        for (size_t l = 1; l <= sel.GetNP(); l++) {
+                        for (size_t l = 1; l <= 3; l++) {
                             edge.I1() = sel.PNumMod(l);
                             edge.I2() = sel.PNumMod(l + 1);
                             edge.Sort();
@@ -1752,7 +1600,7 @@ namespace meshit {
             Point3d tpmin(Point(tri[0]));
             Point3d tpmax(tpmin);
 
-            for (size_t k = 1; k < tri.GetNP(); k++) {
+            for (size_t k = 1; k < 3; k++) {
                 tpmin.SetToMin(Point(tri[k]));
                 tpmax.SetToMax(Point(tri[k]));
             }
@@ -1770,7 +1618,7 @@ namespace meshit {
             Point3d tpmin(Point(tri[0]));
             Point3d tpmax(tpmin);
 
-            for (size_t k = 1; k < tri.GetNP(); k++) {
+            for (size_t k = 1; k < 3; k++) {
                 tpmin.SetToMin(Point(tri[k]));
                 tpmax.SetToMax(Point(tri[k]));
             }
@@ -1883,122 +1731,33 @@ namespace meshit {
         Vec3d rhs, sol;
         const double eps = 1e-6;
 
-        Array<Element2d> loctrigs;
+        Array<Element2d> loctrigs(1);
 
-        //SZ 
-        if (SurfaceElement(element).GetType() == QUAD) {
-            const Element2d& el = SurfaceElement(element);
+        loctrigs[0] = SurfaceElement(element);
+
+        for (size_t j = 0; j < loctrigs.size(); j++) {
+            const Element2d& el = loctrigs[j];
+
 
             const Point3d& p1 = Point(el.PNum(1));
             const Point3d& p2 = Point(el.PNum(2));
             const Point3d& p3 = Point(el.PNum(3));
-            const Point3d& p4 = Point(el.PNum(4));
 
-            // Coefficients of Bilinear Mapping from Ref-Elem to global Elem
-            // X = a + b x + c y + d x y 
-            Vec3d a = p1;
-            Vec3d b = p2 - a;
-            Vec3d c = p4 - a;
-            Vec3d d = p3 - a - b - c;
+            col1 = p2 - p1;
+            col2 = p3 - p1;
+            col3 = Cross(col1, col2);
+            rhs = p - p1;
 
-            double dxb = d.X() * b.Y() - d.Y() * b.X();
-            double dxc = d.X() * c.Y() - d.Y() * c.X();
-            double dxa = d.X() * a.Y() - d.Y() * a.X();
-            double dxp = d.X() * p.Y() - d.Y() * p.X();
+            SolveLinearSystem(col1, col2, col3, rhs, sol);
 
-            const double eps = 1.E-12;
-            double c0, c1, c2;
+            if (sol.X() >= -eps && sol.Y() >= -eps &&
+                sol.X() + sol.Y() <= 1 + eps) {
+                if (!consider3D || (sol.Z() >= -eps && sol.Z() <= eps)) {
+                    lami[0] = sol.X();
+                    lami[1] = sol.Y();
+                    lami[2] = sol.Z();
 
-            lami[2] = 0.;
-
-            if (fabs(d.X()) <= eps && fabs(d.Y()) <= eps) {
-                // Solve Linear System
-                lami[0] = (c.Y() * (p.X() - a.X()) - c.X() * (p.Y() - a.Y())) / (b.X() * c.Y() - b.Y() * c.X());
-                lami[1] = (-b.Y() * (p.X() - a.X()) + b.X() * (p.Y() - a.Y())) / (b.X() * c.Y() - b.Y() * c.X());
-            } else if (fabs(dxb) <= eps) {
-                lami[1] = (dxp - dxa) / dxc;
-                if (fabs(b.X() - d.X() * lami[1]) >= eps) {
-                    lami[0] = (p.X() - a.X() - c.X() * lami[1]) / (b.X() + d.X() * lami[1]);
-                } else {
-                    lami[0] = (p.Y() - a.Y() - c.Y() * lami[1]) / (b.Y() + d.Y() * lami[1]);
-                }
-            } else if (fabs(dxc) <= eps) {
-                lami[0] = (dxp - dxa) / dxb;
-                if (fabs(c.X() - d.X() * lami[0]) >= eps) {
-                    lami[1] = (p.X() - a.X() - b.X() * lami[0]) / (c.X() + d.X() * lami[0]);
-                } else {
-                    lami[1] = (p.Y() - a.Y() - b.Y() * lami[0]) / (c.Y() + d.Y() * lami[0]);
-                }
-            } else {
-                // Solve quadratic equation
-                if (fabs(d.X()) >= eps) {
-                    c2 = d.X() * dxc;
-                    c1 = d.X() * dxc - c.X() * dxb - d.X() * (dxp - dxa);
-                    c0 = -b.X() * (dxp - dxa) - (a.X() - p.X()) * dxb;
-                }
-                else {
-                    c2 = d.Y() * dxc;
-                    c1 = d.Y() * dxc - c.Y() * dxb - d.Y() * (dxp - dxa);
-                    c0 = -b.Y() * (dxp - dxa) - (a.Y() - p.Y()) * dxb;
-                }
-
-                double rt = c1 * c1 - 4 * c2 * c0;
-                if (rt < 0.) return false;
-                lami[1] = (-c1 + sqrt(rt)) / 2 / c2;
-                if (lami[1] <= 1. && lami[1] >= 0.) {
-                    lami[0] = (dxp - dxa - dxc * lami[1]) / dxb;
-                    if (lami[0] <= 1. && lami[0] >= 0.)
-                        return true;
-                }
-
-                lami[1] = (-c1 - sqrt(rt)) / 2 / c2;
-                lami[0] = (dxp - dxa - dxc * lami[1]) / dxb;
-            }
-
-            if (lami[0] <= 1. + eps && lami[0] >= -eps && lami[1] <= 1. + eps && lami[1] >= -eps) {
-                if (consider3D) {
-                    Vec3d n = Cross(b, c);
-                    lami[2] = 0;
-                    for (int i = 1; i <= 3; i++) {
-                        lami[2] += (p.X(i) - a.X(i) - lami[0] * b.X(i) - lami[1] * c.X(i)) * n.X(i);
-                    }
-                    if (lami[2] >= -eps && lami[2] <= eps)
-                        return true;
-                }
-                else
                     return true;
-            }
-
-            return false;
-
-        } else {
-            loctrigs.resize(1);
-            loctrigs[0] = SurfaceElement(element);
-
-            for (size_t j = 0; j < loctrigs.size(); j++) {
-                const Element2d& el = loctrigs[j];
-
-
-                const Point3d& p1 = Point(el.PNum(1));
-                const Point3d& p2 = Point(el.PNum(2));
-                const Point3d& p3 = Point(el.PNum(3));
-
-                col1 = p2 - p1;
-                col2 = p3 - p1;
-                col3 = Cross(col1, col2);
-                rhs = p - p1;
-
-                SolveLinearSystem(col1, col2, col3, rhs, sol);
-
-                if (sol.X() >= -eps && sol.Y() >= -eps &&
-                    sol.X() + sol.Y() <= 1 + eps) {
-                    if (!consider3D || (sol.Z() >= -eps && sol.Z() <= eps)) {
-                        lami[0] = sol.X();
-                        lami[1] = sol.Y();
-                        lami[2] = sol.Z();
-
-                        return true;
-                    }
                 }
             }
         }
@@ -2038,8 +1797,7 @@ namespace meshit {
         numvertices = 0;
         for (size_t i = 0; i < surfelements.size(); i++) {
             const Element2d& el = SurfaceElement(i);
-            size_t nv = el.GetNV();
-            for (size_t j = 1; j <= nv; j++) {
+            for (size_t j = 1; j <= 3; j++) {
                 if (el.PNum(j) > numvertices)
                     numvertices = el.PNum(j);
             }
@@ -2069,23 +1827,6 @@ namespace meshit {
             }
         }
         GetIdentifications().SetMaxPointNr(np - 1);
-    }
-
-    bool Mesh::PureTrigMesh(int faceindex) const
-    {
-        if (!faceindex) {
-            for (size_t i = 0; i < GetNSE(); i++) {
-                if (SurfaceElement(i).GetNP() != 3)
-                    return false;
-            }
-            return true;
-        }
-
-        for (size_t i = 0; i < GetNSE(); i++) {
-            if (SurfaceElement(i).GetIndex() == faceindex && SurfaceElement(i).GetNP() != 3)
-                return false;
-        }
-        return true;
     }
 
     void Mesh::UpdateTopology()
