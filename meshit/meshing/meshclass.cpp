@@ -1148,7 +1148,7 @@ namespace meshit {
         std::cerr << "open segments: " << std::endl;
         opensegments.resize(0);
         for (size_t i = 0; i < faceht.GetNBags(); i++) {
-            for (int j = 0; j < faceht.GetBagSize(i); j++) {
+            for (size_t j = 0; j < faceht.GetBagSize(i); j++) {
                 INDEX_2 i2;
                 INDEX_2 data;
                 faceht.GetData(i, j, i2, data);

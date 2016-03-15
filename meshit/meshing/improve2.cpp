@@ -433,19 +433,6 @@ namespace meshit {
 
                 if (should) {
                     mesh[pi1] = pnew;
-                    Element2d* el1p(NULL);
-                    {
-                        size_t l = 0;
-                        while (mesh.SurfaceElement(elementsonnode[pi1][l]).IsDeleted() &&
-                               l < elementsonnode.EntrySize(pi1 - 1)) {
-                            l++;
-                        }
-                        if (l < elementsonnode.EntrySize(pi1 - 1)) {
-                            el1p = &mesh.SurfaceElement(elementsonnode[pi1][l]);
-                        } else {
-                            MESHIT_LOG_ERROR("MeshOptimize2d::CombineImprove: OOPS!");
-                        }
-                    }
                     for (size_t k = 0; k < elementsonnode[pi2].size(); k++) {
                         Element2d& el = mesh.SurfaceElement(elementsonnode[pi2][k]);
                         if (el.IsDeleted()) continue;

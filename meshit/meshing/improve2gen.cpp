@@ -39,8 +39,6 @@ namespace meshit {
         Array<size_t> elrot;
         Array<PointIndex> pmap;
 
-        int surfnr = mesh.GetFaceDescriptor(faceindex).SurfNr();
-
         ImprovementRule* r1;
 
         // 2 triangles to quad
