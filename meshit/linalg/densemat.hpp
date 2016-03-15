@@ -88,24 +88,18 @@ namespace meshit {
             }
         }
 
-        void MultTrans(const Vector& v, Vector& prod) const;
-        void Residuum(const Vector& x, const Vector& b, Vector& res) const;
         double Det() const;
 
-        friend DenseMatrix operator*(const DenseMatrix& m1, const DenseMatrix& m2);
-        friend DenseMatrix operator+(const DenseMatrix& m1, const DenseMatrix& m2);
-
-        friend void Transpose(const DenseMatrix& m1, DenseMatrix& m2);
-        friend void Mult(const DenseMatrix& m1, const DenseMatrix& m2, DenseMatrix& m3);
-        friend void CalcAAt(const DenseMatrix& a, DenseMatrix& m2);
         friend void CalcABt(const DenseMatrix& a, const DenseMatrix& b, DenseMatrix& m2);
-        friend void CalcAtB(const DenseMatrix& a, const DenseMatrix& b, DenseMatrix& m2);
-        void Solve(const Vector& b, Vector& x) const;
-        void SolveDestroy(const Vector& b, Vector& x);
 
-        const double& Get(size_t i, size_t j) const
+        const double* DataP() const
         {
-            return data[(i - 1) * width + j - 1];
+            return data;
+        }
+
+        double* DataP()
+        {
+            return data;
         }
 
         const double& Get(size_t i) const
@@ -113,23 +107,11 @@ namespace meshit {
             return data[i - 1];
         }
 
-        void Set(size_t i, size_t j, double v)
-        {
-            data[(i - 1) * width + j - 1] = v;
-        }
-
         double& Elem(size_t i, size_t j)
         {
-            return data[(i - 1) * width + j - 1];
-        }
-
-        const double& ConstElem(size_t i, size_t j) const
-        {
-            return data[(i - 1) * width + j - 1];
+            return data[i * width + j];
         }
     };
-
-    extern std::ostream& operator<<(std::ostream& ost, const DenseMatrix& m);
 
     template<size_t WIDTH>
     class MatrixFixWidth
@@ -188,26 +170,6 @@ namespace meshit {
             return *this;
         }
 
-        void Mult(const FlatVector& v, FlatVector& prod) const
-        {
-            const double* mp = data;
-            double* dp = &prod[0];
-
-            for (size_t i = 0; i < height; i++) {
-                double sum = 0;
-                const double* sp = &v[0];
-
-                for (size_t j = 0; j < WIDTH; j++) {
-                    sum += *mp * *sp;
-                    mp++;
-                    sp++;
-                }
-
-                *dp = sum;
-                dp++;
-            }
-        }
-
         double& operator()(size_t i, size_t j)
         {
             return data[i * WIDTH + j];
@@ -260,8 +222,6 @@ namespace meshit {
         }
         return ost;
     };
-
-    extern void CalcAtA(const DenseMatrix& a, DenseMatrix& m2);
 
 }  // namespace meshit
 

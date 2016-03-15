@@ -62,7 +62,7 @@ namespace meshit {
         }
     }
 
-    int LDLtUpdate(DenseMatrix& l, Vector& d, double a, const Vector& u)
+    int LDLtUpdate(DenseMatrix& l, Vector& d, double a, const Vector& u, Vector& v)
     {
         // Bemerkung: Es wird a aus R erlaubt
         // Rueckgabewert: 0 .. D bleibt positiv definit
@@ -70,24 +70,22 @@ namespace meshit {
 
         size_t n = l.Height();
 
-        Vector v(n);
         double told = 1.0;
         v = u;
 
-        for (size_t j = 1; j <= n; j++) {
-            double t = told + a * (v(j - 1) * v(j - 1)) / d(j - 1);
+        for (size_t j = 0; j < n; j++) {
+            double t = told + a * (v(j) * v(j)) / d(j);
 
             if (t <= 0) {
-                std::cout << "update err, t = " << t << std::endl;
                 return 1;
             }
 
-            double xi = a * v(j - 1) / (d(j - 1) * t);
-            d(j - 1) *= t / told;
+            double xi = a * v(j) / (d(j) * t);
+            d(j) *= t / told;
 
-            for (size_t i = j + 1; i <= n; i++) {
-                v(i - 1) -= v(j - 1) * l.Elem(i, j);
-                l.Elem(i, j) += xi * v(i - 1);
+            for (size_t i = j + 1; i < n; i++) {
+                v(i) -= v(j) * l.Elem(i, j);
+                l.Elem(i, j) += xi * v(i);
             }
 
             told = t;
@@ -106,9 +104,6 @@ namespace meshit {
         int it;
         char a1crit, a3acrit;
 
-
-        Vector d(n), g(n), p(n), bs(n), xneu(n), y(n), s(n), x0(n);
-        DenseMatrix l(n);
 
         double /* normg, */ alphahat, hd, fold;
         double a1, a2;
@@ -129,9 +124,13 @@ namespace meshit {
         typx = par.typx;
         typf = par.typf;
 
+        DenseMatrix l(n);
         l = 0;
-        for (size_t i = 1; i <= n; i++)
+        for (size_t i = 0; i < n; i++) {
             l.Elem(i, i) = 1;
+        }
+
+        Vector d(n), g(n), p(n), bs(n), xneu(n), y(n), s(n), x0(n);
 
         f = fun.FuncGrad(x, g);
         f0 = f;
@@ -141,11 +140,11 @@ namespace meshit {
         do {
             // Restart
             if (it % (5 * n) == 0) {
-                for (size_t i = 1; i <= n; i++) {
-                    d(i - 1) = typf / (typx(i - 1) * typx(i - 1));  // 1;
+                for (size_t i = 0; i < n; i++) {
+                    d(i) = typf / (typx(i) * typx(i));
                 }
-                for (size_t i = 2; i <= n; i++) {
-                    for (size_t j = 1; j < i; j++) {
+                for (size_t i = 1; i < n; i++) {
+                    for (size_t j = 0; j < i; j++) {
                         l.Elem(i, j) = 0;
                     }
                 }
@@ -185,21 +184,17 @@ namespace meshit {
 
             a1 = y * s;
             a2 = s * bs;
+            Vector w(y.Size());
 
             if (a1 > 0 && a2 > 0) {
-                if (LDLtUpdate(l, d, 1 / a1, y) != 0) {
-                    std::cerr << "BFGS update error1" << std::endl;
-                    std::cerr << "BFGS update error1" << std::endl;
-                    std::cerr << "l " << std::endl << l << std::endl
-                    << "d " << d << std::endl;
+                if (LDLtUpdate(l, d, 1 / a1, y, w) != 0) {
+                    MESHIT_LOG_ERROR("BFGS update error1");
                     ifail = 1;
                     break;
                 }
 
-                if (LDLtUpdate(l, d, -1 / a2, bs) != 0) {
-                    std::cerr << "BFGS update error2" << std::endl;
-                    std::cerr << "l " << std::endl << l << std::endl
-                    << "d " << d << std::endl;
+                if (LDLtUpdate(l, d, -1 / a2, bs, w) != 0) {
+                    MESHIT_LOG_ERROR("BFGS update error2");
                     ifail = 1;
                     break;
                 }

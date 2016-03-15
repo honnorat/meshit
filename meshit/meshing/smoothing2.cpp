@@ -274,8 +274,8 @@ namespace meshit {
 
             for (size_t k = 1; k <= bel.GetNP(); k++) {
                 PointIndex pi = bel.PNum(k);
-                pts2d[pi] = Point2d(ld.t1 * (mesh.Point(pi) - ld.sp1),
-                                    ld.t2 * (mesh.Point(pi) - ld.sp1));
+                const MeshPoint& mpi = mesh.Point(pi);
+                pts2d[pi] = Point2d((mpi.Y() - ld.sp1.Y()), -(mpi.X() - ld.sp1.X()));
             }
             pts2d[gpi] = Point2d(x(0), x(1));
 

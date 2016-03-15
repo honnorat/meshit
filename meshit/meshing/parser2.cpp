@@ -24,9 +24,9 @@ namespace meshit {
             ist >> pnum;
 
             if (ch == 'x' || ch == 'X')
-                m.Elem(line, 2 * pnum - 1) = f;
+                m.Elem(line - 1, 2 * pnum - 2) = f;
             if (ch == 'y' || ch == 'Y')
-                m.Elem(line, 2 * pnum) = f;
+                m.Elem(line - 1, 2 * pnum - 1) = f;
 
             ist >> ch;
             if (ch == COMMASIGN)
@@ -190,8 +190,8 @@ namespace meshit {
                     }
                     ist >> ch;
                 }
-                for (size_t i = 1; i <= tempoldutofreearealimit.Height(); i++) {
-                    for (size_t j = 1; j <= tempoldutofreearealimit.Width(); j++) {
+                for (size_t i = 0; i < tempoldutofreearealimit.Height(); i++) {
+                    for (size_t j = 0; j < tempoldutofreearealimit.Width(); j++) {
                         tempoldutofreearealimit.Elem(i, j) = tempoldutofreearea.Elem(i, j);
                     }
                 }
@@ -275,18 +275,18 @@ namespace meshit {
         oldutofreearea.SetSize(2 * freezone.size(), 2 * noldp);
         oldutofreearealimit.SetSize(2 * freezone.size(), 2 * noldp);
 
-        for (size_t i = 1; i <= oldutonewu.Height(); i++) {
-            for (size_t j = 1; j <= oldutonewu.Width(); j++) {
+        for (size_t i = 0; i < oldutonewu.Height(); i++) {
+            for (size_t j = 0; j < oldutonewu.Width(); j++) {
                 oldutonewu.Elem(i, j) = tempoldutonewu.Elem(i, j);
             }
         }
-        for (size_t i = 1; i <= oldutofreearea.Height(); i++) {
-            for (size_t j = 1; j <= oldutofreearea.Width(); j++) {
+        for (size_t i = 0; i < oldutofreearea.Height(); i++) {
+            for (size_t j = 0; j < oldutofreearea.Width(); j++) {
                 oldutofreearea.Elem(i, j) = tempoldutofreearea.Elem(i, j);
             }
         }
-        for (size_t i = 1; i <= oldutofreearea.Height(); i++) {
-            for (size_t j = 1; j <= oldutofreearea.Width(); j++) {
+        for (size_t i = 0; i < oldutofreearea.Height(); i++) {
+            for (size_t j = 0; j < oldutofreearea.Width(); j++) {
                 oldutofreearealimit.Elem(i, j) = tempoldutofreearealimit.Elem(i, j);
             }
         }

@@ -335,22 +335,22 @@ namespace meshit {
     {
         switch (typ) {
             case TRIG:
-                dshape.Elem(1, 1) = -1;
+                dshape.Elem(0, 0) = -1;
+                dshape.Elem(0, 1) = 1;
+                dshape.Elem(0, 2) = 0;
+                dshape.Elem(1, 0) = -1;
+                dshape.Elem(1, 1) = 0;
                 dshape.Elem(1, 2) = 1;
-                dshape.Elem(1, 3) = 0;
-                dshape.Elem(2, 1) = -1;
-                dshape.Elem(2, 2) = 0;
-                dshape.Elem(2, 3) = 1;
                 break;
             case QUAD:
-                dshape.Elem(1, 1) = -(1 - p.Y());
-                dshape.Elem(1, 2) = (1 - p.Y());
-                dshape.Elem(1, 3) = p.Y();
-                dshape.Elem(1, 4) = -p.Y();
-                dshape.Elem(2, 1) = -(1 - p.X());
-                dshape.Elem(2, 2) = -p.X();
-                dshape.Elem(2, 3) = p.X();
-                dshape.Elem(2, 4) = (1 - p.X());
+                dshape.Elem(0, 0) = -(1 - p.Y());
+                dshape.Elem(0, 1) = (1 - p.Y());
+                dshape.Elem(0, 2) = p.Y();
+                dshape.Elem(0, 3) = -p.Y();
+                dshape.Elem(1, 0) = -(1 - p.X());
+                dshape.Elem(1, 1) = -p.X();
+                dshape.Elem(1, 2) = p.X();
+                dshape.Elem(1, 3) = (1 - p.X());
                 break;
 
             default:
@@ -360,10 +360,10 @@ namespace meshit {
 
     void Element2d::GetPointMatrix(const Array<Point2d>& points, DenseMatrix& pmat) const
     {
-        for (size_t i = 1; i <= np; i++) {
-            const Point2d& p = points[pnum[i - 1]];
-            pmat.Elem(1, i) = p.X();
-            pmat.Elem(2, i) = p.Y();
+        for (size_t i = 0; i < np; i++) {
+            const Point2d& p = points[pnum[i]];
+            pmat.Elem(0, i) = p.X();
+            pmat.Elem(1, i) = p.Y();
         }
     }
 
@@ -492,8 +492,8 @@ namespace meshit {
         GetPointMatrix(points, pmat);
 
         vmat = 0.0;
-        vmat.Elem(1, pi) = dir.X();
-        vmat.Elem(2, pi) = dir.Y();
+        vmat.Elem(0, pi - 1) = dir.X();
+        vmat.Elem(1, pi - 1) = dir.Y();
 
         double err = 0.0;
         dd = 0;
@@ -547,10 +547,10 @@ namespace meshit {
 
         pmat.SetSize(2, GetNP());
 
-        for (size_t i = 1; i <= GetNP(); i++) {
-            const Point3d& p = points[PNum(i)];
-            pmat.Elem(1, i) = p.Y();
-            pmat.Elem(2, i) = -p.X();
+        for (size_t i = 0; i < GetNP(); i++) {
+            const Point3d& p = points[PNum(i + 1)];
+            pmat.Elem(0, i) = p.Y();
+            pmat.Elem(1, i) = -p.X();
         }
 
         double err = 0;
@@ -777,7 +777,7 @@ namespace meshit {
 
                 if (i2.I1() > maxpnum || i2.I2() > maxpnum) {
                     i2.I1() = i2.I2() = -1;
-                    identifiedpoints->SetData(i+1, j+1, i2, -1);
+                    identifiedpoints->SetData(i + 1, j + 1, i2, -1);
                 }
             }
         }
