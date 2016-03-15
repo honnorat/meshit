@@ -317,10 +317,6 @@ namespace meshit {
             }
         }
 
-        int surfnr = 0;
-        if (faceindex)
-            surfnr = mesh.GetFaceDescriptor(faceindex).SurfNr();
-
         double bad1, bad2;
         Vec3d nv;
 
@@ -351,20 +347,6 @@ namespace meshit {
         }
         for (size_t i = 0; i < mesh.LockedPoints().size(); i++) {
             fixed[mesh.LockedPoints()[i]] = true;
-        }
-
-        Array<Vec3d> normals(np);
-
-        for (PointIndex pi = 0; pi < mesh.Points().size(); pi++) {
-            if (elementsonnode[pi].size()) {
-                Element2d& hel = mesh.SurfaceElement(elementsonnode[pi][0]);
-                for (size_t k = 0; k < 3; k++) {
-                    if (hel[k] == pi) {
-                        GetNormalVector(surfnr, mesh.Point(pi), hel.GeomInfoPi(k + 1), normals[pi]);
-                        break;
-                    }
-                }
-            }
         }
 
         for (size_t i = 0; i < seia.size(); i++) {
@@ -410,13 +392,6 @@ namespace meshit {
                     }
                 }
 
-                Element2d& hel = mesh.SurfaceElement(hasbothpi[0]);
-                for (size_t k = 0; k < 3; k++)
-                    if (hel[k] == pi1) {
-                        GetNormalVector(surfnr, mesh.Point(pi1), hel.GeomInfoPi(k + 1), nv);
-                        break;
-                    }
-
                 for (size_t k = 0; k < elementsonnode[pi2].size(); k++) {
                     const Element2d& el2 = mesh.SurfaceElement(elementsonnode[pi2][k]);
                     if (el2.IsDeleted()) continue;
@@ -458,10 +433,8 @@ namespace meshit {
                     if (hnv * nv < 0) {
                         bad2 += 1e10;
                     }
-                    for (size_t l = 0; l < 3; l++) {
-                        if ((normals[el[l]] * nv) < 0.5) {
-                            bad2 += 1e10;
-                        }
+                    if (nv.Z() < 0.5) {
+                        bad2 += 3e10;
                     }
                 }
                 bad2 /= hasonepi.size();

@@ -341,12 +341,8 @@ namespace meshit {
 
                     // calc metric badness
                     double bad1 = 0, bad2 = 0;
-                    Vec3d n;
-
-                    GetNormalVector(surfnr, mesh.Point(pmap[0]), pgi[0], n);
-
                     for (size_t j = 0; j < rule.oldels.size(); j++) {
-                        bad1 += mesh.SurfaceElement(elmap[j]+1).CalcJacobianBadness(mesh.Points(), n);
+                        bad1 += mesh.SurfaceElement(elmap[j]+1).CalcJacobianBadness(mesh.Points());
                     }
                     // check new element:
                     for (size_t j = 0; j < rule.newels.size(); j++) {
@@ -355,7 +351,7 @@ namespace meshit {
                         for (size_t k = 1; k <= rnel.GetNP(); k++) {
                             nel.PNum(k) = pmap[rnel.PNum(k) - 1];
                         }
-                        bad2 += nel.CalcJacobianBadness(mesh.Points(), n);
+                        bad2 += nel.CalcJacobianBadness(mesh.Points());
                     }
 
                     if (bad2 > 1e3) continue;

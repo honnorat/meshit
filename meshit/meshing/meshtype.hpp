@@ -282,7 +282,7 @@ namespace meshit {
         void ComputeIntegrationPointData() const;
 
         double CalcJacobianBadness(const Array<Point2d>& points) const;
-        double CalcJacobianBadness(const Array<MeshPoint>& points, const Vec3d& n) const;
+        double CalcJacobianBadness(const Array<MeshPoint>& points) const;
         double CalcJacobianBadnessDirDeriv(const Array<Point2d>& points,
                                            int pi, const Vec2d& dir, double& dd) const;
 

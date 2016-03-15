@@ -159,11 +159,8 @@ namespace meshit {
 
         virtual double Func(const Vector& x)
         {
-            Vec3d n;
-
             double badness = 0;
 
-            ld.meshthis->GetNormalVector(ld.surfi, ld.sp1, ld.gi1, n);
             Point3d pp1 = ld.sp1 + x(0) * ld.t1 + x(1) * ld.t2;
 
             for (size_t j = 0; j < ld.locelements.size(); j++) {
@@ -172,7 +169,7 @@ namespace meshit {
 
                 if (ld.uselocalh) ld.loch = ld.lochs[j];
 
-                if (Determinant(e1, e2, n) > 1e-8 * ld.loch * ld.loch) {
+                if (e1.X() * e2.Y() - e1.Y() * e2.X() > 1e-8 * ld.loch * ld.loch) {
                     badness += CalcTriangleBadness(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], ld.locmetricweight, ld.loch);
                 } else {
                     badness += 1e8;
@@ -198,7 +195,7 @@ namespace meshit {
 
                 if (ld.uselocalh) ld.loch = ld.lochs[j];
 
-                if (Determinant(e1, e2, ld.normal) > 1e-8 * ld.loch * ld.loch) {
+                if (e1.X() * e2.Y() - e1.Y() * e2.X() > 1e-8 * ld.loch * ld.loch) {
                     Vec3d hgrad;
                     badness += CalcTriangleBadnessGrad(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], hgrad,
                                                        ld.locmetricweight, ld.loch);
@@ -226,7 +223,7 @@ namespace meshit {
 
                 if (ld.uselocalh) ld.loch = ld.lochs[j];
 
-                if (Determinant(e1, e2, ld.normal) > 1e-8 * ld.loch * ld.loch) {
+                if (e1.X() * e2.Y() - e1.Y() * e2.X() > 1e-8 * ld.loch * ld.loch) {
                     Vec3d hgrad;
                     badness += CalcTriangleBadnessGrad(pp1, ld.loc_pnts2[j], ld.loc_pnts3[j], hgrad,
                                                        ld.locmetricweight, ld.loch);
@@ -262,12 +259,9 @@ namespace meshit {
     double Opti2SurfaceMinFunctionJacobian::FuncGrad(const Vector& x, Vector& grad) const
     {
         int lpi, gpi;
-        Vec3d n;
         double badness;
 
         badness = 0;
-
-        ld.meshthis->GetNormalVector(ld.surfi, ld.sp1, ld.gi1, n);
 
         static Array<Point2d> pts2d;
         pts2d.resize(mesh.GetNP());
@@ -454,9 +448,9 @@ namespace meshit {
                     }
                 }
 
-                GetNormalVector(ld.surfi, ld.sp1, ld.gi1, ld.normal);
-                ld.normal.GetNormal(ld.t1);
-                ld.t2 = Cross(ld.normal, ld.t1);
+                ld.normal = Vec3d(0, 0, 1);
+                ld.t1 = Vec3d(0, 1, 0);
+                ld.t2 = Vec3d(-1, 0, 0);
 
                 // save points, and project to tangential plane
                 for (size_t j = 0; j < ld.locelements.size(); j++) {
@@ -495,9 +489,9 @@ namespace meshit {
                 }
 
                 // optimizer pass (if whole distance is not possible, move only a bit!!!!)
-                Vec3d hv = x(0) * ld.t1 + x(1) * ld.t2;
+                Vec3d hv(-x(1), x(0), 0.0);
                 Point3d origp = mesh[pi];
-                Point3d hnp = origp + Vec3d(hv);
+                Point3d hnp = origp + hv;
                 mesh.Point(pi).X() = hnp.X();
                 mesh.Point(pi).Y() = hnp.Y();
                 mesh.Point(pi).Z() = hnp.Z();
@@ -513,13 +507,4 @@ namespace meshit {
         mesh.SetNextTimeStamp();
     }
 
-    void MeshOptimize2d::GetNormalVector(INDEX /* surfind */, const Point3d& p, Vec3d& nv) const
-    {
-        nv = Vec3d(0, 0, 1);
-    }
-
-    void MeshOptimize2d::GetNormalVector(INDEX surfind, const Point3d& p, PointGeomInfo& gi, Vec3d& n) const
-    {
-        GetNormalVector(surfind, p, n);
-    }
 }  // namespace meshit

@@ -40,9 +40,6 @@ namespace meshit {
             writestatus = ws;
         }
 
-        void GetNormalVector(INDEX surfind, const Point3d& p, PointGeomInfo& gi, Vec3d& n) const;
-        void GetNormalVector(INDEX surfind, const Point3d& p, Vec3d& n) const;
-
         friend class Opti2SurfaceMinFunction;
     };
 

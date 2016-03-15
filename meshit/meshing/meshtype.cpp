@@ -556,7 +556,7 @@ namespace meshit {
         return err;
     }
 
-    double Element2d::CalcJacobianBadness(const Array<MeshPoint>& points, const Vec3d& n) const
+    double Element2d::CalcJacobianBadness(const Array<MeshPoint>& points) const
     {
         size_t nip = GetNIP();
         DenseMatrix trans(2, 2);
@@ -564,14 +564,10 @@ namespace meshit {
 
         pmat.SetSize(2, GetNP());
 
-        Vec3d t1, t2;
-        n.GetNormal(t1);
-        t2 = Cross(n, t1);
-
         for (size_t i = 1; i <= GetNP(); i++) {
-            Point3d p = points[PNum(i)];
-            pmat.Elem(1, i) = p.X() * t1.X() + p.Y() * t1.Y() + p.Z() * t1.Z();
-            pmat.Elem(2, i) = p.X() * t2.X() + p.Y() * t2.Y() + p.Z() * t2.Z();
+            const Point3d& p = points[PNum(i)];
+            pmat.Elem(1, i) = p.Y();
+            pmat.Elem(2, i) = -p.X();
         }
 
         double err = 0;
