@@ -156,7 +156,7 @@ namespace meshit {
         Opti2SurfaceMinFunction(const Mesh& amesh, Opti2dLocalData& ald)
                 : mesh(amesh), ld(ald) { }
 
-        virtual double Func(const Vector& x)
+        virtual double Func(const Vector& x) const
         {
             double badness = 0;
 
@@ -409,17 +409,6 @@ namespace meshit {
                 if (elementsonpoint[hi].size() == 0) continue;
 
                 ld.sp1 = mesh[pi];
-
-                Element2d& hel = mesh.SurfaceElement(elementsonpoint[hi][0]);
-
-                int hpi = 0;
-                for (size_t j = 1; j <= hel.GetNP(); j++) {
-                    if (hel.PNum(j) == pi) {
-                        hpi = j;
-                        break;
-                    }
-                }
-
                 ld.locelements.resize(0);
                 ld.locrots.resize(0);
                 ld.lochs.resize(0);

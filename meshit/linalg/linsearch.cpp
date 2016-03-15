@@ -94,8 +94,7 @@ namespace meshit {
             xneu.Set2(1, x, alphahat, p);
 
             //    f = fun.FuncGrad (xneu, g);
-            //    f = fun.Func (xneu);
-            f = fun.FuncDeriv(xneu, p, phihatprime);
+            f = fun.Func(xneu);
 
             if (f < fmin) {
                 ifail = -1;
@@ -157,7 +156,6 @@ namespace meshit {
             }
         }
         fun.FuncGrad(xneu, g);
-
 
         if (it < 0)
             ifail = 1;
