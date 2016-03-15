@@ -133,7 +133,7 @@ namespace meshit {
         int z1, z2, oldnp(-1);
         bool found;
         int rulenr(-1);
-        Point<3> p1, p2;
+        Point3d p1, p2;
 
         bool debugflag;
 

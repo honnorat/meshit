@@ -143,6 +143,16 @@ namespace meshit {
             return x[2];
         }
 
+        double operator[](size_t i) const
+        {
+            return x[i];
+        }
+
+        double& operator[](size_t i)
+        {
+            return x[i];
+        }
+
         double& X(int i)
         {
             return x[i - 1];

@@ -144,7 +144,7 @@ namespace meshit {
             return 0;
     }
 
-    int AdFront2::SelectBaseLine(Point<3>& p1, Point<3>& p2, int& qualclass)
+    int AdFront2::SelectBaseLine(Point3d& p1, Point3d& p2, int& qualclass)
     {
         int baselineindex = -1;
 
@@ -193,7 +193,7 @@ namespace meshit {
                             double xh)
     {
         int pstind;
-        Point<3> p0;
+        Point3d p0;
 
         pstind = lines[baselineindex].L().I1();
         p0 = points[pstind].P();
@@ -208,8 +208,8 @@ namespace meshit {
         nearpoints.reserve(1000);
 
         // dominating costs !!
-        const Point<3> pmin = p0 - Vec3d(xh, xh, xh);
-        const Point<3> pmax = p0 + Vec3d(xh, xh, xh);
+        const Point3d pmin(p0.X() - xh, p0.Y() - xh);
+        const Point3d pmax(p0.X() + xh, p0.Y() + xh);
         linesearchtree.GetIntersecting(pmin, pmax, nearlines);
         pointsearchtree.GetIntersecting(pmin, pmax, nearpoints);
 

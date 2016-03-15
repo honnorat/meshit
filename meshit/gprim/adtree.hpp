@@ -12,6 +12,7 @@
 
 #include "../meshit.hpp"
 #include "../general/optmem.hpp"
+#include "geom3d.hpp"
 #include "geomobjects.hpp"
 
 namespace meshit {
@@ -89,7 +90,7 @@ namespace meshit {
                 const double* acmax);
         ~ADTree6();
 
-        void Insert(const Point<3>& bmin, const Point<3>& bmax, int pi);
+        void Insert(const Point3d& bmin, const Point3d& bmax, int pi);
         void GetIntersecting(const double* bmin, const double* bmax, std::vector<size_t>& pis) const;
 
         void DeleteElement(int pi);
@@ -137,14 +138,14 @@ namespace meshit {
     {
      protected:
         ADTree6* tree;
-        Point<3> boxpmin, boxpmax;
+        Point3d boxpmin, boxpmax;
 
      public:
         explicit Box3dTree(const Box<3>& abox);
-        Box3dTree(const Point<3>& apmin, const Point<3>& apmax);
+        Box3dTree(const Point3d& apmin, const Point3d& apmax);
         ~Box3dTree();
 
-        void Insert(const Point<3>& bmin, const Point<3>& bmax, int pi);
+        void Insert(const Point3d& bmin, const Point3d& bmax, int pi);
 
         void Insert(const Box<3>& box, int pi)
         {
@@ -156,7 +157,7 @@ namespace meshit {
             tree->DeleteElement(pi);
         }
 
-        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const;
+        void GetIntersecting(const Point3d& pmin, const Point3d& pmax, std::vector<size_t>& pis) const;
     };
 
 }  // namespace meshit

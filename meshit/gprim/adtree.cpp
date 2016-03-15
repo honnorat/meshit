@@ -257,13 +257,13 @@ namespace meshit {
         delete root;
     }
 
-    void ADTree6::Insert(const Point<3>& bmin_, const Point<3>& bmax_, int pi)
+    void ADTree6::Insert(const Point3d& bmin_, const Point3d& bmax_, int pi)
     {
         double p[6];
 
         for (int i = 0; i < 3; i++) {
-            p[i] = bmin_(i);
-            p[i + 3] = bmax_(i);
+            p[i] = bmin_[i];
+            p[i + 3] = bmax_[i];
         }
 
         ADTreeNode6* node = nullptr;
@@ -480,14 +480,14 @@ namespace meshit {
         tree = new ADTree6(tpmin, tpmax);
     }
 
-    Box3dTree::Box3dTree(const Point<3>& apmin, const Point<3>& apmax)
+    Box3dTree::Box3dTree(const Point3d& apmin, const Point3d& apmax)
             : boxpmin(apmin),
               boxpmax(apmax)
     {
         double tpmin[6], tpmax[6];
         for (int i = 0; i < 3; i++) {
-            tpmin[i] = tpmin[i + 3] = boxpmin(i);
-            tpmax[i] = tpmax[i + 3] = boxpmax(i);
+            tpmin[i] = tpmin[i + 3] = boxpmin[i];
+            tpmax[i] = tpmax[i + 3] = boxpmax[i];
         }
         tree = new ADTree6(tpmin, tpmax);
     }
@@ -497,22 +497,22 @@ namespace meshit {
         delete tree;
     }
 
-    void Box3dTree::Insert(const Point<3>& bmin, const Point<3>& bmax, int pi)
+    void Box3dTree::Insert(const Point3d& bmin, const Point3d& bmax, int pi)
     {
         tree->Insert(bmin, bmax, pi);
     }
 
-    void Box3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const
+    void Box3dTree::GetIntersecting(const Point3d& pmin, const Point3d& pmax, std::vector<size_t>& pis) const
     {
         double tpmin[6];
         double tpmax[6];
 
         for (size_t i = 0; i < 3; i++) {
-            tpmin[i] = boxpmin(i);
-            tpmax[i] = pmax(i);
+            tpmin[i] = boxpmin[i];
+            tpmax[i] = pmax[i];
 
-            tpmin[i + 3] = pmin(i);
-            tpmax[i + 3] = boxpmax(i);
+            tpmin[i + 3] = pmin[i];
+            tpmax[i + 3] = boxpmax[i];
         }
 
         tree->GetIntersecting(tpmin, tpmax, pis);

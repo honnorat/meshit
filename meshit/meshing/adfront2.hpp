@@ -172,7 +172,7 @@ namespace meshit {
             return nfl;
         }
 
-        int SelectBaseLine(Point<3>& p1, Point<3>& p2, int& qualclass);
+        int SelectBaseLine(Point3d& p1, Point3d& p2, int& qualclass);
 
         int GetLocals(int baseline,
                       Array<Point3d>& locpoints,
