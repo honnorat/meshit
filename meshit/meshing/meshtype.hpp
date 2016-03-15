@@ -35,16 +35,6 @@ namespace meshit {
 
     extern int NextTimeStamp();
 
-    class PointGeomInfo
-    {
-     public:
-        int trignum;  // for STL Meshing
-        double u, v;  // for OCC Meshing
-
-        PointGeomInfo()
-                : trignum(-1), u(0), v(0) { }
-    };
-
     class EdgePointGeomInfo
     {
      public:
@@ -123,8 +113,6 @@ namespace meshit {
     {
         /// point numbers
         PointIndex pnum[ELEMENT2D_MAXPOINTS];
-        /// geom info of points
-        PointGeomInfo geominfo[ELEMENT2D_MAXPOINTS];
 
         /// surface nr
         int index : 16;
@@ -222,26 +210,6 @@ namespace meshit {
         const PointIndex& PNumMod(size_t i) const
         {
             return pnum[(i - 1) % np];
-        }
-
-        PointGeomInfo& GeomInfoPi(size_t i)
-        {
-            return geominfo[i - 1];
-        }
-
-        const PointGeomInfo& GeomInfoPi(size_t i) const
-        {
-            return geominfo[i - 1];
-        }
-
-        PointGeomInfo& GeomInfoPiMod(size_t i)
-        {
-            return geominfo[(i - 1) % np];
-        }
-
-        const PointGeomInfo& GeomInfoPiMod(size_t i) const
-        {
-            return geominfo[(i - 1) % np];
         }
 
         void SetIndex(int si)
@@ -343,7 +311,6 @@ namespace meshit {
         int domout;
         /// top-level object number of surface
         int tlosurf;
-        PointGeomInfo geominfo[2];
 
         /// surfaces describing edge
         int surfnr1, surfnr2;

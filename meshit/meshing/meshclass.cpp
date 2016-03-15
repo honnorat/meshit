@@ -224,18 +224,14 @@ namespace meshit {
                     compress[pi] = cnt;
                 }
             }
-            PointGeomInfo gi;
-            gi.trignum = 1;
             for (size_t si = 0; si < GetNSeg(); si++) {
                 if (segments[si].domin == domnr) {
-                    meshing.AddBoundaryElement(
-                            compress[segments[si][0]],
-                            compress[segments[si][1]], gi, gi);
+                    meshing.AddBoundaryElement(compress[segments[si][0]],
+                                               compress[segments[si][1]]);
                 }
                 if (segments[si].domout == domnr) {
-                    meshing.AddBoundaryElement(
-                            compress[segments[si][1]],
-                            compress[segments[si][0]], gi, gi);
+                    meshing.AddBoundaryElement(compress[segments[si][1]],
+                                               compress[segments[si][0]]);
                 }
             }
 
@@ -409,10 +405,10 @@ namespace meshit {
             outfile << seg[1];
             outfile << " ";
             outfile.width(8);
-            outfile << seg.geominfo[0].trignum;  // stl dreiecke
+            outfile << 1;  // stl dreiecke
             outfile << " ";
             outfile.width(8);
-            outfile << seg.geominfo[1].trignum;  // <<std::endl;  // stl dreieck
+            outfile << 1;  // <<std::endl;  // stl dreieck
 
             outfile << " ";
             outfile.width(8);
@@ -643,13 +639,15 @@ namespace meshit {
                         infile >> tri.PNum(j);
                     }
                     if (geominfo) {
+                        int hi;
                         for (int j = 1; j <= nep; j++) {
-                            infile >> tri.GeomInfoPi(j).trignum;
+                            infile >> hi;
                         }
                     }
                     if (uv) {
+                        int hi;
                         for (int j = 1; j <= nep; j++) {
-                            infile >> tri.GeomInfoPi(j).u >> tri.GeomInfoPi(j).v;
+                            infile >> hi >> hi;
                         }
                     }
                     if (invertsurf) tri.Invert();
@@ -672,9 +670,7 @@ namespace meshit {
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
                     int hi;
-                    infile >> seg.si >> hi >> seg[0] >> seg[1]
-                    >> seg.geominfo[0].trignum
-                    >> seg.geominfo[1].trignum;
+                    infile >> seg.si >> hi >> seg[0] >> seg[1] >> hi >> hi;
                     AddSegment(seg);
                 }
             }
@@ -688,9 +684,7 @@ namespace meshit {
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
                     int hi;
-                    infile >> seg.si >> hi >> seg[0] >> seg[1]
-                    >> seg.geominfo[0].trignum
-                    >> seg.geominfo[1].trignum
+                    infile >> seg.si >> hi >> seg[0] >> seg[1] >> hi >> hi
                     >> seg.surfnr1 >> seg.surfnr2
                     >> seg.edgenr
                     >> seg.epgeominfo[0].dist
@@ -1165,33 +1159,11 @@ namespace meshit {
                     seg[1] = i2.I2();
                     seg.si = data.I1();
 
-                    // find geomdata:
-                    if (data.I2() > 0) {
-                        // segment due to triangle
-                        const Element2d& el = SurfaceElement(data.I2() - 1);
-                        for (size_t k = 1; k <= el.GetNP(); k++) {
-                            if (seg[0] == el.PNum(k))
-                                seg.geominfo[0] = el.GeomInfoPi(k);
-                            if (seg[1] == el.PNum(k))
-                                seg.geominfo[1] = el.GeomInfoPi(k);
-                        }
-                        std::cerr << "trig seg: ";
-                    } else {
-                        // segment due to line
-                        const Segment& lseg = LineSegment(-(data.I2() - 1));
-                        seg.geominfo[0] = lseg.geominfo[0];
-                        seg.geominfo[1] = lseg.geominfo[1];
-                        std::cerr << "line seg: ";
-                    }
-
                     std::cerr << seg[0] << " - " << seg[1]
                     << " len = " << Dist(Point(seg[0]), Point(seg[1]))
                     << std::endl;
 
                     opensegments.push_back(seg);
-                    if (seg.geominfo[0].trignum <= 0 || seg.geominfo[1].trignum <= 0) {
-                        std::cerr << "Problem with open segment: " << seg << std::endl;
-                    }
                 }
             }
         }

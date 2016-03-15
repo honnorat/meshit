@@ -129,7 +129,6 @@ namespace meshit {
      public:
         const MeshOptimize2d* meshthis;
         MeshPoint sp1;
-        PointGeomInfo gi1;
         Vec3d normal, t1, t2;
         Array<SurfaceElementIndex> locelements;
         Array<int> locrots;
@@ -421,7 +420,6 @@ namespace meshit {
                     }
                 }
 
-                ld.gi1 = hel.GeomInfoPi(hpi);
                 ld.locelements.resize(0);
                 ld.locrots.resize(0);
                 ld.lochs.resize(0);
@@ -495,13 +493,6 @@ namespace meshit {
                 mesh.Point(pi).X() = hnp.X();
                 mesh.Point(pi).Y() = hnp.Y();
                 mesh.Point(pi).Z() = hnp.Z();
-
-                PointGeomInfo ngi;
-                ngi = ld.gi1;
-                ngi.trignum = 1;
-                for (size_t j = 0; j < ld.locelements.size(); j++) {
-                    mesh.SurfaceElement(ld.locelements[j]).GeomInfoPi(ld.locrots[j]) = ngi;
-                }
             }
         }
         mesh.SetNextTimeStamp();

@@ -36,7 +36,6 @@ namespace meshit {
             domin(other.domin),
             domout(other.domout),
             tlosurf(other.tlosurf),
-            geominfo(),
             surfnr1(other.surfnr1),
             surfnr2(other.surfnr2),
             epgeominfo(),
@@ -46,9 +45,6 @@ namespace meshit {
         for (int j = 0; j < 3; j++) {
             pnums[j] = other.pnums[j];
         }
-
-        geominfo[0] = other.geominfo[0];
-        geominfo[1] = other.geominfo[1];
         epgeominfo[0] = other.epgeominfo[0];
         epgeominfo[1] = other.epgeominfo[1];
     }
@@ -66,8 +62,6 @@ namespace meshit {
             domin = other.domin;
             domout = other.domout;
             tlosurf = other.tlosurf;
-            geominfo[0] = other.geominfo[0];
-            geominfo[1] = other.geominfo[1];
             surfnr1 = other.surfnr1;
             surfnr2 = other.surfnr2;
             epgeominfo[0] = other.epgeominfo[0];
@@ -82,9 +76,7 @@ namespace meshit {
 
     std::ostream& operator<<(std::ostream& s, const Segment& seg)
     {
-        s << seg[0] << "(gi=" << seg.geominfo[0].trignum << ") - "
-        << seg[1] << "(gi=" << seg.geominfo[1].trignum << ")"
-        << " domin = " << seg.domin << ", domout = " << seg.domout
+        s << seg[0] << " - " << seg[1] << " domin = " << seg.domin << ", domout = " << seg.domout
         << " si = " << seg.si << ", edgenr = " << seg.edgenr;
         return s;
     }
@@ -93,7 +85,6 @@ namespace meshit {
     {
         for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
             pnum[i] = 0;
-            geominfo[i].trignum = 0;
         }
         np = 3;
         index = 0;
@@ -105,7 +96,6 @@ namespace meshit {
     {
         for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
             pnum[i] = 0;
-            geominfo[i].trignum = 0;
         }
         np = anp;
         index = 0;
@@ -134,7 +124,6 @@ namespace meshit {
     {
         for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
             pnum[i] = 0;
-            geominfo[i].trignum = 0;
         }
 
         SetType(atyp);
@@ -154,9 +143,6 @@ namespace meshit {
         pnum[4] = 0;
         pnum[5] = 0;
 
-        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
-            geominfo[i].trignum = 0;
-        }
         index = 0;
         deleted = 0;
     }
@@ -173,9 +159,6 @@ namespace meshit {
         pnum[4] = 0;
         pnum[5] = 0;
 
-        for (int i = 0; i < ELEMENT2D_MAXPOINTS; i++) {
-            geominfo[i].trignum = 0;
-        }
         index = 0;
         deleted = 0;
     }

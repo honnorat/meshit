@@ -184,11 +184,6 @@ namespace meshit {
                     PointIndex pi3 = mesh.SurfaceElement(t1).PNumMod(o1 + 1);
                     PointIndex pi4 = mesh.SurfaceElement(t2).PNumMod(o2 + 1);
 
-                    PointGeomInfo gi1 = mesh.SurfaceElement(t1).GeomInfoPiMod(o1 + 1 + 1);
-                    PointGeomInfo gi2 = mesh.SurfaceElement(t1).GeomInfoPiMod(o1 + 1 + 2);
-                    PointGeomInfo gi3 = mesh.SurfaceElement(t1).GeomInfoPiMod(o1 + 1);
-                    PointGeomInfo gi4 = mesh.SurfaceElement(t2).GeomInfoPiMod(o2 + 1);
-
                     bool allowswap = true;
 
                     Vec3d auxvec1 = mesh.Point(pi3) - mesh.Point(pi4);
@@ -269,14 +264,6 @@ namespace meshit {
                             mesh.SurfaceElement(t2).PNum(1) = pi2;
                             mesh.SurfaceElement(t2).PNum(2) = pi3;
                             mesh.SurfaceElement(t2).PNum(3) = pi4;
-
-                            mesh.SurfaceElement(t1).GeomInfoPi(1) = gi1;
-                            mesh.SurfaceElement(t1).GeomInfoPi(2) = gi4;
-                            mesh.SurfaceElement(t1).GeomInfoPi(3) = gi3;
-
-                            mesh.SurfaceElement(t2).GeomInfoPi(1) = gi2;
-                            mesh.SurfaceElement(t2).GeomInfoPi(2) = gi3;
-                            mesh.SurfaceElement(t2).GeomInfoPi(3) = gi4;
 
                             pdef[pi1]--;
                             pdef[pi2]--;
@@ -446,7 +433,6 @@ namespace meshit {
 
                 if (should) {
                     mesh[pi1] = pnew;
-                    PointGeomInfo gi;
                     Element2d* el1p(NULL);
                     {
                         size_t l = 0;
@@ -458,11 +444,6 @@ namespace meshit {
                             el1p = &mesh.SurfaceElement(elementsonnode[pi1][l]);
                         } else {
                             MESHIT_LOG_ERROR("MeshOptimize2d::CombineImprove: OOPS!");
-                        }
-                    }
-                    for (size_t l = 0; l < el1p->GetNP(); l++) {
-                        if ((*el1p)[l] == pi1) {
-                            gi = el1p->GeomInfoPi(l + 1);
                         }
                     }
                     for (size_t k = 0; k < elementsonnode[pi2].size(); k++) {
@@ -480,7 +461,6 @@ namespace meshit {
                         for (size_t l = 0; l < el.GetNP(); l++) {
                             if (el[l] == pi2) {
                                 el[l] = pi1;
-                                el.GeomInfoPi(l + 1) = gi;
                             }
                             fixed[el[l]] = true;
                         }

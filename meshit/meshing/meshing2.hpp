@@ -52,9 +52,7 @@ namespace meshit {
         MESHING2_RESULT GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr);
 
         void AddPoint(const Point3d& p, PointIndex globind);
-
-        void AddBoundaryElement(INDEX i1, INDEX i2,
-                                const PointGeomInfo& gi1, const PointGeomInfo& gi2);
+        void AddBoundaryElement(INDEX i1, INDEX i2);
         void SetMaxArea(double amaxarea);
 
      protected:
@@ -69,25 +67,22 @@ namespace meshit {
         /// return >0 .. cannot transform point to true surface
         virtual int TransformFromPlain(Point2d& plainpoint,
                                        Point3d& locpoint,
-                                       PointGeomInfo& geominfo,
                                        double h);
 
         /// projects to surface
         /// return 0 .. ok
-        virtual int BelongsToActiveChart(const Point3d& p,
-                                         const PointGeomInfo& gi);
+        virtual int BelongsToActiveChart(const Point3d& p);
 
         /// computes geoinfo data for line with respect to
         /// selected chart
-        virtual int ComputePointGeomInfo(const Point3d& p,
-                                         PointGeomInfo& gi);
+        virtual int ComputePointGeomInfo(const Point3d& p);
 
         /*
           tests, whether endpoint (= 1 or 2) of line segment p1-p2
           is inside of the selected chart. The endpoint must be on the
           chart
          */
-        virtual int IsLineVertexOnChart(const Point3d& p1, const Point3d& p2, const PointGeomInfo& geominfo);
+        virtual int IsLineVertexOnChart(const Point3d& p1, const Point3d& p2);
 
         /*
           get (projected) boundary of current chart

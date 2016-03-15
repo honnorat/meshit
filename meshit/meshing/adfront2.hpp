@@ -94,8 +94,6 @@ namespace meshit {
         INDEX_2 l;
         /// quality class 
         int lineclass;
-        /// geometry specific data
-        PointGeomInfo geominfo[2];
 
      public:
         FrontLine()
@@ -136,17 +134,6 @@ namespace meshit {
             lineclass = 1000;
         }
 
-        void SetGeomInfo(const PointGeomInfo& gi1, const PointGeomInfo& gi2)
-        {
-            geominfo[0] = gi1;
-            geominfo[1] = gi2;
-        }
-
-        const PointGeomInfo& GetGeomInfo(int endp) const
-        {
-            return geominfo[endp - 1];
-        }
-
         friend class AdFront2;
     };
 
@@ -185,10 +172,7 @@ namespace meshit {
             return nfl;
         }
 
-        int SelectBaseLine(Point<3>& p1, Point<3>& p2,
-                           const PointGeomInfo*& geominfo1,
-                           const PointGeomInfo*& geominfo2,
-                           int& qualclass);
+        int SelectBaseLine(Point<3>& p1, Point<3>& p2, int& qualclass);
 
         int GetLocals(int baseline,
                       Array<Point3d>& locpoints,
@@ -201,18 +185,13 @@ namespace meshit {
 
         int AddPoint(const Point3d& p, PointIndex globind);
 
-        int AddLine(int pi1, int pi2, const PointGeomInfo& gi1, const PointGeomInfo& gi2);
+        int AddLine(int pi1, int pi2);
 
         int ExistsLine(int gpi1, int gpi2);
 
         void IncrementClass(int li)
         {
             lines[li].IncrementClass();
-        }
-
-        const PointGeomInfo& GetLineGeomInfo(int li, int lend) const
-        {
-            return lines[li].GetGeomInfo(lend);
         }
 
         PointIndex GetGlobalIndex(int pi) const

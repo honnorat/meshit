@@ -30,13 +30,9 @@ namespace meshit {
         adfront->AddPoint(p, globind);
     }
 
-    void Meshing2::AddBoundaryElement(int i1, int i2,
-                                      const PointGeomInfo& gi1, const PointGeomInfo& gi2)
+    void Meshing2::AddBoundaryElement(int i1, int i2)
     {
-        if (!gi1.trignum || !gi2.trignum) {
-            MESHIT_LOG_ERROR("Meshing2::AddBoundaryElement: illegal geominfo");
-        }
-        adfront->AddLine(i1 - 1, i2 - 1, gi1, gi2);
+        adfront->AddLine(i1 - 1, i2 - 1);
     }
 
     void Meshing2::StartMesh()
@@ -90,11 +86,9 @@ namespace meshit {
     int Meshing2::TransformFromPlain(
             Point2d& plainpoint,
             Point3d& locpoint,
-            PointGeomInfo& gi,
             double h)
     {
         Vec3d p1p;
-        gi.trignum = 1;
 
         p1p = plainpoint.X() * ex + plainpoint.Y() * ey;
         p1p *= h;
@@ -102,18 +96,17 @@ namespace meshit {
         return 0;
     }
 
-    int Meshing2::BelongsToActiveChart(const Point3d& p, const PointGeomInfo& gi)
+    int Meshing2::BelongsToActiveChart(const Point3d& p)
     {
         return 1;
     }
 
-    int Meshing2::ComputePointGeomInfo(const Point3d& p, PointGeomInfo& gi)
+    int Meshing2::ComputePointGeomInfo(const Point3d& p)
     {
-        gi.trignum = 1;
         return 0;
     }
 
-    int Meshing2::IsLineVertexOnChart(const Point3d& p1, const Point3d& p2, const PointGeomInfo& geominfo)
+    int Meshing2::IsLineVertexOnChart(const Point3d& p1, const Point3d& p2)
     {
         return 1;
     }
@@ -135,16 +128,12 @@ namespace meshit {
         Array<int> pindex, lindex;
         Array<int> delpoints, dellines;
 
-        Array<PointGeomInfo> upgeominfo; // unique info
         Array<Element2d> locelements;
 
         int z1, z2, oldnp(-1);
         bool found;
         int rulenr(-1);
         Point<3> p1, p2;
-
-        const PointGeomInfo* blgeominfo1;
-        const PointGeomInfo* blgeominfo2;
 
         bool debugflag;
 
@@ -226,9 +215,6 @@ namespace meshit {
                 plotnexttrial += 1000;
             }
 
-            // unique-pgi, multi-pgi
-            upgeominfo.resize(0);
-
             nfaces = adfront->GetNFL();
             trials++;
 
@@ -242,7 +228,7 @@ namespace meshit {
                 }
             }
 
-            int baselineindex = adfront->SelectBaseLine(p1, p2, blgeominfo1, blgeominfo2, qualclass);
+            int baselineindex = adfront->SelectBaseLine(p1, p2, qualclass);
 
             found = true;
             his = Dist(p1, p2);
@@ -319,8 +305,7 @@ namespace meshit {
                     if ((z1 >= 0) != (z2 >= 0)) {
                         int innerp = (z1 >= 0) ? 1 : 2;
                         if (IsLineVertexOnChart(locpoints[loclines[i].I1() - 1],
-                                                locpoints[loclines[i].I2() - 1],
-                                                adfront->GetLineGeomInfo(lindex[i], innerp))) {
+                                                locpoints[loclines[i].I2() - 1])) {
 
                             // use one end of line
                             int pini, pouti;
@@ -436,10 +421,9 @@ namespace meshit {
 
             if (found) {
                 locpoints.resize(plainpoints.size());
-                upgeominfo.resize(locpoints.size());
 
                 for (size_t i = oldnp; i < plainpoints.size(); i++) {
-                    int err = TransformFromPlain(plainpoints[i], locpoints[i], upgeominfo[i], h);
+                    int err = TransformFromPlain(plainpoints[i], locpoints[i], h);
 
                     if (err) {
                         found = false;
@@ -596,14 +580,6 @@ namespace meshit {
                                 tp3 = mesh.Point(el.PNum(4));
                             }
 
-                            int onchart = 0;
-                            for (size_t k = 1; k <= el.GetNP(); k++) {
-                                if (BelongsToActiveChart(mesh.Point(el.PNum(k)), el.GeomInfoPi(k)))
-                                    onchart = 1;
-                            }
-                            if (!onchart)
-                                continue;
-
                             Vec3d e1(tp1, tp2);
                             Vec3d e2(tp1, tp3);
                             Vec3d n = Cross(e1, e2);
@@ -666,24 +642,13 @@ namespace meshit {
                         pindex[loclines[i].I2() - 1] == -1) {
                         std::cerr << "pindex is 0" << std::endl;
                     }
-                    if (!upgeominfo[loclines[i].I1() - 1].trignum ||
-                        !upgeominfo[loclines[i].I2() - 1].trignum) {
-                        std::cout << "new el: illegal geominfo" << std::endl;
-                    }
                     adfront->AddLine(pindex[loclines[i].I1() - 1],
-                                     pindex[loclines[i].I2() - 1],
-                                     upgeominfo[loclines[i].I1() - 1],
-                                     upgeominfo[loclines[i].I2() - 1]);
+                                     pindex[loclines[i].I2() - 1]);
                 }
                 for (size_t i = 0; i < locelements.size(); i++) {
                     Element2d mtri(locelements[i].GetNP());
                     mtri = locelements[i];
                     mtri.SetIndex(facenr);
-
-                    // compute triangle geominfo:
-                    for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
-                        mtri.GeomInfoPi(j) = upgeominfo[locelements[i].PNum(j) - 1];
-                    }
 
                     for (size_t j = 1; j <= locelements[i].GetNP(); j++) {
                         mtri.PNum(j) = locelements[i].PNum(j) =

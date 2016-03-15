@@ -62,8 +62,7 @@ namespace meshit {
         return pi;
     }
 
-    int AdFront2::AddLine(int pi1, int pi2,
-                          const PointGeomInfo& gi1, const PointGeomInfo& gi2)
+    int AdFront2::AddLine(int pi1, int pi2)
     {
         int minfn;
         int li;
@@ -88,12 +87,6 @@ namespace meshit {
             lines.push_back(FrontLine(INDEX_2(pi1, pi2)));
             li = lines.size() - 1;
         }
-
-        if (!gi1.trignum || !gi2.trignum) {
-            std::cout << "ERROR: in AdFront::AddLine, illegal geominfo" << std::endl;
-        }
-
-        lines[li].SetGeomInfo(gi1, gi2);
 
         Box3d lbox;
         lbox.SetPoint(p1.P());
@@ -151,10 +144,7 @@ namespace meshit {
             return 0;
     }
 
-    int AdFront2::SelectBaseLine(Point<3>& p1, Point<3>& p2,
-                                 const PointGeomInfo*& geominfo1,
-                                 const PointGeomInfo*& geominfo2,
-                                 int& qualclass)
+    int AdFront2::SelectBaseLine(Point<3>& p1, Point<3>& p2, int& qualclass)
     {
         int baselineindex = -1;
 
@@ -190,9 +180,6 @@ namespace meshit {
 
         p1 = points[lines[baselineindex].L().I1()].P();
         p2 = points[lines[baselineindex].L().I2()].P();
-        geominfo1 = &lines[baselineindex].GetGeomInfo(1);
-        geominfo2 = &lines[baselineindex].GetGeomInfo(2);
-
         qualclass = lines[baselineindex].LineClass();
 
         return baselineindex;

@@ -38,7 +38,6 @@ namespace meshit {
         Array<size_t> elmap;
         Array<size_t> elrot;
         Array<PointIndex> pmap;
-        Array<PointGeomInfo> pgi;
 
         int surfnr = mesh.GetFaceDescriptor(faceindex).SurfNr();
 
@@ -250,7 +249,6 @@ namespace meshit {
             elmap.resize(rule.oldels.size());
             elrot.resize(rule.oldels.size());
             pmap.resize(rule.onp);
-            pgi.resize(rule.onp);
 
             for (size_t sei = 0; sei < ne; sei++) {
 
@@ -272,7 +270,6 @@ namespace meshit {
 
                     for (size_t k = 0; k < el0.GetNP(); k++) {
                         pmap[rel0[k] - 1] = el0.PNumMod(k + elrot[0] + 1);
-                        pgi[rel0[k] - 1] = el0.GeomInfoPiMod(k + elrot[0] + 1);
                     }
 
                     ok = 1;
@@ -296,7 +293,6 @@ namespace meshit {
                                 if (possible) {
                                     for (size_t k = 0; k < el.GetNP(); k++) {
                                         pmap[rel[k] - 1] = el.PNumMod(k + elrot[i] + 1);
-                                        pgi[rel[k] - 1] = el.GeomInfoPiMod(k + elrot[i] + 1);
                                     }
                                     break;
                                 }
@@ -365,7 +361,6 @@ namespace meshit {
                         nel.SetIndex(faceindex);
                         for (size_t k = 1; k <= rnel.GetNP(); k++) {
                             nel.PNum(k) = pmap[rnel.PNum(k) - 1];
-                            nel.GeomInfoPi(k) = pgi[rnel.PNum(k) - 1];
                         }
                         mesh.AddSurfaceElement(nel);
                     }
