@@ -65,8 +65,7 @@ namespace meshit {
         return 0;
     }
 
-    static double TriangleQualityInst(const Point3d& p1, const Point3d& p2,
-                                      const Point3d& p3)
+    static double TriangleQualityInst(const Point3d& p1, const Point3d& p2, const Point3d& p3)
     {
         // quality 0 (worst) .. 1 (optimal)
 
@@ -115,7 +114,7 @@ namespace meshit {
         for (size_t i = 0; i < ncl; i++) {
             MESHIT_LOG_INFO(std::fixed << std::setprecision(2) <<
                             std::setw(4) << static_cast<double>(i) / ncl << " - " <<
-                            std::setw(4) << static_cast<double>(i+1) / ncl << ": " << incl[i]);
+                            std::setw(4) << static_cast<double>(i + 1) / ncl << ": " << incl[i]);
         }
     }
 

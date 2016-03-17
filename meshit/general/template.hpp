@@ -51,9 +51,7 @@ namespace meshit {
         INDEX_2 Sort()
         {
             if (i[0] > i[1]) {
-                INDEX hi = i[0];
-                i[0] = i[1];
-                i[1] = hi;
+                std::swap(i[0], i[1]);
             }
             return *this;
         }

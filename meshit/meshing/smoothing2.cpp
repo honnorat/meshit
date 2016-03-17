@@ -5,30 +5,9 @@
 
 namespace meshit {
 
-    static const double c_trig = 0.1443375672974;  // sqrt(3.0) / 12
-    static const double c_trig4 = 0.577350269189;  // sqrt(3.0) / 3
-
-    inline double CalcTriangleBadness(double x2, double x3, double y3, double metricweight, double h)
-    {
-        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
-        // p1 = (0, 0), p2 = (x2, 0), p3 = (x3, y3);
-
-        double cir_2 = (x2 * x2 + x3 * x3 + y3 * y3 - x2 * x3);
-        double area = x2 * y3;
-
-        if (area <= 1e-24 * cir_2)
-            return 1e10;
-
-        double badness = c_trig4 * cir_2 / area - 1;
-
-        if (metricweight > 0) {
-            // add:  metricweight * (area / h^2 + h^2 / area - 2)
-
-            double areahh = area / (h * h);
-            badness += metricweight * (areahh + 1 / areahh - 2);
-        }
-        return badness;
-    }
+    static const double c_trig0 = 0.144337567297406;  // sqrt(3.0) / 12
+    static const double c_trig2 = 0.288675134594813;  // sqrt(3.0) / 6
+    static const double c_trig4 = 0.577350269189626;  // sqrt(3.0) / 3
 
     double CalcTriangleBadness(
             const Point3d& p1,
@@ -37,25 +16,35 @@ namespace meshit {
             double metricweight,
             double h)
     {
-        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
+        // badness = B = sqrt(3.0)/12 * (\sum l_i^2) / area - 1
+        double dx12 = p2.X() - p1.X();  // x component of e12 = p2 - p1
+        double dx13 = p3.X() - p1.X();  // x component of e13 = p3 - p1
+        double dx23 = p3.X() - p2.X();  // x component of e23 = p3 - p2
+        double dy12 = p2.Y() - p1.Y();  // y component of e12 = p2 - p1
+        double dy13 = p3.Y() - p1.Y();  // y component of e13 = p3 - p1
+        double dy23 = p3.Y() - p2.Y();  // y component of e23 = p3 - p2
 
-        Vec3d e12 = p2 - p1;
-        Vec3d e13 = p3 - p1;
-        Vec3d e23 = p3 - p2;
+        // c^2 = Σ_i L_i^2 = e12.Length2() + e13.Length2() + e23.Length2()
+        double c_2 = dx12 * dx12 + dx13 * dx13 + dx23 * dx23 +
+                     dy12 * dy12 + dy13 * dy13 + dy23 * dy23;
 
-        double cir_2 = e12.Length2() + e13.Length2() + e23.Length2();
-        double area = 0.5 * Cross(e12, e13).Length();
+        // A = (1/2) * || e_12 ^ e_13 || = 0.5 * Cross(e12, e13).Length()
+        double cross_z = dx12 * dy13 - dy12 * dx13;  // z component of Cross(e12, e13)
+        double area = 0.5 * fabs(cross_z);
 
-        if (area <= 1e-24 * cir_2)
+        if (area <= 1e-24 * c_2)
             return 1e10;
 
-        double badness = c_trig * cir_2 / area - 1;
+        // B = sqrt(3.0)/12 * ( c^2 / A ) - 1
+        double badness = c_trig0 * c_2 / area - 1.0;
 
         if (metricweight > 0) {
-            // add:  metricweight * (area / h^2 + h^2 / area - 2)
-            area *= 2;   // optimum for (2 area) is h^2
-            double areahh = area / (h * h);
-            badness += metricweight * (areahh + 1 / areahh - 2);
+            // add:  metricweight * (A / h^2 + h^2 / A - 2)
+            // optimum for (2A) is h^2
+            double areahh = 2.0 * area / (h * h);
+
+            // B += metricweight * (2A / h^2 + h^2 / 2A - 2)
+            badness += metricweight * (areahh + 1.0 / areahh - 2.0);
         }
 
         return badness;
@@ -65,63 +54,94 @@ namespace meshit {
             const Point3d& p1,
             const Point3d& p2,
             const Point3d& p3,
-            Vec3d& gradp1,
+            Vec3d& d_bad,
             double metricweight,
             double h)
     {
-        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
+        // badness = B = sqrt(3.0)/12 * (\sum l_i^2) / area - 1
+        double dx12 = p2.X() - p1.X();  // x component of e12 = p2 - p1
+        double dx13 = p3.X() - p1.X();  // x component of e13 = p3 - p1
+        double dx23 = p3.X() - p2.X();  // x component of e23 = p3 - p2
+        double dy12 = p2.Y() - p1.Y();  // y component of e12 = p2 - p1
+        double dy13 = p3.Y() - p1.Y();  // y component of e13 = p3 - p1
+        double dy23 = p3.Y() - p2.Y();  // y component of e23 = p3 - p2
 
-        Vec3d e12 = p2 - p1;
-        Vec3d e13 = p3 - p1;
-        Vec3d e23 = p3 - p2;
+        // c^2 = Σ_i L_i^2 = e12.Length2() + e13.Length2() + e23.Length2()
+        double c_2 = dx12 * dx12 + dx13 * dx13 + dx23 * dx23 +
+                     dy12 * dy12 + dy13 * dy13 + dy23 * dy23;
 
-        double cir_2 = e12.Length2() + e13.Length2() + e23.Length2();
-        Vec3d varea = Cross(e12, e13);
-        double area = 0.5 * varea.Length();
+        // A = (1/2) * || e_12 x e_13 || = 0.5 * Cross(e12, e13).Length()
+        double cross_z = dx12 * dy13 - dy12 * dx13;  // z component of Cross(e12, e13)
+        double area = 0.5 * fabs(cross_z);
 
-        Vec3d dcir_2 = (-2) * (e12 + e13);
-        Vec3d darea = (0.25 / area) * Cross(p2 - p3, varea);
-
-        if (area <= 1e-24 * cir_2) {
-            gradp1 = 0;
+        if (area <= 1e-24 * c_2) {
+            d_bad = 0;
             return 1e10;
         }
 
-        double badness = c_trig * cir_2 / area - 1;
-        gradp1 = c_trig * (1.0 / area * dcir_2 - cir_2 / (area * area) * darea);
+        // B = sqrt(3.0)/12 * ( c^2 / A ) - 1
+        double badness = c_trig0 * c_2 / area - 1.0;
+
+        // ∇B = sqrt(3.0)/12 * (1/A * ∇(c^2) - c^2 / (A^2) * ∇A);
+        //  with ∇(c^2) = -2*(e_12 + e_13)
+        //  and  ∇A = 1/(4*A) * (e_32 x (e_12 x e_13 ) ) =  (0.25 / area) * Cross(-e23, Cross(e12, e13))
+        double beta = 0.125 * c_2 * cross_z / (area * area);
+        d_bad.X() = -2.0 * (c_trig0 / area) * (dx12 + dx13 - beta * dy23);
+        d_bad.Y() = -2.0 * (c_trig0 / area) * (dy12 + dy13 + beta * dx23);
+        d_bad.Z() = 0.0;
 
         if (metricweight > 0) {
-            // add:  metricweight * (area / h^2 + h^2 / area - 2)
-            area *= 2;  // optimum for (2 area) is h^2
+            // add:  metricweight * (A / h^2 + h^2 / A - 2)
+            // optimum for (2A) is h^2
+            double h_2 = h * h;
+            double areahh = 2.0 * area / h_2;
 
-            double areahh = area / (h * h);
-            badness += metricweight * (areahh + 1 / areahh - 2);
+            // B += metricweight * (2A / h^2 + h^2 / 2A - 2)
+            badness += metricweight * (areahh + 1.0 / areahh - 2.0);
 
-            gradp1 += (2 * metricweight * (1 / (h * h) - (h * h) / (area * area))) * darea;
+            // ∇B += metricweight * ( 2∇A/h^2 - 2 h^2/((2A)^2)∇A )
+            double gamma = 0.5 * metricweight * (1.0 / h_2 - 0.25 * h_2 / (area * area)) / area;
+            d_bad.X() -= gamma * (cross_z * dy23);
+            d_bad.Y() += gamma * (cross_z * dx23);
         }
-
         return badness;
     }
 
-    double CalcTriangleBadness(
+
+    inline double CalcTriangleBadnessRect(double x2, double x3, double y3)
+    {
+        // badness = sqrt(3.0) / 12 * (\sum l_i^2) / area - 1
+        // p1 = (0, 0), p2 = (x2, 0), p3 = (x3, y3);
+
+        double c_2 = (x2 * x2 + x3 * x3 + y3 * y3 - x2 * x3);
+        double area = x2 * y3;
+
+        if (area <= 1e-24 * c_2)
+            return 1e10;
+
+        double badness = c_trig4 * c_2 / area - 1;
+        return badness;
+    }
+
+    double CalcTriangleBadness_2(
             const Point3d& p1,
             const Point3d& p2,
             const Point3d& p3,
-            const Vec3d& n,
-            double metricweight,
-            double h)
+            double n_z)
     {
-        Vec3d v1 = p2 - p1;
-        Vec3d v2 = p3 - p1;
+        double dp12x = p2.X() - p1.X();  // v1 = p2 - p1
+        double dp12y = p2.Y() - p1.Y();
+        double dp13x = p3.X() - p1.X();  // v2 = p3 - p1
+        double dp13y = p3.Y() - p1.Y();
 
-        Vec3d e1 = v1;
-        Vec3d e2 = v2;
+        // x2 = e1 . v1  with  e1 = v1 / ||v1||  ie.  x2 = ||v1||
+        // x3 = e1 . v2  with  e2 = (0, 0, n_z) x e2
+        // y3 = e2 . v2
+        double x2 = sqrt(dp12x * dp12x + dp12y * dp12y);
+        double x3 = (dp12x * dp13x + dp12y * dp13y);
+        double y3 = n_z * (dp13y * dp12x - dp12y * dp13x) / x2;
 
-        e1 -= (e1 * n) * n;
-        e1 /= (e1.Length() + 1e-24);
-        e2 = Cross(n, e1);
-
-        return CalcTriangleBadness((e1 * v1), (e1 * v2), (e2 * v2), metricweight, h);
+        return CalcTriangleBadnessRect(x2, x3, y3);
     }
 
     class Opti2dLocalData
@@ -238,9 +258,7 @@ namespace meshit {
     MeshOptimize2d::MeshOptimize2d()
     {
         SetFaceIndex(0);
-        SetImproveEdges(0);
         SetMetricWeight(0);
-        SetWriteStatus(1);
     }
 
     void MeshOptimize2d::ImproveMesh(Mesh& mesh, const MeshingParameters& mp)

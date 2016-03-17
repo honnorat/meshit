@@ -9,7 +9,6 @@ namespace meshit {
     {
         int faceindex;
         double metricweight;
-        int writestatus;
 
      public:
         MeshOptimize2d();
@@ -17,7 +16,6 @@ namespace meshit {
         virtual ~MeshOptimize2d() { }
 
         void ImproveMesh(Mesh& mesh2d, const MeshingParameters& mp);
-
         void EdgeSwapping(Mesh& mesh, int usemetric);
         void CombineImprove(Mesh& mesh);
 
@@ -26,16 +24,9 @@ namespace meshit {
             faceindex = fi;
         }
 
-        void SetImproveEdges(int ie) { }
-
         void SetMetricWeight(double mw)
         {
             metricweight = mw;
-        }
-
-        void SetWriteStatus(int ws)
-        {
-            writestatus = ws;
         }
 
         friend class Opti2SurfaceMinFunction;
@@ -48,13 +39,11 @@ namespace meshit {
             double metricweight,
             double h);
 
-    double CalcTriangleBadness(
+    double CalcTriangleBadness_2(
             const Point3d& p1,
             const Point3d& p2,
             const Point3d& p3,
-            const Vec3d& n,
-            double metricweight,
-            double h);
+            double n_z);
 }  // namespace meshit
 
 #endif

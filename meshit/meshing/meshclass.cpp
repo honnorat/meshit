@@ -70,7 +70,7 @@ namespace meshit {
         Point3d pmax(bbox.PMax()(0), bbox.PMax()(1), bbox.Diam());
 
         SetLocalH(pmin, pmax, mp.grading);
-        SetGlobalH(h);
+        hglob = h;
 
         geometry.PartitionBoundary(mp, h, *this);
 
@@ -102,19 +102,14 @@ namespace meshit {
             facedecoding.push_back(FaceDescriptor(i, 0, 0, i));
         }
 
-        int maxsegmentindex = 0;
-        for (size_t si = 0; si < GetNSeg(); si++) {
-            if (segments[si].si > maxsegmentindex) maxsegmentindex = segments[si].si;
-        }
-
         CalcLocalH();
 
         int bnp = GetNP();  // boundary points
 
         for (int domnr = 1; domnr <= maxdomnr; domnr++) {
-            if (geometry.GetDomainMaxh(domnr) > 0)
+            if (geometry.GetDomainMaxh(domnr) > 0) {
                 h = geometry.GetDomainMaxh(domnr);
-
+            }
             MESHIT_LOG_DEBUG("Meshing domain " << domnr << " / " << maxdomnr);
 
             int oldnf = GetNSE();
@@ -159,11 +154,11 @@ namespace meshit {
 
         int hsteps = mp.optsteps2d;
 
-        mp.optimize2d = "smcm";
+        mp.optimize2d = "smm";
         mp.optsteps2d = hsteps / 2;
         Optimize2d(*this, mp);
 
-        mp.optimize2d = "Smcm";
+        mp.optimize2d = "Smm";
         mp.optsteps2d = (hsteps + 1) / 2;
         Optimize2d(*this, mp);
 
@@ -537,7 +532,7 @@ namespace meshit {
                     infile >> nep;
                     if (!nep) nep = 3;
 
-                    if ( nep != 3 ) {
+                    if (nep != 3) {
                         MESHIT_LOG_FATAL("Mesh::Load: undefined element type. nep = " << nep << ". Aborting");
                         exit(1);
                     }
@@ -804,9 +799,9 @@ namespace meshit {
             const Segment& seg = segments[i];
             for (int j = 1; j <= 2; j++) {
                 PointIndex hi = (j == 1) ? seg[0] : seg[1];
-                if (points[hi].Type() == INNERPOINT ||
-                    points[hi].Type() == SURFACEPOINT)
+                if (points[hi].Type() == INNERPOINT || points[hi].Type() == SURFACEPOINT) {
                     points[hi].SetType(EDGEPOINT);
+                }
             }
         }
 
@@ -1062,10 +1057,7 @@ namespace meshit {
     void Mesh::SetLocalH(const Point3d& pmin, const Point3d& pmax, double grading)
     {
         Point3d c = Center(pmin, pmax);
-        double d = 0.5 * std::max(
-                pmax.X() - pmin.X(), std::max(
-                pmax.Y() - pmin.Y(),
-                pmax.Z() - pmin.Z()));
+        double d = 0.5 * std::max(pmax.X() - pmin.X(), std::max(pmax.Y() - pmin.Y(), pmax.Z() - pmin.Z()));
         Point3d pmin2 = c - Vec3d(d, d, d);
         Point3d pmax2 = c + Vec3d(d, d, d);
 
@@ -1783,9 +1775,7 @@ namespace meshit {
         SurfaceElementIndex si = facedecoding[facenr - 1].firstelement;
         while (si != -1) {
             const Element2d& se = SurfaceElement(si);
-            if (se.GetIndex() == facenr
-                && se[0] >= 0
-                && !se.IsDeleted()) {
+            if (se.GetIndex() == facenr && se.PNum(1) >= 0 && !se.IsDeleted()) {
                 sei.push_back(si);
             }
             si = se.next;

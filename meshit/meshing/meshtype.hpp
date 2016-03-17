@@ -339,27 +339,10 @@ namespace meshit {
     {
      public:
         /**
-           3d optimization strategy:
-           // m .. move nodes
-           // M .. move nodes, cheap functional
-           // s .. std::swap faces
-           // c .. combine elements
-           // d .. divide elements
-           // p .. plot, no pause
-           // P .. plot, Pause
-           // h .. Histogramm, no pause
-           // H .. Histogramm, pause
-         */
-        const char* optimize3d;
-        /// number of 3d optimization steps
-        int optsteps3d;
-        /**
            2d optimization strategy:
-           // s .. std::swap, opt 6 lines/node
-           // S .. std::swap, optimal elements
+           // s .. Swap, opt 6 lines/node
+           // S .. Swap, optimal elements
            // m .. move nodes
-           // p .. plot, no pause
-           // P .. plot, pause
            // c .. combine
          **/
         const char* optimize2d;
@@ -425,6 +408,8 @@ namespace meshit {
         int secondorder;
         /// high order element curvature
         int elementorder;
+
+        int n_steps;
 
         MeshingParameters();
         void Print(std::ostream& ost) const;

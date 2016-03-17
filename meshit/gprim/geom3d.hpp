@@ -231,6 +231,13 @@ namespace meshit {
             x[0] = x[1] = x[2] = 0;
         }
 
+        Vec3d(double ax, double ay)
+        {
+            x[0] = ax;
+            x[1] = ay;
+            x[2] = 0;
+        }
+
         Vec3d(double ax, double ay, double az)
         {
             x[0] = ax;

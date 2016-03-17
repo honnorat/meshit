@@ -1,6 +1,7 @@
 #include "geometry2d.hpp"
 
 #include <algorithm>
+#include <sstream>
 
 #include "../meshing/meshing2.hpp"
 #include "../meshing/global.hpp"
@@ -16,34 +17,45 @@ namespace meshit {
         int optsteps = mp.optsteps2d;
 
         for (int i = 1; i <= optsteps; i++) {
-            for (size_t j = 1; j <= strlen(optstr); j++) {
-                switch (optstr[j - 1]) {
+            for (size_t j = 0; j < strlen(optstr); j++) {
+                switch (optstr[j]) {
                     case 's': {  // topological swap
                         MeshOptimize2d meshopt;
                         meshopt.SetMetricWeight(0);
                         meshopt.EdgeSwapping(mesh, 0);
+                        mp.n_steps++;
                         break;
                     }
                     case 'S': {  // metric swap
                         MeshOptimize2d meshopt;
                         meshopt.SetMetricWeight(0);
                         meshopt.EdgeSwapping(mesh, 1);
+                        mp.n_steps++;
                         break;
                     }
                     case 'm': {
                         MeshOptimize2d meshopt;
                         meshopt.SetMetricWeight(1);
                         meshopt.ImproveMesh(mesh, mp);
+                        mp.n_steps++;
                         break;
                     }
                     case 'c': {
                         MeshOptimize2d meshopt;
                         meshopt.SetMetricWeight(0.2);
                         meshopt.CombineImprove(mesh);
+                        mp.n_steps++;
+                        break;
+                    }
+                    case 'p': {
+                        // print mesh
+                        std::stringstream mesh_name;
+                        mesh_name << "mesh_debug_" << std::setfill('0') << std::setw(2) << mp.n_steps << ".msh";
+                        mesh.Export(mesh_name.str());
                         break;
                     }
                     default:
-                        MESHIT_LOG_ERROR("Optimization code " << optstr[j - 1] << " not defined");
+                        MESHIT_LOG_ERROR("Optimization code " << optstr[j] << " not defined");
                 }
             }
         }
@@ -233,9 +245,8 @@ namespace meshit {
             mesh2d.RestrictLocalH(Point3d(p2(0), p2(1), 0), h2);
 
             double len = spline.Length();
-            mesh2d.RestrictLocalHLine(
-                    Point3d(p1(0), p1(1), 0),
-                    Point3d(p2(0), p2(1), 0), len / mp.segmentsperedge);
+            mesh2d.RestrictLocalHLine(Point3d(p1(0), p1(1), 0),
+                                      Point3d(p2(0), p2(1), 0), len / mp.segmentsperedge);
 
             double hcurve = std::min(spline.hmax, h / spline.reffak);
             double hl = GetDomainMaxh(spline.leftdom);
@@ -292,7 +303,7 @@ namespace meshit {
                 int npi = -1;
 
                 for (size_t pi = 0; pi < mesh.GetNP(); pi++) {
-                    if (Dist2(mesh.Point(pi+1), newp3) < 1e-12 * diam2) {
+                    if (Dist2(mesh.Point(pi + 1), newp3) < 1e-12 * diam2) {
                         npi = pi;
                     }
                 }

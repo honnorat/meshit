@@ -362,8 +362,6 @@ namespace meshit {
 
     MeshingParameters::MeshingParameters()
     {
-        optimize3d = "cmdmustm";
-        optsteps3d = 3;
         optimize2d = "smsmsmSmSmSm";
         optsteps2d = 3;
         opterrpow = 2;
@@ -392,6 +390,7 @@ namespace meshit {
         starshapeclass = 5;
         baseelnp = 0;
         sloppy = 1;
+        n_steps = 0;
 
         badellimit = 175;
         secondorder = 0;
@@ -400,8 +399,6 @@ namespace meshit {
     void MeshingParameters::Print(std::ostream& ost) const
     {
         ost << "Meshing parameters: " << std::endl
-        << "optimize3d = " << optimize3d << std::endl
-        << "optsteps3d = " << optsteps3d << std::endl
         << " optimize2d = " << optimize2d << std::endl
         << " optsteps2d = " << optsteps2d << std::endl
         << " opterrpow = " << opterrpow << std::endl
@@ -437,10 +434,6 @@ namespace meshit {
 
     void MeshingParameters::CopyFrom(const MeshingParameters& other)
     {
-        // strcpy(optimize3d,other.optimize3d);
-        optimize3d = other.optimize3d;
-        optsteps3d = other.optsteps3d;
-        // strcpy(optimize2d,other.optimize2d);
         optimize2d = other.optimize2d;
         optsteps2d = other.optsteps2d;
         opterrpow = other.opterrpow;

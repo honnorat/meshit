@@ -108,11 +108,11 @@ namespace meshit {
 
     void LocalH::SetH(const Point3d& p, double h)
     {
-        if (
-                fabs(p.X() - root->xmid[0]) > root->h2 ||
-                fabs(p.Y() - root->xmid[1]) > root->h2 ||
-                fabs(p.Z() - root->xmid[2]) > root->h2)
+        if (fabs(p.X() - root->xmid[0]) > root->h2 ||
+            fabs(p.Y() - root->xmid[1]) > root->h2 ||
+            fabs(p.Z() - root->xmid[2]) > root->h2) {
             return;
+        }
 
         if (GetH(p) <= 1.2 * h) return;
 

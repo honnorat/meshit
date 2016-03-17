@@ -289,25 +289,23 @@ namespace meshit {
         Array<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        double bad1, bad2;
-        Vec3d nv;
-
         size_t np = mesh.GetNP();
 
-        TABLE<SurfaceElementIndex> elementsonnode(np);
-        Array<SurfaceElementIndex> hasonepi, hasbothpi;
+        TABLE<SurfaceElementIndex> elements_on_node(np);
+        Array<SurfaceElementIndex> has_one_pi, has_both_pi;
 
         for (size_t i = 0; i < seia.size(); i++) {
-            Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < 3; j++)
-                elementsonnode.Add(el[j], seia[i]);
+            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            for (size_t j = 0; j < 3; j++) {
+                elements_on_node.Add(el[j], seia[i]);
+            }
         }
 
         Array<bool> fixed(np);
         fixed = false;
 
         for (size_t i = 0; i < seia.size(); i++) {
-            Element2d& sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi1 = sel.PNumMod(j + 2);
                 PointIndex pi2 = sel.PNumMod(j + 3);
@@ -341,51 +339,52 @@ namespace meshit {
                     continue;
                 }
 
-                double loch = mesh.GetH(mesh.Point(pi1));
-
                 INDEX_2 si2(pi1, pi2);
                 si2.Sort();
 
-                hasonepi.resize(0);
-                hasbothpi.resize(0);
+                double nv_z = 0.0;
+                has_one_pi.resize(0);
+                has_both_pi.resize(0);
 
-                for (size_t k = 0; k < elementsonnode[pi1].size(); k++) {
-                    const Element2d& el2 = mesh.SurfaceElement(elementsonnode[pi1][k]);
+                for (size_t k = 0; k < elements_on_node[pi1].size(); k++) {
+                    const Element2d& el2 = mesh.SurfaceElement(elements_on_node[pi1][k]);
 
                     if (el2.IsDeleted()) continue;
 
                     if (el2[0] == pi2 || el2[1] == pi2 || el2[2] == pi2) {
-                        hasbothpi.push_back(elementsonnode[pi1][k]);
-                        nv = Cross(
-                                Vec3d(mesh.Point(el2[0]), mesh.Point(el2[1])),
-                                Vec3d(mesh.Point(el2[0]), mesh.Point(el2[2])));
+                        has_both_pi.push_back(elements_on_node[pi1][k]);
+
+                        const Point3d& p1 = mesh.Point(el2[0]);
+                        const Point3d& p2 = mesh.Point(el2[1]);
+                        const Point3d& p3 = mesh.Point(el2[2]);
+
+                        // Vec3d nv = Cross(p2 -p1, p3 - p1);
+                        nv_z = (p2.X() - p1.X()) * (p3.Y() - p1.Y()) - (p2.Y() - p1.Y()) * (p3.X() - p1.X());
                     } else {
-                        hasonepi.push_back(elementsonnode[pi1][k]);
+                        has_one_pi.push_back(elements_on_node[pi1][k]);
                     }
                 }
 
-                for (size_t k = 0; k < elementsonnode[pi2].size(); k++) {
-                    const Element2d& el2 = mesh.SurfaceElement(elementsonnode[pi2][k]);
+                for (size_t k = 0; k < elements_on_node[pi2].size(); k++) {
+                    const Element2d& el2 = mesh.SurfaceElement(elements_on_node[pi2][k]);
                     if (el2.IsDeleted()) continue;
 
                     if (el2[0] != pi1 && el2[1] != pi1 && el2[2] != pi1) {
-                        hasonepi.push_back(elementsonnode[pi2][k]);
+                        has_one_pi.push_back(elements_on_node[pi2][k]);
                     }
                 }
 
-                bad1 = 0;
-                for (size_t k = 0; k < hasonepi.size(); k++) {
-                    const Element2d& el = mesh.SurfaceElement(hasonepi[k]);
-                    bad1 += CalcTriangleBadness(
-                            mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
+                double bad1 = 0.0;
+                for (size_t k = 0; k < has_one_pi.size(); k++) {
+                    const Element2d& el = mesh.SurfaceElement(has_one_pi[k]);
+                    bad1 += CalcTriangleBadness_2(mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv_z);
                 }
 
-                for (size_t k = 0; k < hasbothpi.size(); k++) {
-                    const Element2d& el = mesh.SurfaceElement(hasbothpi[k]);
-                    bad1 += CalcTriangleBadness(
-                            mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv, -1, loch);
+                for (size_t k = 0; k < has_both_pi.size(); k++) {
+                    const Element2d& el = mesh.SurfaceElement(has_both_pi[k]);
+                    bad1 += CalcTriangleBadness_2(mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv_z);
                 }
-                bad1 /= (hasonepi.size() + hasbothpi.size());
+                bad1 /= (has_one_pi.size() + has_both_pi.size());
 
                 MeshPoint p1 = mesh[pi1];
                 MeshPoint p2 = mesh[pi2];
@@ -394,22 +393,24 @@ namespace meshit {
                 mesh[pi1] = pnew;
                 mesh[pi2] = pnew;
 
-                bad2 = 0;
-                for (size_t k = 0; k < hasonepi.size(); k++) {
-                    Element2d& el = mesh.SurfaceElement(hasonepi[k]);
-                    bad2 += CalcTriangleBadness(mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]),
-                                                nv, -1, loch);
+                double bad2 = 0;
+                for (size_t k = 0; k < has_one_pi.size(); k++) {
+                    const Element2d& el = mesh.SurfaceElement(has_one_pi[k]);
+                    const Point3d& p1 = mesh.Point(el[0]);
+                    const Point3d& p2 = mesh.Point(el[1]);
+                    const Point3d& p3 = mesh.Point(el[2]);
+                    bad2 += CalcTriangleBadness_2(p1, p2, p3, nv_z);
 
-                    Vec3d hnv = Cross(mesh.Point(el[1]) - mesh.Point(el[0]),
-                                      mesh.Point(el[2]) - mesh.Point(el[0]));
-                    if (hnv * nv < 0) {
+                    // Vec3d hnv = Cross(p2 - p1, p3 - p1);
+                    double hnv_z = (p2.X() - p1.X()) * (p3.Y() - p1.Y()) - (p2.Y() - p1.Y()) * (p3.X() - p1.X());
+                    if (hnv_z * nv_z < 0) {
                         bad2 += 1e10;
                     }
-                    if (nv.Z() < 0.5) {
-                        bad2 += 3e10;
+                    if (nv_z < 0.5) {
+                        bad2 += 1e10;
                     }
                 }
-                bad2 /= hasonepi.size();
+                bad2 /= has_one_pi.size();
 
                 mesh[pi1] = p1;
                 mesh[pi2] = p2;
@@ -418,10 +419,10 @@ namespace meshit {
 
                 if (should) {
                     mesh[pi1] = pnew;
-                    for (size_t k = 0; k < elementsonnode[pi2].size(); k++) {
-                        Element2d& el = mesh.SurfaceElement(elementsonnode[pi2][k]);
+                    for (size_t k = 0; k < elements_on_node[pi2].size(); k++) {
+                        Element2d& el = mesh.SurfaceElement(elements_on_node[pi2][k]);
                         if (el.IsDeleted()) continue;
-                        elementsonnode.Add(pi1, elementsonnode[pi2][k]);
+                        elements_on_node.Add(pi1, elements_on_node[pi2][k]);
 
                         bool haspi1 = 0;
                         for (size_t l = 0; l < 3; l++) {
@@ -437,8 +438,8 @@ namespace meshit {
                             fixed[el[l]] = true;
                         }
                     }
-                    for (size_t k = 0; k < hasbothpi.size(); k++) {
-                        mesh.SurfaceElement(hasbothpi[k]).Delete();
+                    for (size_t k = 0; k < has_both_pi.size(); k++) {
+                        mesh.SurfaceElement(has_both_pi[k]).Delete();
                     }
                 }
             }
