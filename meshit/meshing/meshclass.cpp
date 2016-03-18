@@ -57,39 +57,25 @@ namespace meshit {
     {
         MESHIT_LOG_DEBUG("Generate Mesh from spline geometry");
 
+        // Take grading from MeshingParameters in priority, or from geometry if not user-defined.
+        double grading = mp.grading;
+        if (grading < 0) {
+            grading = geometry.GetGrading();
+        }
+
         double h = mp.maxh;
-
         Box<2> bbox = geometry.GetBoundingBox();
-
         if (bbox.Diam() < h) {
             h = bbox.Diam();
             mp.maxh = h;
         }
-
         Point3d pmin(bbox.PMin()(0), bbox.PMin()(1), -bbox.Diam());
         Point3d pmax(bbox.PMax()(0), bbox.PMax()(1), bbox.Diam());
 
-        SetLocalH(pmin, pmax, mp.grading);
+        SetLocalH(pmin, pmax, grading);
         hglob = h;
 
         geometry.PartitionBoundary(mp, h, *this);
-
-        // marks mesh points for hp-refinement
-        for (size_t i = 0; i < geometry.GetNP(); i++) {
-            if (geometry.GetPoint(i).hpref) {
-                double mindist = 1e99;
-                size_t mpi = 0;
-                ::meshit::Point<2> gp = geometry.GetPoint(i);
-                ::meshit::Point<3> gp3(gp(0), gp(1), 0);
-                for (size_t pi = 0; pi < GetNP(); pi++) {
-                    if (Dist2(gp3, points[pi]) < mindist) {
-                        mpi = pi;
-                        mindist = Dist2(gp3, points[pi]);
-                    }
-                }
-                points[mpi].Singularity(1.);
-            }
-        }
 
         int maxdomnr = 0;
         for (size_t si = 0; si < GetNSeg(); si++) {
@@ -387,86 +373,12 @@ namespace meshit {
             if (materials[i] && strlen(materials[i]))
                 cntmat++;
         }
-
         if (cntmat) {
             outfile << "materials" << std::endl;
             outfile << cntmat << std::endl;
             for (int i = 0; i < materials.size(); i++) {
                 if (materials[i] && strlen(materials[i]))
                     outfile << i + 1 << " " << materials[i] << std::endl;
-            }
-        }
-
-        int cnt_sing = 0;
-        for (PointIndex pi = 0; pi < points.size(); pi++) {
-            if (points[pi].Singularity() >= 1.) cnt_sing++;
-        }
-
-        if (cnt_sing) {
-            outfile << "singular_points" << std::endl << cnt_sing << std::endl;
-            for (PointIndex pi = 0; pi < points.size(); pi++) {
-                if (points[pi].Singularity() >= 1.)
-                    outfile << int(pi) << "\t" << points[pi].Singularity() << std::endl;
-            }
-        }
-
-        cnt_sing = 0;
-        for (size_t si = 0; si < GetNSeg(); si++) {
-            if (segments[si].singedge_left) cnt_sing++;
-        }
-        if (cnt_sing) {
-            outfile << "singular_edge_left" << std::endl << cnt_sing << std::endl;
-            for (size_t si = 0; si < GetNSeg(); si++) {
-                if (segments[si].singedge_left) {
-                    outfile << si << "\t" << segments[si].singedge_left << std::endl;
-                }
-            }
-        }
-
-        cnt_sing = 0;
-        for (size_t si = 0; si < GetNSeg(); si++) {
-            if (segments[si].singedge_right) cnt_sing++;
-        }
-        if (cnt_sing) {
-            outfile << "singular_edge_right" << std::endl << cnt_sing << std::endl;
-            for (size_t si = 0; si < GetNSeg(); si++) {
-                if (segments[si].singedge_right) {
-                    outfile << si << "\t" << segments[si].singedge_right << std::endl;
-                }
-            }
-        }
-
-
-        cnt_sing = 0;
-        for (size_t sei = 0; sei < GetNSE(); sei++) {
-            if (GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular) {
-                cnt_sing++;
-            }
-        }
-
-        if (cnt_sing) {
-            outfile << "singular_face_inside" << std::endl << cnt_sing << std::endl;
-            for (size_t sei = 0; sei < GetNSE(); sei++) {
-                if (GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular) {
-                    outfile << int(sei) << "\t"
-                    << GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular << std::endl;
-                }
-            }
-        }
-
-        cnt_sing = 0;
-        for (size_t sei = 0; sei < GetNSE(); sei++) {
-            if (GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular) {
-                cnt_sing++;
-            }
-        }
-        if (cnt_sing) {
-            outfile << "singular_face_outside" << std::endl << cnt_sing << std::endl;
-            for (size_t sei = 0; sei < GetNSE(); sei++) {
-                if (GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular) {
-                    outfile << sei << "\t";
-                    outfile << GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular << std::endl;
-                }
             }
         }
     }
@@ -580,12 +492,8 @@ namespace meshit {
                 }
             }
             if (strcmp(str, "edgesegmentsgi2") == 0) {
-                int a;
-                infile >> a;
-                n = a;
-
                 MESHIT_LOG_DEBUG(n << " curve elements");
-
+                infile >> n;
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
                     int hi;
@@ -646,56 +554,6 @@ namespace meshit {
                     std::string mat;
                     infile >> nr >> mat;
                     SetMaterial(nr, mat.c_str());
-                }
-            }
-            if (strcmp(str, "singular_points") == 0) {
-                infile >> n;
-                for (int i = 1; i <= n; i++) {
-                    PointIndex pi;
-                    double s;
-                    infile >> pi;
-                    infile >> s;
-                    points[pi].Singularity(s);
-                }
-            }
-            if (strcmp(str, "singular_edge_left") == 0) {
-                infile >> n;
-                for (int i = 1; i <= n; i++) {
-                    size_t si;
-                    double s;
-                    infile >> si;
-                    infile >> s;
-                    segments[si].singedge_left = s;
-                }
-            }
-            if (strcmp(str, "singular_edge_right") == 0) {
-                infile >> n;
-                for (int i = 1; i <= n; i++) {
-                    size_t si;
-                    double s;
-                    infile >> si;
-                    infile >> s;
-                    segments[si].singedge_right = s;
-                }
-            }
-            if (strcmp(str, "singular_face_inside") == 0) {
-                infile >> n;
-                for (int i = 1; i <= n; i++) {
-                    size_t sei;
-                    double s;
-                    infile >> sei;
-                    infile >> s;
-                    GetFaceDescriptor(surfelements[sei].GetIndex()).domin_singular = s;
-                }
-            }
-            if (strcmp(str, "singular_face_outside") == 0) {
-                infile >> n;
-                for (int i = 1; i <= n; i++) {
-                    size_t sei;
-                    double s;
-                    infile >> sei;
-                    infile >> s;
-                    GetFaceDescriptor(surfelements[sei].GetIndex()).domout_singular = s;
                 }
             }
             if (strcmp(str, "endmesh") == 0)

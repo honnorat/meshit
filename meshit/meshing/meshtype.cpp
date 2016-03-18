@@ -10,9 +10,6 @@ namespace meshit {
         pnums[0] = -1;
         pnums[1] = -1;
         edgenr = -1;
-
-        singedge_left = 0.;
-        singedge_right = 0.;
         seginfo = 0;
 
         si = -1;
@@ -29,8 +26,6 @@ namespace meshit {
 
     Segment::Segment(const Segment& other) :
             edgenr(other.edgenr),
-            singedge_left(other.singedge_left),
-            singedge_right(other.singedge_right),
             seginfo(other.seginfo),
             si(other.si),
             domin(other.domin),
@@ -55,8 +50,6 @@ namespace meshit {
             pnums[0] = other[0];
             pnums[1] = other[1];
             edgenr = other.edgenr;
-            singedge_left = other.singedge_left;
-            singedge_right = other.singedge_right;
             seginfo = other.seginfo;
             si = other.si;
             domin = other.domin;
@@ -189,15 +182,13 @@ namespace meshit {
     FaceDescriptor::FaceDescriptor()
     {
         surfnr = domin = domout = bcprop = 0;
-        domin_singular = domout_singular = 0.;
         tlosurf = -1;
         firstelement = -1;
     }
 
     FaceDescriptor::FaceDescriptor(const FaceDescriptor& other)
             : surfnr(other.surfnr), domin(other.domin), domout(other.domout),
-              tlosurf(other.tlosurf), bcprop(other.bcprop),
-              domin_singular(other.domin_singular), domout_singular(other.domout_singular)
+              tlosurf(other.tlosurf), bcprop(other.bcprop)
     {
         firstelement = -1;
     }
@@ -209,7 +200,6 @@ namespace meshit {
         domout = domouti;
         tlosurf = tlosurfi;
         bcprop = surfnri;
-        domin_singular = domout_singular = 0.;
         firstelement = -1;
     }
 
@@ -220,7 +210,6 @@ namespace meshit {
         domout = seg.domout + 1;
         tlosurf = seg.tlosurf + 1;
         bcprop = 0;
-        domin_singular = domout_singular = 0.;
         firstelement = -1;
     }
 
@@ -230,9 +219,7 @@ namespace meshit {
         << ", domin = " << fd.DomainIn()
         << ", domout = " << fd.DomainOut()
         << ", tlosurf = " << fd.TLOSurface()
-        << ", bcprop = " << fd.BCProperty()
-        << ", domin_sing = " << fd.DomainInSingular()
-        << ", domout_sing = " << fd.DomainOutSingular();
+        << ", bcprop = " << fd.BCProperty();
         return s;
     }
 
@@ -370,7 +357,7 @@ namespace meshit {
         safety = 5;
         relinnersafety = 3;
         uselocalh = 1;
-        grading = 0.3;
+        grading = -1.0;
         delaunay = 1;
         maxh = 1e10;
         minh = 0;

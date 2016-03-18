@@ -194,8 +194,6 @@ namespace meshit {
                 seg.epgeominfo[0].dist = edgelengthold;
                 seg.epgeominfo[1].edgenr = segnr;
                 seg.epgeominfo[1].dist = edgelength;
-                seg.singedge_left = spline.hpref_left;
-                seg.singedge_right = spline.hpref_right;
                 mesh.AddSegment(seg);
 
                 oldmark = mark;

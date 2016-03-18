@@ -31,8 +31,6 @@ namespace meshit {
         double hmax;    // maximal h
         int bc;         // boundary condition number
         int copyfrom;   // copy spline mesh from other spline (-1.. do not copy)
-        bool hpref_left;    // perfrom anisotropic refinement (hp-refinement) to edge
-        bool hpref_right;   // perfrom anisotropic refinement (hp-refinement) to edge
         int layer;
 
         explicit SplineSegExt(const SplineSeg<2>& hseg)
@@ -100,7 +98,7 @@ namespace meshit {
         double elto0;
 
      public:
-        SplineGeometry2d() : elto0(1.0) { }
+        SplineGeometry2d() : elto0{1.0} { }
 
         virtual ~SplineGeometry2d();
 
@@ -142,6 +140,11 @@ namespace meshit {
         void SetGrading(const double grading)
         {
             elto0 = grading;
+        }
+
+        double GetGrading()
+        {
+            return elto0;
         }
     };
 

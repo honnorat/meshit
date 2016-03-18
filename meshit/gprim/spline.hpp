@@ -32,13 +32,11 @@ namespace meshit {
         double refatpoint;
         /// max mesh-size at point
         double hmax;
-        /// hp-refinement
-        bool hpref;
 
         GeomPoint() { }
 
-        GeomPoint(const Point<D>& ap, double aref = 1, bool ahpref = false)
-                : Point<D>(ap), refatpoint(aref), hmax(1e99), hpref(ahpref) { }
+        GeomPoint(const Point<D>& ap, double aref = 1)
+                : Point<D>(ap), refatpoint(aref), hmax(1e99) { }
     };
 
 

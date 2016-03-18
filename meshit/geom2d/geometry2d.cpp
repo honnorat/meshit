@@ -88,14 +88,10 @@ namespace meshit {
         nump = 0;
         int numdomains = 0;
 
-
         TestComment(infile);
         // refinement factor
         infile >> elto0;
         TestComment(infile);
-
-
-        // test if next ch is a letter, i.e. new keyword starts
 
         while (infile.good()) {
             infile >> keyword;
@@ -149,10 +145,8 @@ namespace meshit {
 
                     if (hd == 1)
                         hd = flags.GetNumFlag("ref", 1.0);
-                    //       geompoints.Append (GeomPoint<D>(x, hd));
 
                     infilepoints.push_back(GeomPoint<2>(x, hd));
-                    infilepoints.Last().hpref = flags.GetDefineFlag("hpref");
                     infilepoints.Last().hmax = flags.GetNumFlag("maxh", 1e99);
 
                     TestComment(infile);
@@ -163,7 +157,6 @@ namespace meshit {
                 geompoints.resize(nump);
                 for (int i = 0; i < nump; i++) {
                     geompoints[pointnrs[i] - 1] = infilepoints[i];
-                    geompoints[pointnrs[i] - 1].hpref = infilepoints[i].hpref;
                 }
                 TestComment(infile);
             }
@@ -265,8 +258,6 @@ namespace meshit {
                         infile.putback(ch);
 
                     spex->bc = static_cast<int>(flags.GetNumFlag("bc", i + 1));
-                    spex->hpref_left = flags.GetDefineFlag("hpref") || flags.GetDefineFlag("hprefleft");
-                    spex->hpref_right = flags.GetDefineFlag("hpref") || flags.GetDefineFlag("hprefright");
                     spex->copyfrom = static_cast<int>(flags.GetNumFlag("copy", -1));
                     spex->reffak = flags.GetNumFlag("ref", 1);
                     spex->hmax = flags.GetNumFlag("maxh", 1e99);
@@ -296,9 +287,9 @@ namespace meshit {
 
                 TestComment(infile);
 
-                for (int i = 0; i < numdomains; i++)
+                for (int i = 0; i < numdomains; i++) {
                     materials[i] = new char[100];
-
+                }
                 for (int i = 0; i < numdomains && infile.good(); i++) {
                     TestComment(infile);
                     infile >> domainnr;
@@ -360,8 +351,6 @@ namespace meshit {
                 seg->rightdom = 0;
             }
             seg->bc = bc;
-            seg->hpref_left = false;
-            seg->hpref_right = false;
             seg->reffak = 1;  // Refinement factor
             seg->hmax = hmax;
             splines.push_back(seg);
@@ -393,8 +382,6 @@ namespace meshit {
             seg->leftdom = 1;
             seg->rightdom = 1;
             seg->bc = bc;
-            seg->hpref_left = false;
-            seg->hpref_right = false;
             seg->reffak = 2;  // Refinement factor
             seg->hmax = hmax;
             splines.push_back(seg);

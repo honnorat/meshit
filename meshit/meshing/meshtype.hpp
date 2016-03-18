@@ -62,7 +62,6 @@ namespace meshit {
     class MeshPoint : public Point3d
     {
         int layer;
-        double singular; // singular factor for hp-refinement
         POINTTYPE type;
 
      public:
@@ -70,7 +69,7 @@ namespace meshit {
         MeshPoint() { }
 
         MeshPoint(const Point3d& ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
-                : Point3d(ap), layer(alayer), singular(0.), type(apt) { }
+                : Point3d(ap), layer(alayer), type(apt) { }
 
         int GetLayer() const
         {
@@ -85,16 +84,6 @@ namespace meshit {
         void SetType(POINTTYPE at)
         {
             type = at;
-        }
-
-        double Singularity() const
-        {
-            return singular;
-        }
-
-        void Singularity(double s)
-        {
-            singular = s;
         }
 
     };
@@ -224,8 +213,6 @@ namespace meshit {
         PointIndex pnums[3];  // p1, p2, pmid
 
         int edgenr;
-        double singedge_left;
-        double singedge_right;
 
         /// 0.. not first segment of segs, 1..first of class, 2..first of class, inverse
         unsigned int seginfo : 2;
@@ -279,9 +266,6 @@ namespace meshit {
         /// root of linked list
         SurfaceElementIndex firstelement;
 
-        double domin_singular;
-        double domout_singular;
-
      public:
         FaceDescriptor();
         FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi);
@@ -313,16 +297,6 @@ namespace meshit {
         int BCProperty() const
         {
             return bcprop;
-        }
-
-        double DomainInSingular() const
-        {
-            return domin_singular;
-        }
-
-        double DomainOutSingular() const
-        {
-            return domout_singular;
         }
 
         void SetBCProperty(int bc)
