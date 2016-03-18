@@ -95,26 +95,9 @@ namespace meshit {
 
         void DeleteElement(int pi);
 
-        void Print(std::ostream& ost) const
-        {
-            PrintRec(ost, root);
-        }
-
-        int Depth() const
-        {
-            return DepthRec(root);
-        }
-
-        int Elements() const
-        {
-            return ElementsRec(root);
-        }
-
-        void PrintRec(std::ostream& ost, const ADTreeNode6* node) const;
         int DepthRec(const ADTreeNode6* node) const;
         int ElementsRec(const ADTreeNode6* node) const;
 
-        void PrintMemInfo(std::ostream& ost) const;
     };
 
     class Point3dTree

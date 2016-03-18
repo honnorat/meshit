@@ -260,14 +260,14 @@ namespace meshit {
         /// Find bounding box
         void GetBox(Point3d& pmin, Point3d& pmax, int dom = -1) const;
 
-        int GetNOpenElements() const
+        size_t GetNOpenElements() const
         {
             return openelements.size();
         }
 
-        const Element2d& OpenElement(int i) const
+        const Element2d& OpenElement(size_t i) const
         {
-            return openelements[i - 1];
+            return openelements[i];
         }
 
         /// Refines mesh and projects points to true surface

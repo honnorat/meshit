@@ -1530,12 +1530,12 @@ namespace meshit {
 
     int Mesh::CheckConsistentBoundary() const
     {
-        int nf = GetNOpenElements();
+        size_t nf = GetNOpenElements();
         INDEX_2_HASHTABLE<int> edges(nf + 2);
         INDEX_2 i2, i2s, edge;
         int err = 0;
 
-        for (int i = 1; i <= nf; i++) {
+        for (size_t i = 0; i < nf; i++) {
             const Element2d& sel = OpenElement(i);
 
             for (size_t j = 1; j <= 3; j++) {
@@ -1544,8 +1544,9 @@ namespace meshit {
 
                 int sign = (i2.I2() > i2.I1()) ? 1 : -1;
                 i2.Sort();
-                if (!edges.Used(i2))
+                if (!edges.Used(i2)) {
                     edges.Set(i2, 0);
+                }
                 edges.Set(i2, edges.Get(i2) + sign);
             }
         }
@@ -1558,7 +1559,7 @@ namespace meshit {
                     MESHIT_LOG_ERROR("Edge " << i2.I1() << " - " << i2.I2() << " multiple times in surface mesh");
                     i2s = i2;
                     i2s.Sort();
-                    for (int k = 1; k <= nf; k++) {
+                    for (int k = 0; k < nf; k++) {
                         const Element2d& sel = OpenElement(k);
                         for (size_t l = 1; l <= 3; l++) {
                             edge.I1() = sel.PNumMod(l);

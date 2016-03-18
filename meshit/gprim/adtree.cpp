@@ -3,6 +3,8 @@
 
 namespace meshit {
 
+#define ADTREE_MAX_STACK_SIZE 20
+
     /* ******************************* ADTree3 ******************************* */
 
     ADTreeNode3::ADTreeNode3()
@@ -140,48 +142,44 @@ namespace meshit {
         }
     }
 
+    struct inttn3
+    {
+        ADTreeNode3* node;
+        int dir;
+    };
+
     void ADTree3::GetIntersecting(const double* bmin,
                                   const double* bmax,
                                   std::vector<size_t>& pis) const
     {
-        static Array<ADTreeNode3*> stack(1000);
-        static Array<size_t> stackdir(1000);
-        ADTreeNode3* node;
-
-        stack.resize(1000);
-        stackdir.resize(1000);
         pis.resize(0);
 
-        stack[0] = root;
-        stackdir[0] = 0;
-
+        static inttn3 stack[ADTREE_MAX_STACK_SIZE];
+        stack[0].node = root;
+        stack[0].dir = 0;
         size_t stacks = 1;
 
         while (stacks) {
             stacks--;
-            node = stack[stacks];
-            size_t dir = stackdir[stacks];
+            ADTreeNode3* node = stack[stacks].node;
 
-            if (node->pi != -1) {
-                if (node->data[0] >= bmin[0] && node->data[0] <= bmax[0] &&
-                    node->data[1] >= bmin[1] && node->data[1] <= bmax[1] &&
-                    node->data[2] >= bmin[2] && node->data[2] <= bmax[2])
-
-                    pis.push_back(node->pi);
+            if (node->pi != -1 && !(
+                    node->data[0] < bmin[0] || node->data[0] > bmax[0] ||
+                    node->data[1] < bmin[1] || node->data[1] > bmax[1] ||
+                    node->data[2] < bmin[2] || node->data[2] > bmax[2])) {
+                pis.push_back(node->pi);
             }
 
-            int ndir = dir + 1;
-            if (ndir == 3)
-                ndir = 0;
+            int dir = stack[stacks].dir;
 
             if (node->left && bmin[dir] <= node->sep) {
-                stack[stacks] = node->left;
-                stackdir[stacks] = ndir;
+                stack[stacks].node = node->left;
+                stack[stacks].dir = (dir + 1) % 3;
                 stacks++;
             }
             if (node->right && bmax[dir] >= node->sep) {
-                stack[stacks] = node->right;
-                stackdir[stacks] = ndir;
+                stack[stacks].node = node->right;
+                stack[stacks].dir = (dir + 1) % 3;
                 stacks++;
             }
         }
@@ -202,7 +200,7 @@ namespace meshit {
             PrintRec(ost, node->right);
     }
 
-    /* ******************************* ADTree6 ******************************* */
+/* ******************************* ADTree6 ******************************* */
 
     ADTreeNode6::ADTreeNode6()
     {
@@ -339,18 +337,10 @@ namespace meshit {
         }
     }
 
-    void ADTree6::PrintMemInfo(std::ostream& ost) const
+    struct inttn6
     {
-        ost << Elements() << " elements a " << sizeof(ADTreeNode6)
-        << " Bytes = " << Elements() * sizeof(ADTreeNode6) << std::endl;
-        ost << "maxind = " << ela.size() << " = " << sizeof(ADTreeNode6*) * ela.size() << " Bytes" << std::endl;
-    }
-
-    class inttn6
-    {
-     public:
-        int dir;
         ADTreeNode6* node;
+        int dir;
     };
 
     void ADTree6::GetIntersecting(const double* bmin,
@@ -359,58 +349,34 @@ namespace meshit {
     {
         pis.resize(0);
 
-        std::vector<inttn6> stack(100);
+        static inttn6 stack[ADTREE_MAX_STACK_SIZE];
         stack[0].node = root;
         stack[0].dir = 0;
         size_t stacks = 1;
 
         while (stacks) {
             stacks--;
-
             ADTreeNode6* node = stack[stacks].node;
-            int dir = stack[stacks].dir;
-
-            if (node->pi != -1) {
-                if (node->data[0] > bmax[0] ||
-                    node->data[1] > bmax[1] ||
-                    node->data[2] > bmax[2] ||
-                    node->data[3] < bmin[3] ||
-                    node->data[4] < bmin[4] ||
-                    node->data[5] < bmin[5]) {
-                    // nothing
-                } else {
-                    pis.push_back(node->pi);
-                }
+            if (node->pi != -1 && !(
+                    node->data[0] > bmax[0] || node->data[3] < bmin[3] ||
+                    node->data[1] > bmax[1] || node->data[4] < bmin[4] ||
+                    node->data[2] > bmax[2] || node->data[5] < bmin[5])) {
+                pis.push_back(node->pi);
             }
 
-            int ndir = (dir + 1) % 6;
+            int dir = stack[stacks].dir;
 
             if (node->left && bmin[dir] <= node->sep) {
                 stack[stacks].node = node->left;
-                stack[stacks].dir = ndir;
+                stack[stacks].dir = (dir + 1) % 6;
                 stacks++;
             }
             if (node->right && bmax[dir] >= node->sep) {
                 stack[stacks].node = node->right;
-                stack[stacks].dir = ndir;
+                stack[stacks].dir = (dir + 1) % 6;
                 stacks++;
             }
         }
-    }
-
-    void ADTree6::PrintRec(std::ostream& ost, const ADTreeNode6* node) const
-    {
-        if (node->data) {
-            ost << node->pi << ": ";
-            ost << node->nchilds << " childs, ";
-            for (int i = 0; i < 6; i++)
-                ost << node->data[i] << " ";
-            ost << std::endl;
-        }
-        if (node->left)
-            PrintRec(ost, node->left);
-        if (node->right)
-            PrintRec(ost, node->right);
     }
 
     int ADTree6::DepthRec(const ADTreeNode6* node) const
@@ -435,7 +401,7 @@ namespace meshit {
         return els;
     }
 
-    /* ************************************* Point3dTree ********************** */
+/* ************************************* Point3dTree ********************** */
 
 
     Point3dTree::Point3dTree(const Point<3>& pmin, const Point<3>& pmax)
@@ -517,4 +483,5 @@ namespace meshit {
 
         tree->GetIntersecting(tpmin, tpmax, pis);
     }
+
 }  // namespace meshit

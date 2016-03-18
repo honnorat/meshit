@@ -99,13 +99,14 @@ namespace meshit {
 #endif
         linestruct& line = data[i];
         if (line.size == line.maxsize) {
-            void* p = new char[(line.maxsize + 5) * elsize];
+            size_t new_size = 2 * std::max(static_cast<size_t>(1), line.maxsize);
+            void* new_col = new char[new_size * elsize];
 
-            memcpy(p, line.col, line.maxsize * elsize);
+            memcpy(new_col, line.col, line.maxsize * elsize);
             delete[] (char*) line.col;
 
-            line.col = p;
-            line.maxsize += 5;
+            line.col = new_col;
+            line.maxsize = new_size;
         }
 
         line.size++;

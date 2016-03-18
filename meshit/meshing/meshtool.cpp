@@ -43,11 +43,11 @@ namespace meshit {
     {
         const Point3d* tri1[3], * tri2[3];
 
-        for (int i = 1; i <= mesh.GetNOpenElements(); i++) {
-            for (int j = 1; j < i; j++) {
-                for (int k = 1; k <= 3; k++) {
-                    tri1[k - 1] = &mesh.Point(mesh.OpenElement(i).PNum(k));
-                    tri2[k - 1] = &mesh.Point(mesh.OpenElement(j).PNum(k));
+        for (size_t i = 0; i < mesh.GetNOpenElements(); i++) {
+            for (size_t j = 0; j < i; j++) {
+                for (size_t k = 0; k < 3; k++) {
+                    tri1[k] = &mesh.Point(mesh.OpenElement(i).PNum(k + 1));
+                    tri2[k] = &mesh.Point(mesh.OpenElement(j).PNum(k + 1));
                 }
                 if (IntersectTriangleTriangle(&tri1[0], &tri2[0])) {
                     MESHIT_LOG_ERROR("Surface elements are intersecting :");

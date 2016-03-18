@@ -207,9 +207,9 @@ namespace meshit {
         nearlines.reserve(1000);
         nearpoints.reserve(1000);
 
-        // dominating costs !!
         const Point3d pmin(p0.X() - xh, p0.Y() - xh);
         const Point3d pmax(p0.X() + xh, p0.Y() + xh);
+        // dominating costs !!
         linesearchtree.GetIntersecting(pmin, pmax, nearlines);
         pointsearchtree.GetIntersecting(pmin, pmax, nearpoints);
 
