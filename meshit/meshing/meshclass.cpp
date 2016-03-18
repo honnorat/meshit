@@ -123,7 +123,7 @@ namespace meshit {
                 }
             }
 
-            mp.checkoverlap = 0;
+            mp.check_overlap = 0;
             meshing.GenerateMesh(*this, mp, h, domnr);
 
             for (size_t sei = oldnf; sei < GetNSE(); sei++) {

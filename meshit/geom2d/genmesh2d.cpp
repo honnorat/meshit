@@ -244,7 +244,7 @@ namespace meshit {
 
             double len = spline.Length();
             mesh2d.RestrictLocalHLine(Point3d(p1(0), p1(1), 0),
-                                      Point3d(p2(0), p2(1), 0), len / mp.segmentsperedge);
+                                      Point3d(p2(0), p2(1), 0), len / mp.segments_per_edge);
 
             double hcurve = std::min(spline.hmax, h / spline.reffak);
             double hl = GetDomainMaxh(spline.leftdom);
@@ -255,7 +255,7 @@ namespace meshit {
             int np = 1000;
             for (double t = 0.5 / np; t < 1; t += 1.0 / np) {
                 Point<2> x = spline.GetPoint(t);
-                double hc = 1.0 / mp.curvaturesafety / (1e-99 + spline.CalcCurvature(t));
+                double hc = 1.0 / mp.curvature_safety / (1e-99 + spline.CalcCurvature(t));
                 mesh2d.RestrictLocalH(Point3d(x(0), x(1), 0), std::min(hc, hcurve));
             }
         }

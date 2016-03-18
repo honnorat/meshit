@@ -351,106 +351,46 @@ namespace meshit {
     {
         optimize2d = "smsmsmSmSmSm";
         optsteps2d = 3;
-        opterrpow = 2;
-        blockfill = 1;
-        filldist = 0.1;
-        safety = 5;
-        relinnersafety = 3;
         uselocalh = 1;
         grading = -1.0;
-        delaunay = 1;
         maxh = 1e10;
         minh = 0;
-        meshsizefilename = NULL;
-        startinsurface = 0;
-        checkoverlap = 1;
-        checkoverlappingboundary = 1;
-        checkchartboundary = 1;
-        curvaturesafety = 2;
-        segmentsperedge = 1;
-        parthread = 0;
+        check_overlap = 1;
+        check_chart_boundary = 1;
+        curvature_safety = 2;
+        segments_per_edge = 1;
 
-        elsizeweight = 0.2;
-        giveuptol2d = 200;
-        giveuptol = 10;
-        maxoutersteps = 10;
-        starshapeclass = 5;
-        baseelnp = 0;
-        sloppy = 1;
+        giveup_tol2d = 200;
         n_steps = 0;
-
-        badellimit = 175;
-        secondorder = 0;
     }
 
     void MeshingParameters::Print(std::ostream& ost) const
     {
         ost << "Meshing parameters: " << std::endl
-        << " optimize2d = " << optimize2d << std::endl
-        << " optsteps2d = " << optsteps2d << std::endl
-        << " opterrpow = " << opterrpow << std::endl
-        << " blockfill = " << blockfill << std::endl
-        << " filldist = " << filldist << std::endl
-        << " safety = " << safety << std::endl
-        << " relinnersafety = " << relinnersafety << std::endl
-        << " uselocalh = " << uselocalh << std::endl
-        << " grading = " << grading << std::endl
-        << " delaunay = " << delaunay << std::endl
-        << " maxh = " << maxh << std::endl;
-        if (meshsizefilename)
-            ost << " meshsizefilename = " << meshsizefilename << std::endl;
-        else
-            ost << " meshsizefilename = NULL" << std::endl;
-        ost << " startinsurface = " << startinsurface << std::endl
-        << " checkoverlap = " << checkoverlap << std::endl
-        << " checkchartboundary = " << checkchartboundary << std::endl
-        << " curvaturesafety = " << curvaturesafety << std::endl
-        << " segmentsperedge = " << segmentsperedge << std::endl
-        << " parthread = " << parthread << std::endl
-        << " elsizeweight = " << elsizeweight << std::endl
-        << " giveuptol2d = " << giveuptol2d << std::endl
-        << " giveuptol = " << giveuptol << std::endl
-        << " maxoutersteps = " << maxoutersteps << std::endl
-        << " starshapeclass = " << starshapeclass << std::endl
-        << " baseelnp        = " << baseelnp << std::endl
-        << " sloppy = " << sloppy << std::endl
-        << " badellimit = " << badellimit << std::endl
-        << " secondorder = " << secondorder << std::endl
-        << " elementorder = " << elementorder << std::endl;
+        << "  optimize2d = " << optimize2d << std::endl
+        << "  optsteps2d = " << optsteps2d << std::endl
+        << "  uselocalh = " << uselocalh << std::endl
+        << "  grading = " << grading << std::endl
+        << "  maxh = " << maxh << std::endl
+        << "  check_overlap = " << check_overlap << std::endl
+        << "  check_chart_boundary = " << check_chart_boundary << std::endl
+        << "  curvature_safety = " << curvature_safety << std::endl
+        << "  segments_per_edge = " << segments_per_edge << std::endl
+        << "  giveup_tol2d = " << giveup_tol2d << std::endl;
     }
 
     void MeshingParameters::CopyFrom(const MeshingParameters& other)
     {
         optimize2d = other.optimize2d;
         optsteps2d = other.optsteps2d;
-        opterrpow = other.opterrpow;
-        blockfill = other.blockfill;
-        filldist = other.filldist;
-        safety = other.safety;
-        relinnersafety = other.relinnersafety;
         uselocalh = other.uselocalh;
         grading = other.grading;
-        delaunay = other.delaunay;
         maxh = other.maxh;
-        // strcpy(const_cast<char*>(meshsizefilename), other.meshsizefilename);
-        // const_cast<char*>(meshsizefilename) = other.meshsizefilename; //???
-        startinsurface = other.startinsurface;
-        checkoverlap = other.checkoverlap;
-        checkoverlappingboundary = other.checkoverlappingboundary;
-        checkchartboundary = other.checkchartboundary;
-        curvaturesafety = other.curvaturesafety;
-        segmentsperedge = other.segmentsperedge;
-        parthread = other.parthread;
-        elsizeweight = other.elsizeweight;
-        giveuptol2d = other.giveuptol2d;
-        giveuptol = other.giveuptol;
-        maxoutersteps = other.maxoutersteps;
-        starshapeclass = other.starshapeclass;
-        baseelnp = other.baseelnp;
-        sloppy = other.sloppy;
-        badellimit = other.badellimit;
-        secondorder = other.secondorder;
-        elementorder = other.elementorder;
+        check_overlap = other.check_overlap;
+        check_chart_boundary = other.check_chart_boundary;
+        curvature_safety = other.curvature_safety;
+        segments_per_edge = other.segments_per_edge;
+        giveup_tol2d = other.giveup_tol2d;
     }
 
     DebugParameters::DebugParameters()

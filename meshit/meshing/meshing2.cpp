@@ -244,7 +244,7 @@ namespace meshit {
 
             adfront->GetLocals(baselineindex, locpoints, loclines, pindex, lindex, 2 * hinner);
 
-            if (qualclass > mp.giveuptol2d) {
+            if (qualclass > mp.giveup_tol2d) {
                 MESHIT_LOG_WARNING("give up with qualclass " << qualclass <<
                                    " : number of frontlines = " << adfront->GetNFL());
                 break;
@@ -379,7 +379,7 @@ namespace meshit {
                 maxlegalpoint = locpoints.size();
                 maxlegalline = loclines.size();
 
-                if (mp.checkchartboundary) {
+                if (mp.check_chart_boundary) {
                     for (int i = 0; i < chartboundpoints.size(); i++) {
                         plainpoints.push_back(chartboundpoints[i]);
                         locpoints.push_back(chartboundpoints3d[i]);
@@ -488,7 +488,7 @@ namespace meshit {
                 }
             }
 
-            if (found && mp.checkoverlap) {
+            if (found && mp.check_overlap) {
 
                 Point3d hullmin(1e10, 1e10, 1e10);
                 Point3d hullmax(-1e10, -1e10, -1e10);

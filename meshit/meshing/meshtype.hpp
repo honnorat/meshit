@@ -322,66 +322,24 @@ namespace meshit {
         const char* optimize2d;
         /// number of 2d optimization steps
         int optsteps2d;
-        /// power of error (to approximate max err optimization)
-        double opterrpow;
-        /// do block filling ?  
-        int blockfill;
-        /// block filling up to distance
-        double filldist;
-        /// radius of local environment (times h)
-        double safety;
-        /// radius of active environment (times h)
-        double relinnersafety;
         /// use local h ?
         int uselocalh;
         /// grading for local h
         double grading;
-        /// use delaunay meshing
-        int delaunay;
         /// maximal mesh size
         double maxh;
         /// minimal mesh size
         double minh;
-        /// file for meshsize
-        const char* meshsizefilename;
-        /// start surfacemeshing from everywhere in surface
-        int startinsurface;
         /// check overlapping surfaces (debug)
-        int checkoverlap;
-        /// check overlapping surface mesh before volume meshing
-        int checkoverlappingboundary;
+        int check_overlap;
         /// check chart boundary (sometimes too restrictive)
-        int checkchartboundary;
+        int check_chart_boundary;
         /// safty factor for curvatures (elemetns per radius)
-        double curvaturesafety;
+        double curvature_safety;
         /// minimal number of segments per edge
-        double segmentsperedge;
-        /// use parallel threads
-        int parthread;
-        /// weight of element size w.r.t element shape
-        double elsizeweight;
-        /// init with default values
-
-        /// from mp3:
+        double segments_per_edge;
         /// give up quality class, 2d meshing
-        int giveuptol2d;
-        /// give up quality class, 3d meshing
-        int giveuptol;
-        /// maximal outer steps
-        int maxoutersteps;
-        /// class starting star-shape filling
-        int starshapeclass;
-        /// if non-zero, baseelement must have baseelnp points
-        int baseelnp;
-        /// quality tolerances are handled less careful
-        int sloppy;
-
-        /// limit for max element angle (150-180)
-        double badellimit;
-
-        int secondorder;
-        /// high order element curvature
-        int elementorder;
+        int giveup_tol2d;
 
         int n_steps;
 
