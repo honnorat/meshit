@@ -301,7 +301,7 @@ namespace meshit {
                 int npi = -1;
 
                 for (size_t pi = 0; pi < mesh.GetNP(); pi++) {
-                    if (Dist2(mesh.Point(pi + 1), newp3) < 1e-12 * diam2) {
+                    if (Dist2(mesh.Point(pi), newp3) < 1e-12 * diam2) {
                         npi = pi;
                     }
                 }

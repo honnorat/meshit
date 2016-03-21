@@ -1,5 +1,5 @@
-#ifndef FILE_Array
-#define FILE_Array
+#ifndef FILE_ARRAY_HPP
+#define FILE_ARRAY_HPP
 
 #include <algorithm>
 #include <iostream>

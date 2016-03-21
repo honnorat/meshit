@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     std::string filename_export;
     std::string filename_save;
 
-    MESHIT_LOG_INFO("MeshIt test_argv with '" << filename << "'");
+    MESHIT_LOG_INFO("MeshIt read_argv with '" << filename << "'");
 
     meshit::MeshingParameters mp;
     meshit::Mesh mesh;

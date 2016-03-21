@@ -180,7 +180,7 @@ namespace meshit {
     {
         timestamp = NextTimeStamp();
 
-        int maxn = el[0];
+        PointIndex maxn = el[0];
         for (size_t i = 1; i < 3; i++) {
             if (el[i] > maxn) maxn = el[i];
         }

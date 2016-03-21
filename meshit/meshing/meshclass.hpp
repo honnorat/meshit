@@ -124,25 +124,20 @@ namespace meshit {
 
         MeshPoint& Point(size_t i)
         {
-            return points[i - 1];
+            return points[i];
         }
 
-        MeshPoint& Point(PointIndex pi)
+        const MeshPoint& Point(size_t pi) const
         {
             return points[pi];
         }
 
-        const MeshPoint& Point(PointIndex pi) const
+        const MeshPoint& operator[](size_t pi) const
         {
             return points[pi];
         }
 
-        const MeshPoint& operator[](PointIndex pi) const
-        {
-            return points[pi];
-        }
-
-        MeshPoint& operator[](PointIndex pi)
+        MeshPoint& operator[](size_t pi)
         {
             return points[pi];
         }
