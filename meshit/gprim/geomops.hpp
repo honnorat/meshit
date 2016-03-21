@@ -20,131 +20,131 @@ namespace meshit {
 
 
     template<int D>
-    inline Vec <D> operator+(const Vec <D>& a, const Vec <D>& b)
+    inline Vec<D> operator+(const Vec<D>& a, const Vec<D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = a(i) + b(i);
+            res[i] = a[i] + b[i];
         return res;
     }
 
     template<int D>
-    inline Point <D> operator+(const Point <D>& a, const Vec <D>& b)
+    inline Point<D> operator+(const Point<D>& a, const Vec<D>& b)
     {
         Point<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = a(i) + b(i);
+            res[i] = a[i] + b[i];
         return res;
     }
 
     template<int D>
-    inline Vec <D> operator+(const Point <D>& a, const Point <D>& b)
+    inline Vec<D> operator+(const Point<D>& a, const Point<D>& b)
     {
         Point<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = a(i) + b(i);
+            res[i] = a[i] + b[i];
         return res;
     }
 
     template<int D>
-    inline Vec <D> operator-(const Point <D>& a, const Point <D>& b)
+    inline Vec<D> operator-(const Point<D>& a, const Point<D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = a(i) - b(i);
+            res[i] = a[i] - b[i];
         return res;
     }
 
     template<int D>
-    inline Point <D> operator-(const Point <D>& a, const Vec <D>& b)
+    inline Point<D> operator-(const Point<D>& a, const Vec<D>& b)
     {
         Point<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = a(i) - b(i);
+            res[i] = a[i] - b[i];
         return res;
     }
 
     template<int D>
-    inline Vec <D> operator-(const Vec <D>& a, const Vec <D>& b)
+    inline Vec<D> operator-(const Vec<D>& a, const Vec<D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = a(i) - b(i);
+            res[i] = a[i] - b[i];
         return res;
     }
 
     template<int D>
-    inline Vec <D> operator*(double s, const Vec <D>& b)
+    inline Vec<D> operator*(double s, const Vec<D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = s * b(i);
+            res[i] = s * b[i];
         return res;
     }
 
     template<int D>
-    inline double operator*(const Vec <D>& a, const Vec <D>& b)
+    inline double operator*(const Vec<D>& a, const Vec<D>& b)
     {
         double sum = 0;
         for (int i = 0; i < D; i++)
-            sum += a(i) * b(i);
+            sum += a[i] * b[i];
         return sum;
     }
 
     template<int D>
-    inline Vec <D> operator-(const Vec <D>& b)
+    inline Vec<D> operator-(const Vec<D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
-            res(i) = -b(i);
+            res[i] = -b[i];
         return res;
     }
 
     template<int D>
-    inline Point <D>& operator+=(Point <D>& a, const Vec <D>& b)
+    inline Point<D>& operator+=(Point<D>& a, const Vec<D>& b)
     {
         for (int i = 0; i < D; i++)
-            a(i) += b(i);
+            a[i] += b[i];
         return a;
     }
 
     template<int D>
-    inline Vec <D>& operator+=(Vec <D>& a, const Vec <D>& b)
+    inline Vec<D>& operator+=(Vec<D>& a, const Vec<D>& b)
     {
         for (int i = 0; i < D; i++)
-            a(i) += b(i);
+            a[i] += b[i];
         return a;
     }
 
     template<int D>
-    inline Point <D>& operator-=(Point <D>& a, const Vec <D>& b)
+    inline Point<D>& operator-=(Point<D>& a, const Vec<D>& b)
     {
         for (int i = 0; i < D; i++)
-            a(i) -= b(i);
+            a[i] -= b[i];
         return a;
     }
 
     template<int D>
-    inline Vec <D>& operator-=(Vec <D>& a, const Vec <D>& b)
+    inline Vec<D>& operator-=(Vec<D>& a, const Vec<D>& b)
     {
         for (int i = 0; i < D; i++)
-            a(i) -= b(i);
+            a[i] -= b[i];
         return a;
     }
 
     template<int D>
-    inline Vec <D>& operator*=(Vec <D>& a, double s)
+    inline Vec<D>& operator*=(Vec<D>& a, double s)
     {
         for (int i = 0; i < D; i++)
-            a(i) *= s;
+            a[i] *= s;
         return a;
     }
 
     template<int D>
-    inline Vec <D>& operator/=(Vec <D>& a, double s)
+    inline Vec<D>& operator/=(Vec<D>& a, double s)
     {
         for (int i = 0; i < D; i++)
-            a(i) /= s;
+            a[i] /= s;
         return a;
     }
 
@@ -157,9 +157,9 @@ namespace meshit {
     {
         Vec<2> res;
         for (size_t i = 0; i < 2; i++) {
-            res(i) = 0;
+            res[i] = 0;
             for (size_t j = 0; j < 2; j++) {
-                res(i) += m(i, j) * v(j);
+                res[i] += m(i, j) * v[j];
             }
         }
         return res;
@@ -169,9 +169,9 @@ namespace meshit {
     {
         Vec<2> res;
         for (size_t i = 0; i < 2; i++) {
-            res(i) = 0;
+            res[i] = 0;
             for (size_t j = 0; j < 3; j++) {
-                res(i) += m(i, j) * v(j);
+                res[i] += m(i, j) * v[j];
             }
         }
         return res;
@@ -181,9 +181,9 @@ namespace meshit {
     {
         Vec<3> res;
         for (size_t i = 0; i < 3; i++) {
-            res(i) = 0;
+            res[i] = 0;
             for (size_t j = 0; j < 2; j++) {
-                res(i) += m(i, j) * v(j);
+                res[i] += m(i, j) * v[j];
             }
         }
         return res;
@@ -193,9 +193,9 @@ namespace meshit {
     {
         Vec<3> res;
         for (size_t i = 0; i < 3; i++) {
-            res(i) = 0;
+            res[i] = 0;
             for (size_t j = 0; j < 3; j++) {
-                res(i) += m(i, j) * v(j);
+                res[i] += m(i, j) * v[j];
             }
         }
         return res;
@@ -343,27 +343,27 @@ namespace meshit {
     }
 
     template<int D>
-    inline std::ostream& operator<<(std::ostream& ost, const Vec <D>& a)
+    inline std::ostream& operator<<(std::ostream& ost, const Vec<D>& a)
     {
         ost << "(";
         for (int i = 0; i < D - 1; i++)
-            ost << a(i) << ", ";
+            ost << a[i] << ", ";
         ost << a(D - 1) << ")";
         return ost;
     }
 
     template<int D>
-    inline std::ostream& operator<<(std::ostream& ost, const Point <D>& a)
+    inline std::ostream& operator<<(std::ostream& ost, const Point<D>& a)
     {
         ost << "(";
         for (int i = 0; i < D - 1; i++)
-            ost << a(i) << ", ";
+            ost << a[i] << ", ";
         ost << a(D - 1) << ")";
         return ost;
     }
 
     template<int D>
-    inline std::ostream& operator<<(std::ostream& ost, const Box <D>& b)
+    inline std::ostream& operator<<(std::ostream& ost, const Box<D>& b)
     {
         ost << b.PMin() << " - " << b.PMax();
         return ost;

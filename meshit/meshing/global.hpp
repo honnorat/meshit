@@ -11,10 +11,8 @@
 /*
   global functions and variables
 */
-#include <string>
-#include "../general/array.hpp"
 #include "meshtype.hpp"
-
+//
 namespace meshit
 {
     extern DebugParameters debugparam;

@@ -36,13 +36,9 @@ namespace meshit {
 
     void Meshing2::StartMesh()
     {
-        foundmap.resize(rules.size());
-        canuse.resize(rules.size());
-        ruleused.resize(rules.size());
-
-        foundmap = 0;
-        canuse = 0;
-        ruleused = 0;
+        foundmap.resize(rules.size(), 0);
+        canuse.resize(rules.size(), 0);
+        ruleused.resize(rules.size(), 0);
     }
 
     void Meshing2::EndMesh()
@@ -110,13 +106,6 @@ namespace meshit {
         return 1;
     }
 
-    void Meshing2::GetChartBoundary(Array<Point2d>& points, Array<Point3d>& points3d, Array<INDEX_2>& lines) const
-    {
-        points.resize(0);
-        points3d.resize(0);
-        lines.resize(0);
-    }
-
     double Meshing2::Area() const
     {
         return -1;
@@ -124,10 +113,10 @@ namespace meshit {
 
     MESHING2_RESULT Meshing2::GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr)
     {
-        Array<int> pindex, lindex;
-        Array<int> delpoints, dellines;
-
-        Array<Element2d> locelements;
+        std::vector<int> pindex, lindex;
+        std::vector<int> delpoints;
+        std::vector<int> dellines;
+        std::vector<Element2d> locelements;
 
         int z1, z2;
         bool found;
@@ -138,11 +127,11 @@ namespace meshit {
 
         double h, his, hshould;
 
-        Array<Point3d> locpoints;
-        Array<int> legalpoints;
-        Array<Point2d> plainpoints;
-        Array<int> plainzones;
-        Array<INDEX_2> loclines;
+        std::vector<Point3d> locpoints;
+        std::vector<int> legalpoints;
+        std::vector<Point2d> plainpoints;
+        std::vector<int> plainzones;
+        std::vector<INDEX_2> loclines;
         int cntelem = 0, trials = 0, nfaces = 0;
         size_t oldnl, oldnp;
         int qualclass;
@@ -151,31 +140,28 @@ namespace meshit {
         Box3dTree surfeltree(boundingbox.PMin(), boundingbox.PMax());
 
         std::vector<size_t> intersecttrias;
-        Array<Point3d> critpoints;
+        std::vector<Point3d> critpoints;
 
         // test for doubled edges
 
         StartMesh();
 
-        Array<Point2d> chartboundpoints;
-        Array<Point3d> chartboundpoints3d;
-        Array<INDEX_2> chartboundlines;
+        std::vector<Point2d> chartboundpoints;
+        std::vector<Point3d> chartboundpoints3d;
+        std::vector<INDEX_2> chartboundlines;
 
         // illegal points: points with more then 50 elements per node
         int maxlegalpoint(-1), maxlegalline(-1);
-        Array<int> trigsonnode;
-        Array<int> illegalpoint;
+        std::vector<int> trigsonnode;
+        std::vector<int> illegalpoint;
 
-        trigsonnode.resize(mesh.GetNP());
-        illegalpoint.resize(mesh.GetNP());
-
-        trigsonnode = 0;
-        illegalpoint = 0;
+        trigsonnode.resize(mesh.GetNP(), 0);
+        illegalpoint.resize(mesh.GetNP(), 0);
 
         double totalarea = Area();
         double meshedarea = 0;
 
-        Array<SurfaceElementIndex> seia;
+        std::vector<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(facenr, seia);
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
@@ -336,23 +322,20 @@ namespace meshit {
                             loclines[i - 1].I(3 - innerp) = oldnp;
                         } else {
                             // remove line
-                            loclines.Delete(i - 1);
-                            lindex.Delete(i - 1);
+                            loclines.erase(loclines.begin() + i - 1);
+                            lindex.erase(lindex.begin() + i - 1);
                             oldnl--;
                             i--;
                         }
                     } else if ((z1 > 0 && z2 > 0 && (z1 != z2)) || ((z1 < 0) && (z2 < 0))) {
-                        loclines.Delete(i - 1);
-                        lindex.Delete(i - 1);
+                        loclines.erase(loclines.begin() + i - 1);
+                        lindex.erase(lindex.begin() + i - 1);
                         oldnl--;
                         i--;
                     }
                 }
 
-                legalpoints.resize(plainpoints.size());
-                for (size_t i = 0; i < legalpoints.size(); i++) {
-                    legalpoints[i] = 1;
-                }
+                legalpoints.assign(plainpoints.size(), 1);
                 double avy = 0;
                 for (size_t i = 0; i < plainpoints.size(); i++) {
                     avy += plainpoints[i].Y();
@@ -374,7 +357,9 @@ namespace meshit {
                     }
                 }
 
-                GetChartBoundary(chartboundpoints, chartboundpoints3d, chartboundlines);
+                chartboundpoints.resize(0);
+                chartboundpoints3d.resize(0);
+                chartboundlines.resize(0);
 
                 oldnp = plainpoints.size();
                 maxlegalpoint = locpoints.size();
@@ -578,8 +563,7 @@ namespace meshit {
 
                         int exval = adfront->ExistsLine(nlgpi1, nlgpi2);
                         if (exval) {
-                            std::cout << "ERROR: new line exits, val = " << exval << std::endl;
-                            std::cerr << "ERROR: new line exits, val = " << exval << std::endl;
+                            MESHIT_LOG_ERROR("ERROR: new line exits, val = " << exval);
                             found = false;
                         }
                     }

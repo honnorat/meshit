@@ -96,7 +96,7 @@ namespace meshit {
         Point3d(const Point<3>& p2)
         {
             for (int i = 0; i < 3; i++) {
-                x[i] = p2(i);
+                x[i] = p2[i];
             }
         }
 
@@ -275,9 +275,9 @@ namespace meshit {
 
         Vec3d(const Vec<3>& v2)
         {
-            for (int i = 0; i < 3; i++) {
-                x[i] = v2(i);
-            }
+            x[0] = v2[0];
+            x[1] = v2[1];
+            x[2] = v2[2];
         }
 
         Vec3d& operator=(const Vec3d& v2)

@@ -7,7 +7,8 @@
 /* Date:   04. Apr. 97                                                    */
 /**************************************************************************/
 
-#include "../general/array.hpp"
+#include <cstdlib>
+#include <vector>
 
 namespace meshit {
 

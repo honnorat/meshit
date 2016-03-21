@@ -92,10 +92,8 @@ namespace meshit {
     void MeshQuality2d(const Mesh& mesh)
     {
         size_t ncl = 20, cl;
-        Array<INDEX> incl(ncl);
+        std::vector<INDEX> incl(ncl, 0);
         double qual;
-
-        incl = 0;
 
         for (size_t sei = 0; sei < mesh.GetNSE(); sei++) {
             qual = TriangleQualityInst(

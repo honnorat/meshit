@@ -21,7 +21,7 @@ namespace meshit {
             return;
         }
 
-        Array<Point<2> > points;
+        std::vector<Point<2> > points;
         for (size_t i = 0; i < splines.size(); i++) {
             splines[i]->GetPoints(20, points);
 

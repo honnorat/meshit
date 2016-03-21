@@ -23,7 +23,7 @@ namespace meshit {
         oneblock = NULL;
     }
 
-    BASE_TABLE::BASE_TABLE(const FlatArray<int>& entrysizes, size_t elemsize)
+    BASE_TABLE::BASE_TABLE(const std::vector<int>& entrysizes, size_t elemsize)
             : data(entrysizes.size())
     {
         size_t cnt = 0;

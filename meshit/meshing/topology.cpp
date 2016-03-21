@@ -2,35 +2,6 @@
 
 namespace meshit {
 
-    template<class T>
-    void QuickSortRec(FlatArray<T>& data,
-                      int left, int right)
-    {
-        int i = left;
-        int j = right;
-        T midval = data[(left + right) / 2];
-
-        do {
-            while (data[i] < midval) i++;
-            while (midval < data[j]) j--;
-
-            if (i <= j) {
-                std::swap(data[i], data[j]);
-                i++;
-                j--;
-            }
-        } while (i <= j);
-        if (left < j) QuickSortRec(data, left, j);
-        if (i < right) QuickSortRec(data, i, right);
-    }
-
-    template<class T>
-    void QuickSort(FlatArray<T>& data)
-    {
-        if (data.size() > 1)
-            QuickSortRec(data, 0, data.size() - 1);
-    }
-
     MeshTopology::MeshTopology(const Mesh& amesh)
             : mesh(amesh)
     {
@@ -67,15 +38,14 @@ namespace meshit {
         delete vert2surfelement;
         delete vert2segment;
 
-        Array<int> cnt(nv);
 
         /*
           generate:
-          vertex to element 
+          vertex to element
           vertex to surface element
-          vertex to segment 
+          vertex to segment
          */
-        cnt = 0;
+        std::vector<int> cnt(nv, 0);
         for (size_t i = 0; i < nse; i++) {
             const Element2d& el = mesh.SurfaceElement(i);
             for (size_t j = 0; j < 3; j++) {
@@ -91,7 +61,7 @@ namespace meshit {
             }
         }
 
-        cnt = 0;
+        cnt.assign(nv, 0);
         for (size_t i = 0; i < nseg; i++) {
             const Segment& seg = mesh.LineSegment(i);
             cnt[seg[0]]++;
@@ -107,7 +77,7 @@ namespace meshit {
 
         if (buildedges) {
             // keep existing edges
-            cnt = 0;
+            cnt.assign(nv, 0);
             for (size_t i = 0; i < edge2vert.size(); i++) {
                 cnt[edge2vert[i][0]]++;
             }
@@ -117,7 +87,7 @@ namespace meshit {
             }
 
             // ensure all coarse grid and intermediate level edges
-            cnt = 0;
+            cnt.assign(nv, 0);
             for (size_t i = 0; i < mesh.mlbetweennodes.size(); i++) {
                 INDEX_2 parents = Sort(mesh.mlbetweennodes[i]);
                 if (parents[0] >= 0)
@@ -130,11 +100,9 @@ namespace meshit {
                     vert2vertcoarse.AddSave(parents[0], parents[1]);
             }
 
-            Array<int> edgenr(nv);
-            Array<int> edgeflag(nv);
-            Array<int> vertex2;
-
-            edgeflag = -1;
+            std::vector<int> edgenr(nv);
+            std::vector<int> edgeflag(nv, -1);
+            std::vector<int> vertex2;
 
             ned = edge2vert.size();
 
@@ -189,7 +157,7 @@ namespace meshit {
                     }
                 }
 
-                QuickSort(vertex2);
+                std::sort(vertex2.begin(), vertex2.end());
                 for (size_t j = 0; j < vertex2.size(); j++) {
                     edgenr[vertex2[j]] = ++ned;
                     edge2vert.push_back(INDEX_2(i, vertex2[j]));
@@ -228,7 +196,7 @@ namespace meshit {
 
             size_t oldnfa = face2vert.size();
 
-            cnt = 0;
+            cnt.assign(nv, 0);
             for (size_t i = 0; i < face2vert.size(); i++) {
                 cnt[face2vert[i][0]]++;
             }

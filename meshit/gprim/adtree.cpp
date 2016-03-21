@@ -45,7 +45,6 @@ namespace meshit {
 
     ADTree3::ADTree3(const double* acmin,
                      const double* acmax)
-            : ela(0)
     {
         memcpy(cmin, acmin, 3 * sizeof(double));
         memcpy(cmax, acmax, 3 * sizeof(double));
@@ -240,7 +239,6 @@ namespace meshit {
 
     ADTree6::ADTree6(const double* acmin,
                      const double* acmax)
-            : ela(0)
     {
         memcpy(cmin, acmin, 6 * sizeof(double));
         memcpy(cmax, acmax, 6 * sizeof(double));
@@ -282,10 +280,11 @@ namespace meshit {
                 memcpy(node->data, p, 6 * sizeof(double));
                 node->pi = pi;
 
-                if (ela.size() < static_cast<size_t>(pi + 1)) {
-                    ela.resize(pi + 1);
+                if (static_cast<size_t>(pi) >= ela.size()) {
+                    ela.push_back(node);
+                } else {
+                    ela[pi] = node;
                 }
-                ela[pi] = node;
                 return;
             }
 
@@ -307,10 +306,11 @@ namespace meshit {
         next->pi = pi;
         next->sep = (bmin[dir] + bmax[dir]) / 2;
 
-        if (ela.size() < static_cast<size_t>(pi + 1)) {
-            ela.resize(pi + 1);
+        if (static_cast<size_t>(pi) >= ela.size()) {
+            ela.push_back(next);
+        } else {
+            ela[pi] = next;
         }
-        ela[pi] = next;
 
         if (lr)
             node->right = next;
@@ -408,8 +408,8 @@ namespace meshit {
     {
         double pmi[3], pma[3];
         for (int i = 0; i < 3; i++) {
-            pmi[i] = pmin(i);
-            pma[i] = pmax(i);
+            pmi[i] = pmin[i];
+            pma[i] = pmax[i];
         }
         tree = new ADTree3(pmi, pma);
     }
@@ -428,8 +428,8 @@ namespace meshit {
     {
         double pmi[3], pma[3];
         for (int i = 0; i < 3; i++) {
-            pmi[i] = pmin(i);
-            pma[i] = pmax(i);
+            pmi[i] = pmin[i];
+            pma[i] = pmax[i];
         }
         tree->GetIntersecting(pmi, pma, pis);
     }

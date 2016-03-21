@@ -7,7 +7,9 @@
 /* Date:   20. Jul. 02                                                     */
 /* *************************************************************************/
 
+#include <cstdio>
 #include <cmath>
+
 #include "../general/array.hpp"
 
 namespace meshit {
@@ -63,7 +65,7 @@ namespace meshit {
 
         explicit Point(const Vec<D>& v)
         {
-            for (size_t i = 0; i < D; i++) x[i] = v(i);
+            for (size_t i = 0; i < D; i++) x[i] = v[i];
         }
 
         Point& operator=(const Point<D>& p2)
@@ -76,16 +78,6 @@ namespace meshit {
         {
             for (size_t i = 0; i < D; i++) x[i] = val;
             return *this;
-        }
-
-        double& operator()(size_t i)
-        {
-            return x[i];
-        }
-
-        const double& operator()(size_t i) const
-        {
-            return x[i];
         }
 
         double& operator[](size_t i)
@@ -151,12 +143,12 @@ namespace meshit {
 
         explicit Vec(const Point<D>& p)
         {
-            for (size_t i = 0; i < D; i++) x[i] = p(i);
+            for (size_t i = 0; i < D; i++) x[i] = p[i];
         }
 
         Vec(const Vec<D>& p1, const Vec<D>& p2)
         {
-            for (size_t i = 0; i < D; i++) x[i] = p2(i) - p1(1);
+            for (size_t i = 0; i < D; i++) x[i] = p2[i] - p1[1];
         }
 
         Vec& operator=(const Vec<D>& p2)
@@ -169,16 +161,6 @@ namespace meshit {
         {
             for (size_t i = 0; i < D; i++) x[i] = s;
             return *this;
-        }
-
-        double& operator()(size_t i)
-        {
-            return x[i];
-        }
-
-        const double& operator()(size_t i) const
-        {
-            return x[i];
         }
 
         double& operator[](size_t i)
@@ -198,7 +180,7 @@ namespace meshit {
 
         double Length() const
         {
-            double l = 0;
+            double l = 0.0;
             for (size_t i = 0; i < D; i++) {
                 l += x[i] * x[i];
             }
@@ -207,7 +189,7 @@ namespace meshit {
 
         double Length2() const
         {
-            double l = 0;
+            double l = 0.0;
             for (size_t i = 0; i < D; i++) {
                 l += x[i] * x[i];
             }
@@ -312,15 +294,15 @@ namespace meshit {
         explicit Box(const Point<D>& p1)
         {
             for (size_t i = 0; i < D; i++) {
-                pmin(i) = pmax(i) = p1(i);
+                pmin[i] = pmax[i] = p1[i];
             }
         }
 
         Box(const Point<D>& p1, const Point<D>& p2)
         {
             for (size_t i = 0; i < D; i++) {
-                pmin(i) = std::min(p1(i), p2(i));
-                pmax(i) = std::max(p1(i), p2(i));
+                pmin[i] = std::min(p1[i], p2[i]);
+                pmax[i] = std::max(p1[i], p2[i]);
             }
         }
 
@@ -351,24 +333,8 @@ namespace meshit {
         void Add(const Point<D>& p)
         {
             for (size_t i = 0; i < D; i++) {
-                if (p(i) < pmin(i)) pmin(i) = p(i);
-                else if (p(i) > pmax(i)) pmax(i) = p(i);
-            }
-        }
-
-        template<typename T1, typename T2>
-        void Set(const IndirectArray<T1, T2>& points)
-        {
-            Set(points[0]);
-            for (size_t i = 1; i < points.size(); i++)
-                Add(points[i]);
-        }
-
-        template<typename T1, typename T2>
-        void Add(const IndirectArray<T1, T2>& points)
-        {
-            for (size_t i = 0; i < points.size(); i++) {
-                Add(points[i]);
+                if (p[i] < pmin[i]) pmin[i] = p[i];
+                else if (p[i] > pmax[i]) pmax[i] = p[i];
             }
         }
 
@@ -376,7 +342,7 @@ namespace meshit {
         {
             Point<D> c;
             for (size_t i = 0; i < D; i++) {
-                c(i) = 0.5 * (pmin(i) + pmax(i));
+                c[i] = 0.5 * (pmin[i] + pmax[i]);
             }
             return c;
         }
@@ -390,7 +356,7 @@ namespace meshit {
         {
             Point<D> p;
             for (size_t i = 0; i < D; i++) {
-                p(i) = (nr & 1) ? pmax(i) : pmin(i);
+                p[i] = (nr & 1) ? pmax[i] : pmin[i];
                 nr >>= 1;
             }
             return p;
@@ -399,7 +365,7 @@ namespace meshit {
         bool Intersect(const Box<D>& box2) const
         {
             for (size_t i = 0; i < D; i++) {
-                if (pmin(i) > box2.pmax(i) || pmax(i) < box2.pmin(i)) {
+                if (pmin[i] > box2.pmax[i] || pmax[i] < box2.pmin[i]) {
                     return 0;
                 }
             }
@@ -417,8 +383,8 @@ namespace meshit {
         void Increase(double dist)
         {
             for (size_t i = 0; i < D; i++) {
-                pmin(i) -= dist;
-                pmax(i) += dist;
+                pmin[i] -= dist;
+                pmax[i] += dist;
             }
         }
     };

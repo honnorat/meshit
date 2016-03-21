@@ -84,7 +84,7 @@ namespace meshit {
                 : px(p2.px), py(p2.py) { }
 
         Point2d(const Point<2>& p2)
-                : px(p2(0)), py(p2(1)) { }
+                : px(p2[0]), py(p2[1]) { }
 
         Point2d& operator=(const Point2d& p2)
         {
@@ -215,22 +215,13 @@ namespace meshit {
         Vec2d() { /* vx = vy = 0; */ }
 
         Vec2d(double ax, double ay)
-        {
-            vx = ax;
-            vy = ay;
-        }
+                : vx{ax}, vy{ay} { }
 
         Vec2d(const Vec2d& v2)
-        {
-            vx = v2.vx;
-            vy = v2.vy;
-        }
+                : vx{v2.vx}, vy{v2.vy} { }
 
         explicit Vec2d(const Vec<2>& v2)
-        {
-            vx = v2(0);
-            vy = v2(1);
-        }
+                : vx{v2[0]}, vy{v2[1]} { }
 
         Vec2d(const Point2d& p1, const Point2d& p2)
         {

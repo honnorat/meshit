@@ -40,26 +40,4 @@ namespace meshit {
                 - m(2, 0) * m(1, 1) * m(0, 2);
     }
 
-    void EigenValues(const Mat<3, 3>& m, Vec<3>& ev)
-    {
-        const double pi = 3.141592;
-        double a, b, c, d;
-        double p, q;
-        double arg;
-
-        a = -1.;
-        b = m(0, 0) + m(1, 1) + m(2, 2);
-        c = -(m(0, 0) * m(2, 2) + m(1, 1) * m(2, 2) + m(0, 0) * m(1, 1) -
-              m(0, 1) * m(0, 1) - m(0, 2) * m(0, 2) - m(1, 2) * m(1, 2));
-        d = Det(m);
-        p = 3. * a * c - b * b;
-        q = 27. * a * a * d - 9. * a * b * c + 2. * b * b * b;
-
-        arg = acos((-q / 2) / sqrt(-(p * p * p)));
-
-        ev(0) = (2. * sqrt(-p) * cos(arg / 3.) - b) / 3. * a;
-        ev(1) = (-2. * sqrt(-p) * cos(arg / 3. + pi / 3) - b) / 3. * a;
-        ev(2) = (-2. * sqrt(-p) * cos(arg / 3. - pi / 3) - b) / 3. * a;
-    }
-
 }  // namespace meshit

@@ -83,7 +83,7 @@ namespace meshit {
         deleted = 0;
     }
 
-    void Element2d::GetBox(const Array<MeshPoint>& points, Box3d& box) const
+    void Element2d::GetBox(const std::vector<MeshPoint>& points, Box3d& box) const
     {
         box.SetPoint(points[pnum[0] - 1]);
         for (unsigned i = 1; i < 3; i++) {
@@ -101,7 +101,7 @@ namespace meshit {
         return retval;
     }
 
-    Array<IntegrationPointData*> ipdtrig;
+    std::vector<IntegrationPointData*> ipdtrig;
 
     void Element2d::GetTransformation(class DenseMatrix& pmat, class DenseMatrix& trans) const
     {
@@ -111,7 +111,7 @@ namespace meshit {
         CalcABt(pmat, *dshapep, trans);
     }
 
-    double Element2d::CalcJacobianBadness(const Array<MeshPoint>& points) const
+    double Element2d::CalcJacobianBadness(const std::vector<MeshPoint>& points) const
     {
         DenseMatrix trans(2, 2);
         DenseMatrix pmat;
@@ -272,10 +272,9 @@ namespace meshit {
             return 0;
     }
 
-    void Identifications::GetMap(size_t identnr, Array<int>& identmap, bool symmetric) const
+    void Identifications::GetMap(size_t identnr, std::vector<int>& identmap, bool symmetric) const
     {
-        identmap.resize(mesh.GetNP());
-        identmap = 0;
+        identmap.resize(mesh.GetNP(), 0);
 
         if (identnr > 0) {
             for (size_t i = 0; i < idpoints_table[identnr].size(); i++) {
@@ -303,7 +302,7 @@ namespace meshit {
 
     }
 
-    void Identifications::GetPairs(int identnr, Array<INDEX_2>& identpairs) const
+    void Identifications::GetPairs(int identnr, std::vector<INDEX_2>& identpairs) const
     {
         identpairs.resize(0);
 

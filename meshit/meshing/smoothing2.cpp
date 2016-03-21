@@ -149,10 +149,11 @@ namespace meshit {
      public:
         MeshPoint sp1;
         Vec3d normal, t1, t2;
-        Array<SurfaceElementIndex> locelements;
-        Array<int> locrots;
-        Array<double> lochs;
-        Array<Point3d> loc_pnts2, loc_pnts3;
+        std::vector<SurfaceElementIndex> locelements;
+        std::vector<int> locrots;
+        std::vector<double> lochs;
+        std::vector<Point3d> loc_pnts2;
+        std::vector<Point3d> loc_pnts3;
         double locmetricweight;
         double loch;
         int uselocalh;
@@ -275,17 +276,17 @@ namespace meshit {
 
         Opti2dLocalData ld;
 
-        Array<SurfaceElementIndex> seia;
+        std::vector<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
         Vector x(2);
 
-        Array<MeshPoint> savepoints(mesh.GetNP());
+        std::vector<MeshPoint> savepoints(mesh.GetNP());
 
         ld.uselocalh = mp.uselocalh;
 
-        Array<int> compress(mesh.GetNP());
-        Array<PointIndex> icompress;
+        std::vector<int> compress(mesh.GetNP());
+        std::vector<PointIndex> icompress;
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
@@ -301,19 +302,18 @@ namespace meshit {
                 }
             }
         }
-        Array<int> cnta(icompress.size());
-        cnta = 0;
+        std::vector<int> cnta(icompress.size(), 0);
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 cnta[compress[el[j]]]++;
             }
         }
-        TABLE<SurfaceElementIndex> elementsonpoint(cnta);
+        TABLE<SurfaceElementIndex> elements_on_point(cnta);
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
-                elementsonpoint.Add(compress[el[j]], seia[i]);
+                elements_on_point.Add(compress[el[j]], seia[i]);
             }
         }
 
@@ -328,7 +328,7 @@ namespace meshit {
         for (size_t hi = 0; hi < icompress.size(); hi++) {
             PointIndex pi = icompress[hi];
             if (mesh[pi].Type() == SURFACEPOINT) {
-                if (elementsonpoint[hi].size() == 0) continue;
+                if (elements_on_point[hi].size() == 0) continue;
 
                 ld.sp1 = mesh[pi];
                 ld.locelements.resize(0);
@@ -337,8 +337,8 @@ namespace meshit {
                 ld.loc_pnts2.resize(0);
                 ld.loc_pnts3.resize(0);
 
-                for (size_t j = 0; j < elementsonpoint[hi].size(); j++) {
-                    SurfaceElementIndex sei = elementsonpoint[hi][j];
+                for (size_t j = 0; j < elements_on_point[hi].size(); j++) {
+                    SurfaceElementIndex sei = elements_on_point[hi][j];
                     const Element2d& bel = mesh.SurfaceElement(sei);
                     ld.locelements.push_back(sei);
 

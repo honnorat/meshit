@@ -36,8 +36,8 @@ namespace meshit {
 
         GeomPoint() { }
 
-        GeomPoint(const Point<D>& ap, double aref = 1)
-                : Point<D>(ap), refatpoint(aref), hmax(1e99) { }
+        GeomPoint(const Point<D>& ap, double aref = 1, double ahmax=1e99)
+                : Point<D>(ap), refatpoint{aref}, hmax{ahmax} { }
     };
 
 
@@ -82,16 +82,7 @@ namespace meshit {
         /// returns terminal point on curve
         virtual const GeomPoint<2>& EndPI() const = 0;
 
-        virtual void GetPoints(int n, Array<Point<2> >& points) const;
-
-        /** calculates (2D) lineintersections:
-        for lines $$ a x + b y + c = 0 $$ the interecting points are calculated
-        and stored in points */
-        virtual void LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<2> >& points, const double eps) const
-        {
-            points.resize(0);
-        }
+        virtual void GetPoints(size_t n, std::vector<Point<2> >& points) const;
     };
 
     /// Straight line form p1 to p2
@@ -126,11 +117,6 @@ namespace meshit {
         {
             return "line";
         }
-
-        virtual void LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<2> >& points, const double eps) const;
-
-        virtual void Project(const Point<2>& point, Point<2>& point_on_curve, double& t) const;
 
      protected:
         GeomPoint<2> p1, p2;
@@ -177,11 +163,6 @@ namespace meshit {
         {
             return p2;
         }
-
-        virtual void LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<2> >& points, const double eps) const;
-
-        virtual void Project(const Point<2>& point, Point<2>& point_on_curve, double& t) const;
     };
 }  // namespace meshit
 

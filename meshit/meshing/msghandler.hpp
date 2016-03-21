@@ -1,6 +1,8 @@
 #ifndef MSGHANDLER_HPP
 #define MSGHANDLER_HPP
 
+#include <iostream>
+
 /**************************************************************************/
 /* File:   msghandler.hh                                                  */
 /* Author: Johannes Gerstmayr                                             */

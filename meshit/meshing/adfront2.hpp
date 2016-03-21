@@ -147,8 +147,8 @@ namespace meshit {
         Point3dTree pointsearchtree;   // search tree for points
         Point3dTree cpointsearchtree;  // search tree for cone points (not used ???)
 
-        Array<int> delpointl;  // list of deleted front points
-        Array<int> dellinel;   // list of deleted front lines
+        std::vector<int> delpointl;  // list of deleted front points
+        std::vector<int> dellinel;   // list of deleted front lines
 
         int nfl;  // number of front lines;
         INDEX_2_HASHTABLE<int>* allflines;  // all front lines ever have been
@@ -175,10 +175,10 @@ namespace meshit {
         int SelectBaseLine(Point3d& p1, Point3d& p2, int& qualclass);
 
         int GetLocals(int baseline,
-                      Array<Point3d>& locpoints,
-                      Array<INDEX_2>& loclines,  // local index
-                      Array<int>& pindex,
-                      Array<int>& lindex,
+                      std::vector<Point3d>& locpoints,
+                      std::vector<INDEX_2>& loclines,  // local index
+                      std::vector<int>& pindex,
+                      std::vector<int>& lindex,
                       double xh);
 
         void DeleteLine(int li);

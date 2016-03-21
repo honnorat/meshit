@@ -213,7 +213,7 @@ namespace meshit {
     class BASE_INDEX_2_CLOSED_HASHTABLE
     {
      protected:
-        Array<INDEX_2> hash;
+        std::vector<INDEX_2> hash;
         INDEX invalid;
 
      public:
@@ -271,7 +271,7 @@ namespace meshit {
     template<class T>
     class INDEX_2_CLOSED_HASHTABLE : public BASE_INDEX_2_CLOSED_HASHTABLE
     {
-        Array<T> cont;
+        std::vector<T> cont;
 
      public:
         explicit INDEX_2_CLOSED_HASHTABLE(int size)
@@ -301,7 +301,7 @@ namespace meshit {
     class BASE_INDEX_3_CLOSED_HASHTABLE
     {
      protected:
-        Array<INDEX_3> hash;
+        std::vector<INDEX_3> hash;
         INDEX invalid;
 
      protected:
@@ -363,7 +363,7 @@ namespace meshit {
     template<class T>
     class INDEX_3_CLOSED_HASHTABLE : public BASE_INDEX_3_CLOSED_HASHTABLE
     {
-        Array<T> cont;
+        std::vector<T> cont;
 
      public:
         explicit INDEX_3_CLOSED_HASHTABLE(int size)

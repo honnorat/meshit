@@ -60,15 +60,15 @@ namespace meshit {
             return;
         }
 
-        Array<SurfaceElementIndex> seia;
+        std::vector<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        Array<Neighbour> neighbors(mesh.GetNSE());
+        std::vector<Neighbour> neighbors(mesh.GetNSE());
         INDEX_2_HASHTABLE<trionedge> other(seia.size() + 2);
 
-        Array<char> swapped(mesh.GetNSE());
-        Array<int> pdef(mesh.GetNP());
-        Array<double> pangle(mesh.GetNP());
+        std::vector<char> swapped(mesh.GetNSE());
+        std::vector<int> pdef(mesh.GetNP());
+        std::vector<double> pangle(mesh.GetNP());
 
         static const double minangle[] = {0, 1.481, 2.565, 3.627, 4.683, 5.736, 7, 9};
 
@@ -181,8 +181,7 @@ namespace meshit {
                     Vec3d auxvec1 = mesh.Point(pi3) - mesh.Point(pi4);
                     Vec3d auxvec2 = mesh.Point(pi1) - mesh.Point(pi4);
 
-                    allowswap =
-                            allowswap && fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
+                    allowswap &= fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
                     if (!allowswap)
                         continue;
@@ -192,8 +191,7 @@ namespace meshit {
 
                     auxvec1 = mesh.Point(pi4) - mesh.Point(pi3);
                     auxvec2 = mesh.Point(pi2) - mesh.Point(pi3);
-                    allowswap =
-                            allowswap && fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
+                    allowswap &= fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
                     if (!allowswap)
                         continue;
@@ -213,23 +211,20 @@ namespace meshit {
                     nv2.Normalize();
 
                     double critval = cos(M_PI / 6);  // 30 degree
-                    allowswap = allowswap &&
-                                (nv1.Z() > critval) &&
-                                (nv2.Z() > critval) &&
-                                (nv3.Z() > critval) &&
-                                (nv4.Z() > critval);
+                    allowswap &= (nv1.Z() > critval) &&
+                                 (nv2.Z() > critval) &&
+                                 (nv3.Z() > critval) &&
+                                 (nv4.Z() > critval);
 
                     double horder = Dist(mesh.Point(pi1), mesh.Point(pi2));
 
-                    if (  // nv1 * nv2 >= 0 &&
-                            nv1.Length() > 1e-3 * horder * horder &&
-                            nv2.Length() > 1e-3 * horder * horder &&
-                            allowswap) {
+                    if (allowswap &&
+                        nv1.Length() > 1e-3 * horder * horder &&
+                        nv2.Length() > 1e-3 * horder * horder) {
                         if (!usemetric) {
                             int e = pdef[pi1] + pdef[pi2] - pdef[pi3] - pdef[pi4];
-                            double d =
-                                    Dist2(mesh.Point(pi1), mesh.Point(pi2)) -
-                                    Dist2(mesh.Point(pi3), mesh.Point(pi4));
+                            double d = Dist2(mesh.Point(pi1), mesh.Point(pi2)) -
+                                       Dist2(mesh.Point(pi3), mesh.Point(pi4));
 
                             should = e >= t && (e > 2 || d > 0);
                         } else {
@@ -286,13 +281,13 @@ namespace meshit {
             return;
         }
 
-        Array<SurfaceElementIndex> seia;
+        std::vector<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
         size_t np = mesh.GetNP();
 
         TABLE<SurfaceElementIndex> elements_on_node(np);
-        Array<SurfaceElementIndex> has_one_pi, has_both_pi;
+        std::vector<SurfaceElementIndex> has_one_pi, has_both_pi;
 
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh.SurfaceElement(seia[i]);
@@ -301,8 +296,7 @@ namespace meshit {
             }
         }
 
-        Array<bool> fixed(np);
-        fixed = false;
+        std::vector<bool> fixed(np, false);
 
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);

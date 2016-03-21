@@ -73,7 +73,7 @@ namespace meshit {
             seg.GetDerivatives(t, point, first, second);
         }
 
-        virtual void GetPoints(int n, Array<Point<2> >& points) const
+        virtual void GetPoints(size_t n, std::vector<Point<2> >& points) const
         {
             seg.GetPoints(n, points);
         }
@@ -84,7 +84,7 @@ namespace meshit {
             Vec<2> first, second;
             GetDerivatives(t, point, first, second);
             double fl = first.Length();
-            return fabs(first(0) * second(1) - first(1) * second(0)) / (fl * fl * fl);
+            return fabs(first[0] * second[1] - first[1] * second[0]) / (fl * fl * fl);
         }
 
     };

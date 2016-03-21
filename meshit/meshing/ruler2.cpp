@@ -3,7 +3,7 @@
 namespace meshit {
 
     static double CalcElementBadness(
-            const Array<Point2d>& points,
+            const std::vector<Point2d>& points,
             const Element2d& elem)
     {
         // badness = sqrt(3) /36 * circumference^2 / area - 1 +
@@ -32,13 +32,13 @@ namespace meshit {
     }
 
     int Meshing2::ApplyRules(
-            Array<Point2d>& lpoints,
-            Array<int>& legalpoints,
+            std::vector<Point2d>& lpoints,
+            std::vector<int>& legalpoints,
             int maxlegalpoint,
-            Array<INDEX_2>& llines1,
+            std::vector<INDEX_2>& llines1,
             int maxlegalline,
-            Array<Element2d>& elements,
-            Array<INDEX>& dellines, int tolerance,
+            std::vector<Element2d>& elements,
+            std::vector<INDEX>& dellines, int tolerance,
             const MeshingParameters& mp)
     {
         double maxerr = 0.5 + 0.3 * tolerance;
@@ -47,10 +47,10 @@ namespace meshit {
         size_t noldlp = lpoints.size();
         size_t noldll = llines1.size();
 
-        ArrayMem<Point2d, 100> tempnewpoints;
-        ArrayMem<INDEX_2, 100> tempnewlines;
-        ArrayMem<int, 100> tempdellines;
-        ArrayMem<Element2d, 100> tempelements;
+        std::vector<Point2d> tempnewpoints;
+        std::vector<INDEX_2> tempnewlines;
+        std::vector<int> tempdellines;
+        std::vector<Element2d> tempelements;
 
         elements.resize(0);
         dellines.resize(0);
@@ -90,7 +90,7 @@ namespace meshit {
         }
 
         // resort lines after lnearness
-        Array<INDEX_2> llines(llines1.size());
+        std::vector<INDEX_2> llines(llines1.size());
         std::vector<int> sortlines(llines1.size());
         int lnearness_class[MAX_NEARNESS];
 
@@ -350,7 +350,8 @@ namespace meshit {
                                     np.X() += newu(2 * (i - oldnp) - 2);
                                     np.Y() += newu(2 * (i - oldnp) - 1);
 
-                                    pmap[i - 1] = lpoints.push_back(np);
+                                    lpoints.push_back(np);
+                                    pmap[i - 1] = lpoints.size();
                                 }
                             }
 
@@ -385,8 +386,8 @@ namespace meshit {
                                 minelerr = elerr;
                                 found = ri + 1;
 
-                                tempnewpoints = lpoints.Range(noldlp, lpoints.size());
-                                tempnewlines = llines.Range(noldll, llines.size());
+                                tempnewpoints.assign(lpoints.begin() + noldlp, lpoints.end());
+                                tempnewlines.assign(llines.begin() + noldll, llines.end());
                                 tempdellines = dellines;
                                 tempelements = elements;
                             }
@@ -416,15 +417,10 @@ namespace meshit {
         }
 
         if (found) {
-            lpoints.Append(tempnewpoints);
-            llines1.Append(tempnewlines);
-            dellines.Append(tempdellines);
-            elements.Append(tempelements);
-
-//            lpoints.insert( lpoints.end(), tempnewpoints.begin(), tempnewpoints.end() );
-//            llines1.insert( llines1.end(), tempnewlines.begin(), tempnewlines.end() );
-//            dellines.insert( dellines.end(), tempdellines.begin(), tempdellines.end() );
-//            elements.insert( elements.end(), tempelements.begin(), tempelements.end() );
+            lpoints.insert(lpoints.end(), tempnewpoints.begin(), tempnewpoints.end());
+            llines1.insert( llines1.end(), tempnewlines.begin(), tempnewlines.end() );
+            dellines.insert( dellines.end(), tempdellines.begin(), tempdellines.end() );
+            elements.insert( elements.end(), tempelements.begin(), tempelements.end() );
         }
 
         return found;

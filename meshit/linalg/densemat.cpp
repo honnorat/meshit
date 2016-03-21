@@ -1,7 +1,5 @@
 #include "densemat.hpp"
 
-#include "../general/array.hpp"
-
 namespace meshit {
 
     DenseMatrix::DenseMatrix(size_t h, size_t w)

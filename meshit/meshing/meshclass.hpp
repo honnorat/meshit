@@ -38,14 +38,14 @@ namespace meshit {
     {
      private:
         /// point coordinates
-        Array<MeshPoint> points;
+        std::vector<MeshPoint> points;
 
         /// line-segments at edges
-        Array<Segment> segments;
+        std::vector<Segment> segments;
         /// surface elements, 2d-inner elements
-        Array<Element2d> surfelements;
+        std::vector<Element2d> surfelements;
         /// points will be fixed forever
-        Array<PointIndex> lockedpoints;
+        std::vector<PointIndex> lockedpoints;
 
         /// surface indices at boundary nodes
         TABLE<int> surfacesonnode;
@@ -55,9 +55,9 @@ namespace meshit {
         INDEX_3_CLOSED_HASHTABLE<int>* surfelementht;
 
         /// faces of rest-solid
-        Array<Element2d> openelements;
+        std::vector<Element2d> openelements;
         /// open segmenets for surface meshing  
-        Array<Segment> opensegments;
+        std::vector<Segment> opensegments;
 
         /**
            Representation of local mesh-size h
@@ -65,27 +65,22 @@ namespace meshit {
         LocalH* lochfunc;
         double hglob;
         double hmin;
-        Array<double> maxhdomain;
+        std::vector<double> maxhdomain;
 
         /**
            the face-index of the surface element maps into
            this table.
          */
-        Array<FaceDescriptor> facedecoding;
+        std::vector<FaceDescriptor> facedecoding;
 
         /// sub-domain materials
-        Array<char*> materials;
+        std::vector<char*> materials;
 
         /// Periodic surface, close surface, etc. identifications
         Identifications* ident;
 
         /// number of vertices (if < 0, use np)
         int numvertices;
-
-        /// geometric search tree for interval intersection search
-        Box3dTree* elementsearchtree;
-        /// time stamp for tree
-        mutable int elementsearchtreets;
 
         /// element -> face, element -> edge etc ...
         class MeshTopology* topology;
@@ -95,7 +90,7 @@ namespace meshit {
 
      public:
         /// refinement hierarchy
-        Array<INDEX_2> mlbetweennodes;
+        std::vector<INDEX_2> mlbetweennodes;
 
      private:
         void BuildBoundaryEdges(void);
@@ -122,9 +117,9 @@ namespace meshit {
             return points.size();
         }
 
-        MeshPoint& Point(size_t i)
+        MeshPoint& Point(size_t pi)
         {
-            return points[i];
+            return points[pi];
         }
 
         const MeshPoint& Point(size_t pi) const
@@ -177,12 +172,12 @@ namespace meshit {
         }
 
         void RebuildSurfaceElementLists();
-        void GetSurfaceElementsOfFace(int facenr, Array<SurfaceElementIndex>& sei) const;
+        void GetSurfaceElementsOfFace(int facenr, std::vector<SurfaceElementIndex>& sei) const;
 
         void AddLockedPoint(PointIndex pi);
         void ClearLockedPoints();
 
-        const Array<PointIndex>& LockedPoints() const
+        const std::vector<PointIndex>& LockedPoints() const
         {
             return lockedpoints;
         }
@@ -247,7 +242,7 @@ namespace meshit {
         void SetGlobalH(double h);
         void SetMinimalH(double h);
         double MaxHDomain(int dom) const;
-        void SetMaxHDomain(const Array<double>& mhd);
+        void SetMaxHDomain(const std::vector<double>& mhd);
         double GetH(const Point3d& p) const;
         double GetMinH(const Point3d& pmin, const Point3d& pmax);
 
@@ -287,9 +282,6 @@ namespace meshit {
         void Load(std::istream& infile);
         void Save(const std::string& filename) const;
         void Load(const std::string& filename);
-
-        /// build box-search tree
-        void BuildElementSearchTree();
 
         void SetMaterial(int domnr, const char* mat);
 

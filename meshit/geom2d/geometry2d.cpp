@@ -83,8 +83,8 @@ namespace meshit {
 
         std::string keyword;
 
-        Array<GeomPoint<2> > infilepoints(0);
-        Array<int> pointnrs(0);
+        std::vector<GeomPoint<2> > infilepoints;
+        std::vector<int> pointnrs;
         nump = 0;
         int numdomains = 0;
 
@@ -109,7 +109,7 @@ namespace meshit {
                     pointnrs.push_back(pointnr);
 
                     for (int j = 0; j < 2; j++) {
-                        infile >> x(j);
+                        infile >> x[j];
                     }
                     // hd is now optional, default 1
                     //  infile >> hd;
@@ -146,8 +146,7 @@ namespace meshit {
                     if (hd == 1)
                         hd = flags.GetNumFlag("ref", 1.0);
 
-                    infilepoints.push_back(GeomPoint<2>(x, hd));
-                    infilepoints.Last().hmax = flags.GetNumFlag("maxh", 1e99);
+                    infilepoints.push_back(GeomPoint<2>(x, hd, flags.GetNumFlag("maxh", 1e99)));
 
                     TestComment(infile);
                     infile.get(ch);

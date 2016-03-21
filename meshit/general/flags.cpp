@@ -26,14 +26,9 @@ namespace meshit {
         for (size_t i = 0; i < strflags.Size(); i++) {
             delete[] strflags[i];
         }
-        for (size_t i = 0; i < numlistflags.Size(); i++) {
-            delete numlistflags[i];
-        }
         strflags.DeleteAll();
         numflags.DeleteAll();
         defflags.DeleteAll();
-        strlistflags.DeleteAll();
-        numlistflags.DeleteAll();
     }
 
     void Flags::SetFlag(const char* name, const char* val)
@@ -53,31 +48,12 @@ namespace meshit {
         defflags.Set(name, 1);
     }
 
-    const char*
-    Flags::GetStringFlag(const char* name, const char* def) const
-    {
-        if (strflags.Used(name))
-            return strflags.Get(name);
-        else
-            return def;
-    }
-
     double Flags::GetNumFlag(const char* name, double def) const
     {
         if (numflags.Used(name))
             return numflags.Get(name);
         else
             return def;
-    }
-
-    bool Flags::GetDefineFlag(const char* name) const
-    {
-        return defflags.Used(name);
-    }
-
-    bool Flags::StringFlagDefined(const char* name) const
-    {
-        return strflags.Used(name);
     }
 
 

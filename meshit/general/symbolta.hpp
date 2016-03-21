@@ -20,7 +20,7 @@ namespace meshit {
     {
      protected:
         /// identifiers
-        Array<char*> names;
+        std::vector<char*> names;
 
      public:
         /// Constructor
@@ -46,7 +46,7 @@ namespace meshit {
     {
      private:
         /// Associated data
-        Array<T> data;
+        std::vector<T> data;
 
      public:
         /// Creates a symboltable
@@ -109,7 +109,7 @@ namespace meshit {
     inline void SYMBOLTABLE<T>::DeleteAll()
     {
         DelNames();
-        data.DeleteAll();
+        data.resize(0);
     }
 
 }  // namespace meshit

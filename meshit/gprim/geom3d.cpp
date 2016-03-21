@@ -64,8 +64,8 @@ namespace meshit {
     Box3d::Box3d(const Box<3>& b2)
     {
         for (int i = 0; i < 3; i++) {
-            minx[i] = b2.PMin()(i);
-            maxx[i] = b2.PMax()(i);
+            minx[i] = b2.PMin()[i];
+            maxx[i] = b2.PMax()[i];
         }
     }
 

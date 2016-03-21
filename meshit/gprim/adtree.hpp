@@ -45,7 +45,7 @@ namespace meshit {
      protected:
         ADTreeNode3* root;
         double cmin[3], cmax[3];
-        Array<ADTreeNode3*> ela;
+        std::vector<ADTreeNode3*> ela;
 
      public:
         ADTree3(const double* acmin, const double* acmax);
@@ -83,7 +83,7 @@ namespace meshit {
     {
         ADTreeNode6* root;
         double cmin[6], cmax[6];
-        Array<ADTreeNode6*> ela;
+        std::vector<ADTreeNode6*> ela;
 
      public:
         ADTree6(const double* acmin,

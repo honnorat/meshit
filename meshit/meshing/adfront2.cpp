@@ -50,7 +50,7 @@ namespace meshit {
         int pi;
 
         if (delpointl.size() != 0) {
-            pi = delpointl.Last();
+            pi = delpointl[delpointl.size() - 1];
             delpointl.pop_back();
             points[pi] = FrontPoint2(p, globind);
         } else {
@@ -80,7 +80,7 @@ namespace meshit {
         p2.DecFrontNr(minfn + 1);
 
         if (dellinel.size() != 0) {
-            li = dellinel.Last();
+            li = dellinel[dellinel.size() - 1];
             dellinel.pop_back();
             lines[li] = FrontLine(INDEX_2(pi1, pi2));
         } else {
@@ -186,10 +186,10 @@ namespace meshit {
     }
 
     int AdFront2::GetLocals(int baselineindex,
-                            Array<Point3d>& locpoints,
-                            Array<INDEX_2>& loclines,  // local index
-                            Array<INDEX>& pindex,
-                            Array<INDEX>& lindex,
+                            std::vector<Point3d>& locpoints,
+                            std::vector<INDEX_2>& loclines,  // local index
+                            std::vector<INDEX>& pindex,
+                            std::vector<INDEX>& lindex,
                             double xh)
     {
         int pstind;

@@ -1,8 +1,5 @@
 #include "msghandler.hpp"
 
-#include "../general/array.hpp"
-#include "global.hpp"
-
 namespace meshit {
 
     static int _meshit_logLevel = MESHIT_INFO_LOG_LEVEL;

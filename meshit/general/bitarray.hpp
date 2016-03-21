@@ -10,7 +10,6 @@
 #include <climits>
 #include <iostream>
 
-#include "array.hpp"
 #include "template.hpp"
 
 namespace meshit {
@@ -25,7 +24,7 @@ namespace meshit {
      */
     class BitArrayChar
     {
-        Array<char> data;
+        std::vector<char> data;
 
      public:
         BitArrayChar() { }
@@ -47,7 +46,9 @@ namespace meshit {
 
         void Clear()
         {
-            data = 0;
+            for (size_t i = 0 ; i < data.size(); i++) {
+                data[i] = 0;
+            }
         }
 
         inline int Test(size_t i) const

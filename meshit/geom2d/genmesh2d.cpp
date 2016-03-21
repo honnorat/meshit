@@ -64,27 +64,27 @@ namespace meshit {
     void CalcPartition(
             const SplineSegExt& spline,
             MeshingParameters& mp, Mesh& mesh,
-            double elto0, Array<double>& points)
+            double elto0, std::vector<double>& points)
     {
         double fperel, oldf, f;
 
-        int n = 1000;
+        size_t n = 1000;
 
-        Array<Point<2> > xi(n);
-        Array<double> hi(n);
+        std::vector<Point<2> > xi(n);
+        std::vector<double> hi(n);
 
-        for (int i = 0; i < n; i++) {
+        for (size_t i = 0; i < n; i++) {
             xi[i] = spline.GetPoint((i + 0.5) / n);
-            hi[i] = mesh.GetH(Point3d(xi[i](0), xi[i](1), 0));
+            hi[i] = mesh.GetH(Point3d(xi[i][0], xi[i][1], 0));
         }
 
         // limit slope
         double gradh = 1 / elto0;
-        for (int i = 0; i < n - 1; i++) {
+        for (size_t i = 0; i < n - 1; i++) {
             double hnext = hi[i] + gradh * (xi[i + 1] - xi[i]).Length();
             hi[i + 1] = std::min(hi[i + 1], hnext);
         }
-        for (int i = n - 1; i > 1; i--) {
+        for (size_t i = n - 1; i > 1; i--) {
             double hnext = hi[i] + gradh * (xi[i - 1] - xi[i]).Length();
             hi[i - 1] = std::min(hi[i - 1], hnext);
         }
@@ -95,26 +95,25 @@ namespace meshit {
         double dt = len / n;
 
         double sum = 0;
-        for (int i = 1; i <= n; i++) {
-            double fun = hi[i - 1];
-            sum += dt / fun;
+        for (size_t i = 0; i < n; i++) {
+            sum += dt / hi[i];
         }
 
-        int nel = static_cast<int>(sum + 1);
+        size_t nel = static_cast<size_t>(sum + 1);
         fperel = sum / nel;
 
         points.push_back(0);
 
-        int i = 1;
+        size_t i = 1;
         oldf = 0;
 
-        for (int j = 1; j <= n && i < nel; j++) {
-            double fun = hi[j - 1];
+        for (size_t j = 0; j < n && i < nel; j++) {
+            double fun = hi[j];
 
             f = oldf + dt / fun;
 
             while (i * fperel < f && i < nel) {
-                points.push_back(dt * (j - 1) + (i * fperel - oldf) * fun);
+                points.push_back(dt * j + (i * fperel - oldf) * fun);
                 i++;
             }
             oldf = f;
@@ -131,7 +130,7 @@ namespace meshit {
         size_t n = 100;
 
         Point<2> mark, oldmark;
-        Array<double> curvepoints;
+        std::vector<double> curvepoints;
         double edgelength, edgelengthold;
 
         CalcPartition(spline, mp, mesh, elto0, curvepoints);
@@ -156,10 +155,10 @@ namespace meshit {
                 mark = spline.GetPoint(edgelength);
 
                 PointIndex pi1{-1}, pi2{-1};
-                Point3d mark3(mark(0), mark(1), 0);
-                Point3d oldmark3(oldmark(0), oldmark(1), 0);
+                Point3d mark3(mark[0], mark[1], 0);
+                Point3d oldmark3(oldmark[0], oldmark[1], 0);
 
-                double h = mesh.GetH(Point<3>(oldmark(0), oldmark(1), 0));
+                double h = mesh.GetH(Point<3>(oldmark[0], oldmark[1], 0));
                 Vec<3> v(1e-4 * h, 1e-4 * h, 1e-4 * h);
                 searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
 
@@ -214,11 +213,11 @@ namespace meshit {
         Point<3> pmin;
         Point<3> pmax;
 
-        pmin(2) = -dist;
-        pmax(2) = dist;
+        pmin[2] = -dist;
+        pmax[2] = dist;
         for (int j = 0; j < 2; j++) {
-            pmin(j) = bbox.PMin()(j);
-            pmax(j) = bbox.PMax()(j);
+            pmin[j] = bbox.PMin()[j];
+            pmax[j] = bbox.PMax()[j];
         }
 
         Point3dTree searchtree(pmin, pmax);
@@ -239,12 +238,12 @@ namespace meshit {
 
             double h1 = std::min(p1.hmax, h / p1.refatpoint);
             double h2 = std::min(p2.hmax, h / p2.refatpoint);
-            mesh2d.RestrictLocalH(Point3d(p1(0), p1(1), 0), h1);
-            mesh2d.RestrictLocalH(Point3d(p2(0), p2(1), 0), h2);
+            mesh2d.RestrictLocalH(Point3d(p1[0], p1[1], 0), h1);
+            mesh2d.RestrictLocalH(Point3d(p2[0], p2[1], 0), h2);
 
             double len = spline.Length();
-            mesh2d.RestrictLocalHLine(Point3d(p1(0), p1(1), 0),
-                                      Point3d(p2(0), p2(1), 0), len / mp.segments_per_edge);
+            mesh2d.RestrictLocalHLine(Point3d(p1[0], p1[1], 0),
+                                      Point3d(p2[0], p2[1], 0), len / mp.segments_per_edge);
 
             double hcurve = std::min(spline.hmax, h / spline.reffak);
             double hl = GetDomainMaxh(spline.leftdom);
@@ -256,7 +255,7 @@ namespace meshit {
             for (double t = 0.5 / np; t < 1; t += 1.0 / np) {
                 Point<2> x = spline.GetPoint(t);
                 double hc = 1.0 / mp.curvature_safety / (1e-99 + spline.CalcCurvature(t));
-                mesh2d.RestrictLocalH(Point3d(x(0), x(1), 0), std::min(hc, hcurve));
+                mesh2d.RestrictLocalH(Point3d(x[0], x[1], 0), std::min(hc, hcurve));
             }
         }
 
@@ -271,10 +270,8 @@ namespace meshit {
 
     void SplineGeometry2d::CopyEdgeMesh(size_t from, size_t to, Mesh& mesh, Point3dTree& searchtree)
     {
-        Array<int> mappoints(mesh.GetNP());
-        Array<double> param(mesh.GetNP());
-        mappoints = -1;
-        param = 0;
+        std::vector<int> mappoints(mesh.GetNP(), -1);
+        std::vector<double> param(mesh.GetNP(), 0);
 
         Point3d pmin, pmax;
         mesh.GetBox(pmin, pmax);
@@ -296,7 +293,7 @@ namespace meshit {
         for (size_t i = 0; i < mappoints.size(); i++) {
             if (mappoints[i] != -1) {
                 Point<2> newp = splines[to + 1]->GetPoint(param[i]);
-                Point<3> newp3(newp(0), newp(1), 0);
+                Point<3> newp3(newp[0], newp[1], 0);
 
                 int npi = -1;
 

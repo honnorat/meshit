@@ -118,11 +118,6 @@ namespace meshit {
             return pnum[i];
         }
 
-        FlatArray<const PointIndex> PNums() const
-        {
-            return FlatArray<const PointIndex>(3, &pnum[0]);
-        }
-
         PointIndex& PNum(size_t i)
         {
             return pnum[i - 1];
@@ -153,7 +148,7 @@ namespace meshit {
             return index;
         };
 
-        void GetBox(const Array<MeshPoint>& points, Box3d& box) const;
+        void GetBox(const std::vector<MeshPoint>& points, Box3d& box) const;
         /// invert orientation
         inline void Invert();
         /// first point number is smallest
@@ -166,7 +161,7 @@ namespace meshit {
 
         void ComputeIntegrationPointData() const;
 
-        double CalcJacobianBadness(const Array<MeshPoint>& points) const;
+        double CalcJacobianBadness(const std::vector<MeshPoint>& points) const;
 
         void Delete()
         {
@@ -410,7 +405,7 @@ namespace meshit {
         /// sorted by identification nr
         TABLE<INDEX_2> idpoints_table;
 
-        Array<ID_TYPE> type;
+        std::vector<ID_TYPE> type;
 
         /// number of identifications (or, actually used identifications ?)
         int maxidentnr;
@@ -434,7 +429,7 @@ namespace meshit {
                    identifiedpoints->Used(INDEX_2(pi2, pi1));
         }
 
-        void GetMap(size_t identnr, Array<int>& identmap, bool symmetric = false) const;
+        void GetMap(size_t identnr, std::vector<int>& identmap, bool symmetric = false) const;
 
         ID_TYPE GetType(size_t identnr) const
         {
@@ -453,7 +448,7 @@ namespace meshit {
             type[identnr] = t;
         }
 
-        void GetPairs(int identnr, Array<INDEX_2>& identpairs) const;
+        void GetPairs(int identnr, std::vector<INDEX_2>& identpairs) const;
 
         int GetMaxNr() const
         {

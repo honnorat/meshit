@@ -16,8 +16,6 @@ namespace meshit {
         surfelementht = NULL;
         segmentht = NULL;
         lochfunc = NULL;
-        elementsearchtree = NULL;
-        elementsearchtreets = NextTimeStamp();
         timestamp = NextTimeStamp();
         hglob = 1e10;
         hmin = 0;
@@ -35,7 +33,6 @@ namespace meshit {
         delete segmentht;
         delete topology;
         delete ident;
-        delete elementsearchtree;
 
         for (size_t i = 0; i < materials.size(); i++) {
             delete[] materials[i];
@@ -69,8 +66,8 @@ namespace meshit {
             h = bbox.Diam();
             mp.maxh = h;
         }
-        Point3d pmin(bbox.PMin()(0), bbox.PMin()(1), -bbox.Diam());
-        Point3d pmax(bbox.PMax()(0), bbox.PMax()(1), bbox.Diam());
+        Point3d pmin(bbox.PMin()[0], bbox.PMin()[1], -bbox.Diam());
+        Point3d pmax(bbox.PMax()[0], bbox.PMax()[1], bbox.Diam());
 
         SetLocalH(pmin, pmax, grading);
         hglob = h;
@@ -90,7 +87,7 @@ namespace meshit {
 
         CalcLocalH();
 
-        int bnp = GetNP();  // boundary points
+        size_t bnp = GetNP();  // boundary points
 
         for (int domnr = 1; domnr <= maxdomnr; domnr++) {
             if (geometry.GetDomainMaxh(domnr) > 0) {
@@ -102,10 +99,9 @@ namespace meshit {
 
             Meshing2 meshing(mp, Box<3>(pmin, pmax));
 
-            Array<int> compress(bnp);
-            compress = -1;
+            std::vector<int> compress(bnp, -1);
             int cnt = 0;
-            for (PointIndex pi = 0; pi < bnp; pi++) {
+            for (size_t pi = 0; pi < bnp; pi++) {
                 if (points[pi].GetLayer() == geometry.GetDomainLayer(domnr)) {
                     meshing.AddPoint(points[pi], pi);
                     cnt++;
@@ -200,8 +196,9 @@ namespace meshit {
             MESHIT_LOG_ERROR("has no facedecoding: fd.size = " << facedecoding.size() << ", ind = " << el.index);
         }
 
-        surfelements.Last().next = facedecoding[el.index - 1].firstelement;
-        facedecoding[el.index - 1].firstelement = si;
+        Element2d& bref = surfelements.back();
+        bref.next = facedecoding[bref.index - 1].firstelement;
+        facedecoding[bref.index - 1].firstelement = si;
 
         if (surfarea.Valid()) {
             surfarea.Add(el);
@@ -335,7 +332,7 @@ namespace meshit {
 
         if (ident->GetMaxNr() > 0) {
             outfile << "identifications\n";
-            Array<INDEX_2> identpairs;
+            std::vector<INDEX_2> identpairs;
             int cnt = 0;
             for (int i = 1; i <= ident->GetMaxNr(); i++) {
                 ident->GetPairs(i, identpairs);
@@ -676,21 +673,17 @@ namespace meshit {
         size_t np = GetNP();
         size_t nse = GetNSE();
 
-        Array<int> numonpoint(np);
-
-        numonpoint = 0;
-
-        Array<char> hasface(GetNFD());
+        std::vector<bool> hasface(GetNFD());
 
         for (int i = 0; i < GetNFD(); i++) {
             int domin = GetFaceDescriptor(i + 1).DomainIn();
             int domout = GetFaceDescriptor(i + 1).DomainOut();
-            hasface[i] =
-                    (dom == 0 && (domin != 0 || domout != 0)) ||
-                    (dom != 0 && (domin == dom || domout == dom));
+            hasface[i] = (dom == 0 && (domin != 0 || domout != 0)) ||
+                         (dom != 0 && (domin == dom || domout == dom));
         }
 
-        numonpoint = 0;
+        std::vector<PointIndex> numonpoint(np, 0);
+
         for (size_t sii = 0; sii < nse; sii++) {
             int ind = surfelements[sii].GetIndex();
 
@@ -706,7 +699,7 @@ namespace meshit {
             }
         }
 
-        TABLE<SurfaceElementIndex> selsonpoint(numonpoint);
+        TABLE<SurfaceElementIndex> sels_on_point(numonpoint);
         for (size_t sii = 0; sii < nse; sii++) {
             int ind = surfelements[sii].GetIndex();
 
@@ -718,7 +711,7 @@ namespace meshit {
                         mini = j;
                     }
                 }
-                selsonpoint.Add(hel[mini], sii);
+                sels_on_point.Add(hel[mini], sii);
             }
         }
 
@@ -728,11 +721,11 @@ namespace meshit {
         openelements.resize(0);
 
         for (PointIndex pi = 0; pi < points.size(); pi++) {
-            if (selsonpoint[pi].size()) {
+            if (sels_on_point[pi].size()) {
 
-                faceht.SetSize(2 * selsonpoint[pi].size());
+                faceht.SetSize(2 * sels_on_point[pi].size());
 
-                FlatArray<SurfaceElementIndex> row = selsonpoint[pi];
+                FlatArray<SurfaceElementIndex> row = sels_on_point[pi];
                 for (size_t ii = 0; ii < row.size(); ii++) {
                     hel = SurfaceElement(row[ii]);
                     int ind = hel.GetIndex();
@@ -959,7 +952,7 @@ namespace meshit {
             return 1e10;
     }
 
-    void Mesh::SetMaxHDomain(const Array<double>& mhd)
+    void Mesh::SetMaxHDomain(const std::vector<double>& mhd)
     {
         maxhdomain.resize(mhd.size());
         for (int i = 0; i < mhd.size(); i++) {
@@ -1283,19 +1276,19 @@ namespace meshit {
 
     void Mesh::Compress()
     {
-        Array<PointIndex> op2np(GetNP());
-        Array<MeshPoint> hpoints;
+        std::vector<PointIndex> op2np(GetNP());
+        std::vector<MeshPoint> hpoints;
         BitArrayChar pused(GetNP());
 
         for (size_t i = 0; i < surfelements.size(); i++) {
             if (surfelements[i].IsDeleted()) {
-                surfelements.Delete(i);
+                surfelements.erase(surfelements.begin() + i);
                 i--;
             }
         }
         for (size_t i = 0; i < segments.size(); i++) {
             if (segments[i][0] <= -1) {
-                segments.Delete(i);
+                segments.erase(segments.begin() + i);
                 i--;
             }
         }
@@ -1536,76 +1529,34 @@ namespace meshit {
         return ndom;
     }
 
-    void Mesh::BuildElementSearchTree()
-    {
-        if (elementsearchtreets == GetTimeStamp()) return;
-
-        //#pragma omp critical (buildsearchtree)
-        {
-            if (elementsearchtreets != GetTimeStamp()) {
-
-                MESHIT_LOG_DEBUG("Rebuild element searchtree");
-
-                delete elementsearchtree;
-                elementsearchtree = NULL;
-
-                size_t ne = GetNSE();
-
-                if (ne) {
-                    Box<3> box(Box<3>::EMPTY_BOX);
-                    for (size_t sei = 0; sei < ne; sei++) {
-                        box.Add(points[surfelements[sei].PNums()]);
-                    }
-                    box.Increase(1.01 * box.Diam());
-                    elementsearchtree = new Box3dTree(box);
-
-                    for (size_t sei = 0; sei < ne; sei++) {
-                        box.Set(points[surfelements[sei].PNums()]);
-                        elementsearchtree->Insert(box, sei + 1);
-                    }
-                    elementsearchtreets = GetTimeStamp();
-                }
-            }
-        }
-    }
-
     bool Mesh::PointContainedIn2DElement(const Point3d& p,
                                          double lami[3],
                                          const int element,  // 0-based
                                          bool consider3D) const
     {
-        Vec3d col1, col2, col3;
-        Vec3d rhs, sol;
         const double eps = 1e-6;
 
-        Array<Element2d> loctrigs(1);
+        const Element2d& el = SurfaceElement(element);
+        const Point3d& p1 = Point(el.PNum(1));
+        const Point3d& p2 = Point(el.PNum(2));
+        const Point3d& p3 = Point(el.PNum(3));
 
-        loctrigs[0] = SurfaceElement(element);
+        Vec3d col1 = p2 - p1;
+        Vec3d col2 = p3 - p1;
+        Vec3d col3 = Cross(col1, col2);
+        Vec3d rhs = p - p1;
+        Vec3d sol;
 
-        for (size_t j = 0; j < loctrigs.size(); j++) {
-            const Element2d& el = loctrigs[j];
+        SolveLinearSystem(col1, col2, col3, rhs, sol);
 
+        if (sol.X() >= -eps && sol.Y() >= -eps &&
+            sol.X() + sol.Y() <= 1 + eps) {
+            if (!consider3D || (sol.Z() >= -eps && sol.Z() <= eps)) {
+                lami[0] = sol.X();
+                lami[1] = sol.Y();
+                lami[2] = sol.Z();
 
-            const Point3d& p1 = Point(el.PNum(1));
-            const Point3d& p2 = Point(el.PNum(2));
-            const Point3d& p3 = Point(el.PNum(3));
-
-            col1 = p2 - p1;
-            col2 = p3 - p1;
-            col3 = Cross(col1, col2);
-            rhs = p - p1;
-
-            SolveLinearSystem(col1, col2, col3, rhs, sol);
-
-            if (sol.X() >= -eps && sol.Y() >= -eps &&
-                sol.X() + sol.Y() <= 1 + eps) {
-                if (!consider3D || (sol.Z() >= -eps && sol.Z() <= eps)) {
-                    lami[0] = sol.X();
-                    lami[1] = sol.Y();
-                    lami[2] = sol.Z();
-
-                    return true;
-                }
+                return true;
             }
         }
         return false;
@@ -1623,7 +1574,7 @@ namespace meshit {
         }
     }
 
-    void Mesh::GetSurfaceElementsOfFace(int facenr, Array<SurfaceElementIndex>& sei) const
+    void Mesh::GetSurfaceElementsOfFace(int facenr, std::vector<SurfaceElementIndex>& sei) const
     {
         sei.resize(0);
 

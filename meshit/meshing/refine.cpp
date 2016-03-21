@@ -24,7 +24,7 @@ namespace meshit {
         INDEX_2_HASHTABLE<PointIndex> between(mesh.GetNP() + 5);
 
         // refine edges
-        Array<EdgePointGeomInfo> epgi;
+        std::vector<EdgePointGeomInfo> epgi;
 
         size_t oldns = mesh.GetNSeg();
         for (size_t si = 0; si < oldns; si++) {
@@ -70,12 +70,12 @@ namespace meshit {
             int j, k;
             const Element2d& el = mesh.SurfaceElement(sei);
 
-            ArrayMem<PointIndex, 6> pnums(6);
+            PointIndex pnums[6];
 
             static int betw[3][3] = {
-                    {2, 3, 4},
-                    {1, 3, 5},
-                    {1, 2, 6}
+                    {1, 2, 3},
+                    {0, 2, 4},
+                    {0, 1, 5}
             };
 
             for (j = 1; j <= 3; j++) {
@@ -83,8 +83,8 @@ namespace meshit {
             }
 
             for (j = 0; j < 3; j++) {
-                PointIndex pi1 = pnums[betw[j][0] - 1];
-                PointIndex pi2 = pnums[betw[j][1] - 1];
+                PointIndex pi1 = pnums[betw[j][0]];
+                PointIndex pi2 = pnums[betw[j][1]];
 
                 INDEX_2 i2(pi1, pi2);
                 i2.Sort();
@@ -101,17 +101,17 @@ namespace meshit {
             }
 
             static int reftab[4][3] = {
-                    {1, 6, 5},
-                    {2, 4, 6},
-                    {3, 5, 4},
-                    {6, 4, 5}
+                    {0, 5, 4},
+                    {1, 3, 5},
+                    {2, 4, 3},
+                    {5, 3, 4}
             };
 
             int ind = el.GetIndex();
             for (j = 0; j < 4; j++) {
                 Element2d nel;
                 for (k = 1; k <= 3; k++) {
-                    nel.PNum(k) = pnums[reftab[j][k - 1] - 1];
+                    nel.PNum(k) = pnums[reftab[j][k - 1]];
                 }
                 nel.SetIndex(ind);
 
@@ -124,7 +124,7 @@ namespace meshit {
 
         // update identification tables
         for (size_t i = 0; i < mesh.GetIdentifications().GetMaxNr(); i++) {
-            Array<int> identmap;
+            std::vector<int> identmap;
             mesh.GetIdentifications().GetMap(i + 1, identmap);
 
             for (size_t j = 0; j < between.GetNBags(); j++)

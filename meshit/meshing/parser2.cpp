@@ -223,7 +223,7 @@ namespace meshit {
                 ist >> ch;
                 while (ch == '(') {
                     elements.push_back(Element2d());
-                    Element2d& last = elements[elements.size() - 1];
+                    Element2d& last = elements.back();
 
                     ist >> last.PNum(1);
                     ist >> ch;  // ','
@@ -293,7 +293,7 @@ namespace meshit {
         freesetinequ.SetSize(freezone.size());
 
         {
-            Array<int> pnearness(noldp);
+            std::vector<int> pnearness(noldp);
 
             for (size_t i = 0; i < pnearness.size(); i++) {
                 pnearness[i] = 1000;

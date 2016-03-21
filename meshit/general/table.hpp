@@ -25,12 +25,12 @@ namespace meshit {
             void* col;
         };
 
-        Array<linestruct> data;
+        std::vector<linestruct> data;
         char* oneblock;
 
      public:
         explicit BASE_TABLE(size_t size);
-        BASE_TABLE(const FlatArray<int>& entrysizes, size_t elemsize);
+        BASE_TABLE(const std::vector<int>& entrysizes, size_t elemsize);
         ~BASE_TABLE();
 
         void SetSize(size_t size);
@@ -67,31 +67,14 @@ namespace meshit {
         explicit TABLE(size_t size = 0) : BASE_TABLE(size) { }
 
         /// Creates fixed maximal element size table
-        explicit TABLE(const FlatArray<int>& entrysizes)
-                : BASE_TABLE(FlatArray<int>(entrysizes.size(), const_cast<int*> (&entrysizes[0])), sizeof(T)) { }
-
-        /// Changes Size of table to size, deletes data
-        inline void SetSize(size_t size)
-        {
-            BASE_TABLE::SetSize(size);
-        }
-
-        /// Changes Size of table to size, keep data
-        inline void ChangeSize(size_t size)
-        {
-            BASE_TABLE::ChangeSize(size);
-        }
+        explicit TABLE(const std::vector<int>& entrysizes)
+                : BASE_TABLE(entrysizes, sizeof(T)) { }
 
         /// Inserts element acont into row i. Does not test if already used.
         inline void Add(size_t i, const T& acont)
         {
             IncSize(i, sizeof(T));
             static_cast<T*>(data[i].col)[data[i].size - 1] = acont;
-        }
-
-        void IncSizePrepare(size_t i)
-        {
-            data[i].maxsize++;
         }
 
         /// Inserts element acont into row i. Does not test if already used, assumes to have enough memory

@@ -32,9 +32,9 @@ namespace meshit {
         /// the current advancing front
         AdFront2* adfront;
         /// rules for mesh generation
-        Array<netrule*> rules;
+        std::vector<netrule*> rules;
         /// statistics
-        Array<int> ruleused, canuse, foundmap;
+        std::vector<int> ruleused, canuse, foundmap;
         Box<3> boundingbox;
         double maxarea;
 
@@ -84,22 +84,18 @@ namespace meshit {
          */
         virtual int IsLineVertexOnChart(const Point3d& p1, const Point3d& p2);
 
-        /*
-          get (projected) boundary of current chart
-         */
-        virtual void GetChartBoundary(Array<Point2d>& points, Array<Point3d>& points3d, Array<INDEX_2>& lines) const;
-
         virtual double Area() const;
 
         /** Applies 2D rules.
          Tests all 2D rules */
         int ApplyRules(
-                Array<Point2d>& lpoints,
-                Array<int>& legalpoints,
+                std::vector<Point2d>& lpoints,
+                std::vector<int>& legalpoints,
                 int maxlegalpoint,
-                Array<INDEX_2>& llines,
+                std::vector<INDEX_2>& llines,
                 int maxlegelline,
-                Array<Element2d>& elements, Array<INDEX>& dellines,
+                std::vector<Element2d>& elements,
+                std::vector<INDEX>& dellines,
                 int tolerance,
                 const MeshingParameters& mp);
     };
