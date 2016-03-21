@@ -15,30 +15,25 @@ namespace meshit {
 
     class GradingBox
     {
-        double xmid[3];
-        double h2;  // half edgelength
-
-        GradingBox* childs[8];
-
-        double hopt;
-
      public:
-        struct
-        {
-            unsigned int cutboundary : 1;
-            unsigned int isinner : 1;
-            unsigned int oldcell : 1;
-            unsigned int pinner : 1;
-        } flags;
-
         GradingBox(const double* ax1, const double* ax2);
         void DeleteChilds();
+
+        void SetBox(const double* ax1, const double* ax2);
 
         friend class LocalH;
 
         static BlockAllocator ball;
         void* operator new(size_t);
         void operator delete(void*);
+
+     protected:
+        double xmid[3];
+        double h2;  // half edgelength
+
+        GradingBox* childs[8];
+
+        double hopt;
     };
 
     /**
@@ -48,11 +43,9 @@ namespace meshit {
     {
         GradingBox* root;
         double grading;
-        Array<GradingBox*> boxes;
 
      public:
         LocalH(const Point3d& pmin, const Point3d& pmax, double grading);
-        LocalH(const Box<3>& box, double grading);
         ~LocalH();
 
         void SetH(const Point3d& x, double h);

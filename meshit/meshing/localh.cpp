@@ -5,6 +5,11 @@ namespace meshit {
 
     GradingBox::GradingBox(const double* ax1, const double* ax2)
     {
+        SetBox(ax1, ax2);
+    }
+
+    void GradingBox::SetBox(const double* ax1, const double* ax2)
+    {
         h2 = 0.5 * (ax2[0] - ax1[0]);
         for (int i = 0; i < 3; i++)
             xmid[i] = 0.5 * (ax1[i] + ax2[i]);
@@ -12,11 +17,6 @@ namespace meshit {
         for (int i = 0; i < 8; i++) {
             childs[i] = NULL;
         }
-
-        flags.cutboundary = 0;
-        flags.isinner = 0;
-        flags.oldcell = 0;
-        flags.pinner = 0;
 
         hopt = 2.0 * h2;
     }
@@ -45,59 +45,32 @@ namespace meshit {
 
     LocalH::LocalH(const Point3d& pmin, const Point3d& pmax, double agrading)
     {
-        double x1[3], x2[3];
-        double hmax;
-
-        Box3d(pmin, pmax);
         grading = agrading;
 
         // a small enlargement, non-regular points
-        double val = 0.0879;
-        for (int i = 1; i <= 3; i++) {
-            x1[i - 1] = (1 + val * i) * pmin.X(i) - val * i * pmax.X(i);
-            x2[i - 1] = 1.1 * pmax.X(i) - 0.1 * pmin.X(i);
-        }
-
-        hmax = x2[0] - x1[0];
-        for (int i = 1; i <= 2; i++)
-            if (x2[i] - x1[i] > hmax)
-                hmax = x2[i] - x1[i];
-
-        for (int i = 0; i <= 2; i++)
-            x2[i] = x1[i] + hmax;
-
-        root = new GradingBox(x1, x2);
-        boxes.push_back(root);
-    }
-
-    LocalH::LocalH(const Box<3>& box, double agrading)
-    {
-        Point3d pmin = box.PMin();
-        Point3d pmax = box.PMax();
+        constexpr double val = 0.0879;
+        constexpr double val2 = 2 * val;
+        constexpr double val3 = 3 * val;
 
         double x1[3], x2[3];
-        double hmax;
+        x1[0] = (1.0 + val) * pmin.X() - val * pmax.X();
+        x2[0] = 1.1 * pmax.X() - 0.1 * pmin.X();
 
-        Box3d(pmin, pmax);
-        grading = agrading;
+        x1[1] = (1.0 + val2) * pmin.Y() - val2 * pmax.Y();
+        x2[1] = 1.1 * pmax.Y() - 0.1 * pmin.Y();
 
-        // a small enlargement, non-regular points
-        double val = 0.0879;
-        for (int i = 1; i <= 3; i++) {
-            x1[i - 1] = (1 + val * i) * pmin.X(i) - val * i * pmax.X(i);
-            x2[i - 1] = 1.1 * pmax.X(i) - 0.1 * pmin.X(i);
-        }
+        x1[2] = (1.0 + val3) * pmin.Z() - val3 * pmax.Z();
+        x2[2] = 1.1 * pmax.Z() - 0.1 * pmin.Z();
 
-        hmax = x2[0] - x1[0];
-        for (int i = 1; i <= 2; i++)
-            if (x2[i] - x1[i] > hmax)
-                hmax = x2[i] - x1[i];
+        double hmax = x2[0] - x1[0];
+        hmax = std::max(hmax, x2[1] - x1[1]);
+        hmax = std::max(hmax, x2[2] - x1[2]);
 
-        for (int i = 0; i <= 2; i++)
-            x2[i] = x1[i] + hmax;
+        x2[0] = x1[0] + hmax;
+        x2[1] = x1[1] + hmax;
+        x2[2] = x1[2] + hmax;
 
         root = new GradingBox(x1, x2);
-        boxes.push_back(root);
     }
 
     LocalH::~LocalH()
@@ -108,9 +81,13 @@ namespace meshit {
 
     void LocalH::SetH(const Point3d& p, double h)
     {
-        if (fabs(p.X() - root->xmid[0]) > root->h2 ||
-            fabs(p.Y() - root->xmid[1]) > root->h2 ||
-            fabs(p.Z() - root->xmid[2]) > root->h2) {
+        double p_x = p.X();
+        double p_y = p.Y();
+        double p_z = p.Z();
+
+        if (fabs(p_x - root->xmid[0]) > root->h2 ||
+            fabs(p_y - root->xmid[1]) > root->h2 ||
+            fabs(p_z - root->xmid[2]) > root->h2) {
             return;
         }
 
@@ -118,57 +95,49 @@ namespace meshit {
 
         GradingBox* box = root;
         GradingBox* nbox = root;
-        GradingBox* ngb;
-        int childnr;
         double x1[3], x2[3];
 
         while (nbox) {
             box = nbox;
-            childnr = 0;
-            if (p.X() > box->xmid[0]) childnr += 1;
-            if (p.Y() > box->xmid[1]) childnr += 2;
-            if (p.Z() > box->xmid[2]) childnr += 4;
+            int childnr = 0;
+            childnr += 1 * static_cast<int>((p_x > box->xmid[0]));
+            childnr += 2 * static_cast<int>((p_y > box->xmid[1]));
+            childnr += 4 * static_cast<int>((p_z > box->xmid[2]));
             nbox = box->childs[childnr];
         }
 
         const double h_half = 0.5 * h;
 
         while (box->h2 > h_half) {
-            childnr = 0;
-            if (p.X() > box->xmid[0]) childnr += 1;
-            if (p.Y() > box->xmid[1]) childnr += 2;
-            if (p.Z() > box->xmid[2]) childnr += 4;
+            int childnr = 0;
+            childnr += 1 * static_cast<int>((p_x > box->xmid[0]));
+            childnr += 2 * static_cast<int>((p_y > box->xmid[1]));
+            childnr += 4 * static_cast<int>((p_z > box->xmid[2]));
 
             double h2 = box->h2;
             if (childnr & 1) {
                 x1[0] = box->xmid[0];
-                x2[0] = x1[0] + h2;  // box->x2[0];
+                x2[0] = x1[0] + h2;
             } else {
                 x2[0] = box->xmid[0];
-                x1[0] = x2[0] - h2;  // box->x1[0];
+                x1[0] = x2[0] - h2;
             }
-
             if (childnr & 2) {
                 x1[1] = box->xmid[1];
-                x2[1] = x1[1] + h2;  // box->x2[1];
+                x2[1] = x1[1] + h2;
             } else {
                 x2[1] = box->xmid[1];
-                x1[1] = x2[1] - h2;  // box->x1[1];
+                x1[1] = x2[1] - h2;
             }
-
             if (childnr & 4) {
                 x1[2] = box->xmid[2];
-                x2[2] = x1[2] + h2;  // box->x2[2];
+                x2[2] = x1[2] + h2;
             } else {
                 x2[2] = box->xmid[2];
-                x1[2] = x2[2] - h2;  // box->x1[2];
+                x1[2] = x2[2] - h2;
             }
 
-            ngb = new GradingBox(x1, x2);
-            box->childs[childnr] = ngb;
-
-            boxes.push_back(ngb);
-            box = box->childs[childnr];
+            box = box->childs[childnr] = new GradingBox(x1, x2);
         }
 
         box->hopt = h;
@@ -176,15 +145,14 @@ namespace meshit {
         double hbox = 2 * box->h2;  // box->x2[0] - box->x1[0];
         double hnp = h + grading * hbox;
 
-        Point3d np;
-        for (int i = 1; i <= 3; i++) {
-            np = p;
-            np.X(i) = p.X(i) + hbox;
-            SetH(np, hnp);
+        SetH(Point3d(p_x + hbox, p_y, p_z), hnp);
+        SetH(Point3d(p_x - hbox, p_y, p_z), hnp);
 
-            np.X(i) = p.X(i) - hbox;
-            SetH(np, hnp);
-        }
+        SetH(Point3d(p_x, p_y + hbox, p_z), hnp);
+        SetH(Point3d(p_x, p_y - hbox, p_z), hnp);
+
+        SetH(Point3d(p_x, p_y, p_z + hbox), hnp);
+        SetH(Point3d(p_x, p_y, p_z - hbox), hnp);
     }
 
     double LocalH::GetH(const Point3d& x) const

@@ -129,7 +129,7 @@ namespace meshit {
 
         Array<Element2d> locelements;
 
-        int z1, z2, oldnp(-1);
+        int z1, z2;
         bool found;
         int rulenr(-1);
         Point3d p1, p2;
@@ -144,7 +144,7 @@ namespace meshit {
         Array<int> plainzones;
         Array<INDEX_2> loclines;
         int cntelem = 0, trials = 0, nfaces = 0;
-        int oldnl = 0;
+        size_t oldnl, oldnp;
         int qualclass;
 
         // test for 3d overlaps
@@ -264,10 +264,11 @@ namespace meshit {
                 debugflag = true;
 
             // problem recognition !
-            if (found && (gpi1 < illegalpoint.size()) && (gpi2 < illegalpoint.size())) {
-                if (illegalpoint[gpi1] || illegalpoint[gpi2]) {
-                    found = false;
-                }
+            if (found
+                && gpi1 < static_cast<PointIndex>(illegalpoint.size())
+                && gpi2 < static_cast<PointIndex>(illegalpoint.size())
+                && (illegalpoint[gpi1] || illegalpoint[gpi2])) {
+                found = false;
             }
 
             Point2d p12d, p22d;
@@ -288,14 +289,14 @@ namespace meshit {
                     MESHIT_LOG_DEBUG("3d->2d transformation");
                 }
 
-                for (int i = 0; i < locpoints.size(); i++) {
+                for (size_t i = 0; i < locpoints.size(); i++) {
                     TransformToPlain(locpoints[i], plainpoints[i], h, plainzones[i]);
                 }
 
                 p12d = plainpoints[0];
                 p22d = plainpoints[1];
 
-                for (int i = 1; i < loclines.size(); i++) // don't remove first line
+                for (size_t i = 1; i < loclines.size(); i++) // don't remove first line
                 {
                     z1 = plainzones[loclines[i].I1() - 1];
                     z2 = plainzones[loclines[i].I2() - 1];
@@ -349,17 +350,17 @@ namespace meshit {
                 }
 
                 legalpoints.resize(plainpoints.size());
-                for (int i = 0; i < legalpoints.size(); i++) {
+                for (size_t i = 0; i < legalpoints.size(); i++) {
                     legalpoints[i] = 1;
                 }
                 double avy = 0;
-                for (int i = 0; i < plainpoints.size(); i++) {
+                for (size_t i = 0; i < plainpoints.size(); i++) {
                     avy += plainpoints[i].Y();
                 }
                 avy *= 1. / plainpoints.size();
 
 
-                for (int i = 0; i < plainpoints.size(); i++) {
+                for (size_t i = 0; i < plainpoints.size(); i++) {
                     if (plainzones[i] < 0) {
                         plainpoints[i] = Point2d(1e4, 1e4);
                         legalpoints[i] = 0;
@@ -380,13 +381,13 @@ namespace meshit {
                 maxlegalline = loclines.size();
 
                 if (mp.check_chart_boundary) {
-                    for (int i = 0; i < chartboundpoints.size(); i++) {
+                    for (size_t i = 0; i < chartboundpoints.size(); i++) {
                         plainpoints.push_back(chartboundpoints[i]);
                         locpoints.push_back(chartboundpoints3d[i]);
                         legalpoints.push_back(0);
                     }
 
-                    for (int i = 0; i < chartboundlines.size(); i++) {
+                    for (size_t i = 0; i < chartboundlines.size(); i++) {
                         INDEX_2 line(chartboundlines[i].I1() + oldnp,
                                      chartboundlines[i].I2() + oldnp);
                         loclines.push_back(line);
@@ -408,16 +409,17 @@ namespace meshit {
                 }
             }
 
-            for (size_t i = 0; i < locelements.size() && found; i++) {
-                const Element2d& el = locelements[i];
-                for (size_t j = 1; j <= 3; j++) {
-                    if (el.PNum(j) <= oldnp && pindex[el.PNum(j) - 1] == -1) {
-                        found = false;
-                        MESHIT_LOG_ERROR("meshing2, index missing");
+            if (found) {
+                for (size_t i = 0; i < locelements.size() && found; i++) {
+                    const Element2d& el = locelements[i];
+                    for (size_t j = 1; j <= 3; j++) {
+                        if (el.PNum(j) <= static_cast<PointIndex>(oldnp) && pindex[el.PNum(j) - 1] == -1) {
+                            found = false;
+                            MESHIT_LOG_ERROR("meshing2, index missing");
+                        }
                     }
                 }
             }
-
             if (found) {
                 locpoints.resize(plainpoints.size());
 
@@ -566,10 +568,11 @@ namespace meshit {
             if (found) {
                 // check, whether new front line already exists
 
-                for (int i = oldnl; i < loclines.size(); i++) {
+                for (size_t i = oldnl; i < loclines.size(); i++) {
                     int nlgpi1 = loclines[i].I1();
                     int nlgpi2 = loclines[i].I2();
-                    if (nlgpi1 <= pindex.size() && nlgpi2 <= pindex.size()) {
+                    if (nlgpi1 <= static_cast<INDEX>(pindex.size()) &&
+                        nlgpi2 <= static_cast<INDEX>(pindex.size())) {
                         nlgpi1 = adfront->GetGlobalIndex(pindex[nlgpi1 - 1]);
                         nlgpi2 = adfront->GetGlobalIndex(pindex[nlgpi2 - 1]);
 
@@ -674,7 +677,7 @@ namespace meshit {
                     std::cout << "success of rule" << rules[rulenr - 1]->Name() << std::endl;
                     std::cerr << "trials = " << trials << std::endl;
                     std::cerr << "locpoints " << std::endl;
-                    for (int i = 0; i < pindex.size(); i++) {
+                    for (size_t i = 0; i < pindex.size(); i++) {
                         std::cerr << adfront->GetGlobalIndex(pindex[i]) << std::endl;
                     }
                     std::cerr << "old number of lines = " << oldnl << std::endl;
@@ -683,7 +686,7 @@ namespace meshit {
                         for (size_t j = 1; j <= 2; j++) {
                             int hi = 0;
                             if (loclines[i].I(j) >= 1 &&
-                                loclines[i].I(j) <= pindex.size())
+                                loclines[i].I(j) <= static_cast<INDEX>(pindex.size()))
                                 hi = adfront->GetGlobalIndex(pindex[loclines[i].I(j) - 1]);
 
                             std::cerr << hi << " ";
@@ -707,7 +710,7 @@ namespace meshit {
                         for (size_t j = 1; j <= 2; j++) {
                             int hi = 0;
                             if (loclines[i].I(j) >= 1 &&
-                                loclines[i].I(j) <= pindex.size())
+                                loclines[i].I(j) <= static_cast<INDEX>(pindex.size()))
                                 hi = adfront->GetGlobalIndex(pindex[loclines[i].I(j) - 1]);
 
                             std::cerr << hi << " ";
@@ -724,13 +727,18 @@ namespace meshit {
 
         MESHIT_LOG_DEBUG("Surface meshing done");
 
-        adfront->PrintOpenSegments(std::cout);
+        adfront->
+                PrintOpenSegments(std::cout);
 
         EndMesh();
 
-        if (!adfront->Empty())
-            return MESHING2_GIVEUP;
+        if (!adfront->
+                Empty()
+                )
+            return
+                    MESHING2_GIVEUP;
 
-        return MESHING2_OK;
+        return
+                MESHING2_OK;
     }
 }

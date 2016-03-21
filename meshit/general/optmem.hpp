@@ -18,12 +18,13 @@ namespace meshit {
     class BlockAllocator
     {
      private:
-        unsigned size, blocks;
+        size_t blocks;
+        size_t size;
         void* freelist;
-        Array<char*> bablocks;
+        std::vector<char*> bablocks;
 
      public:
-        explicit BlockAllocator(unsigned asize, unsigned ablocks = 100);
+        explicit BlockAllocator(size_t asize, size_t ablocks = 100);
         ~BlockAllocator();
 
         void* Alloc();
