@@ -103,6 +103,6 @@ namespace meshit {
                 int tolerance,
                 const MeshingParameters& mp);
     };
-}
+}  // namespace meshit
 
 #endif

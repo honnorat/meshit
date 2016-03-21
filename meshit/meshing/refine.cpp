@@ -146,4 +146,4 @@ namespace meshit {
         mesh.RebuildSurfaceElementLists();
         return;
     }
-}
+}  // namespace meshit

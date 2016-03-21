@@ -16,24 +16,23 @@ in geom2d only 2D - Geometry classes (with material properties etc.)
 
 namespace meshit {
 
-    template<int D>
     class SplineGeometry
     {
      public:
-        std::vector<GeomPoint<D> > geompoints;
-        std::vector<SplineSeg<D>*> splines;
+        std::vector<GeomPoint<2> > geompoints;
+        std::vector<SplineSeg*> splines;
 
         virtual ~SplineGeometry();
 
-        const std::vector<SplineSeg<D>*>& GetSplines() const
+        const std::vector<SplineSeg*>& GetSplines() const
         {
             return splines;
         }
-        void GetBoundingBox(Box<D>& box) const;
+        void GetBoundingBox(Box<2>& box) const;
 
-        Box<D> GetBoundingBox() const
+        Box<2> GetBoundingBox() const
         {
-            Box<D> box;
+            Box<2> box;
             GetBoundingBox(box);
             return box;
         }
@@ -43,7 +42,7 @@ namespace meshit {
             return geompoints.size();
         }
 
-        const GeomPoint<D>& GetPoint(size_t i) const
+        const GeomPoint<2>& GetPoint(size_t i) const
         {
             return geompoints[i];
         }

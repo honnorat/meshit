@@ -49,6 +49,6 @@ namespace meshit {
 
     };
 
-}
+}  // namespace meshit
 
 #endif

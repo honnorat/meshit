@@ -20,10 +20,10 @@ namespace meshit {
 
     void Optimize2d(Mesh& mesh, MeshingParameters& mp);
 
-    class SplineSegExt : public SplineSeg<2>
+    class SplineSegExt : public SplineSeg
     {
      public:
-        const SplineSeg<2>& seg;
+        const SplineSeg& seg;
 
         int leftdom;    // left domain
         int rightdom;   // right domain
@@ -33,7 +33,7 @@ namespace meshit {
         int copyfrom;   // copy spline mesh from other spline (-1.. do not copy)
         int layer;
 
-        explicit SplineSegExt(const SplineSeg<2>& hseg)
+        explicit SplineSegExt(const SplineSeg& hseg)
                 : seg(hseg)
         {
             layer = 1;
@@ -89,7 +89,7 @@ namespace meshit {
 
     };
 
-    class SplineGeometry2d : public SplineGeometry<2>
+    class SplineGeometry2d : public SplineGeometry
     {
      protected:
         std::vector<char*> materials;

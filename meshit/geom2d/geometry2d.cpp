@@ -172,7 +172,7 @@ namespace meshit {
                     i++;
                     TestComment(infile);
 
-                    SplineSeg<2>* spline = 0;
+                    SplineSeg* spline = 0;
                     TestComment(infile);
 
                     infile >> leftdom >> rightdom;
@@ -184,55 +184,18 @@ namespace meshit {
                     // type of spline segement
                     if (strcmp(buf, "2") == 0) {  // a line
                         infile >> hi1 >> hi2;
-                        spline = new LineSeg<2>(
+                        spline = new LineSeg(
                                 geompoints[hi1 - 1],
                                 geompoints[hi2 - 1]);
                     }
                     else if (strcmp(buf, "3") == 0) {  // a rational spline
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new SplineSeg3<2>(
+                        spline = new SplineSeg3(
                                 geompoints[hi1 - 1],
                                 geompoints[hi2 - 1],
                                 geompoints[hi3 - 1]);
                     }
-                    else if (strcmp(buf, "4") == 0) {  // an arc
-                        infile >> hi1 >> hi2 >> hi3;
-                        spline = new CircleSeg<2>(
-                                geompoints[hi1 - 1],
-                                geompoints[hi2 - 1],
-                                geompoints[hi3 - 1]);
-                    }
-                    else if (strcmp(buf, "discretepoints") == 0) {
-                        int npts;
-                        infile >> npts;
-                        Array<Point<2> > pts(npts);
-                        for (int j = 0; j < npts; j++)
-                            for (int k = 0; k < 2; k++)
-                                infile >> pts[j](k);
 
-                        spline = new DiscretePointsSeg<2>(pts);
-                    }
-                    else if (strcmp(buf, "bsplinepoints") == 0) {
-                        int npts, order;
-                        infile >> npts;
-                        infile >> order;
-                        Array<Point<2> > pts(npts);
-                        for (int j = 0; j < npts; j++)
-                            for (int k = 0; k < 2; k++)
-                                infile >> pts[j](k);
-                        if (order < 2)
-                            std::cerr << "Minimum order of 2 is required!!" << std::endl;
-                        else if (order == 2)
-                            spline = new BSplineSeg<2, 2>(pts);
-                        else if (order == 3)
-                            spline = new BSplineSeg<2, 3>(pts);
-                        else if (order == 4)
-                            spline = new BSplineSeg<2, 4>(pts);
-                        else if (order > 4)
-                            std::cerr << "Maximum allowed order is 4!!" << std::endl;
-                    }
-
-                    //      infile >> spline->reffak;
                     SplineSegExt* spex = new SplineSegExt(*spline);
 
                     spex->leftdom = leftdom;
@@ -341,7 +304,7 @@ namespace meshit {
             size_t i0 = (hole) ? nnew_points - i - 1 : i;
             size_t i1 = (hole) ? (i0 == 0) ? nnew_points - 1 : i0 - 1
                                : (i0 == nnew_points - 1) ? 0 : i0 + 1;
-            SplineSeg<2>* spline = new LineSeg<2>(gpts[i0], gpts[i1]);
+            SplineSeg* spline = new LineSeg(gpts[i0], gpts[i1]);
             SplineSegExt* seg = new SplineSegExt(*spline);
             if (hole) {
                 seg->leftdom = 0;
@@ -377,7 +340,7 @@ namespace meshit {
         for (size_t i = 0; i < nnew_points; i++) {
             size_t i0 = i;
             size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
-            SplineSeg<2>* spline = new LineSeg<2>(gpts[i0], gpts[i1]);
+            SplineSeg* spline = new LineSeg(gpts[i0], gpts[i1]);
             SplineSegExt* seg = new SplineSegExt(*spline);
             seg->leftdom = 1;
             seg->rightdom = 1;

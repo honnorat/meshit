@@ -117,5 +117,4 @@ namespace meshit {
                             std::setw(4) << static_cast<double>(i + 1) / ncl << ": " << incl[i]);
         }
     }
-
-}
+}  // namespace meshit

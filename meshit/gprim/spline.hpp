@@ -8,6 +8,7 @@
 /**************************************************************************/
 
 #define _USE_MATH_DEFINES 1
+
 #include <iostream>
 #include <string>
 #include <cmath>
@@ -42,7 +43,6 @@ namespace meshit {
 
     /// base class for 2d - segment
 
-    template<int D>
     class SplineSeg
     {
      public:
@@ -53,74 +53,71 @@ namespace meshit {
         virtual double Length() const;
 
         /// returns point at curve, 0 <= t <= 1
-        virtual Point<D> GetPoint(double t) const = 0;
+        virtual Point<2> GetPoint(double t) const = 0;
 
         /// returns a (not necessarily unit-length) tangent vector for 0 <= t <= 1
 
-        virtual Vec<D> GetTangent(const double t) const
+        virtual Vec<2> GetTangent(const double t) const
         {
             std::cerr << "GetTangent not implemented for spline base-class" << std::endl;
-            Vec<D> dummy;
+            Vec<2> dummy;
             return dummy;
         }
 
         virtual void GetDerivatives(const double t,
-                                    Point<D>& point,
-                                    Vec<D>& first,
-                                    Vec<D>& second) const
+                                    Point<2>& point,
+                                    Vec<2>& first,
+                                    Vec<2>& second) const
         {
             double eps = 1e-6;
             point = GetPoint(t);
-            Point<D> pl = GetPoint(t - eps);
-            Point<D> pr = GetPoint(t + eps);
+            Point<2> pl = GetPoint(t - eps);
+            Point<2> pr = GetPoint(t + eps);
             first = 1.0 / (2 * eps) * (pr - pl);
             second = 1.0 / (eps * eps) * ((pr - point) + (pl - point));
         }
 
         /// returns initial point on curve
-        virtual const GeomPoint<D>& StartPI() const = 0;
+        virtual const GeomPoint<2>& StartPI() const = 0;
         /// returns terminal point on curve
-        virtual const GeomPoint<D>& EndPI() const = 0;
+        virtual const GeomPoint<2>& EndPI() const = 0;
 
-        virtual void GetPoints(int n, Array<Point<D> >& points) const;
+        virtual void GetPoints(int n, Array<Point<2> >& points) const;
 
         /** calculates (2D) lineintersections:
         for lines $$ a x + b y + c = 0 $$ the interecting points are calculated
         and stored in points */
         virtual void LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<D> >& points, const double eps) const
+                                       Array<Point<2> >& points, const double eps) const
         {
             points.resize(0);
         }
     };
 
     /// Straight line form p1 to p2
-
-    template<int D>
-    class LineSeg : public SplineSeg<D>
+    class LineSeg : public SplineSeg
     {
-        GeomPoint<D> p1, p2;
      public:
-
-        LineSeg(const GeomPoint<D>& ap1, const GeomPoint<D>& ap2);
+        LineSeg(const GeomPoint<2>& ap1, const GeomPoint<2>& ap2)
+                : p1(ap1), p2(ap2) { }
 
         virtual double Length() const;
 
-        inline virtual Point<D> GetPoint(double t) const;
+        inline virtual Point<2> GetPoint(double t) const;
 
-        virtual Vec<D> GetTangent(const double t) const;
+        virtual Vec<2> GetTangent(const double t) const;
 
         virtual void GetDerivatives(const double t,
-                                    Point<D>& point,
-                                    Vec<D>& first,
-                                    Vec<D>& second) const;
+                                    Point<2>& point,
+                                    Vec<2>& first,
+                                    Vec<2>& second) const;
 
-        virtual const GeomPoint<D>& StartPI() const
+        virtual const GeomPoint<2>& StartPI() const
         {
             return p1;
         };
 
-        virtual const GeomPoint<D>& EndPI() const
+        virtual const GeomPoint<2>& EndPI() const
         {
             return p2;
         }
@@ -131,40 +128,42 @@ namespace meshit {
         }
 
         virtual void LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<D> >& points, const double eps) const;
+                                       Array<Point<2> >& points, const double eps) const;
 
-        virtual void Project(const Point<D>& point, Point<D>& point_on_curve, double& t) const;
+        virtual void Project(const Point<2>& point, Point<2>& point_on_curve, double& t) const;
+
+     protected:
+        GeomPoint<2> p1, p2;
     };
 
     /// curve given by a rational, quadratic spline (including ellipses)
 
-    template<int D>
-    class SplineSeg3 : public SplineSeg<D>
+    class SplineSeg3 : public SplineSeg
     {
-        GeomPoint<D> p1, p2, p3;
+        GeomPoint<2> p1, p2, p3;
         double weight;
         mutable double proj_latest_t;
      public:
 
-        SplineSeg3(const GeomPoint<D>& ap1,
-                   const GeomPoint<D>& ap2,
-                   const GeomPoint<D>& ap3);
+        SplineSeg3(const GeomPoint<2>& ap1,
+                   const GeomPoint<2>& ap2,
+                   const GeomPoint<2>& ap3);
 
-        inline virtual Point<D> GetPoint(double t) const;
+        inline virtual Point<2> GetPoint(double t) const;
 
-        virtual Vec<D> GetTangent(const double t) const;
+        virtual Vec<2> GetTangent(const double t) const;
 
         virtual void GetDerivatives(const double t,
-                                    Point<D>& point,
-                                    Vec<D>& first,
-                                    Vec<D>& second) const;
+                                    Point<2>& point,
+                                    Vec<2>& first,
+                                    Vec<2>& second) const;
 
-        virtual const GeomPoint<D>& StartPI() const
+        virtual const GeomPoint<2>& StartPI() const
         {
             return p1;
         };
 
-        virtual const GeomPoint<D>& EndPI() const
+        virtual const GeomPoint<2>& EndPI() const
         {
             return p3;
         }
@@ -174,390 +173,16 @@ namespace meshit {
             return "spline3";
         }
 
-        const GeomPoint<D>& TangentPoint(void) const
+        const GeomPoint<2>& TangentPoint(void) const
         {
             return p2;
         }
 
         virtual void LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<D> >& points, const double eps) const;
+                                       Array<Point<2> >& points, const double eps) const;
 
-        virtual void Project(const Point<D>& point, Point<D>& point_on_curve, double& t) const;
+        virtual void Project(const Point<2>& point, Point<2>& point_on_curve, double& t) const;
     };
-
-    // Gundolf Haase  8/26/97
-    /// A circle
-
-    template<int D>
-    class CircleSeg : public SplineSeg<D>
-    {
-     private:
-        GeomPoint<D> p1, p2, p3;
-        //const GeomPoint<D>	&p1, &p2, &p3;
-        Point<D> pm;
-        double radius, w1, w3;
-     public:
-
-        CircleSeg(const GeomPoint<D>& ap1,
-                  const GeomPoint<D>& ap2,
-                  const GeomPoint<D>& ap3);
-
-        virtual Point<D> GetPoint(double t) const;
-
-        virtual const GeomPoint<D>& StartPI() const
-        {
-            return p1;
-        }
-
-        virtual const GeomPoint<D>& EndPI() const
-        {
-            return p3;
-        }
-
-        double Radius() const
-        {
-            return radius;
-        }
-
-        double StartAngle() const
-        {
-            return w1;
-        }
-
-        double EndAngle() const
-        {
-            return w3;
-        }
-
-        const Point<D>& MidPoint(void) const
-        {
-            return pm;
-        }
-
-        virtual std::string GetType(void) const
-        {
-            return "circle";
-        }
-
-        virtual void LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<D> >& points, const double eps) const;
-    };
-
-    template<int D>
-    class DiscretePointsSeg : public SplineSeg<D>
-    {
-     protected:
-        Array<Point<D> > pts;
-        GeomPoint<D> p1n, p2n;
-
-     public:
-        explicit DiscretePointsSeg(const Array<Point<D> >& apts);
-
-        virtual ~DiscretePointsSeg();
-
-        virtual Point<D> GetPoint(double t) const;
-
-        virtual const GeomPoint<D>& StartPI() const
-        {
-            return p1n;
-        };
-
-        virtual const GeomPoint<D>& EndPI() const
-        {
-            return p2n;
-        }
-    };
-
-
-
-    // calculates length of spline-curve
-
-    template<int D>
-    double SplineSeg<D>::Length() const
-    {
-        int n = 100;
-        double dt = 1.0 / n;
-
-        Point<D> pold = GetPoint(0);
-
-        double l = 0;
-        for (int i = 1; i <= n; i++) {
-            Point<D> p = GetPoint(i * dt);
-            l += Dist(p, pold);
-            pold = p;
-        }
-
-        return l;
-    }
-
-    template<int D>
-    void SplineSeg<D>::GetPoints(int n, Array<Point<D> >& points) const
-    {
-        points.resize(n);
-        if (n >= 2)
-            for (int i = 0; i < n; i++)
-                points[i] = GetPoint(double(i) / (n - 1));
-    }
-
-    /* 
-       Implementation of line-segment from p1 to p2
-     */
-    template<int D>
-    LineSeg<D>::LineSeg(const GeomPoint<D>& ap1, const GeomPoint<D>& ap2)
-            : p1(ap1), p2(ap2) { }
-
-    template<int D>
-    inline Point<D> LineSeg<D>::GetPoint(double t) const
-    {
-        return p1 + t * (p2 - p1);
-    }
-
-    template<int D>
-    Vec<D> LineSeg<D>::GetTangent(const double t) const
-    {
-        return p2 - p1;
-    }
-
-    template<int D>
-    void LineSeg<D>::GetDerivatives(
-            const double t,
-            Point<D>& point,
-            Vec<D>& first,
-            Vec<D>& second) const
-    {
-        first = p2 - p1;
-        point = p1 + t * first;
-        second = 0;
-    }
-
-    template<int D>
-    double LineSeg<D>::Length() const
-    {
-        return Dist(p1, p2);
-    }
-
-    template<int D>
-    void LineSeg<D>::LineIntersections(const double a, const double b, const double c,
-                                       Array<Point<D> >& points, const double eps) const
-    {
-        points.resize(0);
-
-        double denom = -a * p2(0) + a * p1(0) - b * p2(1) + b * p1(1);
-        if (fabs(denom) < 1e-20)
-            return;
-
-        double t = (a * p1(0) + b * p1(1) + c) / denom;
-        if ((t > -eps) && (t < 1. + eps))
-            points.push_back(GetPoint(t));
-    }
-
-    template<int D>
-    void LineSeg<D>::Project(const Point<D>& point, Point<D>& point_on_curve, double& t) const
-    {
-        Vec<D> v = p2 - p1;
-        double l = v.Length();
-        v *= 1. / l;
-        t = (point - p1) * v;
-
-        if (t < 0) t = 0;
-        if (t > l) t = l;
-
-        point_on_curve = p1 + t * v;
-
-        t *= 1. / l;
-    }
-
-    //########################################################################
-    //		circlesegment
-
-    template<int D>
-    CircleSeg<D>::CircleSeg(
-            const GeomPoint<D>& ap1,
-            const GeomPoint<D>& ap2,
-            const GeomPoint<D>& ap3)
-            : p1(ap1), p2(ap2), p3(ap3)
-    {
-        Vec<D> v1, v2;
-
-        v1 = p1 - p2;
-        v2 = p3 - p2;
-
-        Point<D> p1t(p1 + v1);
-        Point<D> p2t(p3 + v2);
-
-        // works only in 2D!!!!!!!!!
-
-        Line2d g1t, g2t;
-
-        g1t.P1() = Point<2>(p1(0), p1(1));
-        g1t.P2() = Point<2>(p1t(0), p1t(1));
-        g2t.P1() = Point<2>(p3(0), p3(1));
-        g2t.P2() = Point<2>(p2t(0), p2t(1));
-
-        Point<2> mp = CrossPoint(g1t, g2t);
-
-        pm(0) = mp(0);
-        pm(1) = mp(1);
-        radius = Dist(pm, StartPI());
-        Vec2d auxv;
-        auxv.X() = p1(0) - pm(0);
-        auxv.Y() = p1(1) - pm(1);
-        w1 = Angle(auxv);
-        auxv.X() = p3(0) - pm(0);
-        auxv.Y() = p3(1) - pm(1);
-        w3 = Angle(auxv);
-        if (fabs(w3 - w1) > M_PI) {
-            if (w3 > M_PI) w3 -= 2 * M_PI;
-            if (w1 > M_PI) w1 -= 2 * M_PI;
-        }
-    }
-
-    template<>
-    inline Point<3> CircleSeg<3>::GetPoint(double t) const
-    {
-        // not really useful, but keep it as it was ...
-        if (t >= 1.0) {
-            return p3;
-        }
-        double phi = StartAngle() + t * (EndAngle() - StartAngle());
-        Vec<3> tmp(cos(phi), sin(phi), 0);
-        return pm + Radius() * tmp;
-    }
-
-    template<>
-    inline Point<2> CircleSeg<2>::GetPoint(double t) const
-    {
-        if (t >= 1.0) {
-            return p3;
-        }
-
-        double phi = StartAngle() + t * (EndAngle() - StartAngle());
-        Vec2d tmp(cos(phi), sin(phi));
-
-        return pm + Radius() * tmp;
-    }
-
-    template<int D>
-    DiscretePointsSeg<D>::DiscretePointsSeg(const Array<Point<D> >& apts)
-            : pts(apts)
-    {
-        for (unsigned i = 0; i < D; i++) {
-            p1n(i) = apts[0](i);
-            p2n(i) = apts.Last()(i);
-        }
-        p1n.refatpoint = 1;
-        p2n.refatpoint = 1;
-        p1n.hmax = 1e99;
-        p2n.hmax = 1e99;
-    }
-
-    template<int D>
-    DiscretePointsSeg<D>::~DiscretePointsSeg()
-    {
-        ;
-    }
-
-    template<int D>
-    Point<D> DiscretePointsSeg<D>::GetPoint(double t) const
-    {
-        double t1 = t * (pts.size() - 1);
-
-        size_t segnr;
-        if ( t1 < 0.0 ) segnr = 0;
-        else            segnr = static_cast<size_t>(t1);
-
-        if (segnr >= pts.size()) segnr = pts.size() - 1;
-
-        double rest = t1 - static_cast<double>(segnr);
-
-        return pts[segnr] + rest * Vec<D>(pts[segnr + 1] - pts[segnr]);
-    }
-
-    // *************************************
-    // Template for B-Splines of order ORDER
-    // thx to Gerhard Kitzler
-    // *************************************
-
-    template<int D, int ORDER>
-    class BSplineSeg : public SplineSeg<D>
-    {
-     protected:
-        Array<Point<D> > pts;
-        GeomPoint<D> p1n, p2n;
-        Array<int> ti;
-
-     public:
-        explicit BSplineSeg(const Array<Point<D> >& apts);
-
-        virtual ~BSplineSeg() { }
-
-        virtual Point<D> GetPoint(double t) const;
-
-        virtual const GeomPoint<D>& StartPI() const
-        {
-            return p1n;
-        };
-
-        virtual const GeomPoint<D>& EndPI() const
-        {
-            return p2n;
-        }
-    };
-
-    // Constructor
-
-    template<int D, int ORDER>
-    BSplineSeg<D, ORDER>::BSplineSeg(const Array<Point<D> >& apts)
-            : pts(apts)
-    {
-        p1n = apts[0];
-        p2n = apts.Last();
-
-        int m = pts.size() + ORDER;
-        ti.resize(m);
-        ti = 0;
-        //    b=0.0;
-        for (int i = ORDER; i < m - ORDER + 1; i++)
-            ti[i] = i - ORDER + 1;
-        for (int i = m - ORDER + 1; i < m; i++)
-            ti[i] = m - 2 * ORDER + 1;
-    }
-
-    // GetPoint Method...(evaluation of BSpline Curve)
-
-    template<int D, int ORDER>
-    Point<D> BSplineSeg<D, ORDER>::GetPoint(double t_in) const
-    {
-        int m = pts.size() + ORDER;
-
-        double t = t_in * (m - 2 * ORDER + 1);
-
-        double b[ORDER];
-
-        int interval_nr = int(t) + ORDER - 1;
-        if (interval_nr < ORDER - 1) interval_nr = ORDER - 1;
-        if (interval_nr > m - ORDER - 1) interval_nr = m - ORDER - 1;
-
-        b[ORDER - 1] = 1.0;
-
-        for (int degree = 1; degree < ORDER; degree++)
-            for (int k = 0; k <= degree; k++) {
-                int j = interval_nr - degree + k;
-                double bnew = 0;
-
-                if (k != 0)
-                    bnew += (t - ti[j]) / (ti[j + degree] - ti[j]) * b[k - degree + ORDER - 1];
-                if (k != degree)
-                    bnew += (ti[j + degree + 1] - t) / (ti[j + degree + 1] - ti[j + 1]) * b[k - degree + ORDER];
-                b[k - degree + ORDER - 1] = bnew;
-            }
-
-        Point<D> p = 0.0;
-        for (int i = 0; i < ORDER; i++)
-            p += b[i] * Vec<D>(pts[i + interval_nr - ORDER + 1]);
-        return p;
-    }
-
-}
+}  // namespace meshit
 
 #endif

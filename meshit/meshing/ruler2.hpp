@@ -1,5 +1,5 @@
-#ifndef FILE_NETRULE
-#define FILE_NETRULE
+#ifndef FILE_NETRULE_HPP
+#define FILE_NETRULE_HPP
 
 #include <iostream>
 #include <vector>
@@ -12,8 +12,7 @@ namespace meshit {
 
     class netrule
     {
-      private:
-
+     private:
         typedef struct tf
         {
             double f1, f2, f3;
@@ -21,7 +20,7 @@ namespace meshit {
 
         class threeint
         {
-          public:
+         public:
             int i1, i2, i3;
 
             threeint() { }
@@ -35,11 +34,11 @@ namespace meshit {
         };
 
         int quality;
-        char * name;
+        char* name;
         std::vector<Point2d> points;
         std::vector<INDEX_2> lines;
         std::vector<Point2d> freezone, freezonelimit;
-        std::vector<Array<Point2d>*> freezone_i;
+        std::vector<std::vector<Point2d>*> freezone_i;
         std::vector<Point2d> transfreezone;
 
         std::vector<int> dellines;
@@ -58,8 +57,7 @@ namespace meshit {
         /// topological distance of line to base element
         std::vector<int> lnearness;
 
-      public:
-
+     public:
         netrule();
         ~netrule();
 
@@ -105,25 +103,25 @@ namespace meshit {
 
         int GetLNearness(size_t li) const
         {
-            return lnearness[li-1];
+            return lnearness[li - 1];
         }
 
-        const Point2d & GetPoint(size_t i) const
+        const Point2d& GetPoint(size_t i) const
         {
             return points[i - 1];
         }
 
-        const INDEX_2 & GetLine(size_t i) const
+        const INDEX_2& GetLine(size_t i) const
         {
             return lines[i - 1];
         }
 
-        const Element2d & GetElement(size_t i) const
+        const Element2d& GetElement(size_t i) const
         {
             return elements[i - 1];
         }
 
-        const threeint & GetOrientation(size_t i) const
+        const threeint& GetOrientation(size_t i) const
         {
             return orientations[i - 1];
         }
@@ -133,40 +131,44 @@ namespace meshit {
             return dellines[i - 1];
         }
 
-        double CalcPointDist(size_t pi, const Point2d & p) const
+        double CalcPointDist(size_t pi, const Point2d& p) const
         {
             double dx = p.X() - points[pi - 1].X();
             double dy = p.Y() - points[pi - 1].Y();
-            const threefloat * tfp = &tolerances[pi - 1];
+            const threefloat* tfp = &tolerances[pi - 1];
             return tfp->f1 * dx * dx + tfp->f2 * dx * dy + tfp->f3 * dy * dy;
         }
 
-        double CalcLineError(int li, const Vec2d & v) const;
+        double CalcLineError(int li, const Vec2d& v) const;
 
-        void SetFreeZoneTransformation(const Vector & u, int tolclass);
+        void SetFreeZoneTransformation(const Vector& u, int tolclass);
 
-        bool IsInFreeZone(const Point2d & p) const
+        bool IsInFreeZone(const Point2d& p) const
         {
             if (p.X() < fzminx || p.X() > fzmaxx ||
-                    p.Y() < fzminy || p.Y() > fzmaxy) return 0;
+                p.Y() < fzminy || p.Y() > fzmaxy)
+                return 0;
 
             for (size_t i = 0; i < transfreezone.size(); i++) {
                 if (freesetinequ(i, 0) * p.X() +
-                        freesetinequ(i, 1) * p.Y() +
-                        freesetinequ(i, 2) > 0) return 0;
+                    freesetinequ(i, 1) * p.Y() +
+                    freesetinequ(i, 2) > 0)
+                    return 0;
             }
             return 1;
         }
 
-        int IsLineInFreeZone(const Point2d & p1, const Point2d & p2) const
+        int IsLineInFreeZone(const Point2d& p1, const Point2d& p2) const
         {
             if ((p1.X() > fzmaxx && p2.X() > fzmaxx) ||
-                    (p1.X() < fzminx && p2.X() < fzminx) ||
-                    (p1.Y() > fzmaxy && p2.Y() > fzmaxy) ||
-                    (p1.Y() < fzminy && p2.Y() < fzminy)) return 0;
+                (p1.X() < fzminx && p2.X() < fzminx) ||
+                (p1.Y() > fzmaxy && p2.Y() > fzmaxy) ||
+                (p1.Y() < fzminy && p2.Y() < fzminy))
+                return 0;
             return IsLineInFreeZone2(p1, p2);
         }
-        int IsLineInFreeZone2(const Point2d & p1, const Point2d & p2) const;
+
+        int IsLineInFreeZone2(const Point2d& p1, const Point2d& p2) const;
         int ConvexFreeZone() const;
 
         int GetPointNr(size_t ln, int endp) const
@@ -174,20 +176,19 @@ namespace meshit {
             return lines[ln - 1].I(endp);
         }
 
-        const DenseMatrix & GetOldUToNewU() const
+        const DenseMatrix& GetOldUToNewU() const
         {
             return oldutonewu;
         }
 
-        const char * Name() const
+        const char* Name() const
         {
             return name;
         }
 
-        void LoadRule(std::istream & ist);
+        void LoadRule(std::istream& ist);
     };
-
-}
+}  // namespace meshit
 
 #endif
 

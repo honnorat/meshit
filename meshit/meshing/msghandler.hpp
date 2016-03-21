@@ -32,8 +32,7 @@
                   << ":"     << line            \
                   << " in '" << function        \
                   << "'";                       \
-    }                                           \
-    while(0);
+    } while(0);
 
 #define _MESHIT_LOG_MACRO_BODY(logEvent, logLevel, retline)                             \
     do {                                                                                \
@@ -69,8 +68,6 @@
 #define MESHIT_LOG_DEBUG_CONT(logEvent) _MESHIT_LOG_MACRO_BODY(logEvent, MESHIT_DEBUG_LOG_LEVEL, false)
 
 namespace meshit {
-
-    void PrintDot(char ch = '.');
 
     int GetLogLevel();
     void SetLogLevel(int logLevel);

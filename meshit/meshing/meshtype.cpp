@@ -399,5 +399,5 @@ namespace meshit {
         haltnosuccess = 0;
         haltlargequalclass = 0;
     };
-}
+}  // namespace meshit
 

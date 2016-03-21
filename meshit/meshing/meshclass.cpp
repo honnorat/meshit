@@ -153,11 +153,6 @@ namespace meshit {
         Compress();
     }
 
-    PointIndex Mesh::AddPoint(const Point3d& p, int layer)
-    {
-        return AddPoint(p, layer, INNERPOINT);
-    }
-
     PointIndex Mesh::AddPoint(const Point3d& p, int layer, POINTTYPE type)
     {
         timestamp = NextTimeStamp();
@@ -492,8 +487,8 @@ namespace meshit {
                 }
             }
             if (strcmp(str, "edgesegmentsgi2") == 0) {
-                MESHIT_LOG_DEBUG(n << " curve elements");
                 infile >> n;
+                MESHIT_LOG_DEBUG(n << " curve elements");
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
                     int hi;
@@ -1048,7 +1043,7 @@ namespace meshit {
             }
         }
 
-        for (int i = 0; i < GetNSeg(); i++) {
+        for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = segments[i];
             const Point3d& p1 = points[seg[0]];
             const Point3d& p2 = points[seg[1]];
@@ -1065,8 +1060,8 @@ namespace meshit {
 
         assert(lochfunc);
 
-        for (PointIndex i = 0; i < GetNP(); i++) {
-            for (PointIndex j = i + 1; j < GetNP(); j++) {
+        for (size_t i = 0; i < GetNP(); i++) {
+            for (size_t j = i + 1; j < GetNP(); j++) {
                 const Point3d& p1 = points[i];
                 const Point3d& p2 = points[j];
                 double hl = Dist(p1, p2);
@@ -1254,7 +1249,7 @@ namespace meshit {
         pmin = Point3d(1e10, 1e10, 1e10);
         pmax = Point3d(-1e10, -1e10, -1e10);
         if (dom <= 0) {
-            for (PointIndex pi = 0; pi < points.size(); pi++) {
+            for (size_t pi = 0; pi < points.size(); pi++) {
                 pmin.SetToMin(points[pi]);
                 pmax.SetToMax(points[pi]);
             }
@@ -1417,15 +1412,16 @@ namespace meshit {
                     MESHIT_LOG_ERROR("Edge " << i2.I1() << " - " << i2.I2() << " multiple times in surface mesh");
                     i2s = i2;
                     i2s.Sort();
-                    for (int k = 0; k < nf; k++) {
+                    for (size_t k = 0; k < nf; k++) {
                         const Element2d& sel = OpenElement(k);
                         for (size_t l = 1; l <= 3; l++) {
                             edge.I1() = sel.PNumMod(l);
                             edge.I2() = sel.PNumMod(l + 1);
                             edge.Sort();
 
-                            if (edge == i2s)
+                            if (edge == i2s) {
                                 MESHIT_LOG_ERROR("  edge of element " << sel);
+                            }
                         }
                     }
                     err = 2;

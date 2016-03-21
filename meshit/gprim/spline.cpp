@@ -7,59 +7,104 @@
 
 namespace meshit {
 
-    template<>
-    void CircleSeg<2>::LineIntersections(const double a, const double b, const double c,
-                                         Array<Point<2> >& points, const double eps) const
+    // calculates length of spline-curve
+
+    double SplineSeg::Length() const
     {
-        points.resize(0);
+        int n = 100;
+        double dt = 1.0 / n;
 
-        double px = 0, py = 0;
+        Point<2> pold = GetPoint(0);
 
-        if (fabs(b) > 1e-20)
-            py = -c / b;
-        else
-            px = -c / a;
-
-        const double c1 = a * a + b * b;
-        const double c2 = 2. * (a * (py - pm(1)) - b * (px - pm(0)));
-        const double c3 = pow(px - pm(0), 2) + pow(py - pm(1), 2) - pow(Radius(), 2);
-
-        const double discr = c2 * c2 - 4 * c1 * c3;
-
-        if (discr < 0)
-            return;
-
-        Array<double> t;
-
-        if (fabs(discr) < 1e-20) {
-            t.push_back(-0.5 * c2 / c1);
-        } else {
-            t.push_back((-c2 + sqrt(discr)) / (2. * c1));
-            t.push_back((-c2 - sqrt(discr)) / (2. * c1));
+        double l = 0;
+        for (int i = 1; i <= n; i++) {
+            Point<2> p = GetPoint(i * dt);
+            l += Dist(p, pold);
+            pold = p;
         }
 
-        for (size_t i = 0; i < t.size(); i++) {
-            Point<2> p(px - t[i] * b, py + t[i] * a);
-            double angle = atan2(p(1), p(0)) + M_PI;
+        return l;
+    }
 
-            if (angle > StartAngle() - eps && angle < EndAngle() + eps) {
-                points.push_back(p);
+    void SplineSeg::GetPoints(int n, Array<Point<2> >& points) const
+    {
+        points.resize(n);
+        if (n >= 2) {
+            for (int i = 0; i < n; i++) {
+                points[i] = GetPoint(double(i) / (n - 1));
             }
         }
     }
 
-    template<int D>
-    SplineSeg3<D>::SplineSeg3(const GeomPoint<D>& ap1,
-                              const GeomPoint<D>& ap2,
-                              const GeomPoint<D>& ap3)
+    /*
+       Implementation of line-segment from p1 to p2
+     */
+
+    inline Point<2> LineSeg::GetPoint(double t) const
+    {
+        return p1 + t * (p2 - p1);
+    }
+
+    Vec<2> LineSeg::GetTangent(const double t) const
+    {
+        return p2 - p1;
+    }
+
+    void LineSeg::GetDerivatives(
+            const double t,
+            Point<2>& point,
+            Vec<2>& first,
+            Vec<2>& second) const
+    {
+        first = p2 - p1;
+        point = p1 + t * first;
+        second = 0;
+    }
+
+    double LineSeg::Length() const
+    {
+        return Dist(p1, p2);
+    }
+
+    void LineSeg::LineIntersections(const double a, const double b, const double c,
+                                    Array<Point<2> >& points, const double eps) const
+    {
+        points.resize(0);
+
+        double denom = -a * p2(0) + a * p1(0) - b * p2(1) + b * p1(1);
+        if (fabs(denom) < 1e-20)
+            return;
+
+        double t = (a * p1(0) + b * p1(1) + c) / denom;
+        if ((t > -eps) && (t < 1. + eps))
+            points.push_back(GetPoint(t));
+    }
+
+    void LineSeg::Project(const Point<2>& point, Point<2>& point_on_curve, double& t) const
+    {
+        Vec<2> v = p2 - p1;
+        double l = v.Length();
+        v *= 1. / l;
+        t = (point - p1) * v;
+
+        if (t < 0) t = 0;
+        if (t > l) t = l;
+
+        point_on_curve = p1 + t * v;
+
+        t *= 1. / l;
+    }
+
+    SplineSeg3::SplineSeg3(const GeomPoint<2>& ap1,
+                           const GeomPoint<2>& ap2,
+                           const GeomPoint<2>& ap3)
             : p1(ap1), p2(ap2), p3(ap3)
     {
         weight = Dist(p1, p3) / sqrt(0.5 * (Dist2(p1, p2) + Dist2(p2, p3)));
         proj_latest_t = 0.5;
     }
 
-    template<int D>
-    inline Point<D> SplineSeg3<D>::GetPoint(double t) const
+    inline Point<2> SplineSeg3::GetPoint(double t) const
     {
         double b1, b2, b3;
 
@@ -67,29 +112,27 @@ namespace meshit {
         b2 = weight * t * (1 - t);
         b3 = t * t;
 
-        Vec<D> hp = b1 * Vec<D>(p1) + b2 * Vec<D>(p2) + b3 * Vec<D>(p3);
+        Vec<2> hp = b1 * Vec<2>(p1) + b2 * Vec<2>(p2) + b3 * Vec<2>(p3);
         double w = b1 + b2 + b3;
-        return Point<D>((1.0 / w) * hp);
+        return Point<2>((1.0 / w) * hp);
     }
 
-    template<int D>
-    Vec<D> SplineSeg3<D>::GetTangent(const double t) const
+    Vec<2> SplineSeg3::GetTangent(const double t) const
     {
         const double b1 = (1. - t) * ((weight - 2.) * t - weight);
         const double b2 = weight * (1. - 2. * t);
         const double b3 = t * ((weight - 2) * t + 2.);
 
 
-        Vec<D> retval;
-        for (int i = 0; i < D; i++)
+        Vec<2> retval;
+        for (int i = 0; i < 2; i++)
             retval(i) = b1 * p1(i) + b2 * p2(i) + b3 * p3(i);
 
         return retval;
 
     }
 
-    template<int D>
-    void SplineSeg3<D>::Project(const Point<D>& point, Point<D>& point_on_curve, double& t) const
+    void SplineSeg3::Project(const Point<2>& point, Point<2>& point_on_curve, double& t) const
     {
         double t_old = -1;
 
@@ -98,8 +141,8 @@ namespace meshit {
         else
             t = 0.5;
 
-        Point<D> phi;
-        Vec<D> phip, phipp, phimp;
+        Point<2> phi;
+        Vec<2> phip, phipp, phimp;
 
         int i = 0;
 
@@ -119,18 +162,18 @@ namespace meshit {
         if (i < 20 && t > -0.4 && t < 1.4) {
             t = std::max(0.0, std::min(t, 1.0));
 
-            point_on_curve = SplineSeg3<D>::GetPoint(t);
+            point_on_curve = SplineSeg3::GetPoint(t);
 
             double dist = Dist(point, point_on_curve);
 
-            phi = SplineSeg3<D>::GetPoint(0);
+            phi = SplineSeg3::GetPoint(0);
             double auxdist = Dist(phi, point);
             if (auxdist < dist) {
                 t = 0.;
                 point_on_curve = phi;
                 dist = auxdist;
             }
-            phi = SplineSeg3<D>::GetPoint(1);
+            phi = SplineSeg3::GetPoint(1);
             auxdist = Dist(phi, point);
             if (auxdist < dist) {
                 t = 1.;
@@ -144,11 +187,11 @@ namespace meshit {
             double d0, d1, d2;
 
             while (t2 - t0 > 1e-8) {
-                phi = SplineSeg3<D>::GetPoint(t0);
+                phi = SplineSeg3::GetPoint(t0);
                 d0 = Dist(phi, point);
-                phi = SplineSeg3<D>::GetPoint(t1);
+                phi = SplineSeg3::GetPoint(t1);
                 d1 = Dist(phi, point);
-                phi = SplineSeg3<D>::GetPoint(t2);
+                phi = SplineSeg3::GetPoint(t2);
                 d2 = Dist(phi, point);
 
                 double a = (2. * d0 - 4. * d1 + 2. * d2) / pow(t2 - t0, 2);
@@ -184,11 +227,11 @@ namespace meshit {
                 }
             }
 
-            phi = SplineSeg3<D>::GetPoint(t0);
+            phi = SplineSeg3::GetPoint(t0);
             d0 = Dist(phi, point);
-            phi = SplineSeg3<D>::GetPoint(t1);
+            phi = SplineSeg3::GetPoint(t1);
             d1 = Dist(phi, point);
-            phi = SplineSeg3<D>::GetPoint(t2);
+            phi = SplineSeg3::GetPoint(t2);
             d2 = Dist(phi, point);
 
             double mind = d0;
@@ -202,18 +245,17 @@ namespace meshit {
                 mind = d2;
             }
 
-            point_on_curve = SplineSeg3<D>::GetPoint(t);
+            point_on_curve = SplineSeg3::GetPoint(t);
         }
         proj_latest_t = t;
     }
 
-    template<int D>
-    void SplineSeg3<D>::GetDerivatives(const double t,
-                                       Point<D>& point,
-                                       Vec<D>& first,
-                                       Vec<D>& second) const
+    void SplineSeg3::GetDerivatives(const double t,
+                                    Point<2>& point,
+                                    Vec<2>& first,
+                                    Vec<2>& second) const
     {
-        Vec<D> v1(p1), v2(p2), v3(p3);
+        Vec<2> v1(p1), v2(p2), v3(p3);
 
         double b1 = (1. - t) * (1. - t);
         double b2 = weight * t * (1. - t);
@@ -238,7 +280,7 @@ namespace meshit {
         const double wpp = b1pp + b2pp + b3pp;
         const double fac2 = (wpp * w - 2. * wp * wp) / (w * w);
 
-        for (int i = 0; i < D; i++)
+        for (int i = 0; i < 2; i++)
             point(i) = b1 * p1(i) + b2 * p2(i) + b3 * p3(i);
 
 
@@ -251,9 +293,8 @@ namespace meshit {
                  (b3pp / w - 2 * b3p * fac1 - b3 * fac2) * v3;
     }
 
-    template<int D>
-    void SplineSeg3<D>::LineIntersections(const double a, const double b, const double c,
-                                          Array<Point<D> >& points, const double eps) const
+    void SplineSeg3::LineIntersections(const double a, const double b, const double c,
+                                       Array<Point<2> >& points, const double eps) const
     {
         points.resize(0);
 
@@ -296,11 +337,4 @@ namespace meshit {
         if ((t > -eps) && (t < 1. + eps))
             points.push_back(GetPoint(t));
     }
-
-    template
-    class SplineSeg3<2>;
-
-    template
-    class SplineSeg3<3>;
-
 }  // namespace meshit

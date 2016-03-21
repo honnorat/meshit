@@ -31,13 +31,6 @@ namespace meshit {
     class EdgePointGeomInfo
     {
      public:
-        int edgenr;
-        int body;     // for ACIS
-        double dist;  // for 2d meshing
-        double u, v;  // for OCC Meshing
-
-     public:
-
         EdgePointGeomInfo()
                 : edgenr(0), body(0), dist(0.0), u(0.0), v(0.0) { }
 
@@ -50,6 +43,12 @@ namespace meshit {
             v = gi2.v;
             return *this;
         }
+
+     public:
+        int edgenr;
+        int body;     // for ACIS
+        double dist;  // for 2d meshing
+        double u, v;  // for OCC Meshing
     };
 
     typedef int PointIndex;
@@ -61,11 +60,7 @@ namespace meshit {
      */
     class MeshPoint : public Point3d
     {
-        int layer;
-        POINTTYPE type;
-
      public:
-
         MeshPoint() { }
 
         MeshPoint(const Point3d& ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
@@ -86,6 +81,9 @@ namespace meshit {
             type = at;
         }
 
+     protected:
+        int layer;
+        POINTTYPE type;
     };
 
     /**
@@ -464,7 +462,6 @@ namespace meshit {
 
         /// remove secondorder
         void SetMaxPointNr(int maxpnum);
-
     };
 
 }  // namelist meshit

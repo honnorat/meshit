@@ -342,10 +342,11 @@ namespace meshit {
                 for (size_t k = 0; k < oldutofreearea.Width(); k++)
                     mati(j, k) = lam1 * oldutofreearea(j, k) + (1 - lam1) * oldutofreearealimit(j, k);
 
-            freezone_i[i] = new Array<Point2d>(freezone.size());
-            Array<Point2d>& fzi = *freezone_i[i];
-            for (size_t j = 0; j < freezone.size(); j++)
+            freezone_i[i] = new std::vector<Point2d>(freezone.size());
+            std::vector<Point2d>& fzi = *freezone_i[i];
+            for (size_t j = 0; j < freezone.size(); j++) {
                 fzi[j] = freezonelimit[j] + lam1 * (freezone[j] - freezonelimit[j]);
+            }
         }
     }
 

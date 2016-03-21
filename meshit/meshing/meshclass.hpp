@@ -115,8 +115,7 @@ namespace meshit {
 
         void BuildFromSpline2D(SplineGeometry2d& geometry, MeshingParameters& mp);
 
-        PointIndex AddPoint(const Point3d& p, int layer = 1);
-        PointIndex AddPoint(const Point3d& p, int layer, POINTTYPE type);
+        PointIndex AddPoint(const Point3d& p, int layer = 1, POINTTYPE type = INNERPOINT);
 
         size_t GetNP() const
         {

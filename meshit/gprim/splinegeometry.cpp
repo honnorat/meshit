@@ -6,24 +6,22 @@
 
 namespace meshit {
 
-    template<int D>
-    SplineGeometry<D>::~SplineGeometry()
+    SplineGeometry::~SplineGeometry()
     {
         for (size_t i = 0; i < splines.size(); i++) {
             delete splines[i];
         }
     }
 
-    template<int D>
-    void SplineGeometry<D>::GetBoundingBox(Box<D>& box) const
+    void SplineGeometry::GetBoundingBox(Box<2>& box) const
     {
         if (!splines.size()) {
-            Point<D> auxp = 0.;
+            Point<2> auxp = 0.;
             box.Set(auxp);
             return;
         }
 
-        Array<Point<D> > points;
+        Array<Point<2> > points;
         for (size_t i = 0; i < splines.size(); i++) {
             splines[i]->GetPoints(20, points);
 
@@ -33,12 +31,6 @@ namespace meshit {
             }
         }
     }
-
-    template
-    class SplineGeometry<2>;
-
-    template
-    class SplineGeometry<3>;
 }
 
 
