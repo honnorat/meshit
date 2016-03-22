@@ -1,7 +1,6 @@
+#include "smoothing2.hpp"
 #include "improve2.hpp"
 #include "global.hpp"
-
-#include "../linalg/opti.hpp"
 
 namespace meshit {
 
@@ -144,117 +143,86 @@ namespace meshit {
         return CalcTriangleBadnessRect(x2, x3, y3);
     }
 
-    class Opti2dLocalData
+    double MinFunction_2d::Func(const double* x) const
     {
-     public:
-        MeshPoint sp1;
-        Vec3d normal, t1, t2;
-        std::vector<SurfaceElementIndex> locelements;
-        std::vector<int> locrots;
-        std::vector<double> lochs;
-        std::vector<Point3d> loc_pnts2;
-        std::vector<Point3d> loc_pnts3;
-        double locmetricweight;
-        double loch;
-        int uselocalh;
+        double badness = 0;
 
-     public:
-        Opti2dLocalData()
-        {
-            locmetricweight = 0;
+        Point3d pp1(ld.sp1.X() - x[1],
+                    ld.sp1.Y() + x[0]);
+
+        for (size_t j = 0; j < ld.locelements.size(); j++) {
+            const Point3d& pe2 = ld.loc_pnts2[j];
+            const Point3d& pe3 = ld.loc_pnts3[j];
+            Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
+            Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
+
+            if (ld.uselocalh) ld.loch = ld.lochs[j];
+
+            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
+                badness += CalcTriangleBadness(pp1, pe2, pe3, ld.locmetricweight, ld.loch);
+            } else {
+                badness += 1e8;
+            }
         }
-    };
+        return badness;
+    }
 
-    class Opti2SurfaceMinFunction : public MinFunction
+    double MinFunction_2d::FuncGrad(const double* x, double* g) const
     {
-        const Mesh& mesh;
-        Opti2dLocalData& ld;
 
-     public:
-        Opti2SurfaceMinFunction(const Mesh& amesh, Opti2dLocalData& ald)
-                : mesh(amesh), ld(ald) { }
+        double badness = 0;
 
-        virtual double Func(const Vector& x) const
-        {
-            double badness = 0;
+        Vec3d vgrad;
+        Point3d pp1(ld.sp1.X() - x[1],
+                    ld.sp1.Y() + x[0]);
 
-            Point3d pp1(ld.sp1.X() - x(1),
-                        ld.sp1.Y() + x(0));
+        for (size_t j = 0; j < ld.locelements.size(); j++) {
+            const Point3d& pe2 = ld.loc_pnts2[j];
+            const Point3d& pe3 = ld.loc_pnts3[j];
+            Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
+            Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
 
-            for (size_t j = 0; j < ld.locelements.size(); j++) {
-                const Point3d& pe2 = ld.loc_pnts2[j];
-                const Point3d& pe3 = ld.loc_pnts3[j];
-                Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
-                Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
+            if (ld.uselocalh) ld.loch = ld.lochs[j];
 
-                if (ld.uselocalh) ld.loch = ld.lochs[j];
-
-                if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
-                    badness += CalcTriangleBadness(pp1, pe2, pe3, ld.locmetricweight, ld.loch);
-                } else {
-                    badness += 1e8;
-                }
+            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
+                Vec3d hgrad;
+                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.locmetricweight, ld.loch);
+                vgrad += hgrad;
+            } else {
+                badness += 1e8;
             }
-            return badness;
         }
+        g[0] = +vgrad.Y();
+        g[1] = -vgrad.X();
+        return badness;
+    }
 
-        virtual double FuncGrad(const Vector& x, Vector& g) const
-        {
+    double MinFunction_2d::FuncDeriv(const double* x, const double* dir, double& deriv) const
+    {
+        deriv = 0;
+        double badness = 0;
 
-            double badness = 0;
+        Point3d pp1(ld.sp1.X() - x[1],
+                    ld.sp1.Y() + x[0]);
 
-            Vec3d vgrad;
-            Point3d pp1(ld.sp1.X() - x(1),
-                        ld.sp1.Y() + x(0));
+        for (size_t j = 0; j < ld.locelements.size(); j++) {
+            const Point3d& pe2 = ld.loc_pnts2[j];
+            const Point3d& pe3 = ld.loc_pnts3[j];
+            Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
+            Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
 
-            for (size_t j = 0; j < ld.locelements.size(); j++) {
-                const Point3d& pe2 = ld.loc_pnts2[j];
-                const Point3d& pe3 = ld.loc_pnts3[j];
-                Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
-                Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
+            if (ld.uselocalh) ld.loch = ld.lochs[j];
 
-                if (ld.uselocalh) ld.loch = ld.lochs[j];
-
-                if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
-                    Vec3d hgrad;
-                    badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.locmetricweight, ld.loch);
-                    vgrad += hgrad;
-                } else {
-                    badness += 1e8;
-                }
+            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
+                Vec3d hgrad;
+                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.locmetricweight, ld.loch);
+                deriv += dir[0] * hgrad.Y() - dir[1] * hgrad.X();
+            } else {
+                badness += 1e8;
             }
-            g[0] = +vgrad.Y();
-            g[1] = -vgrad.X();
-            return badness;
         }
-
-        virtual double FuncDeriv(const Vector& x, const Vector& dir, double& deriv) const
-        {
-            deriv = 0;
-            double badness = 0;
-
-            Point3d pp1(ld.sp1.X() - x[1],
-                        ld.sp1.Y() + x[0]);
-
-            for (size_t j = 0; j < ld.locelements.size(); j++) {
-                const Point3d& pe2 = ld.loc_pnts2[j];
-                const Point3d& pe3 = ld.loc_pnts3[j];
-                Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
-                Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
-
-                if (ld.uselocalh) ld.loch = ld.lochs[j];
-
-                if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
-                    Vec3d hgrad;
-                    badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.locmetricweight, ld.loch);
-                    deriv += dir[0] * hgrad.Y() - dir[1] * hgrad.X();
-                } else {
-                    badness += 1e8;
-                }
-            }
-            return badness;
-        }
-    };
+        return badness;
+    }
 
     MeshOptimize2d::MeshOptimize2d()
     {
@@ -279,7 +247,6 @@ namespace meshit {
         std::vector<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
-        Vector x(2);
 
         std::vector<MeshPoint> savepoints(mesh.GetNP());
 
@@ -320,7 +287,7 @@ namespace meshit {
         ld.loch = mp.maxh;
         ld.locmetricweight = metricweight;
 
-        Opti2SurfaceMinFunction surfminf(mesh, ld);
+        MinFunction_2d surfminf(mesh, ld);
         OptiParameters par;
         par.maxit_linsearch = 8;
         par.maxit_bfgs = 5;
@@ -378,9 +345,9 @@ namespace meshit {
                     }
                 }
 
-                x = 0;
+                double x[2] = {0.0, 0.0};
                 par.typx = 0.3 * ld.lochs[0];
-                BFGS(x, surfminf, par, 1e-6);
+                BFGS_2d(x, surfminf, par, 1e-6);
 
                 // restore other points
                 for (size_t j = 0; j < ld.locelements.size(); j++) {
@@ -392,7 +359,7 @@ namespace meshit {
                 }
 
                 // optimizer pass (if whole distance is not possible, move only a bit!!!!)
-                Vec3d hv(-x(1), x(0), 0.0);
+                Vec3d hv(-x[1], x[0], 0.0);
                 Point3d origp = mesh[pi];
                 Point3d hnp = origp + hv;
                 mesh.Point(pi).X() = hnp.X();

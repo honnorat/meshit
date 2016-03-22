@@ -106,7 +106,8 @@ namespace meshit {
         SurfaceElementIndex next;
 
      public:
-        Element2d();
+        Element2d()
+                : pnum{0, 0, 0}, index{0}, deleted{false} { }
 
         PointIndex& operator[](size_t i)
         {
@@ -148,7 +149,6 @@ namespace meshit {
             return index;
         };
 
-        void GetBox(const std::vector<MeshPoint>& points, Box3d& box) const;
         /// invert orientation
         inline void Invert();
         /// first point number is smallest
@@ -156,12 +156,6 @@ namespace meshit {
 
         // friend ostream & operator<<(ostream  & s, const Element2d & el);
         friend class Mesh;
-
-        void GetTransformation(class DenseMatrix& pmat, class DenseMatrix& trans) const;
-
-        void ComputeIntegrationPointData() const;
-
-        double CalcJacobianBadness(const std::vector<MeshPoint>& points) const;
 
         void Delete()
         {
@@ -187,7 +181,6 @@ namespace meshit {
     {
      public:
         Point3d p;
-        double weight;
         Vector shape;
         DenseMatrix dshape;
     };
@@ -222,8 +215,6 @@ namespace meshit {
         /// surfaces describing edge
         int surfnr1, surfnr2;
         EdgePointGeomInfo epgeominfo[2];
-        // int pmid; // for second order
-        int meshdocval;
 
      public:
         Segment& operator=(const Segment& other);

@@ -151,7 +151,7 @@ namespace meshit {
                                   const double* bmax,
                                   std::vector<size_t>& pis) const
     {
-        pis.resize(0);
+        pis.clear();
 
         static inttn3 stack[ADTREE_MAX_STACK_SIZE];
         stack[0].node = root;
@@ -347,7 +347,7 @@ namespace meshit {
                                   const double* bmax,
                                   std::vector<size_t>& pis) const
     {
-        pis.resize(0);
+        pis.clear();
 
         static inttn6 stack[ADTREE_MAX_STACK_SIZE];
         stack[0].node = root;

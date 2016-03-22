@@ -21,7 +21,6 @@ namespace meshit {
         surfnr1 = -1;
         surfnr2 = -1;
         pnums[2] = -1;
-        meshdocval = 0;
     }
 
     Segment::Segment(const Segment& other) :
@@ -34,7 +33,6 @@ namespace meshit {
             surfnr1(other.surfnr1),
             surfnr2(other.surfnr2),
             epgeominfo(),
-            meshdocval(other.meshdocval),
             hp_elnr(other.hp_elnr)
     {
         for (int j = 0; j < 3; j++) {
@@ -60,7 +58,6 @@ namespace meshit {
             epgeominfo[0] = other.epgeominfo[0];
             epgeominfo[1] = other.epgeominfo[1];
             pnums[2] = other.pnums[2];
-            meshdocval = other.meshdocval;
             hp_elnr = other.hp_elnr;
         }
 
@@ -74,23 +71,6 @@ namespace meshit {
         return s;
     }
 
-    Element2d::Element2d()
-    {
-        for (int i = 0; i < 3; i++) {
-            pnum[i] = 0;
-        }
-        index = 0;
-        deleted = 0;
-    }
-
-    void Element2d::GetBox(const std::vector<MeshPoint>& points, Box3d& box) const
-    {
-        box.SetPoint(points[pnum[0] - 1]);
-        for (unsigned i = 1; i < 3; i++) {
-            box.AddPoint(points[pnum[i] - 1]);
-        }
-    }
-
     bool Element2d::operator==(const Element2d& el2) const
     {
         bool retval = true;
@@ -99,76 +79,6 @@ namespace meshit {
         }
 
         return retval;
-    }
-
-    std::vector<IntegrationPointData*> ipdtrig;
-
-    void Element2d::GetTransformation(class DenseMatrix& pmat, class DenseMatrix& trans) const
-    {
-        ComputeIntegrationPointData();
-        DenseMatrix* dshapep = &ipdtrig[0]->dshape;
-
-        CalcABt(pmat, *dshapep, trans);
-    }
-
-    double Element2d::CalcJacobianBadness(const std::vector<MeshPoint>& points) const
-    {
-        DenseMatrix trans(2, 2);
-        DenseMatrix pmat;
-
-        pmat.SetSize(2, 3);
-
-        for (size_t i = 0; i < 3; i++) {
-            const Point3d& p = points[PNum(i + 1)];
-            pmat.Elem(0, i) = p.Y();
-            pmat.Elem(1, i) = -p.X();
-        }
-
-        GetTransformation(pmat, trans);
-
-        // Frobenius norm
-        double frob = 0;
-        for (size_t j = 1; j <= 4; j++) {
-            double d = trans.Get(j);
-            frob += d * d;
-        }
-        frob = 0.5 * sqrt(frob);
-
-        double err;
-        double det = trans.Det();
-        if (det <= 0)
-            err = 1e12;
-        else
-            err = frob * frob / det;
-
-        return err;
-    }
-
-    void Element2d::ComputeIntegrationPointData() const
-    {
-        if (ipdtrig.size()) return;
-
-        IntegrationPointData* ipd = new IntegrationPointData;
-        ipd->p.X() = 1.0 / 3.0;
-        ipd->p.Y() = 1.0 / 3.0;
-        ipd->p.Z() = 0;
-        ipd->weight = 0.5;
-
-        ipd->shape.SetSize(3);
-        ipd->dshape.SetSize(2, 3);
-
-        ipd->shape[0] = 1.0 / 3.0;
-        ipd->shape[1] = 1.0 / 3.0;
-        ipd->shape[2] = 1.0 / 3.0;
-
-        ipd->dshape.Elem(0, 0) = -1;
-        ipd->dshape.Elem(0, 1) = 1;
-        ipd->dshape.Elem(0, 2) = 0;
-        ipd->dshape.Elem(1, 0) = -1;
-        ipd->dshape.Elem(1, 1) = 0;
-        ipd->dshape.Elem(1, 2) = 1;
-
-        ipdtrig.push_back(ipd);
     }
 
     std::ostream& operator<<(std::ostream& s, const Element2d& el)
