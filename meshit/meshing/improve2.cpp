@@ -340,13 +340,16 @@ namespace meshit {
                 has_one_pi.resize(0);
                 has_both_pi.resize(0);
 
-                for (size_t k = 0; k < elements_on_node[pi1].size(); k++) {
-                    const Element2d& el2 = mesh.SurfaceElement(elements_on_node[pi1][k]);
+                std::vector<SurfaceElementIndex> elem_idx_1 = elements_on_node[pi1];
+                std::vector<SurfaceElementIndex> elem_idx_2 = elements_on_node[pi2];
+
+                for (size_t k = 0; k < elem_idx_1.size(); k++) {
+                    const Element2d& el2 = mesh.SurfaceElement(elem_idx_1[k]);
 
                     if (el2.IsDeleted()) continue;
 
                     if (el2[0] == pi2 || el2[1] == pi2 || el2[2] == pi2) {
-                        has_both_pi.push_back(elements_on_node[pi1][k]);
+                        has_both_pi.push_back(elem_idx_1[k]);
 
                         const Point3d& p1 = mesh.Point(el2[0]);
                         const Point3d& p2 = mesh.Point(el2[1]);
@@ -355,16 +358,16 @@ namespace meshit {
                         // Vec3d nv = Cross(p2 -p1, p3 - p1);
                         nv_z = (p2.X() - p1.X()) * (p3.Y() - p1.Y()) - (p2.Y() - p1.Y()) * (p3.X() - p1.X());
                     } else {
-                        has_one_pi.push_back(elements_on_node[pi1][k]);
+                        has_one_pi.push_back(elem_idx_1[k]);
                     }
                 }
 
-                for (size_t k = 0; k < elements_on_node[pi2].size(); k++) {
-                    const Element2d& el2 = mesh.SurfaceElement(elements_on_node[pi2][k]);
+                for (size_t k = 0; k < elem_idx_2.size(); k++) {
+                    const Element2d& el2 = mesh.SurfaceElement(elem_idx_2[k]);
                     if (el2.IsDeleted()) continue;
 
                     if (el2[0] != pi1 && el2[1] != pi1 && el2[2] != pi1) {
-                        has_one_pi.push_back(elements_on_node[pi2][k]);
+                        has_one_pi.push_back(elem_idx_2[k]);
                     }
                 }
 
@@ -413,10 +416,10 @@ namespace meshit {
 
                 if (should) {
                     mesh[pi1] = pnew;
-                    for (size_t k = 0; k < elements_on_node[pi2].size(); k++) {
-                        Element2d& el = mesh.SurfaceElement(elements_on_node[pi2][k]);
+                    for (size_t k = 0; k < elem_idx_2.size(); k++) {
+                        Element2d& el = mesh.SurfaceElement(elem_idx_2[k]);
                         if (el.IsDeleted()) continue;
-                        elements_on_node.Add(pi1, elements_on_node[pi2][k]);
+                        elements_on_node.Add(pi1, elem_idx_2[k]);
 
                         bool haspi1 = 0;
                         for (size_t l = 0; l < 3; l++) {

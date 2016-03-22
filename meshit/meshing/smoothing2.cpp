@@ -328,7 +328,8 @@ namespace meshit {
         for (size_t hi = 0; hi < icompress.size(); hi++) {
             PointIndex pi = icompress[hi];
             if (mesh[pi].Type() == SURFACEPOINT) {
-                if (elements_on_point[hi].size() == 0) continue;
+                std::vector<SurfaceElementIndex> elem_idx = elements_on_point[hi];
+                if (elem_idx.size() == 0) continue;
 
                 ld.sp1 = mesh[pi];
                 ld.locelements.resize(0);
@@ -337,8 +338,8 @@ namespace meshit {
                 ld.loc_pnts2.resize(0);
                 ld.loc_pnts3.resize(0);
 
-                for (size_t j = 0; j < elements_on_point[hi].size(); j++) {
-                    SurfaceElementIndex sei = elements_on_point[hi][j];
+                for (size_t j = 0; j < elem_idx.size(); j++) {
+                    SurfaceElementIndex sei = elem_idx[j];
                     const Element2d& bel = mesh.SurfaceElement(sei);
                     ld.locelements.push_back(sei);
 

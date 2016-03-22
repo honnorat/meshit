@@ -122,13 +122,13 @@ namespace meshit {
         }
 
         /// Access entry.
-        FlatArray<T> operator[](size_t i) const
+        std::vector<T> operator[](size_t i) const
         {
-#ifdef DEBUG
-            if (i < 0 || i >= data.size())
-                std::cout << "table out of range, i = " << i << ", s = " << data.size() << std::endl;
-#endif
-            return FlatArray<T>(data[i].size, (T*) data[i].col);
+            std::vector<T> vec(data[i].size);
+            for (size_t j = 0; j < vec.size(); j++) {
+                vec[j] = static_cast<T*>(data[i].col)[j];
+            }
+            return vec;
         }
     };
 

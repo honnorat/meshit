@@ -621,9 +621,10 @@ namespace meshit {
 
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
+                std::vector<int> surf_idx = surfacesonnode[pi];
                 bool found = 0;
-                for (int k = 0; k < surfacesonnode[pi].size(); k++) {
-                    if (surfacesonnode[pi][k] == si) {
+                for (size_t k = 0; k < surf_idx.size(); k++) {
+                    if (surf_idx[k] == si) {
                         found = 1;
                         break;
                     }
@@ -645,21 +646,19 @@ namespace meshit {
             surfelementht->Set(i3, sei); // war das wichtig ???    sel.GetIndex());
         }
 
-        for (int i = 0; i < segments.size(); i++) {
+        for (size_t i = 0; i < segments.size(); i++) {
             const Segment& seg = segments[i];
-            for (int j = 1; j <= 2; j++) {
-                PointIndex hi = (j == 1) ? seg[0] : seg[1];
-                if (points[hi].Type() == INNERPOINT || points[hi].Type() == SURFACEPOINT) {
-                    points[hi].SetType(EDGEPOINT);
-                }
-            }
+            MeshPoint& mp1 = points[seg[0]];
+            MeshPoint& mp2 = points[seg[1]];
+            if (mp1.Type() == INNERPOINT || mp1.Type() == SURFACEPOINT) mp1.SetType(EDGEPOINT);
+            if (mp2.Type() == INNERPOINT || mp2.Type() == SURFACEPOINT) mp2.SetType(EDGEPOINT);
         }
 
-        for (int i = 0; i < lockedpoints.size(); i++) {
+        for (size_t i = 0; i < lockedpoints.size(); i++) {
             points[lockedpoints[i]].SetType(FIXEDPOINT);
         }
 
-        for (int i = 0; i < GetNSeg(); i++) {
+        for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = segments[i];
             INDEX_2 i2(seg[0], seg[1]);
             i2.Sort();
@@ -720,49 +719,46 @@ namespace meshit {
         INDEX_3_CLOSED_HASHTABLE<INDEX_2> faceht(100);
         openelements.resize(0);
 
-        for (PointIndex pi = 0; pi < points.size(); pi++) {
-            if (sels_on_point[pi].size()) {
+        for (size_t pi = 0; pi < points.size(); pi++) {
+            std::vector<SurfaceElementIndex> row = sels_on_point[pi];
+            if (row.size() == 0) continue;
+            faceht.SetSize(2 * row.size());
+            for (size_t ii = 0; ii < row.size(); ii++) {
+                hel = SurfaceElement(row[ii]);
+                int ind = hel.GetIndex();
 
-                faceht.SetSize(2 * sels_on_point[pi].size());
-
-                FlatArray<SurfaceElementIndex> row = sels_on_point[pi];
-                for (size_t ii = 0; ii < row.size(); ii++) {
-                    hel = SurfaceElement(row[ii]);
-                    int ind = hel.GetIndex();
-
-                    if (GetFaceDescriptor(ind).DomainIn() &&
-                        (dom == 0 || dom == GetFaceDescriptor(ind).DomainIn())) {
-                        hel.NormalizeNumbering();
-                        if (hel.PNum(1) == pi) {
-                            INDEX_3 i3(hel[0], hel[1], hel[2]);
-                            INDEX_2 i2(GetFaceDescriptor(ind).DomainIn(), PointIndex{-1});
-                            faceht.Set(i3, i2);
-                        }
-                    }
-                    if (GetFaceDescriptor(ind).DomainOut() &&
-                        (dom == 0 || dom == GetFaceDescriptor(ind).DomainOut())) {
-                        hel.Invert();
-                        hel.NormalizeNumbering();
-                        if (hel.PNum(1) == pi) {
-                            INDEX_3 i3(hel[0], hel[1], hel[2]);
-                            INDEX_2 i2(GetFaceDescriptor(ind).DomainOut(), PointIndex{-1});
-                            faceht.Set(i3, i2);
-                        }
+                if (GetFaceDescriptor(ind).DomainIn() &&
+                    (dom == 0 || dom == GetFaceDescriptor(ind).DomainIn())) {
+                    hel.NormalizeNumbering();
+                    if (hel.PNum(1) == pi) {
+                        INDEX_3 i3(hel[0], hel[1], hel[2]);
+                        INDEX_2 i2(GetFaceDescriptor(ind).DomainIn(), PointIndex{-1});
+                        faceht.Set(i3, i2);
                     }
                 }
-                for (size_t i = 0; i < faceht.Size(); i++) {
-                    if (faceht.UsedPos(i)) {
-                        INDEX_3 i3;
-                        INDEX_2 i2;
-                        faceht.GetData(i, i3, i2);
-                        if (i2.I1() != -1) {
-                            Element2d tri;
-                            for (size_t l = 0; l < 3; l++) {
-                                tri[l] = i3.I(l + 1);
-                            }
-                            tri.SetIndex(i2.I1());
-                            openelements.push_back(tri);
+                if (GetFaceDescriptor(ind).DomainOut() &&
+                    (dom == 0 || dom == GetFaceDescriptor(ind).DomainOut())) {
+                    hel.Invert();
+                    hel.NormalizeNumbering();
+                    if (hel.PNum(1) == pi) {
+                        INDEX_3 i3(hel[0], hel[1], hel[2]);
+                        INDEX_2 i2(GetFaceDescriptor(ind).DomainOut(), PointIndex{-1});
+                        faceht.Set(i3, i2);
+                    }
+                }
+            }
+            for (size_t i = 0; i < faceht.Size(); i++) {
+                if (faceht.UsedPos(i)) {
+                    INDEX_3 i3;
+                    INDEX_2 i2;
+                    faceht.GetData(i, i3, i2);
+                    if (i2.I1() != -1) {
+                        Element2d tri;
+                        for (size_t l = 0; l < 3; l++) {
+                            tri[l] = i3.I(l + 1);
                         }
+                        tri.SetIndex(i2.I1());
+                        openelements.push_back(tri);
                     }
                 }
             }
@@ -955,7 +951,7 @@ namespace meshit {
     void Mesh::SetMaxHDomain(const std::vector<double>& mhd)
     {
         maxhdomain.resize(mhd.size());
-        for (int i = 0; i < mhd.size(); i++) {
+        for (size_t i = 0; i < mhd.size(); i++) {
             maxhdomain[i] = mhd[i];
         }
     }

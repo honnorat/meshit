@@ -8,7 +8,7 @@ namespace meshit {
     {
         MESHIT_LOG_DEBUG("Check Surface mesh");
 
-        int nf = mesh.GetNSE();
+        size_t nf = mesh.GetNSE();
         INDEX_2_HASHTABLE<int> edges(nf + 2);
         INDEX_2 i2;
         int cnt1 = 0, cnt2 = 0;

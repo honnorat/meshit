@@ -202,7 +202,7 @@ namespace meshit {
          */
         void FindOpenSegments(int surfnr = 0);
 
-        int GetNOpenSegments()
+        size_t GetNOpenSegments()
         {
             return opensegments.size();
         }
