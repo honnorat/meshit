@@ -1,5 +1,5 @@
-#ifndef _FILE_SPLINEGEOMETRY
-#define _FILE_SPLINEGEOMETRY
+#ifndef _FILE_SPLINEGEOMETRY_HPP
+#define _FILE_SPLINEGEOMETRY_HPP
 
 /*
 
@@ -14,8 +14,8 @@ in geom2d only 2D - Geometry classes (with material properties etc.)
 #include <string>
 #include "spline.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class SplineGeometry
     {
      public:
@@ -24,10 +24,6 @@ namespace meshit {
 
         virtual ~SplineGeometry();
 
-        const std::vector<SplineSeg*>& GetSplines() const
-        {
-            return splines;
-        }
         void GetBoundingBox(Box<2>& box) const;
 
         Box<2> GetBoundingBox() const
@@ -36,17 +32,8 @@ namespace meshit {
             GetBoundingBox(box);
             return box;
         }
-
-        size_t GetNP() const
-        {
-            return geompoints.size();
-        }
-
-        const GeomPoint<2>& GetPoint(size_t i) const
-        {
-            return geompoints[i];
-        }
     };
-}
 
-#endif // _FILE_SPLINEGEOMETRY
+}  // namespace meshit
+
+#endif  // _FILE_SPLINEGEOMETRY_HPP

@@ -1,7 +1,7 @@
 #include "densemat.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     DenseMatrix::DenseMatrix(size_t h, size_t w)
     {
         if (w == 0) w = h;

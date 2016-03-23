@@ -13,8 +13,8 @@
 #include "../meshing/msghandler.hpp"
 #include "../meshing/smoothing2.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     void MultLDLt(const DenseMatrix& l, const double* d, const double* g, double* p)
     {
         p[0] = g[0] * l(0, 0) + g[1] * l(1, 0);
@@ -61,7 +61,7 @@ namespace meshit {
               double* p,       // i: search direction
               double& f,       // i: function-value at x, o: function-value at xneu, iff ifail = 0
               double* g,       // i: gradient at x, o: gradient at xneu, iff ifail = 0
-              const MinFunction_2d& fun,     // function to minimize
+              MinFunction_2d& fun,     // function to minimize
               const OptiParameters& par,
               double& alphahat,  // i: initial value for alpha_hat, o: solution alpha iff ifail = 0
               double fmin,     // i: lower bound for f
@@ -161,7 +161,7 @@ namespace meshit {
 
     double BFGS_2d(
             double* x,  // i: Startwert, o: Loesung, falls IFAIL = 0
-            const MinFunction_2d& fun,
+            MinFunction_2d& fun,
             const OptiParameters& par,
             double eps)
     {
@@ -276,9 +276,10 @@ namespace meshit {
         } while (!a1crit || !a3acrit);
 
         if (f0 < f || (ifail == 1)) {
-            MESHIT_LOG_DEBUG("fail, f = " << f << " f0 = " << f0 << " diff = " << f0 - f << "  ifail = " << ifail);
+            MESHIT_LOG_WARNING("fail, f = " << f << " f0 = " << f0 << " diff = " << f0 - f << "  ifail = " << ifail);
             f = f0;
-            x = x0;
+            x[0] = x0[0];
+            x[1] = x0[1];
         }
 
         return f;

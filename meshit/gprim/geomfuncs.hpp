@@ -1,5 +1,5 @@
-#ifndef FILE_GEOMFUNCS
-#define FILE_GEOMFUNCS
+#ifndef FILE_GEOMFUNCS_HPP
+#define FILE_GEOMFUNCS_HPP
 
 /* *************************************************************************/
 /* File:   geomfuncs.hpp                                                   */
@@ -10,8 +10,8 @@
 #include "geomobjects.hpp"
 #include "geomops.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     template<int D>
     inline double Abs(const Vec<D>& v)
     {
@@ -40,33 +40,6 @@ namespace meshit {
     inline double Dist2(const Point<D>& a, const Point<D>& b)
     {
         return Abs2(a - b);
-    }
-
-    template<int D>
-    inline Point<D> Center(const Point<D>& a, const Point<D>& b)
-    {
-        Point<D> res;
-        for (int i = 0; i < D; i++)
-            res[i] = 0.5 * (a[i] + b[i]);
-        return res;
-    }
-
-    template<int D>
-    inline Point<D> Center(const Point<D>& a, const Point<D>& b, const Point<D>& c)
-    {
-        Point<D> res;
-        for (int i = 0; i < D; i++)
-            res[i] = (1.0 / 3.0) * (a[i] + b[i] + c[i]);
-        return res;
-    }
-
-    template<int D>
-    inline Point<D> Center(const Point<D>& a, const Point<D>& b, const Point<D>& c, const Point<D>& d)
-    {
-        Point<D> res;
-        for (int i = 0; i < D; i++)
-            res[i] = (1.0 / 4.0) * (a[i] + b[i] + c[i] + d[i]);
-        return res;
     }
 
     template<>
@@ -119,10 +92,9 @@ namespace meshit {
         inv = ainv * Trans(m);
     }
 
-
     double Det(const Mat<2, 2>& m);
     double Det(const Mat<3, 3>& m);
 
-}
+}  // namespace meshit
 
 #endif

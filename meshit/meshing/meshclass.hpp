@@ -22,8 +22,8 @@
   The mesh class
  */
 
-namespace meshit {
-
+namespace meshit
+{
     enum resthtype
     {
         RESTRICTH_FACE, RESTRICTH_EDGE,
@@ -31,8 +31,6 @@ namespace meshit {
     };
 
     class SplineGeometry2d;
-
-    /// 2d mesh
 
     class Mesh
     {
@@ -56,7 +54,7 @@ namespace meshit {
 
         /// faces of rest-solid
         std::vector<Element2d> openelements;
-        /// open segmenets for surface meshing  
+        /// open segmenets for surface meshing
         std::vector<Segment> opensegments;
 
         /**
@@ -79,14 +77,11 @@ namespace meshit {
         /// Periodic surface, close surface, etc. identifications
         Identifications* ident;
 
-        /// number of vertices (if < 0, use np)
-        int numvertices;
+        /// number of vertices
+        size_t numvertices;
 
         /// element -> face, element -> edge etc ...
         class MeshTopology* topology;
-
-        /// changed by every minor modification (addpoint, ...)
-        int timestamp;
 
      public:
         /// refinement hierarchy
@@ -97,10 +92,10 @@ namespace meshit {
 
      public:
         bool PointContainedIn2DElement(
-                const Point3d& p,
-                double lami[3],
-                const int element,
-                bool consider3D = false) const;
+            const Point3d& p,
+            double lami[3],
+            const int element,
+            bool consider3D = false) const;
 
      public:
         Mesh();
@@ -110,7 +105,7 @@ namespace meshit {
 
         void BuildFromSpline2D(SplineGeometry2d& geometry, MeshingParameters& mp);
 
-        PointIndex AddPoint(const Point3d& p, int layer = 1, POINTTYPE type = INNERPOINT);
+        size_t AddPoint(const Point3d& p, int layer = 1, POINTTYPE type = INNERPOINT);
 
         size_t GetNP() const
         {
@@ -172,7 +167,7 @@ namespace meshit {
         }
 
         void RebuildSurfaceElementLists();
-        void GetSurfaceElementsOfFace(int facenr, std::vector<SurfaceElementIndex>& sei) const;
+        void GetSurfaceElementsOfFace(size_t facenr, std::vector<SurfaceElementIndex>& sei) const;
 
         void AddLockedPoint(PointIndex pi);
         void ClearLockedPoints();
@@ -193,14 +188,14 @@ namespace meshit {
            boundary elements without inner element.
            Results are stored in openelements.
            if dom == 0, all sub-domains, else subdomain dom */
-        void FindOpenElements(int dom = 0);
+        void FindOpenElements(size_t dom = 0);
 
         /**
            finds segments without surface element,
            and surface elements without neighbours.
            store in opensegmentsy
          */
-        void FindOpenSegments(int surfnr = 0);
+        void FindOpenSegments(size_t surfnr = 0);
 
         size_t GetNOpenSegments()
         {
@@ -227,8 +222,8 @@ namespace meshit {
            finds average h of surface surfnr if surfnr > 0,
            else of all surfaces.
          */
-        double AverageH(int surfnr = 0) const;
-        /// Calculates localh 
+        double AverageH(size_t surfnr = 0) const;
+        /// Calculates localh
         void CalcLocalH();
         void SetLocalH(const Point3d& pmin, const Point3d& pmax, double grading);
         void RestrictLocalH(const Point3d& p, double hloc);
@@ -237,7 +232,7 @@ namespace meshit {
         /// number of elements per radius
         void CalcLocalHFromSurfaceCurvature(double elperr);
         void CalcLocalHFromPointDistances();
-        void RestrictLocalH(resthtype rht, int nr, double loch);
+        void RestrictLocalH(resthtype rht, size_t nr, double loch);
         void LoadLocalMeshSize(const char* meshsizefilename);
         void SetGlobalH(double h);
         void SetMinimalH(double h);
@@ -247,7 +242,7 @@ namespace meshit {
         double GetMinH(const Point3d& pmin, const Point3d& pmax);
 
         /// Find bounding box
-        void GetBox(Point3d& pmin, Point3d& pmax, int dom = -1) const;
+        void GetBox(Point3d& pmin, Point3d& pmax) const;
 
         size_t GetNOpenElements() const
         {
@@ -283,9 +278,9 @@ namespace meshit {
         void Save(const std::string& filename) const;
         void Load(const std::string& filename);
 
-        void SetMaterial(int domnr, const char* mat);
+        void SetMaterial(size_t domnr, const char* mat);
 
-        int GetNFD() const
+        size_t GetNFD() const
         {
             return facedecoding.size();
         }
@@ -310,10 +305,14 @@ namespace meshit {
 
         /// find number of vertices
         void ComputeNVertices();
+
         /// number of vertices (no edge-midpoints)
-        size_t GetNV() const;
+        size_t GetNV() const {
+            return numvertices;
+        }
+
         /// remove edge points
-        void SetNP(int np);
+        void SetNP(size_t np);
 
         void UpdateTopology();
 
@@ -325,7 +324,7 @@ namespace meshit {
 
          public:
             CSurfaceArea(const Mesh& amesh)
-                    : mesh(amesh), valid(false) { }
+                : mesh(amesh), valid(false) { }
 
             void Add(const Element2d& sel)
             {
@@ -348,16 +347,6 @@ namespace meshit {
             return surfarea.Area();
         }
 
-        int GetTimeStamp() const
-        {
-            return timestamp;
-        }
-
-        void SetNextTimeStamp()
-        {
-            timestamp = NextTimeStamp();
-        }
-
         void PrintMemInfo(std::ostream& ost) const;
 
         friend class Meshing3;
@@ -370,7 +359,7 @@ namespace meshit {
         return ost;
     }
 
-}
+}  // namespace meshit
 
 #endif
 

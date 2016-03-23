@@ -7,16 +7,15 @@
 #include "meshing2.hpp"
 #include "../interface/writeuser.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     Mesh::Mesh()
-            : surfarea(*this)
+        : surfarea(*this)
     {
         boundaryedges = NULL;
         surfelementht = NULL;
         segmentht = NULL;
         lochfunc = NULL;
-        timestamp = NextTimeStamp();
         hglob = 1e10;
         hmin = 0;
         numvertices = -1;
@@ -59,6 +58,10 @@ namespace meshit {
         if (grading < 0) {
             grading = geometry.GetGrading();
         }
+        if (grading < 0.05) {
+            MESHIT_LOG_WARNING("grading is too small: " << grading << ". We reset it to 0.05");
+            grading = 0.05;
+        }
 
         double h = mp.maxh;
         Box<2> bbox = geometry.GetBoundingBox();
@@ -74,14 +77,14 @@ namespace meshit {
 
         geometry.PartitionBoundary(mp, h, *this);
 
-        int maxdomnr = 0;
+        size_t maxdomnr = 0;
         for (size_t si = 0; si < GetNSeg(); si++) {
             if (segments[si].domin > maxdomnr) maxdomnr = segments[si].domin;
             if (segments[si].domout > maxdomnr) maxdomnr = segments[si].domout;
         }
 
         facedecoding.resize(0);
-        for (int i = 1; i <= maxdomnr; i++) {
+        for (size_t i = 1; i <= maxdomnr; i++) {
             facedecoding.push_back(FaceDescriptor(i, 0, 0, i));
         }
 
@@ -89,7 +92,7 @@ namespace meshit {
 
         size_t bnp = GetNP();  // boundary points
 
-        for (int domnr = 1; domnr <= maxdomnr; domnr++) {
+        for (size_t domnr = 1; domnr <= maxdomnr; domnr++) {
             if (geometry.GetDomainMaxh(domnr) > 0) {
                 h = geometry.GetDomainMaxh(domnr);
             }
@@ -149,11 +152,9 @@ namespace meshit {
         Compress();
     }
 
-    PointIndex Mesh::AddPoint(const Point3d& p, int layer, POINTTYPE type)
+    size_t Mesh::AddPoint(const Point3d& p, int layer, POINTTYPE type)
     {
-        timestamp = NextTimeStamp();
-
-        PointIndex pi = points.size();
+        size_t pi = points.size();
         points.push_back(MeshPoint(p, layer, type));
 
         return pi;
@@ -161,8 +162,6 @@ namespace meshit {
 
     void Mesh::AddSegment(const Segment& s)
     {
-        timestamp = NextTimeStamp();
-
         size_t maxn = std::max(s[0], s[1]);
 
         if (maxn < points.size()) {
@@ -174,15 +173,13 @@ namespace meshit {
 
     void Mesh::AddSurfaceElement(const Element2d& el)
     {
-        timestamp = NextTimeStamp();
-
         PointIndex maxn = el[0];
         for (size_t i = 1; i < 3; i++) {
             if (el[i] > maxn) maxn = el[i];
         }
         maxn += 1;
 
-        if (maxn <= points.size()) {
+        if (static_cast<size_t>(maxn) <= points.size()) {
             for (size_t i = 0; i < 3; i++) {
                 if (points[el[i]].Type() > SURFACEPOINT)
                     points[el[i]].SetType(SURFACEPOINT);
@@ -321,7 +318,7 @@ namespace meshit {
         outfile.setf(std::ios::fixed, std::ios::floatfield);
         outfile.setf(std::ios::showpoint);
 
-        for (PointIndex pi = 0; pi < GetNP(); pi++) {
+        for (size_t pi = 0; pi < GetNP(); pi++) {
             outfile.width(22);
             outfile << points[pi].X() / scale << "  ";
             outfile.width(22);
@@ -330,45 +327,15 @@ namespace meshit {
             outfile << points[pi].Z() / scale << "\n";
         }
 
-        if (ident->GetMaxNr() > 0) {
-            outfile << "identifications\n";
-            std::vector<INDEX_2> identpairs;
-            int cnt = 0;
-            for (int i = 1; i <= ident->GetMaxNr(); i++) {
-                ident->GetPairs(i, identpairs);
-                cnt += identpairs.size();
-            }
-            outfile << cnt << "\n";
-            for (int i = 1; i <= ident->GetMaxNr(); i++) {
-                ident->GetPairs(i, identpairs);
-                for (int j = 0; j < identpairs.size(); j++) {
-                    outfile.width(8);
-                    outfile << identpairs[j].I1();
-                    outfile.width(8);
-                    outfile << identpairs[j].I2();
-                    outfile.width(8);
-                    outfile << i << "\n";
-                }
-            }
-
-            outfile << "identificationtypes\n";
-            outfile << ident->GetMaxNr() << "\n";
-            for (size_t i = 0; i < ident->GetMaxNr(); i++) {
-                int type = ident->GetType(i);
-                outfile << " " << type;
-            }
-            outfile << "\n";
-        }
-
         int cntmat = 0;
-        for (int i = 0; i < materials.size(); i++) {
+        for (size_t i = 0; i < materials.size(); i++) {
             if (materials[i] && strlen(materials[i]))
                 cntmat++;
         }
         if (cntmat) {
             outfile << "materials" << std::endl;
             outfile << cntmat << std::endl;
-            for (int i = 0; i < materials.size(); i++) {
+            for (size_t i = 0; i < materials.size(); i++) {
                 if (materials[i] && strlen(materials[i]))
                     outfile << i + 1 << " " << materials[i] << std::endl;
             }
@@ -412,19 +379,28 @@ namespace meshit {
                 bool uv = strcmp(str, "surfaceelementsuv") == 0;
 
                 for (int i = 1; i <= n; i++) {
-                    int surfnr, bcp, domin, domout, nep, faceind = 0;
+                    int surfnr, domin, domout, bcp, nep, faceind = 0;
 
                     infile >> surfnr >> bcp >> domin >> domout;
+
+                    if (surfnr < 1) {
+                        MESHIT_LOG_ERROR("Invalid surface index number: " << surfnr);
+                        throw std::runtime_error("Aborting.");
+                    }
+                    if (domin < 0 || domout < 0) {
+                        MESHIT_LOG_ERROR("Invalid domain index number: in = " << domin << " out = " << domout);
+                        throw std::runtime_error("Aborting.");
+                    }
                     surfnr--;
 
                     bool invert_el = false;
 
-                    for (int j = 1; j <= facedecoding.size(); j++) {
-                        if (GetFaceDescriptor(j).SurfNr() == surfnr &&
-                            GetFaceDescriptor(j).BCProperty() == bcp &&
-                            GetFaceDescriptor(j).DomainIn() == domin &&
-                            GetFaceDescriptor(j).DomainOut() == domout) {
-                            faceind = j;
+                    for (size_t j = 0; j < facedecoding.size(); j++) {
+                        if (GetFaceDescriptor(j + 1).SurfNr() == static_cast<size_t>(surfnr) &&
+                            GetFaceDescriptor(j + 1).BCProperty() == static_cast<size_t>(bcp) &&
+                            GetFaceDescriptor(j + 1).DomainIn() == static_cast<size_t>(domin) &&
+                            GetFaceDescriptor(j + 1).DomainOut() == static_cast<size_t>(domout)) {
+                            faceind = j + 1;
                         }
                     }
                     if (!faceind) {
@@ -519,25 +495,6 @@ namespace meshit {
                     AddPoint(p);
                 }
             }
-            if (strcmp(str, "identifications") == 0) {
-                infile >> n;
-                MESHIT_LOG_DEBUG(n << " identifications");
-                for (int i = 1; i <= n; i++) {
-                    PointIndex pi1, pi2;
-                    int ind;
-                    infile >> pi1 >> pi2 >> ind;
-                    ident->Add(pi1, pi2, ind);
-                }
-            }
-            if (strcmp(str, "identificationtypes") == 0) {
-                infile >> n;
-                MESHIT_LOG_DEBUG(n << " identificationtypes");
-                for (size_t i = 0; i < n; i++) {
-                    int type;
-                    infile >> type;
-                    ident->SetType(i, Identifications::ID_TYPE(type));
-                }
-            }
             if (strcmp(str, "materials") == 0) {
                 infile >> n;
                 MESHIT_LOG_DEBUG(n << " materials");
@@ -564,7 +521,7 @@ namespace meshit {
         delete boundaryedges;
 
         boundaryedges = new INDEX_2_CLOSED_HASHTABLE<int>
-                (3 * (GetNSE() + GetNOpenElements()) + GetNSeg() + 1);
+            (3 * (GetNSE() + GetNOpenElements()) + GetNSeg() + 1);
 
         for (size_t sei = 0; sei < GetNSE(); sei++) {
             const Element2d& sel = surfelements[sei];
@@ -579,7 +536,7 @@ namespace meshit {
             }
         }
 
-        for (int i = 0; i < openelements.size(); i++) {
+        for (size_t i = 0; i < openelements.size(); i++) {
             const Element2d& sel = openelements[i];
             for (size_t j = 0; j < 3; j++) {
                 INDEX_2 i2;
@@ -592,7 +549,7 @@ namespace meshit {
             }
         }
 
-        for (int i = 0; i < GetNSeg(); i++) {
+        for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = segments[i];
             INDEX_2 i2(seg[0], seg[1]);
             i2.Sort();
@@ -643,7 +600,7 @@ namespace meshit {
             i3.I2() = sel.PNum(2);
             i3.I3() = sel.PNum(3);
             i3.Sort();
-            surfelementht->Set(i3, sei); // war das wichtig ???    sel.GetIndex());
+            surfelementht->Set(i3, sei);
         }
 
         for (size_t i = 0; i < segments.size(); i++) {
@@ -667,16 +624,16 @@ namespace meshit {
         }
     }
 
-    void Mesh::FindOpenElements(int dom)
+    void Mesh::FindOpenElements(size_t dom)
     {
         size_t np = GetNP();
         size_t nse = GetNSE();
 
         std::vector<bool> hasface(GetNFD());
 
-        for (int i = 0; i < GetNFD(); i++) {
-            int domin = GetFaceDescriptor(i + 1).DomainIn();
-            int domout = GetFaceDescriptor(i + 1).DomainOut();
+        for (size_t i = 0; i < GetNFD(); i++) {
+            size_t domin = GetFaceDescriptor(i + 1).DomainIn();
+            size_t domout = GetFaceDescriptor(i + 1).DomainOut();
             hasface[i] = (dom == 0 && (domin != 0 || domout != 0)) ||
                          (dom != 0 && (domin == dom || domout == dom));
         }
@@ -730,7 +687,7 @@ namespace meshit {
                 if (GetFaceDescriptor(ind).DomainIn() &&
                     (dom == 0 || dom == GetFaceDescriptor(ind).DomainIn())) {
                     hel.NormalizeNumbering();
-                    if (hel.PNum(1) == pi) {
+                    if (hel.PNum(1) == static_cast<PointIndex>(pi)) {
                         INDEX_3 i3(hel[0], hel[1], hel[2]);
                         INDEX_2 i2(GetFaceDescriptor(ind).DomainIn(), PointIndex{-1});
                         faceht.Set(i3, i2);
@@ -740,7 +697,7 @@ namespace meshit {
                     (dom == 0 || dom == GetFaceDescriptor(ind).DomainOut())) {
                     hel.Invert();
                     hel.NormalizeNumbering();
-                    if (hel.PNum(1) == pi) {
+                    if (hel.PNum(1) == static_cast<PointIndex>(pi)) {
                         INDEX_3 i3(hel[0], hel[1], hel[2]);
                         INDEX_2 i2(GetFaceDescriptor(ind).DomainOut(), PointIndex{-1});
                         faceht.Set(i3, i2);
@@ -787,7 +744,7 @@ namespace meshit {
                 }
             }
             for (size_t j = 1; j <= 3; j++) {
-                PointIndex pi = sel.PNum(j);
+                size_t pi = sel.PNum(j);
                 if (pi < points.size()) {
                     points[pi].SetType(FIXEDPOINT);
                 }
@@ -795,7 +752,7 @@ namespace meshit {
         }
     }
 
-    void Mesh::FindOpenSegments(int surfnr)
+    void Mesh::FindOpenSegments(size_t surfnr)
     {
         INDEX_2_HASHTABLE<INDEX_2> faceht(4 * GetNSE() + GetNSeg() + 1);
 
@@ -803,7 +760,7 @@ namespace meshit {
         for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
 
-            if (surfnr == 0 || seg.si == surfnr) {
+            if (surfnr == 0 || seg.si == static_cast<int>(surfnr)) {
                 INDEX_2 key(seg[0], seg[1]);
                 INDEX_2 data(seg.si, -(i + 1));
 
@@ -818,7 +775,7 @@ namespace meshit {
         for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = LineSegment(i);
 
-            if (surfnr == 0 || seg.si == surfnr) {
+            if (surfnr == 0 || seg.si == static_cast<int>(surfnr)) {
                 INDEX_2 key(seg[1], seg[0]);
                 if (!faceht.Used(key)) {
                     std::cerr << "ERROR: Segment " << seg << " brother not used" << std::endl;
@@ -840,7 +797,7 @@ namespace meshit {
                     }
                     if (faceht.Used(seg)) {
                         data = faceht.Get(seg);
-                        if (data.I1() == el.GetIndex()) {
+                        if (data.I1() == static_cast<INDEX>(el.GetIndex())) {
                             data.I1() = 0;
                             faceht.Set(seg, data);
                         } else {
@@ -978,10 +935,9 @@ namespace meshit {
         return hmin;
     }
 
-    double Mesh::AverageH(int surfnr) const
+    double Mesh::AverageH(size_t surfnr) const
     {
         double maxh = 0, minh = 1e10;
-
         double hsum = 0;
         size_t n = 0;
         for (size_t i = 0; i < GetNSE(); i++) {
@@ -1125,7 +1081,7 @@ namespace meshit {
         }
     }
 
-    void Mesh::RestrictLocalH(resthtype rht, int nr, double loch)
+    void Mesh::RestrictLocalH(resthtype rht, size_t nr, double loch)
     {
         switch (rht) {
             case RESTRICTH_FACE: {
@@ -1139,7 +1095,7 @@ namespace meshit {
             case RESTRICTH_EDGE: {
                 for (size_t i = 0; i < GetNSeg(); i++) {
                     const Segment& seg = LineSegment(i);
-                    if (seg.edgenr == nr)
+                    if (seg.edgenr == static_cast<int>(nr))
                         RestrictLocalH(RESTRICTH_SEGMENT, i + 1, loch);
                 }
                 break;
@@ -1176,8 +1132,8 @@ namespace meshit {
         std::ifstream msf(meshsizefilename);
 
         // Philippose - 09/03/2009
-        // Adding print message information in case the specified 
-        // does not exist, or does not load successfully due to 
+        // Adding print message information in case the specified
+        // does not exist, or does not load successfully due to
         // other reasons such as access rights, etc...
         if (!msf) {
             MESHIT_LOG_ERROR("Error loading mesh size file: " << meshsizefilename << "....  Skipping!");
@@ -1221,14 +1177,14 @@ namespace meshit {
             msf >> hi;
             if (!msf.good())
                 throw std::runtime_error(
-                        "Mesh-size file error: Number of line definitions don't match specified list size\n");
+                    "Mesh-size file error: Number of line definitions don't match specified list size\n");
             RestrictLocalHLine(p1, p2, hi);
         }
 
         msf.close();
     }
 
-    void Mesh::GetBox(Point3d& pmin, Point3d& pmax, int dom) const
+    void Mesh::GetBox(Point3d& pmin, Point3d& pmax) const
     {
         if (points.size() == 0) {
             pmin = pmax = Point3d(0, 0, 0);
@@ -1237,23 +1193,9 @@ namespace meshit {
 
         pmin = Point3d(1e10, 1e10, 1e10);
         pmax = Point3d(-1e10, -1e10, -1e10);
-        if (dom <= 0) {
-            for (size_t pi = 0; pi < points.size(); pi++) {
-                pmin.SetToMin(points[pi]);
-                pmax.SetToMax(points[pi]);
-            }
-        } else {
-            for (size_t sei = 0; sei < GetNSE(); sei++) {
-                const Element2d& el = surfelements[sei];
-                if (el.IsDeleted()) continue;
-
-                if (dom == -1 || el.GetIndex() == dom) {
-                    for (size_t j = 0; j < 3; j++) {
-                        pmin.SetToMin(points[el[j]]);
-                        pmax.SetToMax(points[el[j]]);
-                    }
-                }
-            }
+        for (size_t pi = 0; pi < points.size(); pi++) {
+            pmin.SetToMin(points[pi]);
+            pmax.SetToMax(points[pi]);
         }
         if (pmin.X() > 0.5e10) {
             pmin = pmax = Point3d(0, 0, 0);
@@ -1365,9 +1307,6 @@ namespace meshit {
         }
 
         CalcSurfacesOfNode();
-
-        //  FindOpenElements();
-        timestamp = NextTimeStamp();
     }
 
     int Mesh::CheckConsistentBoundary() const
@@ -1513,7 +1452,7 @@ namespace meshit {
 
     int Mesh::GetNDomains() const
     {
-        int ndom = 0;
+        size_t ndom = 0;
 
         for (size_t k = 0; k < facedecoding.size(); k++) {
             if (facedecoding[k].DomainIn() > ndom)
@@ -1570,9 +1509,9 @@ namespace meshit {
         }
     }
 
-    void Mesh::GetSurfaceElementsOfFace(int facenr, std::vector<SurfaceElementIndex>& sei) const
+    void Mesh::GetSurfaceElementsOfFace(size_t facenr, std::vector<SurfaceElementIndex>& sei) const
     {
-        sei.resize(0);
+        sei.clear();
 
         SurfaceElementIndex si = facedecoding[facenr - 1].firstelement;
         while (si != -1) {
@@ -1590,30 +1529,22 @@ namespace meshit {
         for (size_t i = 0; i < surfelements.size(); i++) {
             const Element2d& el = SurfaceElement(i);
             for (size_t j = 1; j <= 3; j++) {
-                if (el.PNum(j) > numvertices)
-                    numvertices = el.PNum(j);
+                if (el.PNum(j) > static_cast<PointIndex>(numvertices)) {
+                    numvertices = static_cast<size_t>(el.PNum(j));
+                }
             }
         }
         numvertices += 1;
+        MESHIT_LOG_INFO("Mesh::ComputeNVertices: numvertices = " << numvertices << " numpoints = " << GetNP());
     }
 
-    size_t Mesh::GetNV() const
+    void Mesh::SetNP(size_t np)
     {
-        if (numvertices < 0)
-            return GetNP();
-        else
-            return static_cast<size_t>(numvertices);
-    }
-
-    void Mesh::SetNP(int np)
-    {
+        size_t mlold = mlbetweennodes.size();
         points.resize(np);
-        //  ptyps.SetSize(np);
-
-        int mlold = mlbetweennodes.size();
         mlbetweennodes.resize(np);
         if (np > mlold) {
-            for (int i = mlold; i < np; i++) {
+            for (size_t i = mlold; i < np; i++) {
                 mlbetweennodes[i].I1() = -1;
                 mlbetweennodes[i].I2() = -1;
             }
@@ -1626,12 +1557,12 @@ namespace meshit {
         topology->Update();
     }
 
-    void Mesh::SetMaterial(int domnr, const char* mat)
+    void Mesh::SetMaterial(size_t domnr, const char* mat)
     {
         if (domnr > materials.size()) {
-            int olds = materials.size();
+            size_t olds = materials.size();
             materials.resize(domnr);
-            for (int i = olds; i < domnr; i++) {
+            for (size_t i = olds; i < domnr; i++) {
                 materials[i] = 0;
             }
         }

@@ -7,7 +7,6 @@
 /* Date:   27. Apr. 01                                                    */
 /**************************************************************************/
 
-#include "../general/array.hpp"
 #include "meshclass.hpp"
 
 /*
@@ -15,8 +14,8 @@
     (Elements, Faces, Edges, Vertices
  */
 
-namespace meshit {
-
+namespace meshit
+{
     class Mesh;
 
     class MeshTopology
@@ -29,10 +28,9 @@ namespace meshit {
         std::vector<INDEX_4> face2vert;
         TABLE<int>* vert2surfelement;
         TABLE<size_t>* vert2segment;
-        int timestamp;
 
      public:
-        MeshTopology(const Mesh& amesh);
+        explicit MeshTopology(const Mesh& amesh);
         ~MeshTopology();
 
         void Update();
@@ -46,7 +44,6 @@ namespace meshit {
         {
             return face2vert.size();
         }
-
     };
 
 }  // namespace meshit

@@ -8,8 +8,8 @@
 #define COMMASIGN ','
 #endif
 
-namespace meshit {
-
+namespace meshit
+{
     void LoadMatrixLine(std::istream& ist, DenseMatrix& m, int line)
     {
         char ch;
@@ -293,27 +293,27 @@ namespace meshit {
         freesetinequ.SetSize(freezone.size());
 
         {
-            std::vector<int> pnearness(noldp);
+            std::vector<uint32_t> pnearness(noldp);
 
             for (size_t i = 0; i < pnearness.size(); i++) {
                 pnearness[i] = 1000;
             }
             for (int j = 1; j <= 2; j++) {
-                pnearness[GetPointNr(1, j) - 1] = 0;
+                pnearness[GetPointNr(0, j)] = 0;
             }
 
             bool ok;
             do {
                 ok = true;
 
-                for (size_t i = 1; i <= noldl; i++) {
-                    int minn = 1000;
+                for (size_t i = 0; i < noldl; i++) {
+                    uint32_t minn = 1000;
                     for (int j = 1; j <= 2; j++) {
-                        minn = std::min(minn, pnearness[GetPointNr(i, j) - 1]);
+                        minn = std::min(minn, pnearness[GetPointNr(i, j)]);
                     }
                     for (int j = 1; j <= 2; j++) {
-                        if (pnearness[GetPointNr(i, j) - 1] > minn + 1) {
-                            pnearness[GetPointNr(i, j) - 1] = minn + 1;
+                        if (pnearness[GetPointNr(i, j)] > minn + 1) {
+                            pnearness[GetPointNr(i, j)] = minn + 1;
                             ok = false;
                         }
                     }
@@ -325,7 +325,7 @@ namespace meshit {
             for (size_t i = 0; i < noldl; i++) {
                 lnearness[i] = 0;
                 for (int j = 1; j <= 2; j++) {
-                    lnearness[i] += pnearness[GetPointNr(i + 1, j) - 1];
+                    lnearness[i] += pnearness[GetPointNr(i, j)];
                 }
             }
         }

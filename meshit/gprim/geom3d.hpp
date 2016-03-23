@@ -1,5 +1,5 @@
-#ifndef FILE_GEOM3D
-#define FILE_GEOM3D
+#ifndef FILE_GEOM3D_HPP
+#define FILE_GEOM3D_HPP
 
 /* *************************************************************************/
 /* File:   geom3d.hh                                                       */
@@ -12,8 +12,8 @@
 
 #include "geom2d.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class Point3d;
 
     class Vec3d;
@@ -21,12 +21,8 @@ namespace meshit {
     inline Vec3d operator-(const Point3d& p1, const Point3d& p2);
     inline Point3d operator-(const Point3d& p1, const Vec3d& v);
     inline Point3d operator+(const Point3d& p1, const Vec3d& v);
-    Point3d& Add(double d, const Vec3d& v);
-    Point3d& Add2(double d, const Vec3d& v, double d2, const Vec3d& v2);
     inline Point3d Center(const Point3d& p1, const Point3d& p2);
     inline Point3d Center(const Point3d& p1, const Point3d& p2, const Point3d& p3);
-    inline Point3d Center(const Point3d& p1, const Point3d& p2,
-                          const Point3d& p3, const Point3d& p4);
     std::ostream& operator<<(std::ostream& s, const Point3d& p);
     inline Vec3d operator-(const Vec3d& p1, const Vec3d& v);
     inline Vec3d operator+(const Vec3d& p1, const Vec3d& v);
@@ -34,24 +30,14 @@ namespace meshit {
     inline double operator*(const Vec3d& v1, const Vec3d& v2);
     inline Vec3d Cross(const Vec3d& v1, const Vec3d& v2);
     inline Vec3d Cross(const Vec3d& v1, const Vec3d& v2);
-    inline void Cross(const Vec3d& v1, const Vec3d& v2, Vec3d& prod);
-    double Angle(const Vec3d& v);
-    double FastAngle(const Vec3d& v);
     double Angle(const Vec3d& v1, const Vec3d& v2);
-    double FastAngle(const Vec3d& v1, const Vec3d& v2);
     std::ostream& operator<<(std::ostream& s, const Vec3d& v);
     void Transpose(Vec3d& v1, Vec3d& v2, Vec3d& v3);
-    int SolveLinearSystem(
-            const Vec3d& col1,
-            const Vec3d& col2,
-            const Vec3d& col3,
-            const Vec3d& rhs,
-            Vec3d& sol);
+    int SolveLinearSystem(const Vec3d& col1, const Vec3d& col2, const Vec3d& col3,
+                          const Vec3d& rhs, Vec3d& sol);
     double Determinant(const Vec3d& col1, const Vec3d& col2, const Vec3d& col3);
 
     inline double Dist2(const Point3d& p1, const Point3d& p2);
-
-    /// Point in R3
 
     class Point3d
     {
@@ -59,31 +45,16 @@ namespace meshit {
         double x[3];
 
      public:
-
         Point3d()
         {
             x[0] = x[1] = x[2] = 0;
         }
 
-        Point3d(double ax, double ay)
-        {
-            x[0] = ax;
-            x[1] = ay;
-            x[2] = 0.0;
-        }
-
-        Point3d(double ax, double ay, double az)
+        Point3d(double ax, double ay, double az = 0.0)
         {
             x[0] = ax;
             x[1] = ay;
             x[2] = az;
-        }
-
-        explicit Point3d(double ax[3])
-        {
-            x[0] = ax[0];
-            x[1] = ax[1];
-            x[2] = ax[2];
         }
 
         Point3d(const Point3d& p2)
@@ -93,11 +64,11 @@ namespace meshit {
             x[2] = p2.x[2];
         }
 
-        Point3d(const Point<3>& p2)
+        explicit Point3d(const Point<3>& p2)
         {
-            for (int i = 0; i < 3; i++) {
-                x[i] = p2[i];
-            }
+            x[0] = p2[0];
+            x[1] = p2[1];
+            x[2] = p2[2];
         }
 
         Point3d& operator=(const Point3d& p2)
@@ -184,16 +155,13 @@ namespace meshit {
         friend inline Point3d operator+(const Point3d& p1, const Vec3d& v);
         inline Point3d& operator+=(const Vec3d& v);
         inline Point3d& operator-=(const Vec3d& v);
-        inline Point3d& Add(double d, const Vec3d& v);
-        inline Point3d& Add2(double d, const Vec3d& v,
-                             double d2, const Vec3d& v2);
 
         friend inline double Dist(const Point3d& p1, const Point3d& p2)
         {
             return sqrt(
-                    (p1.x[0] - p2.x[0]) * (p1.x[0] - p2.x[0]) +
-                    (p1.x[1] - p2.x[1]) * (p1.x[1] - p2.x[1]) +
-                    (p1.x[2] - p2.x[2]) * (p1.x[2] - p2.x[2]));
+                (p1.x[0] - p2.x[0]) * (p1.x[0] - p2.x[0]) +
+                (p1.x[1] - p2.x[1]) * (p1.x[1] - p2.x[1]) +
+                (p1.x[2] - p2.x[2]) * (p1.x[2] - p2.x[2]));
         }
 
         inline friend double Dist2(const Point3d& p1, const Point3d& p2)
@@ -205,8 +173,6 @@ namespace meshit {
 
         friend inline Point3d Center(const Point3d& p1, const Point3d& p2);
         friend inline Point3d Center(const Point3d& p1, const Point3d& p2, const Point3d& p3);
-        friend inline Point3d Center(const Point3d& p1, const Point3d& p2,
-                                     const Point3d& p3, const Point3d& p4);
         friend std::ostream& operator<<(std::ostream& s, const Point3d& p);
 
         friend class Vec3d;
@@ -225,7 +191,6 @@ namespace meshit {
         double x[3];
 
      public:
-
         Vec3d()
         {
             x[0] = x[1] = x[2] = 0;
@@ -252,11 +217,18 @@ namespace meshit {
             x[2] = ax[2];
         }
 
-        Vec3d(const Vec3d& v2)
+        explicit Vec3d(const Point3d& p1)
         {
-            x[0] = v2.x[0];
-            x[1] = v2.x[1];
-            x[2] = v2.x[2];
+            x[0] = p1.x[0];
+            x[1] = p1.x[1];
+            x[2] = p1.x[2];
+        }
+
+        explicit Vec3d(const Vec<3>& v2)
+        {
+            x[0] = v2[0];
+            x[1] = v2[1];
+            x[2] = v2[2];
         }
 
         Vec3d(const Point3d& p1, const Point3d& p2)
@@ -266,18 +238,11 @@ namespace meshit {
             x[2] = p2.x[2] - p1.x[2];
         }
 
-        Vec3d(const Point3d& p1)
+        Vec3d(const Vec3d& v2)
         {
-            x[0] = p1.x[0];
-            x[1] = p1.x[1];
-            x[2] = p1.x[2];
-        }
-
-        Vec3d(const Vec<3>& v2)
-        {
-            x[0] = v2[0];
-            x[1] = v2[1];
-            x[2] = v2[2];
+            x[0] = v2.x[0];
+            x[1] = v2.x[1];
+            x[2] = v2.x[2];
         }
 
         Vec3d& operator=(const Vec3d& v2)
@@ -344,27 +309,11 @@ namespace meshit {
             return x[0] * x[0] + x[1] * x[1] + x[2] * x[2];
         }
 
-        inline friend double Dist(const Vec3d& v1, const Vec3d& v2)
-        {
-            return sqrt((v1.x[0] - v2.x[0]) * (v1.x[0] - v2.x[0]) +
-                        (v1.x[1] - v2.x[1]) * (v1.x[1] - v2.x[1]) +
-                        (v1.x[2] - v2.x[2]) * (v1.x[2] - v2.x[2]));
-        }
-
-        inline friend double Dist2(const Vec3d& v1, const Vec3d& v2)
-        {
-            return ((v1.x[0] - v2.x[0]) * (v1.x[0] - v2.x[0]) +
-                    (v1.x[1] - v2.x[1]) * (v1.x[1] - v2.x[1]) +
-                    (v1.x[2] - v2.x[2]) * (v1.x[2] - v2.x[2]));
-        }
-
         Vec3d& operator+=(const Vec3d& v2);
         Vec3d& operator-=(const Vec3d& v2);
         Vec3d& operator*=(double s);
         Vec3d& operator/=(double s);
         inline Vec3d& Add(double d, const Vec3d& v);
-        inline Vec3d& Add2(double d, const Vec3d& v,
-                           double d2, const Vec3d& v2);
 
         friend inline Vec3d operator-(const Point3d& p1, const Point3d& p2);
         friend inline Point3d operator-(const Point3d& p1, const Vec3d& v);
@@ -375,14 +324,10 @@ namespace meshit {
 
         friend inline double operator*(const Vec3d& v1, const Vec3d& v2);
         friend inline Vec3d Cross(const Vec3d& v1, const Vec3d& v2);
-        friend inline void Cross(const Vec3d& v1, const Vec3d& v2, Vec3d& prod);
 
         /// Returns one normal-vector to n
         void GetNormal(Vec3d& n) const;
-        friend double Angle(const Vec3d& v);
-        friend double FastAngle(const Vec3d& v);
         friend double Angle(const Vec3d& v1, const Vec3d& v2);
-        friend double FastAngle(const Vec3d& v1, const Vec3d& v2);
 
         void Normalize()
         {
@@ -412,27 +357,18 @@ namespace meshit {
     inline Point3d Center(const Point3d& p1, const Point3d& p2)
     {
         return Point3d(
-                0.5 * (p1.x[0] + p2.x[0]),
-                0.5 * (p1.x[1] + p2.x[1]),
-                0.5 * (p1.x[2] + p2.x[2]));
+            0.5 * (p1.x[0] + p2.x[0]),
+            0.5 * (p1.x[1] + p2.x[1]),
+            0.5 * (p1.x[2] + p2.x[2]));
     }
 
     inline Point3d Center(const Point3d& p1, const Point3d& p2,
                           const Point3d& p3)
     {
         return Point3d(
-                1.0 / 3.0 * (p1.x[0] + p2.x[0] + p3.x[0]),
-                1.0 / 3.0 * (p1.x[1] + p2.x[1] + p3.x[1]),
-                1.0 / 3.0 * (p1.x[2] + p2.x[2] + p3.x[2]));
-    }
-
-    inline Point3d Center(const Point3d& p1, const Point3d& p2,
-                          const Point3d& p3, const Point3d& p4)
-    {
-        return Point3d(
-                0.25 * (p1.x[0] + p2.x[0] + p3.x[0] + p4.x[0]),
-                0.25 * (p1.x[1] + p2.x[1] + p3.x[1] + p4.x[1]),
-                0.25 * (p1.x[2] + p2.x[2] + p3.x[2] + p4.x[2]));
+            1.0 / 3.0 * (p1.x[0] + p2.x[0] + p3.x[0]),
+            1.0 / 3.0 * (p1.x[1] + p2.x[1] + p3.x[1]),
+            1.0 / 3.0 * (p1.x[2] + p2.x[2] + p3.x[2]));
     }
 
     inline Vec3d& Vec3d::operator+=(const Vec3d& v2)
@@ -477,15 +413,6 @@ namespace meshit {
         return *this;
     }
 
-    inline Vec3d& Vec3d::Add2(double d, const Vec3d& v,
-                              double d2, const Vec3d& v2)
-    {
-        x[0] += d * v.x[0] + d2 * v2.x[0];
-        x[1] += d * v.x[1] + d2 * v2.x[1];
-        x[2] += d * v.x[2] + d2 * v2.x[2];
-        return *this;
-    }
-
     inline Vec3d operator-(const Point3d& p1, const Point3d& p2)
     {
         return Vec3d(p1.x[0] - p2.x[0], p1.x[1] - p2.x[1], p1.x[2] - p2.x[2]);
@@ -514,23 +441,6 @@ namespace meshit {
         x[0] -= v.x[0];
         x[1] -= v.x[1];
         x[2] -= v.x[2];
-        return *this;
-    }
-
-    inline Point3d& Point3d::Add(double d, const Vec3d& v)
-    {
-        x[0] += d * v.x[0];
-        x[1] += d * v.x[1];
-        x[2] += d * v.x[2];
-        return *this;
-    }
-
-    inline Point3d& Point3d::Add2(double d, const Vec3d& v,
-                                  double d2, const Vec3d& v2)
-    {
-        x[0] += d * v.x[0] + d2 * v2.x[0];
-        x[1] += d * v.x[1] + d2 * v2.x[1];
-        x[2] += d * v.x[2] + d2 * v2.x[2];
         return *this;
     }
 
@@ -569,35 +479,20 @@ namespace meshit {
     inline Vec3d Cross(const Vec3d& v1, const Vec3d& v2)
     {
         return Vec3d(
-                v1.Y() * v2.Z() - v1.Z() * v2.Y(),
-                v1.Z() * v2.X() - v1.X() * v2.Z(),
-                v1.X() * v2.Y() - v1.Y() * v2.X());
-    }
-
-    inline Vec3d Cross(const Vec<3>& v1, const Vec<3>& v2)
-    {
-        return Vec3d(
-                v1[1] * v2[2] - v1[2] * v2[1],
-                v1[2] * v2[0] - v1[0] * v2[2],
-                v1[0] * v2[1] - v1[1] * v2[0]);
-    }
-
-    inline void Cross(const Vec3d& v1, const Vec3d& v2, Vec3d& prod)
-    {
-        prod.x[0] = v1.x[1] * v2.x[2] - v1.x[2] * v2.x[1];
-        prod.x[1] = v1.x[2] * v2.x[0] - v1.x[0] * v2.x[2];
-        prod.x[2] = v1.x[0] * v2.x[1] - v1.x[1] * v2.x[0];
+            v1.Y() * v2.Z() - v1.Z() * v2.Y(),
+            v1.Z() * v2.X() - v1.X() * v2.Z(),
+            v1.X() * v2.Y() - v1.Y() * v2.X());
     }
 
     inline double Determinant(
-            const Vec3d& col1,
-            const Vec3d& col2,
-            const Vec3d& col3)
+        const Vec3d& col1,
+        const Vec3d& col2,
+        const Vec3d& col3)
     {
         return
-                col1.x[0] * (col2.x[1] * col3.x[2] - col2.x[2] * col3.x[1]) +
-                col1.x[1] * (col2.x[2] * col3.x[0] - col2.x[0] * col3.x[2]) +
-                col1.x[2] * (col2.x[0] * col3.x[1] - col2.x[1] * col3.x[0]);
+            col1.x[0] * (col2.x[1] * col3.x[2] - col2.x[2] * col3.x[1]) +
+            col1.x[1] * (col2.x[2] * col3.x[0] - col2.x[0] * col3.x[2]) +
+            col1.x[2] * (col2.x[0] * col3.x[1] - col2.x[1] * col3.x[0]);
     }
 
     class Box3d
@@ -606,53 +501,13 @@ namespace meshit {
         double minx[3], maxx[3];
 
      public:
-        Box3d() { };
+        Box3d() { }
         Box3d(double aminx, double amaxx,
               double aminy, double amaxy,
               double aminz, double amaxz);
         Box3d(const Box3d& b2);
         Box3d(const Point3d& p1, const Point3d& p2);
         Box3d(const Box<3>& b2);
-
-        double MinX() const
-        {
-            return minx[0];
-        }
-
-        double MaxX() const
-        {
-            return maxx[0];
-        }
-
-        double MinY() const
-        {
-            return minx[1];
-        }
-
-        double MaxY() const
-        {
-            return maxx[1];
-        }
-
-        double MinZ() const
-        {
-            return minx[2];
-        }
-
-        double MaxZ() const
-        {
-            return maxx[2];
-        }
-
-        double Mini(int i) const
-        {
-            return minx[i - 1];
-        }
-
-        double Maxi(int i) const
-        {
-            return maxx[i - 1];
-        }
 
         Point3d PMin() const
         {
@@ -662,32 +517,6 @@ namespace meshit {
         Point3d PMax() const
         {
             return Point3d(maxx[0], maxx[1], maxx[2]);
-        }
-
-        void GetPointNr(int i, Point3d& point) const;
-        /// increase Box at each side with dist
-        void Increase(double dist);
-        /// increase Box by factor rel
-        void IncreaseRel(double rel);
-        /// return 1 if closures are intersecting
-
-        int Intersect(const Box3d& box2) const
-        {
-            if (minx[0] > box2.maxx[0] || maxx[0] < box2.minx[0] ||
-                minx[1] > box2.maxx[1] || maxx[1] < box2.minx[1] ||
-                minx[2] > box2.maxx[2] || maxx[2] < box2.minx[2])
-                return 0;
-            return 1;
-        }
-        /// return 1 if point p in closure
-
-        int IsIn(const Point3d& p) const
-        {
-            if (minx[0] <= p.x[0] && maxx[0] >= p.x[0] &&
-                minx[1] <= p.x[1] && maxx[1] >= p.x[1] &&
-                minx[2] <= p.x[2] && maxx[2] >= p.x[2])
-                return 1;
-            return 0;
         }
 
         inline void SetPoint(const Point3d& p)
@@ -708,17 +537,9 @@ namespace meshit {
         }
 
         const Box3d& operator+=(const Box3d& b);
-
-        Point3d CalcCenter() const
-        {
-            return Point3d(
-                    0.5 * (minx[0] + maxx[0]),
-                    0.5 * (minx[1] + maxx[1]),
-                    0.5 * (minx[2] + maxx[2]));
-        }
     };
 
-}
+}  // namespace meshit
 
 
 #endif

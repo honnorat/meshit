@@ -1,8 +1,10 @@
 #ifndef FILE_SYMBOLTA_HPP
 #define FILE_SYMBOLTA_HPP
 
-#include "array.hpp"
-#include "template.hpp"
+#include <vector>
+#include <cstring>
+
+#include "index.hpp"
 
 /**************************************************************************/
 /* File:   symbolta.hh                                                    */
@@ -10,8 +12,8 @@
 /* Date:   01. Jun. 95                                                    */
 /**************************************************************************/
 
-namespace meshit {
-
+namespace meshit
+{
 /**
    Base class for the generic SYMBOLTABLE.
    An array of identifiers is maintained.
@@ -65,12 +67,6 @@ namespace meshit {
             return data[std::max(0UL, i - 1)];
         }
 
-        /// Returns i-th element
-        const T& Get(size_t i) const
-        {
-            return data[i - 1];
-        }
-
         /// Associates el to the string name, overrides if name is used
         inline void Set(const char* name, const T& el);
 
@@ -79,6 +75,7 @@ namespace meshit {
         {
             return (Index(name) > 0);
         }
+
         /// Deletes symboltable
         inline void DeleteAll();
 

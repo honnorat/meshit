@@ -11,8 +11,8 @@
 #include "../general/optmem.hpp"
 #include "../gprim/geom3d.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class GradingBox
     {
      public:

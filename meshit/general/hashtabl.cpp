@@ -13,8 +13,8 @@
 
 #include "hashtabl.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     std::ostream& operator<<(std::ostream& s, const INDEX_2& i2)
     {
         return s << i2.I1() << ", " << i2.I2();
@@ -27,7 +27,7 @@ namespace meshit {
 
     BASE_INDEX_2_CLOSED_HASHTABLE::
     BASE_INDEX_2_CLOSED_HASHTABLE(size_t size)
-            : hash(size)
+        : hash(size)
     {
         invalid = -1;
         for (size_t i = 0; i < size; i++) {

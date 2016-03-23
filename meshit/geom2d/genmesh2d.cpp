@@ -1,14 +1,11 @@
-#include "geometry2d.hpp"
-
-#include <algorithm>
 #include <sstream>
 
+#include "geometry2d.hpp"
 #include "../meshing/meshing2.hpp"
 #include "../meshing/global.hpp"
-#include "../meshing/refine.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     void Optimize2d(Mesh& mesh, MeshingParameters& mp)
     {
         mesh.CalcSurfacesOfNode();
@@ -61,10 +58,11 @@ namespace meshit {
         }
     }
 
-    void CalcPartition(
-            const SplineSegExt& spline,
-            MeshingParameters& mp, Mesh& mesh,
-            double elto0, std::vector<double>& points)
+    void CalcPartition(const SplineSegExt& spline,
+                       MeshingParameters& mp,
+                       Mesh& mesh,
+                       double elto0,
+                       std::vector<double>& points)
     {
         double fperel, oldf, f;
 
@@ -124,8 +122,11 @@ namespace meshit {
     // partitionizes spline curve
 
     void Partition(const SplineSegExt& spline,
-                   MeshingParameters& mp, double elto0,
-                   Mesh& mesh, Point3dTree& searchtree, int segnr)
+                   MeshingParameters& mp,
+                   double elto0,
+                   Mesh& mesh,
+                   Point3dTree& searchtree,
+                   int segnr)
     {
         size_t n = 100;
 
@@ -158,8 +159,8 @@ namespace meshit {
                 Point3d mark3(mark[0], mark[1], 0);
                 Point3d oldmark3(oldmark[0], oldmark[1], 0);
 
-                double h = mesh.GetH(Point<3>(oldmark[0], oldmark[1], 0));
-                Vec<3> v(1e-4 * h, 1e-4 * h, 1e-4 * h);
+                double h = mesh.GetH(Point3d(oldmark[0], oldmark[1], 0));
+                Vec3d v(1e-4 * h, 1e-4 * h, 1e-4 * h);
                 searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
 
                 for (size_t k = 0; k < locsearch.size(); k++) {
@@ -210,8 +211,8 @@ namespace meshit {
         Box<2> bbox;
         GetBoundingBox(bbox);
         double dist = Dist(bbox.PMin(), bbox.PMax());
-        Point<3> pmin;
-        Point<3> pmax;
+        Point3d pmin;
+        Point3d pmax;
 
         pmin[2] = -dist;
         pmax[2] = dist;
@@ -260,83 +261,8 @@ namespace meshit {
         }
 
         for (size_t i = 0; i < splines.size(); i++) {
-            if (GetSpline(i).copyfrom == -1) {
-                Partition(GetSpline(i), mp, elto0, mesh2d, searchtree, i + 1);
-            } else {
-                CopyEdgeMesh(static_cast<size_t>(GetSpline(i).copyfrom), i + 1, mesh2d, searchtree);
-            }
+            Partition(GetSpline(i), mp, elto0, mesh2d, searchtree, i + 1);
         }
     }
 
-    void SplineGeometry2d::CopyEdgeMesh(size_t from, size_t to, Mesh& mesh, Point3dTree& searchtree)
-    {
-        std::vector<int> mappoints(mesh.GetNP(), -1);
-        std::vector<double> param(mesh.GetNP(), 0);
-
-        Point3d pmin, pmax;
-        mesh.GetBox(pmin, pmax);
-        double diam2 = Dist2(pmin, pmax);
-
-        MESHIT_LOG_DEBUG("copy edge, from = " << from << " to " << to);
-
-        for (size_t i = 0; i < mesh.GetNSeg(); i++) {
-            const Segment& seg = mesh.LineSegment(i);
-            if (seg.edgenr == static_cast<int>(from)) {
-                mappoints[seg[0] - 1] = 1;
-                mappoints[seg[1] - 1] = 1;
-                param[seg[0] - 1] = seg.epgeominfo[0].dist;
-                param[seg[1] - 1] = seg.epgeominfo[1].dist;
-            }
-        }
-
-        bool mapped = false;
-        for (size_t i = 0; i < mappoints.size(); i++) {
-            if (mappoints[i] != -1) {
-                Point<2> newp = splines[to + 1]->GetPoint(param[i]);
-                Point<3> newp3(newp[0], newp[1], 0);
-
-                int npi = -1;
-
-                for (size_t pi = 0; pi < mesh.GetNP(); pi++) {
-                    if (Dist2(mesh.Point(pi), newp3) < 1e-12 * diam2) {
-                        npi = pi;
-                    }
-                }
-
-                if (npi == -1) {
-                    npi = mesh.AddPoint(newp3);
-                    searchtree.Insert(newp3, npi);
-                }
-
-                mappoints[i] = npi;
-
-                mesh.GetIdentifications().Add(i + 1, npi, to);
-                mapped = true;
-            }
-        }
-        if (mapped) {
-            mesh.GetIdentifications().SetType(to, Identifications::PERIODIC);
-        }
-
-        // copy segments
-        size_t oldnseg = mesh.GetNSeg();
-        for (size_t i = 0; i < oldnseg; i++) {
-            const Segment& seg = mesh.LineSegment(i);
-            if (seg.edgenr == static_cast<int>(from)) {
-                Segment nseg;
-                nseg.edgenr = to;
-                nseg.si = GetSpline(to - 1).bc;
-                nseg[0] = mappoints[seg[0] - 1];
-                nseg[1] = mappoints[seg[1] - 1];
-                nseg.domin = GetSpline(to - 1).leftdom;
-                nseg.domout = GetSpline(to - 1).rightdom;
-
-                nseg.epgeominfo[0].edgenr = to;
-                nseg.epgeominfo[0].dist = param[seg[0] - 1];
-                nseg.epgeominfo[1].edgenr = to;
-                nseg.epgeominfo[1].dist = param[seg[1] - 1];
-                mesh.AddSegment(nseg);
-            }
-        }
-    }
 }  // namespace meshit

@@ -1,18 +1,18 @@
-#include <iostream>
-#include <sstream>
-
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
 #include <meshit/geom2d/geometry2d.hpp>
 
+#include <iostream>
+#include <sstream>
+
+
 inline double uclock(void)
 {
-    return static_cast<double>(std::clock()) / double(CLOCKS_PER_SEC);
+    return static_cast<double>(std::clock()) / static_cast<double>(CLOCKS_PER_SEC);
 }
 
 int main(int argc, char** argv)
 {
-
     MESHIT_LOG_INFO("MeshIt square_istream");
 
     meshit::MeshingParameters mp;

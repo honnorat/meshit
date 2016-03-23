@@ -3,27 +3,18 @@
 
 #include "improve2.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class Refinement
     {
      public:
         Refinement() { }
 
-        virtual ~Refinement() { }
+        ~Refinement() { }
 
         void Refine(Mesh& mesh);
 
-        virtual void PointBetween(
-                const Point<3>& p1, const Point<3>& p2,
-                double secpoint, Point<3>& newp) const;
-
-        virtual void PointBetween(
-                const Point<3>& p1, const Point<3>& p2,
-                double secpoint,
-                const EdgePointGeomInfo& ap1,
-                const EdgePointGeomInfo& ap2,
-                Point<3>& newp, EdgePointGeomInfo& newgi) const;
+        void PointBetween(const Point3d& p1, const Point3d& p2, double secpoint, Point3d& newp) const;
     };
 
 }  // namespace meshit

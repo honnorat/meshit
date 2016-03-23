@@ -10,10 +10,10 @@
 #include <climits>
 #include <iostream>
 
-#include "template.hpp"
+#include "index.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     /**
        data type BitArrayChar
    

@@ -2,10 +2,9 @@
 
 #include "../linalg/densemat.hpp"
 
-namespace meshit {
-
-    int
-    IntersectTriangleLine(const Point3d** tri, const Point3d** line)
+namespace meshit
+{
+    int IntersectTriangleLine(const Point3d** tri, const Point3d** line)
     {
         Vec3d vl(*line[0], *line[1]);
         Vec3d vt1(*tri[0], *tri[1]);
@@ -44,7 +43,6 @@ namespace meshit {
         }
 
         return 0;
-
     }
 
     int IntersectTriangleTriangle(const Point3d** tri1, const Point3d** tri2)
@@ -98,9 +96,8 @@ namespace meshit {
         return 0;
     }
 
-    void
-    LocalCoordinates(const Vec3d& e1, const Vec3d& e2,
-                     const Vec3d& v, double& lam1, double& lam2)
+    void LocalCoordinates(const Vec3d& e1, const Vec3d& e2,
+                          const Vec3d& v, double& lam1, double& lam2)
     {
         double m11 = e1 * e1;
         double m12 = e1 * e2;
@@ -135,10 +132,10 @@ namespace meshit {
     }
 
     double ComputeCylinderRadius(
-            const Point3d& p1,
-            const Point3d& p2,
-            const Point3d& p3,
-            const Point3d& p4)
+        const Point3d& p1,
+        const Point3d& p2,
+        const Point3d& p3,
+        const Point3d& p4)
     {
         Vec3d v12(p1, p2);
         Vec3d v13(p1, p3);
@@ -278,8 +275,7 @@ namespace meshit {
         if (in1 && in2 && in3) {
             Point3d pp = tp1 + lam1 * Vec3d(tp1, tp2) + lam2 * Vec3d(tp1, tp3);
             res = Dist2(p, pp);
-        }
-        else {
+        } else {
             res = Dist2(tp1, p);
             if (!in1) {
                 double hv = MinDistLP2(tp1, tp3, p);
@@ -295,56 +291,6 @@ namespace meshit {
             }
         }
         return res;
-    }
-
-    // 0 checks !!!
-
-    double MinDistLL2(const Point3d& l1p1, const Point3d& l1p2,
-                      const Point3d& l2p1, const Point3d& l2p2)
-    {
-        // dist(lam1,lam2) = \| l2p1+lam2v2 - (l1p1+lam1 v1) \|
-        // min !
-
-        Vec3d l1l2(l1p1, l2p1);
-        Vec3d v1(l1p1, l1p2);
-        Vec3d v2(l2p1, l2p2);
-
-        double a11, a12, a22, rs1, rs2;
-        double lam1, lam2, det;
-
-        a11 = v1 * v1;
-        a12 = -(v1 * v2);
-        a22 = v2 * v2;
-        rs1 = l1l2 * v1;
-        rs2 = -(l1l2 * v2);
-
-        det = a11 * a22 - a12 * a12;
-        if (det < 1e-14 * a11 * a22)
-            det = 1e-14 * a11 * a22;  // regularization should be stable
-
-        if (det < 1e-20)
-            det = 1e-20;
-
-
-        lam1 = (a22 * rs1 - a12 * rs2) / det;
-        lam2 = (-a12 * rs1 + a11 * rs2) / det;
-
-        if (lam1 >= 0 && lam2 >= 0 && lam1 <= 1 && lam2 <= 1) {
-            Vec3d v = l1l2 + (-lam1) * v1 + lam2 * v2;
-            return v.Length2();
-        }
-
-        double minv, hv;
-        minv = MinDistLP2(l1p1, l1p2, l2p1);
-        hv = MinDistLP2(l1p1, l1p2, l2p2);
-        if (hv < minv) minv = hv;
-
-        hv = MinDistLP2(l2p1, l2p2, l1p1);
-        if (hv < minv) minv = hv;
-        hv = MinDistLP2(l2p1, l2p2, l1p2);
-        if (hv < minv) minv = hv;
-
-        return minv;
     }
 
 }  // namespace meshit

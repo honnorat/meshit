@@ -1,15 +1,14 @@
 #include "topology.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     MeshTopology::MeshTopology(const Mesh& amesh)
-            : mesh(amesh)
+        : mesh(amesh)
     {
         buildedges = 1;
         buildfaces = 1;
-        vert2surfelement = 0;
-        vert2segment = 0;
-        timestamp = -1;
+        vert2surfelement = nullptr;
+        vert2segment = nullptr;
     }
 
     MeshTopology::~MeshTopology()
@@ -20,24 +19,19 @@ namespace meshit {
 
     void MeshTopology::Update()
     {
-        if (timestamp > mesh.GetTimeStamp()) return;
-
         size_t nse = mesh.GetNSE();
         size_t nseg = mesh.GetNSeg();
         size_t np = mesh.GetNP();
         size_t nv = mesh.GetNV();
-        size_t nfa = 0;
-        size_t ned = edge2vert.size();
 
-        std::cerr << " UPDATE MESH TOPOLOGY " << std::endl;
-        std::cerr << "nse  = " << nse << std::endl;
-        std::cerr << "nseg = " << nseg << std::endl;
-        std::cerr << "np   = " << np << std::endl;
-        std::cerr << "nv   = " << nv << std::endl;
+        MESHIT_LOG_DEBUG(" UPDATE MESH TOPOLOGY ");
+        MESHIT_LOG_DEBUG("nse  = " << nse);
+        MESHIT_LOG_DEBUG("nseg = " << nseg);
+        MESHIT_LOG_DEBUG("np   = " << np);
+        MESHIT_LOG_DEBUG("nv   = " << nv);
 
         delete vert2surfelement;
         delete vert2segment;
-
 
         /*
           generate:
@@ -104,7 +98,7 @@ namespace meshit {
             std::vector<int> edgeflag(nv, -1);
             std::vector<int> vertex2;
 
-            ned = edge2vert.size();
+            size_t ned = edge2vert.size();
 
             for (size_t i = 0; i < nv; i++) {
                 vertex2.resize(0);
@@ -118,7 +112,7 @@ namespace meshit {
 
                 for (size_t j = 0; j < vert2vertcoarse[i].size(); j++) {
                     int v2 = vert2vertcoarse[i][j];
-                    if (edgeflag[v2] < i) {
+                    if (edgeflag[v2] < static_cast<int>(i)) {
                         edgeflag[v2] = i;
                         vertex2.push_back(v2);
                     }
@@ -134,11 +128,11 @@ namespace meshit {
                     for (size_t k = 0; k < 3; k++) {
                         INDEX_2 edge(el[eledges[k][0]], el[eledges[k][1]]);
                         edge.Sort();
-                        if (edge.I1() != i) continue;
+                        if (edge.I1() != static_cast<int>(i)) continue;
 
-                        if (edgeflag[edge.I2()] < i) {
+                        if (edgeflag[edge.I2()] < static_cast<int>(i)) {
                             vertex2.push_back(edge.I2());
-                            edgeflag[edge.I2()] = i;
+                            edgeflag[edge.I2()] = static_cast<int>(i);
                         }
                     }
                 }
@@ -149,11 +143,11 @@ namespace meshit {
 
                     INDEX_2 edge(el[0], el[1]);
                     edge.Sort();
-                    if (edge.I1() != i) continue;
+                    if (edge.I1() != static_cast<int>(i)) continue;
 
-                    if (edgeflag[edge.I2()] < i) {
+                    if (edgeflag[edge.I2()] < static_cast<int>(i)) {
                         vertex2.push_back(edge.I2());
-                        edgeflag[edge.I2()] = i;
+                        edgeflag[edge.I2()] = static_cast<int>(i);
                     }
                 }
 
@@ -174,7 +168,7 @@ namespace meshit {
 
                         int edgedir = (edge.I1() > edge.I2());
                         if (edgedir) std::swap(edge.I1(), edge.I2());
-                        if (edge.I1() != i) continue;
+                        if (edge.I1() != static_cast<int>(i)) continue;
                     }
                 }
 
@@ -186,15 +180,15 @@ namespace meshit {
 
                     int edgedir = (edge.I1() > edge.I2());
                     if (edgedir) std::swap(edge.I1(), edge.I2());
-                    if (edge.I1() != i) continue;
+                    if (edge.I1() != static_cast<int>(i)) continue;
                 }
             }
         }
 
         // generate faces
         if (buildfaces) {
-
             size_t oldnfa = face2vert.size();
+            size_t nfa = oldnfa;
 
             cnt.assign(nv, 0);
             for (size_t i = 0; i < face2vert.size(); i++) {
@@ -210,7 +204,6 @@ namespace meshit {
                 max_face_on_vertex = std::max(onv, max_face_on_vertex);
             }
 
-            nfa = oldnfa;
             for (size_t v = 0; v < nv; v++) {
                 size_t first_fa = nfa;
 
@@ -225,10 +218,9 @@ namespace meshit {
                 }
 
                 for (size_t pass = 1; pass <= 2; pass++) {
-
                     if (pass == 2) {
                         for (size_t j = first_fa; j < face2vert.size(); j++) {
-                            if (face2vert[j][0] == v) {
+                            if (face2vert[j][0] == static_cast<int>(v)) {
                                 INDEX_3 face(face2vert[j].I1(),
                                              face2vert[j].I2(),
                                              face2vert[j].I3());
@@ -254,7 +246,7 @@ namespace meshit {
                             std::swap(face.I1(), face.I2());
                         }
 
-                        if (face.I1() != v) continue;
+                        if (face.I1() != static_cast<int>(v)) continue;
 
                         if (!vert2face.Used(face)) {
                             nfa++;
@@ -279,6 +271,5 @@ namespace meshit {
             }
             face2vert.reserve(nfa);
         }
-        timestamp = NextTimeStamp();
     }
 }  // namespace meshit

@@ -1,5 +1,5 @@
-#ifndef FILE_GLOBAL
-#define FILE_GLOBAL
+#ifndef FILE_GLOBAL_HPP
+#define FILE_GLOBAL_HPP
 
 
 /**************************************************************************/

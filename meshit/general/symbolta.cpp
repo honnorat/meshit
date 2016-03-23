@@ -10,11 +10,8 @@
 
 #include "symbolta.hpp"
 
-#ifndef FILE_SYMBOLTABLECC
-#define FILE_SYMBOLTABLECC
-
-namespace meshit {
-
+namespace meshit
+{
     BASE_SYMBOLTABLE::~BASE_SYMBOLTABLE()
     {
         DelNames();
@@ -40,5 +37,3 @@ namespace meshit {
         return 0;
     }
 }  // namespace meshit
-
-#endif

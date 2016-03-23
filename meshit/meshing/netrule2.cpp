@@ -1,7 +1,7 @@
 #include "ruler2.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     netrule::netrule()
     {
         name = new char[1];
@@ -60,14 +60,14 @@ namespace meshit {
             fzmaxy = fzminy = transfreezone[0].Y();
         }
 
-        for (int i = 1; i < fzs; i++) {
+        for (size_t i = 1; i < fzs; i++) {
             if (transfreezone[i].X() > fzmaxx) fzmaxx = transfreezone[i].X();
             if (transfreezone[i].X() < fzminx) fzminx = transfreezone[i].X();
             if (transfreezone[i].Y() > fzmaxy) fzmaxy = transfreezone[i].Y();
             if (transfreezone[i].Y() < fzminy) fzminy = transfreezone[i].Y();
         }
 
-        for (int i = 0; i < fzs; i++) {
+        for (size_t i = 0; i < fzs; i++) {
             Point2d p1 = transfreezone[i];
             Point2d p2 = transfreezone[(i + 1) % fzs];
 
@@ -89,22 +89,19 @@ namespace meshit {
         }
     }
 
-    int netrule::IsLineInFreeZone2(const Point2d& p1, const Point2d& p2) const
+    bool netrule::IsLineInFreeZone(const Point2d& p1, const Point2d& p2) const
     {
-        int left, right, allleft, allright;
-
         if ((p1.X() > fzmaxx && p2.X() > fzmaxx) ||
             (p1.X() < fzminx && p2.X() < fzminx) ||
             (p1.Y() > fzmaxy && p2.Y() > fzmaxy) ||
-            (p1.Y() < fzminy && p2.Y() < fzminy))
-            return 0;
+            (p1.Y() < fzminy && p2.Y() < fzminy)) {
+            return false;
+        }
 
-        for (size_t i = 1; i <= transfreezone.size(); i++) {
-            if (freesetinequ.Get(i, 1) * p1.X() + freesetinequ.Get(i, 2) * p1.Y() +
-                freesetinequ.Get(i, 3) > -1e-8 &&
-                freesetinequ.Get(i, 1) * p2.X() + freesetinequ.Get(i, 2) * p2.Y() +
-                freesetinequ.Get(i, 3) > -1e-8) {
-                return 0;
+        for (size_t i = 0; i < transfreezone.size(); i++) {
+            if (freesetinequ(i, 0) * p1.X() + freesetinequ(i, 1) * p1.Y() + freesetinequ(i, 2) > -1e-8 &&
+                freesetinequ(i, 0) * p2.X() + freesetinequ(i, 1) * p2.Y() + freesetinequ(i, 2) > -1e-8) {
+                return false;
             }
         }
 
@@ -117,42 +114,43 @@ namespace meshit {
             ny /= nl;
             double c = -(p1.X() * nx + p1.Y() * ny);
 
-            allleft = 1;
-            allright = 1;
+            bool all_left = true;
+            bool all_right = true;
 
             for (size_t i = 0; i < transfreezone.size(); i++) {
-                left = transfreezone[i].X() * nx + transfreezone[i].Y() + c < 1e-7;
-                right = transfreezone[i].X() * nx + transfreezone[i].Y() + c > -1e-7;
+                bool left = transfreezone[i].X() * nx + transfreezone[i].Y() + c < 1e-7;
+                bool right = transfreezone[i].X() * nx + transfreezone[i].Y() + c > -1e-7;
 
-                if (!left) allleft = 0;
-                if (!right) allright = 0;
+                if (!left) all_left = false;
+                if (!right) all_right = false;
             }
-            if (allleft || allright) return 0;
+            if (all_left || all_right) return false;
         }
 
-        return 1;
+        return true;
     }
 
     int netrule::ConvexFreeZone() const
     {
         size_t n = transfreezone.size();
         for (size_t i = 0; i < n; i++) {
-            const bool counterclockwise = CCW(
-                    transfreezone[i],
-                    transfreezone[(i + 1) % n],
-                    transfreezone[(i + 2) % n], 1e-7);
+            const bool counterclockwise = CCW(transfreezone[i],
+                                              transfreezone[(i + 1) % n],
+                                              transfreezone[(i + 2) % n], 1e-7);
             if (!counterclockwise)
                 return 0;
         }
         return 1;
     }
 
-    double netrule::CalcLineError(int li, const Vec2d& v) const
+    double netrule::CalcLineError(size_t li, const Vec2d& v) const
     {
-        double dx = v.X() - linevecs[li - 1].X();
-        double dy = v.Y() - linevecs[li - 1].Y();
+        double dx = v.X() - linevecs[li].X();
+        double dy = v.Y() - linevecs[li].Y();
 
-        const threefloat* ltf = &linetolerances[li - 1];
-        return ltf->f1 * dx * dx + ltf->f2 * dx * dy + ltf->f3 * dy * dy;
+        const threefloat* ltf = &linetolerances[li];
+        return ltf->f1 * dx * dx +
+               ltf->f2 * dx * dy +
+               ltf->f3 * dy * dy;
     }
 }  // namespace meshit

@@ -1,7 +1,7 @@
 #include "msghandler.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     static int _meshit_logLevel = MESHIT_INFO_LOG_LEVEL;
 
     int GetLogLevel()

@@ -6,13 +6,10 @@
 
 #include "geometry2d.hpp"
 
-#include <string>
-#include <vector>
-
 #include "../general/flags.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     SplineGeometry2d::~SplineGeometry2d()
     {
         for (size_t i = 0; i < materials.size(); i++) {
@@ -23,7 +20,6 @@ namespace meshit {
     void SplineGeometry2d::Load(const std::string& filename)
     {
         std::ifstream infile;
-        Point<2> x;
         char buf[50];
 
         infile.open(filename);
@@ -183,16 +179,16 @@ namespace meshit {
                     // type of spline segement
                     if (strcmp(buf, "2") == 0) {  // a line
                         infile >> hi1 >> hi2;
-                        spline = new LineSeg(
-                                geompoints[hi1 - 1],
-                                geompoints[hi2 - 1]);
-                    }
-                    else if (strcmp(buf, "3") == 0) {  // a rational spline
+                        spline = new LineSeg(geompoints[hi1 - 1],
+                                             geompoints[hi2 - 1]);
+                    } else if (strcmp(buf, "3") == 0) {  // a rational spline
                         infile >> hi1 >> hi2 >> hi3;
-                        spline = new SplineSeg3(
-                                geompoints[hi1 - 1],
-                                geompoints[hi2 - 1],
-                                geompoints[hi3 - 1]);
+                        spline = new SplineSeg3(geompoints[hi1 - 1],
+                                                geompoints[hi2 - 1],
+                                                geompoints[hi3 - 1]);
+                    } else {
+                        MESHIT_LOG_ERROR("Unknown segment type : " << buf);
+                        throw std::runtime_error("SplineGeometry2d::LoadData : unknown segment type");
                     }
 
                     SplineSegExt* spex = new SplineSegExt(*spline);
@@ -220,7 +216,6 @@ namespace meshit {
                         infile.putback(ch);
 
                     spex->bc = static_cast<int>(flags.GetNumFlag("bc", i + 1));
-                    spex->copyfrom = static_cast<int>(flags.GetNumFlag("copy", -1));
                     spex->reffak = flags.GetNumFlag("ref", 1);
                     spex->hmax = flags.GetNumFlag("maxh", 1e99);
                     if (hd != 1) spex->reffak = hd;
@@ -232,6 +227,7 @@ namespace meshit {
                 infile.get(ch);
                 infile.putback(ch);
             }
+
             else if (keyword == "materials") {
                 TestComment(infile);
                 int domainnr;
@@ -257,7 +253,7 @@ namespace meshit {
                     infile >> domainnr;
                     infile >> material;
 
-                    strcpy(materials[domainnr - 1], material);
+                    strncpy(materials[domainnr - 1], material, 100);
 
                     Flags flags;
                     ch = 'a';
@@ -323,7 +319,6 @@ namespace meshit {
                                             double hmax,
                                             int bc)
     {
-
         size_t nold_points = geompoints.size();
         size_t nnew_points = point_list.size();
 
@@ -363,20 +358,21 @@ namespace meshit {
         }
     }
 
-    void SplineGeometry2d::GetMaterial(const int domnr, char*& material)
+    void SplineGeometry2d::GetMaterial(size_t domnr, char*& material)
     {
-        if ((int) materials.size() >= domnr)
+        if (domnr <= materials.size())
             material = materials[domnr - 1];
         else
-            material = 0;
+            material = nullptr;
     }
 
-    double SplineGeometry2d::GetDomainMaxh(const int domnr)
+    double SplineGeometry2d::GetDomainMaxh(size_t domnr)
     {
-        if ((int) maxh.size() >= domnr && domnr > 0)
+        if (domnr > 0 && domnr <= maxh.size()) {
             return maxh[domnr - 1];
-        else
-            return -1;
+        } else {
+            return -1.0;
+        }
     }
 
     int SplineGeometry2d::GenerateMesh(Mesh*& mesh, MeshingParameters& mp)

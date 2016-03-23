@@ -1,5 +1,5 @@
-#ifndef FILE_OBJECTS
-#define FILE_OBJECTS
+#ifndef FILE_OBJECTS_HPP
+#define FILE_OBJECTS_HPP
 
 /* *************************************************************************/
 /* File:   geomobjects.hpp                                                 */
@@ -7,12 +7,12 @@
 /* Date:   20. Jul. 02                                                     */
 /* *************************************************************************/
 
+#include <algorithm>
 #include <cstdio>
 #include <cmath>
 
-#include "../general/array.hpp"
-
-namespace meshit {
+namespace meshit
+{
     template<int D>
     class Vec;
 
@@ -28,7 +28,7 @@ namespace meshit {
      public:
         Point() { }
 
-        Point(double ax)
+        explicit Point(double ax)
         {
             for (size_t i = 0; i < D; i++) {
                 x[i] = ax;
@@ -103,7 +103,6 @@ namespace meshit {
         double x[D];
 
      public:
-
         Vec() { }
 
         explicit Vec(double ax)
@@ -199,10 +198,11 @@ namespace meshit {
         const Vec<D>& Normalize()
         {
             double l = Length();
-            if (l != 0)
+            if (l != 0) {
                 for (size_t i = 0; i < D; i++) {
                     x[i] /= l;
                 }
+            }
             return *this;
         }
 
@@ -216,7 +216,6 @@ namespace meshit {
         double x[H * W];
 
      public:
-
         Mat() { }
 
         Mat(const Mat& b)
@@ -306,15 +305,6 @@ namespace meshit {
             }
         }
 
-        enum EB_TYPE
-        {
-            EMPTY_BOX = 1
-        };
-
-        explicit Box(EB_TYPE et)
-                : pmin(Point<3>(1e99, 1e99, 1e99)),
-                  pmax(Point<3>(-1e99, -1e99, -1e99)) { }
-
         const Point<D>& PMin() const
         {
             return pmin;
@@ -393,13 +383,11 @@ namespace meshit {
     class BoxSphere : public Box<D>
     {
      protected:
-
         Point<D> c;
         double diam;
         double inner;
 
      public:
-
         BoxSphere() { }
 
         explicit BoxSphere(const Box<D>& box)
@@ -458,9 +446,8 @@ namespace meshit {
                 }
             }
         }
-
     };
 
-}
+}  // namespace meshit
 
 #endif

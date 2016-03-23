@@ -1,15 +1,13 @@
-#include <ctime>
-
-#include <iostream>
-#include <sstream>
-
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
 #include <meshit/geom2d/geometry2d.hpp>
 
+#include <sstream>
+#include <string>
+
 inline double uclock(void)
 {
-    return static_cast<double>(std::clock()) / double(CLOCKS_PER_SEC);
+    return static_cast<double>(std::clock()) / static_cast<double>(CLOCKS_PER_SEC);
 }
 
 inline bool ends_with(const std::string& str, const std::string& end)

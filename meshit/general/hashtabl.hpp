@@ -10,10 +10,10 @@
 #include <iostream>
 
 #include "table.hpp"
-#include "template.hpp"
+#include "index.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class BASE_INDEX_2_HASHTABLE
     {
      protected:
@@ -21,7 +21,7 @@ namespace meshit {
 
      public:
         explicit BASE_INDEX_2_HASHTABLE(size_t size)
-                : hash(size) { }
+            : hash(size) { }
 
         int HashValue(const INDEX_2& ind) const
         {
@@ -46,7 +46,7 @@ namespace meshit {
 
      public:
         explicit INDEX_2_HASHTABLE(size_t size)
-                : BASE_INDEX_2_HASHTABLE(size), cont(size) { }
+            : BASE_INDEX_2_HASHTABLE(size), cont(size) { }
 
         void Set(const INDEX_2& ahash, const T& acont)
         {
@@ -90,8 +90,8 @@ namespace meshit {
 
         void SetData(size_t bnr, size_t colnr, const INDEX_2& ahash, const T& acont)
         {
-            hash.Set(bnr - 1, colnr - 1, ahash);
-            cont.Set(bnr - 1, colnr - 1, acont);
+            hash.Set(bnr, colnr, ahash);
+            cont.Set(bnr, colnr, acont);
         }
     };
 
@@ -103,7 +103,7 @@ namespace meshit {
 
      public:
         explicit BASE_INDEX_3_HASHTABLE(int size)
-                : hash(size) { }
+            : hash(size) { }
 
      protected:
         int HashValue(const INDEX_3& ind) const
@@ -130,7 +130,7 @@ namespace meshit {
 
      public:
         explicit INDEX_3_HASHTABLE(size_t size)
-                : BASE_INDEX_3_HASHTABLE(size), cont(size) { }
+            : BASE_INDEX_3_HASHTABLE(size), cont(size) { }
 
         inline void Set(const INDEX_3& ahash, const T& acont);
         inline const T& Get(const INDEX_3& ahash) const;
@@ -147,7 +147,7 @@ namespace meshit {
 
          public:
             Iterator(const INDEX_3_HASHTABLE& aht, int abagnr, int apos)
-                    : ht(aht), bagnr(abagnr), pos(apos) { }
+                : ht(aht), bagnr(abagnr), pos(apos) { }
 
             int BagNr() const
             {
@@ -275,7 +275,7 @@ namespace meshit {
 
      public:
         explicit INDEX_2_CLOSED_HASHTABLE(int size)
-                : BASE_INDEX_2_CLOSED_HASHTABLE(size), cont(size) { }
+            : BASE_INDEX_2_CLOSED_HASHTABLE(size), cont(size) { }
 
         inline void Set(const INDEX_2& ahash, const T& acont);
         inline const T& Get(const INDEX_2& ahash) const;
@@ -306,7 +306,7 @@ namespace meshit {
 
      protected:
         explicit BASE_INDEX_3_CLOSED_HASHTABLE(size_t size)
-                : hash(size)
+            : hash(size)
         {
             invalid = -1;
             for (size_t i = 0; i < size; i++) {
@@ -367,7 +367,7 @@ namespace meshit {
 
      public:
         explicit INDEX_3_CLOSED_HASHTABLE(int size)
-                : BASE_INDEX_3_CLOSED_HASHTABLE(size), cont(size) { }
+            : BASE_INDEX_3_CLOSED_HASHTABLE(size), cont(size) { }
 
         void Set(const INDEX_3& ahash, const T& acont)
         {

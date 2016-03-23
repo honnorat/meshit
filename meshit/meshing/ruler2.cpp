@@ -1,10 +1,8 @@
 #include "meshing2.hpp"
 
-namespace meshit {
-
-    static double CalcElementBadness(
-            const std::vector<Point2d>& points,
-            const Element2d& elem)
+namespace meshit
+{
+    static double CalcElementBadness(const std::vector<Point2d>& points, const Element2d& elem)
     {
         // badness = sqrt(3) /36 * circumference^2 / area - 1 +
         //           h / li + li / h - 2
@@ -31,15 +29,15 @@ namespace meshit {
                + 1 / l12 + l12 + 1 / l13 + l13 + 1 / l23 + l23 - 6;
     }
 
-    int Meshing2::ApplyRules(
-            std::vector<Point2d>& lpoints,
-            std::vector<int>& legalpoints,
-            int maxlegalpoint,
-            std::vector<INDEX_2>& llines1,
-            int maxlegalline,
-            std::vector<Element2d>& elements,
-            std::vector<INDEX>& dellines, int tolerance,
-            const MeshingParameters& mp)
+    int Meshing2::ApplyRules(std::vector<Point2d>& lpoints,
+                             std::vector<int>& legalpoints,
+                             size_t maxlegalpoint,
+                             std::vector<INDEX_2>& llines1,
+                             size_t maxlegalline,
+                             std::vector<Element2d>& elements,
+                             std::vector<uint32_t>& dellines,
+                             int tolerance,
+                             const MeshingParameters& mp)
     {
         double maxerr = 0.5 + 0.3 * tolerance;
         double minelerr = 2 + 0.5 * tolerance * tolerance;
@@ -49,7 +47,7 @@ namespace meshit {
 
         std::vector<Point2d> tempnewpoints;
         std::vector<INDEX_2> tempnewlines;
-        std::vector<int> tempdellines;
+        std::vector<uint32_t> tempdellines;
         std::vector<Element2d> tempelements;
 
         elements.resize(0);
@@ -59,23 +57,24 @@ namespace meshit {
 
         size_t found = 0;  // rule number
 
-        std::vector<int> pnearness(noldlp, 1000);
-        std::vector<int> lnearness(llines1.size());
+        std::vector<uint32_t> pnearness(noldlp, 1000);
+        std::vector<uint32_t> lnearness(llines1.size());
 
         for (int j = 0; j < 2; j++) {
             pnearness[llines1[0][j] - 1] = 0;
         }
 
-        const int MAX_NEARNESS = 3;
+        const size_t MAX_NEARNESS = 3;
 
-        for (int cnt = 0; cnt < MAX_NEARNESS; cnt++) {
+        for (size_t cnt = 0; cnt < MAX_NEARNESS; cnt++) {
             bool ok = true;
-            for (int i = 0; i < maxlegalline; i++) {
+            for (size_t i = 0; i < maxlegalline; i++) {
                 const INDEX_2& hline = llines1[i];
 
-                int minn = std::min(pnearness[hline[0] - 1], pnearness[hline[1] - 1]);
+                size_t minn = std::min(pnearness[hline[0] - 1],
+                                       pnearness[hline[1] - 1]);
 
-                for (int j = 0; j < 2; j++) {
+                for (size_t j = 0; j < 2; j++) {
                     if (pnearness[hline[j] - 1] > minn + 1) {
                         ok = false;
                         pnearness[hline[j] - 1] = minn + 1;
@@ -85,30 +84,30 @@ namespace meshit {
             if (!ok) break;
         }
 
-        for (int i = 0; i < maxlegalline; i++) {
+        for (size_t i = 0; i < maxlegalline; i++) {
             lnearness[i] = pnearness[llines1[i][0] - 1] + pnearness[llines1[i][1] - 1];
         }
 
         // resort lines after lnearness
         std::vector<INDEX_2> llines(llines1.size());
-        std::vector<int> sortlines(llines1.size());
-        int lnearness_class[MAX_NEARNESS];
+        std::vector<size_t> sortlines(llines1.size());
+        uint32_t lnearness_class[MAX_NEARNESS];
 
-        for (int j = 0; j < MAX_NEARNESS; j++) {
+        for (size_t j = 0; j < MAX_NEARNESS; j++) {
             lnearness_class[j] = 0;
         }
-        for (int i = 0; i < maxlegalline; i++) {
+        for (size_t i = 0; i < maxlegalline; i++) {
             if (lnearness[i] < MAX_NEARNESS)
                 lnearness_class[lnearness[i]]++;
         }
         int cumm = 0;
-        for (int j = 0; j < MAX_NEARNESS; j++) {
+        for (size_t j = 0; j < MAX_NEARNESS; j++) {
             int hcnt = lnearness_class[j];
             lnearness_class[j] = cumm;
             cumm += hcnt;
         }
 
-        for (int i = 0; i < maxlegalline; i++)
+        for (size_t i = 0; i < maxlegalline; i++)
             if (lnearness[i] < MAX_NEARNESS) {
                 llines[lnearness_class[lnearness[i]]] = llines1[i];
                 sortlines[lnearness_class[lnearness[i]]] = i + 1;
@@ -119,19 +118,21 @@ namespace meshit {
                 cumm++;
             }
 
-        for (int i = maxlegalline; i < llines1.size(); i++) {
+        for (size_t i = maxlegalline; i < llines1.size(); i++) {
             llines[cumm] = llines1[i];
             sortlines[cumm] = i + 1;
             cumm++;
         }
 
-        for (int i = 0; i < maxlegalline; i++) {
+        for (size_t i = 0; i < maxlegalline; i++) {
             lnearness[i] = pnearness[llines[i][0] - 1] + pnearness[llines[i][1] - 1];
         }
 
         std::vector<int> pused(maxlegalpoint, 0);
-        std::vector<int> lused(maxlegalline, 0);
-        std::vector<int> pmap, pfixed, lmap;
+        std::vector<bool> lused(maxlegalline, false);
+        std::vector<int> pmap;
+        std::vector<bool> pfixed;
+        std::vector<size_t> lmap;
 
         for (size_t ri = 0; ri < rules.size(); ri++) {
             netrule* rule = rules[ri];
@@ -141,28 +142,27 @@ namespace meshit {
             pmap.assign(rule->GetNP(), 0);
             lmap.assign(rule->GetNL(), 0);
 
-            lused[0] = 1;
+            lused[0] = true;
             lmap[0] = 1;
 
             for (int j = 0; j < 2; j++) {
-                pmap[rule->GetLine(1)[j] - 1] = llines[0][j];
+                pmap[rule->GetLine(0)[j] - 1] = llines[0][j];
                 pused[llines[0][j] - 1]++;
             }
 
-            int nlok = 2;
+            size_t nlok = 1;
             bool ok = false;
 
-            while (nlok >= 2) {
-                if (nlok <= static_cast<int>(rule->GetNOldL())) {
+            while (nlok > 0) {
+                if (nlok < rule->GetNOldL()) {
                     ok = 0;
 
-                    int maxline = (rule->GetLNearness(nlok) < MAX_NEARNESS)
-                                  ? lnearness_class[rule->GetLNearness(nlok)] : maxlegalline;
-                    // int maxline = maxlegalline;
+                    size_t maxline = (rule->GetLNearness(nlok) < MAX_NEARNESS)
+                                     ? lnearness_class[rule->GetLNearness(nlok)] : maxlegalline;
 
-                    while (!ok && lmap[nlok - 1] < maxline) {
-                        lmap[nlok - 1]++;
-                        int locli = lmap[nlok - 1];
+                    while (!ok && lmap[nlok] < maxline) {
+                        lmap[nlok]++;
+                        int locli = lmap[nlok];
 
                         if (lnearness[locli - 1] > rule->GetLNearness(nlok)) continue;
                         if (lused[locli - 1]) continue;
@@ -178,10 +178,10 @@ namespace meshit {
                         }
 
                         for (int j = 0; j < 2; j++) {
-                            int refpi = rule->GetLine(nlok)[j];
+                            int refpi = rule->GetLine(nlok)[j] - 1;
 
-                            if (pmap[refpi - 1] != 0) {
-                                if (pmap[refpi - 1] != loclin[j]) {
+                            if (pmap[refpi] != 0) {
+                                if (pmap[refpi] != loclin[j]) {
                                     ok = 0;
                                     break;
                                 }
@@ -197,23 +197,23 @@ namespace meshit {
                     }
 
                     if (ok) {
-                        int locli = lmap[nlok - 1];
+                        int locli = lmap[nlok];
                         INDEX_2 loclin = llines[locli - 1];
 
-                        lused[locli - 1] = 1;
+                        lused[locli - 1] = true;
                         for (int j = 0; j < 2; j++) {
                             pmap[rule->GetLine(nlok)[j] - 1] = loclin[j];
                             pused[loclin[j] - 1]++;
                         }
                         nlok++;
                     } else {
-                        lmap[nlok - 1] = 0;
+                        lmap[nlok] = 0;
                         nlok--;
 
-                        lused[lmap[nlok - 1] - 1] = 0;
+                        lused[lmap[nlok] - 1] = false;
                         for (int j = 0; j < 2; j++) {
-                            pused[llines[lmap[nlok - 1] - 1][j] - 1]--;
-                            if (!pused[llines[lmap[nlok - 1] - 1][j] - 1]) {
+                            pused[llines[lmap[nlok] - 1][j] - 1]--;
+                            if (!pused[llines[lmap[nlok] - 1][j] - 1]) {
                                 pmap[rule->GetLine(nlok)[j] - 1] = 0;
                             }
                         }
@@ -222,7 +222,7 @@ namespace meshit {
                     // all lines are mapped !!
                     // map also all points:
 
-                    int npok = 1;
+                    int npok = 0;
                     int incnpok = 1;
 
                     pfixed.resize(pmap.size());
@@ -230,9 +230,9 @@ namespace meshit {
                         pfixed[i] = (pmap[i] >= 1);
                     }
 
-                    while (npok >= 1) {
-                        if (npok <= static_cast<int>(rule->GetNOldP())) {
-                            if (pfixed[npok - 1]) {
+                    while (npok >= 0) {
+                        if (npok < static_cast<int>(rule->GetNOldP())) {
+                            if (pfixed[npok]) {
                                 if (incnpok)
                                     npok++;
                                 else
@@ -240,36 +240,36 @@ namespace meshit {
                             } else {
                                 ok = 0;
 
-                                if (pmap[npok - 1]) {
-                                    pused[pmap[npok - 1] - 1]--;
+                                if (pmap[npok]) {
+                                    pused[pmap[npok] - 1]--;
                                 }
-                                while (!ok && pmap[npok - 1] < maxlegalpoint) {
+                                while (!ok && pmap[npok] < static_cast<int>(maxlegalpoint)) {
                                     ok = 1;
 
-                                    pmap[npok - 1]++;
+                                    pmap[npok]++;
 
-                                    if (pused[pmap[npok - 1] - 1]) {
+                                    if (pused[pmap[npok] - 1]) {
                                         ok = 0;
                                     } else {
-                                        if (rule->CalcPointDist(npok, lpoints[pmap[npok - 1] - 1]) > maxerr
-                                            || !legalpoints[pmap[npok - 1] - 1]) {
+                                        if (rule->CalcPointDist(npok, lpoints[pmap[npok] - 1]) > maxerr
+                                            || !legalpoints[pmap[npok] - 1]) {
                                             ok = 0;
                                         }
                                     }
                                 }
 
                                 if (ok) {
-                                    pused[pmap[npok - 1] - 1]++;
+                                    pused[pmap[npok] - 1]++;
                                     npok++;
                                     incnpok = 1;
                                 } else {
-                                    pmap[npok - 1] = 0;
+                                    pmap[npok] = 0;
                                     npok--;
                                     incnpok = 0;
                                 }
                             }
                         } else {
-                            npok = rule->GetNOldP();
+                            npok = rule->GetNOldP() - 1;
                             incnpok = 0;
 
                             if (ok)
@@ -278,7 +278,7 @@ namespace meshit {
                             ok = 1;
 
                             // check orientations
-                            for (size_t i = 1; i <= rule->GetNOrientations(); i++) {
+                            for (size_t i = 0; i < rule->GetNOrientations(); i++) {
                                 if (CW(lpoints[pmap[rule->GetOrientation(i).i1 - 1] - 1],
                                        lpoints[pmap[rule->GetOrientation(i).i2 - 1] - 1],
                                        lpoints[pmap[rule->GetOrientation(i).i3 - 1] - 1])) {
@@ -292,7 +292,7 @@ namespace meshit {
                             Vector oldu(2 * rule->GetNOldP());
 
                             for (size_t i = 0; i < rule->GetNOldP(); i++) {
-                                Vec2d ui(rule->GetPoint(i + 1), lpoints[pmap[i] - 1]);
+                                Vec2d ui(rule->GetPoint(i), lpoints[pmap[i] - 1]);
                                 oldu(2 * i + 0) = ui.X();
                                 oldu(2 * i + 1) = ui.Y();
                             }
@@ -312,7 +312,7 @@ namespace meshit {
                             }
                             if (!ok) continue;
 
-                            for (int i = maxlegalpoint; i < lpoints.size(); i++) {
+                            for (size_t i = maxlegalpoint; i < lpoints.size(); i++) {
                                 if (rule->IsInFreeZone(lpoints[i])) {
                                     ok = 0;
                                     break;
@@ -320,7 +320,7 @@ namespace meshit {
                             }
                             if (!ok) continue;
 
-                            for (int i = 0; i < maxlegalline; i++) {
+                            for (size_t i = 0; i < maxlegalline; i++) {
                                 if (!lused[i] && rule->IsLineInFreeZone(lpoints[llines[i].I1() - 1],
                                                                         lpoints[llines[i].I2() - 1])) {
                                     ok = 0;
@@ -329,7 +329,7 @@ namespace meshit {
                             }
                             if (!ok) continue;
 
-                            for (int i = maxlegalline; i < llines.size(); i++) {
+                            for (size_t i = maxlegalline; i < llines.size(); i++) {
                                 if (rule->IsLineInFreeZone(lpoints[llines[i].I1() - 1],
                                                            lpoints[llines[i].I2() - 1])) {
                                     ok = 0;
@@ -345,38 +345,38 @@ namespace meshit {
                                 rule->GetOldUToNewU().Mult(oldu, newu);
 
                                 size_t oldnp = rule->GetNOldP();
-                                for (size_t i = oldnp + 1; i <= rule->GetNP(); i++) {
+                                for (size_t i = oldnp; i < rule->GetNP(); i++) {
                                     Point2d np = rule->GetPoint(i);
-                                    np.X() += newu(2 * (i - oldnp) - 2);
-                                    np.Y() += newu(2 * (i - oldnp) - 1);
+                                    np.X() += newu(2 * (i - oldnp));
+                                    np.Y() += newu(2 * (i - oldnp) + 1);
 
                                     lpoints.push_back(np);
-                                    pmap[i - 1] = lpoints.size();
+                                    pmap[i] = lpoints.size();
                                 }
                             }
 
                             // Setze neue Linien:
-                            for (size_t i = rule->GetNOldL() + 1; i <= rule->GetNL(); i++) {
+                            for (size_t i = rule->GetNOldL(); i < rule->GetNL(); i++) {
                                 llines.push_back(INDEX_2(pmap[rule->GetLine(i)[0] - 1],
                                                          pmap[rule->GetLine(i)[1] - 1]));
                             }
 
                             // delete old lines:
-                            for (size_t i = 1; i <= rule->GetNDelL(); i++) {
+                            for (size_t i = 0; i < rule->GetNDelL(); i++) {
                                 dellines.push_back(sortlines[lmap[rule->GetDelLine(i) - 1] - 1]);
                             }
 
                             // insert new elements:
                             for (size_t i = 0; i < rule->GetNE(); i++) {
-                                elements.push_back(rule->GetElement(i + 1));
+                                elements.push_back(rule->GetElement(i));
                                 for (size_t j = 1; j <= 3; j++) {
                                     elements[i].PNum(j) = pmap[elements[i].PNum(j) - 1];
                                 }
                             }
 
                             double elerr = 0;
-                            for (size_t i = 1; i <= elements.size(); i++) {
-                                double hf = CalcElementBadness(lpoints, elements[i - 1]);
+                            for (size_t i = 0; i < elements.size(); i++) {
+                                double hf = CalcElementBadness(lpoints, elements[i]);
                                 if (hf > elerr) elerr = hf;
                             }
 
@@ -400,16 +400,16 @@ namespace meshit {
                         }
                     }
 
-                    nlok = rule->GetNOldL();
+                    nlok = rule->GetNOldL() - 1;
 
-                    lused[lmap[nlok - 1] - 1] = 0;
+                    lused[lmap[nlok] - 1] = false;
 
                     for (int j = 1; j <= 2; j++) {
                         int refpi = rule->GetPointNr(nlok, j);
-                        pused[pmap[refpi - 1] - 1]--;
+                        pused[pmap[refpi] - 1]--;
 
-                        if (pused[pmap[refpi - 1] - 1] == 0) {
-                            pmap[refpi - 1] = 0;
+                        if (pused[pmap[refpi] - 1] == 0) {
+                            pmap[refpi] = 0;
                         }
                     }
                 }
@@ -418,9 +418,9 @@ namespace meshit {
 
         if (found) {
             lpoints.insert(lpoints.end(), tempnewpoints.begin(), tempnewpoints.end());
-            llines1.insert( llines1.end(), tempnewlines.begin(), tempnewlines.end() );
-            dellines.insert( dellines.end(), tempdellines.begin(), tempdellines.end() );
-            elements.insert( elements.end(), tempelements.begin(), tempelements.end() );
+            llines1.insert(llines1.end(), tempnewlines.begin(), tempnewlines.end());
+            dellines.insert(dellines.end(), tempdellines.begin(), tempdellines.end());
+            elements.insert(elements.end(), tempelements.begin(), tempelements.end());
         }
 
         return found;

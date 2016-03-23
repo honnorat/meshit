@@ -15,24 +15,20 @@
 #include "../gprim/geom3d.hpp"
 #include "../general/hashtabl.hpp"
 
-namespace meshit {
-
-    typedef int ELEMENT_EDGE[2]; // initial point, end point
-
-#define ELEMENT2D_MAXPOINTS 3
+namespace meshit
+{
+    typedef int ELEMENT_EDGE[2];  // initial point, end point
 
     enum POINTTYPE
     {
         FIXEDPOINT = 1, EDGEPOINT = 2, SURFACEPOINT = 3, INNERPOINT = 4
     };
 
-    extern int NextTimeStamp();
-
     class EdgePointGeomInfo
     {
      public:
         EdgePointGeomInfo()
-                : edgenr(0), body(0), dist(0.0), u(0.0), v(0.0) { }
+            : edgenr(0), body(0), dist(0.0), u(0.0), v(0.0) { }
 
         EdgePointGeomInfo& operator=(const EdgePointGeomInfo& gi2)
         {
@@ -63,8 +59,8 @@ namespace meshit {
      public:
         MeshPoint() { }
 
-        MeshPoint(const Point3d& ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
-                : Point3d(ap), layer(alayer), type(apt) { }
+        explicit MeshPoint(const Point3d& ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
+            : Point3d(ap), layer(alayer), type(apt) { }
 
         int GetLayer() const
         {
@@ -91,14 +87,14 @@ namespace meshit {
      */
     class Element2d
     {
+        /// surface nr
+        size_t index;
+
         /// point numbers
         PointIndex pnum[3];
 
-        /// surface nr
-        int index : 16;
-
         // marked for refinement
-        bool deleted : 1; // element is deleted
+        bool deleted;  // element is deleted
 
         // element visible
 
@@ -107,7 +103,7 @@ namespace meshit {
 
      public:
         Element2d()
-                : pnum{0, 0, 0}, index{0}, deleted{false} { }
+            : index{0}, pnum{0, 0, 0}, deleted{false} { }
 
         PointIndex& operator[](size_t i)
         {
@@ -144,7 +140,7 @@ namespace meshit {
             index = si;
         }
 
-        int GetIndex() const
+        size_t GetIndex() const
         {
             return index;
         };
@@ -172,18 +168,9 @@ namespace meshit {
         // Access functions for the new property: visible
 
         bool operator==(const Element2d& el2) const;
-
     };
 
     std::ostream& operator<<(std::ostream& s, const Element2d& el);
-
-    class IntegrationPointData
-    {
-     public:
-        Point3d p;
-        Vector shape;
-        DenseMatrix dshape;
-    };
 
     /**
        Edge segment.
@@ -206,9 +193,9 @@ namespace meshit {
         /// surface decoding index
         int si;
         /// domain number inner side
-        int domin;
+        size_t domin;
         /// domain number outer side
-        int domout;
+        size_t domout;
         /// top-level object number of surface
         int tlosurf;
 
@@ -237,38 +224,38 @@ namespace meshit {
     class FaceDescriptor
     {
         /// which surface, 0 if not available
-        int surfnr;
+        size_t surfnr;
         /// domain nr inside
-        int domin;
+        size_t domin;
         /// domain nr outside
-        int domout;
+        size_t domout;
         /// top level object number of surface
         int tlosurf;
         /// boundary condition property
-        int bcprop;
+        size_t bcprop;
 
         /// root of linked list
         SurfaceElementIndex firstelement;
 
      public:
         FaceDescriptor();
-        FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi);
-        FaceDescriptor(const Segment& seg);
         FaceDescriptor(const FaceDescriptor& other);
+        FaceDescriptor(size_t surfnri, size_t domini, size_t domouti, int tlosurfi);
+        explicit FaceDescriptor(const Segment& seg);
 
         ~FaceDescriptor() { }
 
-        int SurfNr() const
+        size_t SurfNr() const
         {
             return surfnr;
         }
 
-        int DomainIn() const
+        size_t DomainIn() const
         {
             return domin;
         }
 
-        int DomainOut() const
+        size_t DomainOut() const
         {
             return domout;
         }
@@ -278,7 +265,7 @@ namespace meshit {
             return tlosurf;
         }
 
-        int BCProperty() const
+        size_t BCProperty() const
         {
             return bcprop;
         }
@@ -359,8 +346,7 @@ namespace meshit {
                 PNum(2) = PNum(3);
                 PNum(3) = PNum(1);
                 PNum(1) = pi1;
-            }
-            else {
+            } else {
                 PointIndex pi1 = PNum(3);
                 PNum(3) = PNum(2);
                 PNum(2) = PNum(1);
@@ -378,38 +364,8 @@ namespace meshit {
     class Identifications
     {
      public:
-
-        enum ID_TYPE
-        {
-            UNDEFINED = 1, PERIODIC = 2
-        };
-
-     private:
-        Mesh& mesh;
-
-        /// identify points (thin layers, periodic b.c.)  
-        INDEX_2_HASHTABLE<int>* identifiedpoints;
-
-        /// the same, with info about the id-nr
-        INDEX_3_HASHTABLE<int>* identifiedpoints_nr;
-
-        /// sorted by identification nr
-        TABLE<INDEX_2> idpoints_table;
-
-        std::vector<ID_TYPE> type;
-
-        /// number of identifications (or, actually used identifications ?)
-        int maxidentnr;
-
-     public:
-        Identifications(Mesh& amesh);
+        explicit Identifications(Mesh& amesh);
         ~Identifications();
-
-        /*
-          Identify points pi1 and pi2, due to
-          identification nr identnr
-         */
-        void Add(PointIndex pi1, PointIndex pi2, int identnr);
 
         int Get(PointIndex pi1, PointIndex pi2) const;
         bool Get(PointIndex pi1, PointIndex pi2, int identnr) const;
@@ -420,37 +376,20 @@ namespace meshit {
                    identifiedpoints->Used(INDEX_2(pi2, pi1));
         }
 
-        void GetMap(size_t identnr, std::vector<int>& identmap, bool symmetric = false) const;
-
-        ID_TYPE GetType(size_t identnr) const
-        {
-            if (identnr < type.size()) {
-                return type[identnr];
-            } else {
-                return UNDEFINED;
-            }
-        }
-
-        void SetType(size_t identnr, ID_TYPE t)
-        {
-            while (type.size() <= identnr) {
-                type.push_back(UNDEFINED);
-            }
-            type[identnr] = t;
-        }
-
-        void GetPairs(int identnr, std::vector<INDEX_2>& identpairs) const;
-
-        int GetMaxNr() const
-        {
-            return maxidentnr;
-        }
-
         /// remove secondorder
         void SetMaxPointNr(int maxpnum);
+
+     private:
+        Mesh& mesh;
+
+        /// identify points (thin layers, periodic b.c.)
+        INDEX_2_HASHTABLE<PointIndex>* identifiedpoints;
+
+        /// the same, with info about the id-nr
+        INDEX_3_HASHTABLE<PointIndex>* identifiedpoints_nr;
     };
 
-}  // namelist meshit
+}  // namespace meshit
 
 #endif
 

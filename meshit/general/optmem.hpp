@@ -10,12 +10,11 @@
 #include <cstdlib>
 #include <vector>
 
-namespace meshit {
-
-/** 
+namespace meshit
+{
+/**
     Optimized Memory allocation classes
 */
-
     class BlockAllocator
     {
      private:
@@ -32,7 +31,7 @@ namespace meshit {
 
         void Free(void* p)
         {
-            *(void**) p = freelist;
+            *reinterpret_cast<void**>(p) = freelist;
             freelist = p;
         }
     };

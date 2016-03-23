@@ -16,8 +16,8 @@
 
 #include "../meshing/meshclass.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     /*! GMSH v2.xx mesh format export function
      *
      *  This function extends the export capabilities of
@@ -47,8 +47,7 @@ namespace meshit {
 
         /// Prepare GMSH 2.2 file (See GMSH 2.2 Documentation)
         os << "$MeshFormat\n";
-        os << "2.2 0 "
-        << (int) sizeof(double) << "\n";
+        os << "2.2 0 " << sizeof(double) << "\n";
         os << "$EndMeshFormat\n";
 
         /// Write nodes

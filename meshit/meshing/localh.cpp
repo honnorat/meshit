@@ -1,8 +1,8 @@
 #include "localh.hpp"
 #include "adfront2.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     GradingBox::GradingBox(const double* ax1, const double* ax2)
     {
         SetBox(ax1, ax2);
@@ -189,8 +189,8 @@ namespace meshit {
     }
 
     double LocalH::GetMinHRec(
-            const Point3d& pmin, const Point3d& pmax,
-            const GradingBox* box) const
+        const Point3d& pmin, const Point3d& pmax,
+        const GradingBox* box) const
     {
         double h2 = box->h2;
         if (pmax.X() < box->xmid[0] - h2 || pmin.X() > box->xmid[0] + h2 ||

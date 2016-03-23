@@ -1,5 +1,5 @@
-#ifndef FILE_ADFRONT2
-#define FILE_ADFRONT2
+#ifndef FILE_ADFRONT2_HPP
+#define FILE_ADFRONT2_HPP
 
 /**************************************************************************/
 /* File:   adfront2.hpp                                                   */
@@ -16,19 +16,17 @@
 #include "meshtype.hpp"
 
 /**
-
     Advancing front class for surfaces
-
  */
-namespace meshit {
-
+namespace meshit
+{
     class FrontPoint2
     {
         /// coordinates
         Point3d p;
         /// global node index
         PointIndex globalindex;
-        /// number of front lines connected to point 
+        /// number of front lines connected to point
         int nlinetopoint;
         /// distance to original boundary
         int frontnr;
@@ -37,7 +35,7 @@ namespace meshit {
         FrontPoint2()
         {
             nlinetopoint = 0;
-            frontnr = INT_MAX - 10; // attention: overflow on calculating  INT_MAX + 1
+            frontnr = INT_MAX - 10;  // attention: overflow on calculating  INT_MAX + 1
         }
 
         FrontPoint2(const Point3d& ap, PointIndex agi);
@@ -92,7 +90,7 @@ namespace meshit {
      private:
         /// Point Indizes
         INDEX_2 l;
-        /// quality class 
+        /// quality class
         int lineclass;
 
      public:
@@ -156,7 +154,7 @@ namespace meshit {
         std::vector<int> invpindex;
 
         int minval;
-        int starti;
+        size_t starti;
 
      public:
         explicit AdFront2(const Box3d& aboundingbox);

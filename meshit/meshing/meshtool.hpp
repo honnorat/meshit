@@ -3,14 +3,12 @@
 
 #include "meshclass.hpp"
 
-namespace meshit {
+namespace meshit
+{
+    void MeshQuality2d(const Mesh& mesh);
 
-    void MeshQuality2d(const Mesh & mesh);
-
-    class Surface;
-
-    int CheckSurfaceMesh(const Mesh & mesh);
-    int CheckSurfaceMesh2(const Mesh & mesh);
+    int CheckSurfaceMesh(const Mesh& mesh);
+    int CheckSurfaceMesh2(const Mesh& mesh);
 
 }
 #endif

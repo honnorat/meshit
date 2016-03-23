@@ -7,13 +7,11 @@
 /* Date:   01. Jun. 95                                                    */
 /**************************************************************************/
 
-#include "array.hpp"
+#include <iostream>
+#include <vector>
 
-namespace meshit {
-
-
-    /// Base class to generic class TABLE.
-
+namespace meshit
+{
     class BASE_TABLE
     {
      protected:
@@ -68,7 +66,7 @@ namespace meshit {
 
         /// Creates fixed maximal element size table
         explicit TABLE(const std::vector<int>& entrysizes)
-                : BASE_TABLE(entrysizes, sizeof(T)) { }
+            : BASE_TABLE(entrysizes, sizeof(T)) { }
 
         /// Inserts element acont into row i. Does not test if already used.
         inline void Add(size_t i, const T& acont)
@@ -132,19 +130,6 @@ namespace meshit {
         }
     };
 
-    template<class T>
-    inline std::ostream& operator<<(std::ostream& ost, const TABLE<T>& table)
-    {
-        for (int i = 0; i < table.Size(); i++) {
-            ost << i << ": ";
-            FlatArray<T> row = table[i];
-            ost << "(" << row.size() << ") ";
-            for (int j = 0; j < row.size(); j++)
-                ost << row[j] << " ";
-            ost << std::endl;
-        }
-        return ost;
-    }
 
 }  // namespace meshit
 

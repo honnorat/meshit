@@ -3,8 +3,8 @@
 #include "global.hpp"
 #include "../gprim/geomtest3d.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     Meshing2::Meshing2(const MeshingParameters& mp, const Box<3>& aboundingbox)
     {
         boundingbox = aboundingbox;
@@ -78,26 +78,11 @@ namespace meshit {
         zone = 0;
     }
 
-    int Meshing2::TransformFromPlain(
-            Point2d& plainpoint,
-            Point3d& locpoint,
-            double h)
+    int Meshing2::TransformFromPlain(Point2d& plainpoint, Point3d& locpoint, double h)
     {
-        Vec3d p1p;
-
-        p1p = plainpoint.X() * ex + plainpoint.Y() * ey;
+        Vec3d p1p = plainpoint.X() * ex + plainpoint.Y() * ey;
         p1p *= h;
         locpoint = globp1 + p1p;
-        return 0;
-    }
-
-    int Meshing2::BelongsToActiveChart(const Point3d& p)
-    {
-        return 1;
-    }
-
-    int Meshing2::ComputePointGeomInfo(const Point3d& p)
-    {
         return 0;
     }
 
@@ -115,7 +100,7 @@ namespace meshit {
     {
         std::vector<int> pindex, lindex;
         std::vector<int> delpoints;
-        std::vector<int> dellines;
+        std::vector<uint32_t> dellines;
         std::vector<Element2d> locelements;
 
         int z1, z2;
@@ -133,11 +118,11 @@ namespace meshit {
         std::vector<int> plainzones;
         std::vector<INDEX_2> loclines;
         int cntelem = 0, trials = 0, nfaces = 0;
-        size_t oldnl, oldnp;
         int qualclass;
 
         // test for 3d overlaps
-        Box3dTree surfeltree(boundingbox.PMin(), boundingbox.PMax());
+        Box3dTree surfeltree(static_cast<Point3d>(boundingbox.PMin()),
+                             static_cast<Point3d>(boundingbox.PMax()));
 
         std::vector<size_t> intersecttrias;
         std::vector<Point3d> critpoints;
@@ -150,8 +135,6 @@ namespace meshit {
         std::vector<Point3d> chartboundpoints3d;
         std::vector<INDEX_2> chartboundlines;
 
-        // illegal points: points with more then 50 elements per node
-        int maxlegalpoint(-1), maxlegalline(-1);
         std::vector<int> trigsonnode;
         std::vector<int> illegalpoint;
 
@@ -185,7 +168,6 @@ namespace meshit {
         double meshedarea_before = meshedarea;
 
         while (!adfront->Empty()) {
-
             locpoints.resize(0);
             loclines.resize(0);
             pindex.resize(0);
@@ -259,6 +241,9 @@ namespace meshit {
 
             Point2d p12d, p22d;
 
+            size_t oldnl = 0;
+            size_t oldnp = 0;
+
             if (found) {
                 oldnp = locpoints.size();
                 oldnl = loclines.size();
@@ -282,7 +267,7 @@ namespace meshit {
                 p12d = plainpoints[0];
                 p22d = plainpoints[1];
 
-                for (size_t i = 1; i < loclines.size(); i++) // don't remove first line
+                for (size_t i = 1; i < loclines.size(); i++)  // don't remove first line
                 {
                     z1 = plainzones[loclines[i].I1() - 1];
                     z2 = plainzones[loclines[i].I2() - 1];
@@ -292,7 +277,6 @@ namespace meshit {
                         int innerp = (z1 >= 0) ? 1 : 2;
                         if (IsLineVertexOnChart(locpoints[loclines[i].I1() - 1],
                                                 locpoints[loclines[i].I2() - 1])) {
-
                             // use one end of line
                             int pini, pouti;
                             Vec2d v;
@@ -351,7 +335,7 @@ namespace meshit {
                     if (pindex[i] == -1) {
                         legalpoints[i] = 0;
                     }
-                    if (plainpoints[i].Y() < -1e-10 * avy) // changed
+                    if (plainpoints[i].Y() < -1e-10 * avy)  // changed
                     {
                         legalpoints[i] = 0;
                     }
@@ -362,8 +346,8 @@ namespace meshit {
                 chartboundlines.resize(0);
 
                 oldnp = plainpoints.size();
-                maxlegalpoint = locpoints.size();
-                maxlegalline = loclines.size();
+                size_t maxlegalpoint = locpoints.size();
+                size_t maxlegalline = loclines.size();
 
                 if (mp.check_chart_boundary) {
                     for (size_t i = 0; i < chartboundpoints.size(); i++) {
@@ -381,9 +365,7 @@ namespace meshit {
 
                 oldnl = loclines.size();
                 oldnp = plainpoints.size();
-            }
 
-            if (found) {
                 rulenr = ApplyRules(plainpoints, legalpoints, maxlegalpoint,
                                     loclines, maxlegalline, locelements,
                                     dellines, qualclass, mp);
@@ -429,12 +411,6 @@ namespace meshit {
                 for (size_t i = oldnl; i < loclines.size(); i++) {
                     double eh = Dist(locpoints[loclines[i].I1() - 1],
                                      locpoints[loclines[i].I2() - 1]);
-
-                    // Markus (brute force method to avoid bad elements on geometries like \_/ )
-                    //if(eh > 4.*mesh.GetH(locpoints.Get(loclines[i].I1()))) found = 0;
-                    //if(eh > 4.*mesh.GetH(locpoints.Get(loclines[i].I2()))) found = 0;
-                    // Markus end
-
                     if (eh > newedgemaxh)
                         newedgemaxh = eh;
                 }
@@ -444,7 +420,7 @@ namespace meshit {
                     Point3d pmax = pmin;
                     for (size_t j = 2; j <= 3; j++) {
                         const Point3d& hp =
-                                locpoints[locelements[i].PNum(j) - 1];
+                            locpoints[locelements[i].PNum(j) - 1];
                         pmin.SetToMin(hp);
                         pmax.SetToMax(hp);
                     }
@@ -535,9 +511,7 @@ namespace meshit {
                         lam3 = n * Vec3d(tp1, p);
                         LocalCoordinates(e1, e2, Vec3d(tp1, p), lam1, lam2);
 
-                        if (fabs(lam3) < 0.1 * hshould &&
-                            lam1 > 0 && lam2 > 0 && (lam1 + lam2) < 1) {
-
+                        if (fabs(lam3) < 0.1 * hshould && lam1 > 0 && lam2 > 0 && (lam1 + lam2) < 1.0) {
                             for (int k = 1; k <= 5; k++) {
                                 adfront->IncrementClass(lindex[0]);
                             }
@@ -583,7 +557,6 @@ namespace meshit {
                 }
 
                 for (size_t i = oldnl; i < loclines.size(); i++) {
-
                     if (pindex[loclines[i].I1() - 1] == -1 ||
                         pindex[loclines[i].I2() - 1] == -1) {
                         std::cerr << "pindex is 0" << std::endl;
@@ -598,7 +571,7 @@ namespace meshit {
 
                     for (size_t j = 1; j <= 3; j++) {
                         mtri.PNum(j) = locelements[i].PNum(j) =
-                                adfront->GetGlobalIndex(pindex[locelements[i].PNum(j) - 1]);
+                            adfront->GetGlobalIndex(pindex[locelements[i].PNum(j) - 1]);
                     }
 
                     mesh.AddSurfaceElement(mtri);
@@ -712,17 +685,18 @@ namespace meshit {
         MESHIT_LOG_DEBUG("Surface meshing done");
 
         adfront->
-                PrintOpenSegments(std::cout);
+            PrintOpenSegments(std::cout);
 
         EndMesh();
 
         if (!adfront->
-                Empty()
-                )
+            Empty()
+            )
             return
-                    MESHING2_GIVEUP;
+                MESHING2_GIVEUP;
 
         return
-                MESHING2_OK;
+            MESHING2_OK;
     }
-}
+
+}  // namespace meshit

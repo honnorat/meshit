@@ -1,7 +1,8 @@
 #include <cstring>
 #include "adtree.hpp"
 
-namespace meshit {
+namespace meshit
+{
 
 #define ADTREE_MAX_STACK_SIZE 20
 
@@ -33,7 +34,7 @@ namespace meshit {
 
     BlockAllocator ADTreeNode3::ball(sizeof(ADTreeNode3));
 
-    void* ADTreeNode3::operator new(size_t s)
+    void* ADTreeNode3::operator new(size_t /*s*/)
     {
         return ball.Alloc();
     }
@@ -59,7 +60,7 @@ namespace meshit {
         delete root;
     }
 
-    void ADTree3::Insert(const Point<3>& p, int pi)
+    void ADTree3::Insert(const Point3d& p, int pi)
     {
         ADTreeNode3* node = nullptr;
         ADTreeNode3* next = root;
@@ -163,9 +164,9 @@ namespace meshit {
             ADTreeNode3* node = stack[stacks].node;
 
             if (node->pi != -1 && !(
-                    node->data[0] < bmin[0] || node->data[0] > bmax[0] ||
-                    node->data[1] < bmin[1] || node->data[1] > bmax[1] ||
-                    node->data[2] < bmin[2] || node->data[2] > bmax[2])) {
+                node->data[0] < bmin[0] || node->data[0] > bmax[0] ||
+                node->data[1] < bmin[1] || node->data[1] > bmax[1] ||
+                node->data[2] < bmin[2] || node->data[2] > bmax[2])) {
                 pis.push_back(node->pi);
             }
 
@@ -227,7 +228,7 @@ namespace meshit {
 
     BlockAllocator ADTreeNode6::ball(sizeof(ADTreeNode6));
 
-    void* ADTreeNode6::operator new(size_t s)
+    void* ADTreeNode6::operator new(size_t /*s*/)
     {
         return ball.Alloc();
     }
@@ -358,9 +359,9 @@ namespace meshit {
             stacks--;
             ADTreeNode6* node = stack[stacks].node;
             if (node->pi != -1 && !(
-                    node->data[0] > bmax[0] || node->data[3] < bmin[3] ||
-                    node->data[1] > bmax[1] || node->data[4] < bmin[4] ||
-                    node->data[2] > bmax[2] || node->data[5] < bmin[5])) {
+                node->data[0] > bmax[0] || node->data[3] < bmin[3] ||
+                node->data[1] > bmax[1] || node->data[4] < bmin[4] ||
+                node->data[2] > bmax[2] || node->data[5] < bmin[5])) {
                 pis.push_back(node->pi);
             }
 
@@ -404,7 +405,7 @@ namespace meshit {
 /* ************************************* Point3dTree ********************** */
 
 
-    Point3dTree::Point3dTree(const Point<3>& pmin, const Point<3>& pmax)
+    Point3dTree::Point3dTree(const Point3d& pmin, const Point3d& pmax)
     {
         double pmi[3], pma[3];
         for (int i = 0; i < 3; i++) {
@@ -419,12 +420,12 @@ namespace meshit {
         delete tree;
     }
 
-    void Point3dTree::Insert(const Point<3>& p, int pi)
+    void Point3dTree::Insert(const Point3d& p, int pi)
     {
         tree->Insert(p, pi);
     }
 
-    void Point3dTree::GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const
+    void Point3dTree::GetIntersecting(const Point3d& pmin, const Point3d& pmax, std::vector<size_t>& pis) const
     {
         double pmi[3], pma[3];
         for (int i = 0; i < 3; i++) {
@@ -435,8 +436,8 @@ namespace meshit {
     }
 
     Box3dTree::Box3dTree(const Box<3>& abox)
-            : boxpmin(abox.PMin()),
-              boxpmax(abox.PMax())
+        : boxpmin(abox.PMin()),
+          boxpmax(abox.PMax())
     {
         double tpmin[6], tpmax[6];
         for (size_t i = 0; i < 3; i++) {
@@ -447,8 +448,8 @@ namespace meshit {
     }
 
     Box3dTree::Box3dTree(const Point3d& apmin, const Point3d& apmax)
-            : boxpmin(apmin),
-              boxpmax(apmax)
+        : boxpmin(apmin),
+          boxpmax(apmax)
     {
         double tpmin[6], tpmax[6];
         for (int i = 0; i < 3; i++) {

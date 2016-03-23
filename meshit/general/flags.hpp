@@ -10,12 +10,14 @@
 
 #include <iostream>
 
+#include <cstring>
+
 #include "../meshit.hpp"
 #include "symbolta.hpp"
 
-namespace meshit {
-
-/** 
+namespace meshit
+{
+/**
    Flag - Table.
    A flag table maintains string variables, numerical 
    variables and boolean flags.
@@ -28,8 +30,12 @@ namespace meshit {
         SYMBOLTABLE<int> defflags;
 
      public:
-        Flags();
-        ~Flags();
+        Flags() { }
+
+        ~Flags()
+        {
+            DeleteFlags();
+        }
 
         /// Deletes all flags
         void DeleteFlags();

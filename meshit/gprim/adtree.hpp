@@ -1,5 +1,5 @@
-#ifndef FILE_ADTREE
-#define FILE_ADTREE
+#ifndef FILE_ADTREE_HPP
+#define FILE_ADTREE_HPP
 
 /* *************************************************************************/
 /* File:   adtree.hh                                                       */
@@ -15,12 +15,11 @@
 #include "geom3d.hpp"
 #include "geomobjects.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     /**
       Alternating Digital Tree
      */
-
     class ADTreeNode3
     {
      public:
@@ -37,7 +36,7 @@ namespace meshit {
 
         static BlockAllocator ball;
         void* operator new(size_t);
-        void operator delete(void*);
+        void operator delete(void* p);
     };
 
     class ADTree3
@@ -51,7 +50,7 @@ namespace meshit {
         ADTree3(const double* acmin, const double* acmax);
         ~ADTree3();
 
-        void Insert(const Point<3>& p, int pi);
+        void Insert(const Point3d& p, int pi);
 
         void GetIntersecting(const double* bmin, const double* bmax, std::vector<size_t>& pis) const;
 
@@ -76,7 +75,7 @@ namespace meshit {
 
         static BlockAllocator ball;
         void* operator new(size_t);
-        void operator delete(void*);
+        void operator delete(void* p);
     };
 
     class ADTree6
@@ -97,7 +96,6 @@ namespace meshit {
 
         int DepthRec(const ADTreeNode6* node) const;
         int ElementsRec(const ADTreeNode6* node) const;
-
     };
 
     class Point3dTree
@@ -105,16 +103,16 @@ namespace meshit {
         ADTree3* tree;
 
      public:
-        Point3dTree(const Point<3>& pmin, const Point<3>& pmax);
+        Point3dTree(const Point3d& pmin, const Point3d& pmax);
         ~Point3dTree();
-        void Insert(const Point<3>& p, int pi);
+        void Insert(const Point3d& p, int pi);
 
         void DeleteElement(int pi)
         {
             tree->DeleteElement(pi);
         }
 
-        void GetIntersecting(const Point<3>& pmin, const Point<3>& pmax, std::vector<size_t>& pis) const;
+        void GetIntersecting(const Point3d& pmin, const Point3d& pmax, std::vector<size_t>& pis) const;
     };
 
     class Box3dTree
@@ -132,7 +130,8 @@ namespace meshit {
 
         void Insert(const Box<3>& box, int pi)
         {
-            Insert(box.PMin(), box.PMax(), pi);
+            Insert(static_cast<Point3d>(box.PMin()),
+                   static_cast<Point3d>(box.PMax()), pi);
         }
 
         void DeleteElement(int pi)

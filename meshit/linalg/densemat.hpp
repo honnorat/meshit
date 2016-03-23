@@ -13,8 +13,8 @@
 
 #include "vector.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class DenseMatrix
     {
      protected:
@@ -24,7 +24,7 @@ namespace meshit {
 
      public:
         DenseMatrix()
-                : height{0}, width{0}, data{nullptr} { }
+            : height{0}, width{0}, data{nullptr} { }
 
         explicit DenseMatrix(size_t h, size_t w = 0);
         DenseMatrix(const DenseMatrix& m2);
@@ -102,11 +102,6 @@ namespace meshit {
             return data;
         }
 
-        const double& Get(size_t i) const
-        {
-            return data[i - 1];
-        }
-
         double& Elem(size_t i, size_t j)
         {
             return data[i * width + j];
@@ -123,19 +118,19 @@ namespace meshit {
 
      public:
         MatrixFixWidth()
-                : height{0}, ownmem{false}
+            : height{0}, ownmem{false}
         {
             data = nullptr;
         }
 
         explicit MatrixFixWidth(size_t h)
-                : height{h}, ownmem{true}
+            : height{h}, ownmem{true}
         {
             data = new double[WIDTH * height];
         }
 
         explicit MatrixFixWidth(size_t h, double* adata)
-                : height{h}, ownmem{false}, data{adata} { }
+            : height{h}, ownmem{false}, data{adata} { }
 
         ~MatrixFixWidth()
         {
@@ -189,26 +184,6 @@ namespace meshit {
             }
             return *this;
         }
-
-        const double& Get(size_t i, size_t j) const
-        {
-            return data[(i - 1) * WIDTH + j - 1];
-        }
-
-        const double& Get(size_t i) const
-        {
-            return data[i - 1];
-        }
-
-        void Set(size_t i, size_t j, double v)
-        {
-            data[(i - 1) * WIDTH + j - 1] = v;
-        }
-
-        double& Elem(size_t i, size_t j)
-        {
-            return data[(i - 1) * WIDTH + j - 1];
-        }
     };
 
     template<size_t WIDTH>
@@ -216,7 +191,7 @@ namespace meshit {
     {
         for (size_t i = 0; i < m.Height(); i++) {
             for (size_t j = 0; j < m.Width(); j++) {
-                ost << m.Get(i + 1, j + 1) << " ";
+                ost << m(i, j) << " ";
             }
             ost << std::endl;
         }

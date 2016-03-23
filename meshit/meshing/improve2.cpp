@@ -1,8 +1,8 @@
 #include "improve2.hpp"
 #include "global.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class Neighbour
     {
         int nr[3];
@@ -85,9 +85,8 @@ namespace meshit {
             for (size_t j = 0; j < 3; j++) {
                 POINTTYPE typ = mesh.Point(sel[j]).Type();
                 if (typ == FIXEDPOINT || typ == EDGEPOINT) {
-                    pangle[sel[j]] += Angle(
-                            mesh.Point(sel[(j + 1) % 3]) - mesh.Point(sel[j]),
-                            mesh.Point(sel[(j + 2) % 3]) - mesh.Point(sel[j]));
+                    pangle[sel[j]] += Angle(mesh.Point(sel[(j + 1) % 3]) - mesh.Point(sel[j]),
+                                            mesh.Point(sel[(j + 2) % 3]) - mesh.Point(sel[j]));
                 }
             }
         }
@@ -265,8 +264,6 @@ namespace meshit {
             }
             t--;
         }
-
-        mesh.SetNextTimeStamp();
     }
 
     void MeshOptimize2d::CombineImprove(Mesh& mesh)
@@ -383,10 +380,10 @@ namespace meshit {
                 }
                 bad1 /= (has_one_pi.size() + has_both_pi.size());
 
-                MeshPoint p1 = mesh[pi1];
-                MeshPoint p2 = mesh[pi2];
+                MeshPoint p1_save = mesh[pi1];
+                MeshPoint p2_save = mesh[pi2];
 
-                MeshPoint pnew = p1;
+                MeshPoint pnew = p1_save;
                 mesh[pi1] = pnew;
                 mesh[pi2] = pnew;
 
@@ -409,8 +406,8 @@ namespace meshit {
                 }
                 bad2 /= has_one_pi.size();
 
-                mesh[pi1] = p1;
-                mesh[pi2] = p2;
+                mesh[pi1] = p1_save;
+                mesh[pi2] = p2_save;
 
                 bool should = (bad2 < bad1 && bad2 < 1e4);
 
@@ -441,8 +438,6 @@ namespace meshit {
                 }
             }
         }
-
         mesh.Compress();
-        mesh.SetNextTimeStamp();
     }
 }  // namespace meshit

@@ -3,10 +3,9 @@
  */
 
 #include "spline.hpp"
-#include "../linalg/densemat.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     // calculates length of spline-curve
 
     double SplineSeg::Length() const
@@ -45,16 +44,7 @@ namespace meshit {
         return p1 + t * (p2 - p1);
     }
 
-    Vec<2> LineSeg::GetTangent(const double t) const
-    {
-        return p2 - p1;
-    }
-
-    void LineSeg::GetDerivatives(
-            const double t,
-            Point<2>& point,
-            Vec<2>& first,
-            Vec<2>& second) const
+    void LineSeg::GetDerivatives(const double t, Point<2>& point, Vec<2>& first, Vec<2>& second) const
     {
         first = p2 - p1;
         point = p1 + t * first;
@@ -69,10 +59,9 @@ namespace meshit {
     SplineSeg3::SplineSeg3(const GeomPoint<2>& ap1,
                            const GeomPoint<2>& ap2,
                            const GeomPoint<2>& ap3)
-            : p1(ap1), p2(ap2), p3(ap3)
+        : p1(ap1), p2(ap2), p3(ap3)
     {
         weight = Dist(p1, p3) / sqrt(0.5 * (Dist2(p1, p2) + Dist2(p2, p3)));
-        proj_latest_t = 0.5;
     }
 
     inline Point<2> SplineSeg3::GetPoint(double t) const
@@ -88,25 +77,7 @@ namespace meshit {
         return Point<2>((1.0 / w) * hp);
     }
 
-    Vec<2> SplineSeg3::GetTangent(const double t) const
-    {
-        const double b1 = (1. - t) * ((weight - 2.) * t - weight);
-        const double b2 = weight * (1. - 2. * t);
-        const double b3 = t * ((weight - 2) * t + 2.);
-
-
-        Vec<2> retval;
-        for (int i = 0; i < 2; i++)
-            retval[i] = b1 * p1[i] + b2 * p2[i] + b3 * p3[i];
-
-        return retval;
-
-    }
-
-    void SplineSeg3::GetDerivatives(const double t,
-                                    Point<2>& point,
-                                    Vec<2>& first,
-                                    Vec<2>& second) const
+    void SplineSeg3::GetDerivatives(const double t, Point<2>& point, Vec<2>& first, Vec<2>& second) const
     {
         Vec<2> v1(p1), v2(p2), v3(p3);
 
@@ -144,4 +115,5 @@ namespace meshit {
                  (b2pp / w - 2 * b2p * fac1 - b2 * fac2) * v2 +
                  (b3pp / w - 2 * b3p * fac1 - b3 * fac2) * v3;
     }
+
 }  // namespace meshit

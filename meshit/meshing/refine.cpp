@@ -1,19 +1,12 @@
 #include "refine.hpp"
 
-namespace meshit {
-
-    void Refinement::PointBetween(
-            const Point<3>& p1, const Point<3>& p2, double secpoint, Point<3>& newp) const
+namespace meshit
+{
+    void Refinement::PointBetween(const Point3d& p1, const Point3d& p2, double secpoint, Point3d& newp) const
     {
-        newp = p1 + secpoint * (p2 - p1);
-    }
-
-    void Refinement::PointBetween(const Point<3>& p1, const Point<3>& p2, double secpoint,
-                                  const EdgePointGeomInfo& ap1,
-                                  const EdgePointGeomInfo& ap2,
-                                  Point<3>& newp, EdgePointGeomInfo& newgi) const
-    {
-        newp = p1 + secpoint * (p2 - p1);
+        newp[0] = p1[0] + secpoint * (p2[0] - p1[0]);
+        newp[1] = p1[1] + secpoint * (p2[1] - p1[1]);
+        newp[2] = p1[2] + secpoint * (p2[2] - p1[2]);
     }
 
     void Refinement::Refine(Mesh& mesh)
@@ -31,19 +24,16 @@ namespace meshit {
             const Segment& el = mesh.LineSegment(si);
 
             INDEX_2 i2 = INDEX_2::Sort(el[0], el[1]);
-            PointIndex pinew;
+            size_t pinew;
             EdgePointGeomInfo ngi;
 
             if (between.Used(i2)) {
                 pinew = between.Get(i2);
                 ngi = epgi[pinew];
             } else {
-                Point<3> pnew;
+                Point3d pnew;
                 PointBetween(mesh.Point(el[0]),
-                             mesh.Point(el[1]), 0.5,
-                             el.epgeominfo[0], el.epgeominfo[1],
-                             pnew, ngi);
-
+                             mesh.Point(el[1]), 0.5, pnew);
                 pinew = mesh.AddPoint(pnew);
                 between.Set(i2, pinew);
 
@@ -73,9 +63,9 @@ namespace meshit {
             PointIndex pnums[6];
 
             static int betw[3][3] = {
-                    {1, 2, 3},
-                    {0, 2, 4},
-                    {0, 1, 5}
+                {1, 2, 3},
+                {0, 2, 4},
+                {0, 1, 5}
             };
 
             for (j = 1; j <= 3; j++) {
@@ -89,7 +79,7 @@ namespace meshit {
                 INDEX_2 i2(pi1, pi2);
                 i2.Sort();
 
-                Point<3> pb;
+                Point3d pb;
                 PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
 
                 if (between.Used(i2)) {
@@ -101,10 +91,10 @@ namespace meshit {
             }
 
             static int reftab[4][3] = {
-                    {0, 5, 4},
-                    {1, 3, 5},
-                    {2, 4, 3},
-                    {5, 3, 4}
+                {0, 5, 4},
+                {1, 3, 5},
+                {2, 4, 3},
+                {5, 3, 4}
             };
 
             int ind = el.GetIndex();
@@ -120,26 +110,6 @@ namespace meshit {
                 else
                     mesh.AddSurfaceElement(nel);
             }
-        }
-
-        // update identification tables
-        for (size_t i = 0; i < mesh.GetIdentifications().GetMaxNr(); i++) {
-            std::vector<int> identmap;
-            mesh.GetIdentifications().GetMap(i + 1, identmap);
-
-            for (size_t j = 0; j < between.GetNBags(); j++)
-                for (size_t k = 0; k < between.GetBagSize(j); k++) {
-                    INDEX_2 i2;
-                    PointIndex newpi;
-                    between.GetData(j, k, i2, newpi);
-                    INDEX_2 oi2(identmap[i2.I1() - 1], identmap[i2.I2() - 1]);
-                    oi2.Sort();
-                    if (between.Used(oi2)) {
-                        PointIndex onewpi = between.Get(oi2);
-                        mesh.GetIdentifications().Add(newpi, onewpi, i + 1);
-                    }
-                }
-
         }
 
         mesh.ComputeNVertices();

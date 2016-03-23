@@ -1,5 +1,5 @@
-#ifndef FILE_TEMPLATE
-#define FILE_TEMPLATE
+#ifndef FILE_TEMPLATE_HPP
+#define FILE_TEMPLATE_HPP
 
 /**************************************************************************/
 /* File:   template.hh                                                    */
@@ -9,12 +9,8 @@
 
 #include <iostream>
 
-namespace meshit {
-
-    /*
-       templates, global types, defines and variables
-     */
-
+namespace meshit
+{
     /**
       INDEX is a typedef for (at least) 4-byte integer
      */

@@ -1,7 +1,7 @@
 #include "geom3d.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     std::ostream& operator<<(std::ostream& s, const Point3d& p)
     {
         return s << "(" << p.x[0] << ", " << p.x[1] << ", " << p.x[2] << ")";
@@ -41,9 +41,9 @@ namespace meshit {
     }
 
     Box3d::Box3d(
-            double aminx, double amaxx,
-            double aminy, double amaxy,
-            double aminz, double amaxz)
+        double aminx, double amaxx,
+        double aminy, double amaxy,
+        double aminz, double amaxz)
     {
         minx[0] = aminx;
         maxx[0] = amaxx;
@@ -66,31 +66,6 @@ namespace meshit {
         for (int i = 0; i < 3; i++) {
             minx[i] = b2.PMin()[i];
             maxx[i] = b2.PMax()[i];
-        }
-    }
-
-    void Box3d::GetPointNr(int i, Point3d& point) const
-    {
-        i--;
-        point.X() = (i & 1) ? maxx[0] : minx[0];
-        point.Y() = (i & 2) ? maxx[1] : minx[1];
-        point.Z() = (i & 4) ? maxx[2] : minx[2];
-    }
-
-    void Box3d::Increase(double d)
-    {
-        for (int i = 0; i <= 2; i++) {
-            minx[i] -= d;
-            maxx[i] += d;
-        }
-    }
-
-    void Box3d::IncreaseRel(double /* rel */)
-    {
-        for (int i = 0; i <= 2; i++) {
-            double d = 0.5 * (maxx[i] - minx[i]);
-            minx[i] -= d;
-            maxx[i] += d;
         }
     }
 
@@ -124,8 +99,8 @@ namespace meshit {
     }
 
     int SolveLinearSystem(
-            const Vec3d& col1, const Vec3d& col2, const Vec3d& col3,
-            const Vec3d& rhs, Vec3d& sol)
+        const Vec3d& col1, const Vec3d& col2, const Vec3d& col3,
+        const Vec3d& rhs, Vec3d& sol)
     {
         // changed by MW
         double matrix[3][3];

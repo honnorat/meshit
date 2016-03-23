@@ -2,8 +2,8 @@
 
 #include "../gprim/geomtest3d.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     int CheckSurfaceMesh(const Mesh& mesh)
     {
         MESHIT_LOG_DEBUG("Check Surface mesh");
@@ -23,8 +23,7 @@ namespace meshit {
                         MESHIT_LOG_ERROR("CheckSurfaceMesh, hi = " << hi);
                     edges.Set(i2, 2);
                     cnt2++;
-                }
-                else {
+                } else {
                     std::swap(i2.I1(), i2.I2());
                     edges.Set(i2, 1);
                     cnt1++;
@@ -59,7 +58,6 @@ namespace meshit {
                         std::cerr << *tri2[k] << "   ";
                     std::cerr << std::endl;
                 }
-
             }
         }
         return 0;
@@ -97,9 +95,9 @@ namespace meshit {
 
         for (size_t sei = 0; sei < mesh.GetNSE(); sei++) {
             qual = TriangleQualityInst(
-                    mesh[mesh.SurfaceElement(sei)[0]],
-                    mesh[mesh.SurfaceElement(sei)[1]],
-                    mesh[mesh.SurfaceElement(sei)[2]]);
+                mesh[mesh.SurfaceElement(sei)[0]],
+                mesh[mesh.SurfaceElement(sei)[1]],
+                mesh[mesh.SurfaceElement(sei)[2]]);
 
             cl = static_cast<size_t>((ncl - 1e-3) * qual);
             incl[cl]++;

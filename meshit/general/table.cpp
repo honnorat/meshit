@@ -10,10 +10,12 @@
 
 #include "table.hpp"
 
-namespace meshit {
+#include <cstring>
 
+namespace meshit
+{
     BASE_TABLE::BASE_TABLE(size_t size)
-            : data(size)
+        : data(size)
     {
         for (size_t i = 0; i < size; i++) {
             data[i].maxsize = 0;
@@ -24,7 +26,7 @@ namespace meshit {
     }
 
     BASE_TABLE::BASE_TABLE(const std::vector<int>& entrysizes, size_t elemsize)
-            : data(entrysizes.size())
+        : data(entrysizes.size())
     {
         size_t cnt = 0;
         size_t n = entrysizes.size();
@@ -49,7 +51,7 @@ namespace meshit {
             delete[] oneblock;
         } else {
             for (size_t i = 0; i < data.size(); i++) {
-                delete[] (char*) data[i].col;
+                delete[] reinterpret_cast<char*>(data[i].col);
             }
         }
     }
@@ -57,7 +59,7 @@ namespace meshit {
     void BASE_TABLE::SetSize(size_t size)
     {
         for (size_t i = 0; i < data.size(); i++) {
-            delete[] (char*) data[i].col;
+            delete[] reinterpret_cast<char*>(data[i].col);
         }
         data.resize(size);
         for (size_t i = 0; i < size; i++) {
@@ -75,7 +77,7 @@ namespace meshit {
 
         if (size < oldsize) {
             for (size_t i = size; i < oldsize; i++) {
-                delete[] (char*) data[i].col;
+                delete[] reinterpret_cast<char*>(data[i].col);
             }
         }
 
@@ -103,7 +105,7 @@ namespace meshit {
             void* new_col = new char[new_size * elsize];
 
             memcpy(new_col, line.col, line.maxsize * elsize);
-            delete[] (char*) line.col;
+            delete[] reinterpret_cast<char*>(line.col);
 
             line.col = new_col;
             line.maxsize = new_size;

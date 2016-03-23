@@ -1,5 +1,5 @@
-#ifndef FILE_MESHING2
-#define FILE_MESHING2
+#ifndef FILE_MESHING2_HPP
+#define FILE_MESHING2_HPP
 
 /**************************************************************************/
 /* File:   meshing2.hpp                                                   */
@@ -11,8 +11,8 @@
 #include "ruler2.hpp"
 #include "meshclass.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     enum MESHING2_RESULT
     {
         MESHING2_OK = 0,
@@ -42,9 +42,8 @@ namespace meshit {
         Point3d globp1;
 
      public:
-
         Meshing2(const MeshingParameters& mp, const Box<3>& aboundingbox);
-        virtual ~Meshing2();
+        ~Meshing2();
 
         /// Load rules, either from file, or compiled rules
         void LoadRules(const char* filename);
@@ -56,48 +55,38 @@ namespace meshit {
         void SetMaxArea(double amaxarea);
 
      protected:
+        void StartMesh();
+        void EndMesh();
+        double CalcLocalH(const Point3d& p, double gh) const;
 
-        virtual void StartMesh();
-        virtual void EndMesh();
-        virtual double CalcLocalH(const Point3d& p, double gh) const;
-
-        virtual void DefineTransformation(const Point3d& p1, const Point3d& p2);
-        virtual void TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h, int& zone);
+        void DefineTransformation(const Point3d& p1, const Point3d& p2);
+        void TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h, int& zone);
         /// return 0 .. ok
         /// return >0 .. cannot transform point to true surface
-        virtual int TransformFromPlain(Point2d& plainpoint,
-                                       Point3d& locpoint,
-                                       double h);
-
-        /// projects to surface
-        /// return 0 .. ok
-        virtual int BelongsToActiveChart(const Point3d& p);
-
-        /// computes geoinfo data for line with respect to
-        /// selected chart
-        virtual int ComputePointGeomInfo(const Point3d& p);
+        int TransformFromPlain(Point2d& plainpoint,
+                               Point3d& locpoint,
+                               double h);
 
         /*
           tests, whether endpoint (= 1 or 2) of line segment p1-p2
           is inside of the selected chart. The endpoint must be on the
           chart
          */
-        virtual int IsLineVertexOnChart(const Point3d& p1, const Point3d& p2);
+        int IsLineVertexOnChart(const Point3d& p1, const Point3d& p2);
 
-        virtual double Area() const;
+        double Area() const;
 
         /** Applies 2D rules.
          Tests all 2D rules */
-        int ApplyRules(
-                std::vector<Point2d>& lpoints,
-                std::vector<int>& legalpoints,
-                int maxlegalpoint,
-                std::vector<INDEX_2>& llines,
-                int maxlegelline,
-                std::vector<Element2d>& elements,
-                std::vector<INDEX>& dellines,
-                int tolerance,
-                const MeshingParameters& mp);
+        int ApplyRules(std::vector<Point2d>& lpoints,
+                       std::vector<int>& legalpoints,
+                       size_t maxlegalpoint,
+                       std::vector<INDEX_2>& llines,
+                       size_t maxlegelline,
+                       std::vector<Element2d>& elements,
+                       std::vector<uint32_t>& dellines,
+                       int tolerance,
+                       const MeshingParameters& mp);
     };
 }  // namespace meshit
 

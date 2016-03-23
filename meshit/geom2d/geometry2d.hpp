@@ -1,5 +1,5 @@
-#ifndef MESHIT_GEOM2D_GEOMETRY2D_H
-#define MESHIT_GEOM2D_GEOMETRY2D_H
+#ifndef MESHIT_GEOM2D_GEOMETRY2D_HPP
+#define MESHIT_GEOM2D_GEOMETRY2D_HPP
 
 /* *************************************************************************/
 /* File:   geometry2d.hpp                                                  */
@@ -8,6 +8,7 @@
 /* *************************************************************************/
 
 #define _USE_MATH_DEFINES 1
+
 #include <vector>
 #include <string>
 
@@ -16,8 +17,8 @@
 #include "../gprim/geomobjects.hpp"
 #include "../meshing/refine.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     void Optimize2d(Mesh& mesh, MeshingParameters& mp);
 
     class SplineSegExt : public SplineSeg
@@ -25,19 +26,17 @@ namespace meshit {
      public:
         const SplineSeg& seg;
 
-        int leftdom;    // left domain
-        int rightdom;   // right domain
-        double reffak;  // refinement at line
-        double hmax;    // maximal h
-        int bc;         // boundary condition number
-        int copyfrom;   // copy spline mesh from other spline (-1.. do not copy)
+        size_t leftdom;     // left domain
+        size_t rightdom;    // right domain
+        double reffak;      // refinement at line
+        double hmax;        // maximal h
+        int bc;             // boundary condition number
         int layer;
 
         explicit SplineSegExt(const SplineSeg& hseg)
-                : seg(hseg)
+            : seg(hseg)
         {
             layer = 1;
-            copyfrom = -1;
         }
 
         ~SplineSegExt()
@@ -58,11 +57,6 @@ namespace meshit {
         virtual Point<2> GetPoint(double t) const
         {
             return seg.GetPoint(t);
-        }
-
-        virtual Vec<2> GetTangent(const double t) const
-        {
-            return seg.GetTangent(t);
         }
 
         virtual void GetDerivatives(const double t,
@@ -86,7 +80,6 @@ namespace meshit {
             double fl = first.Length();
             return fabs(first[0] * second[1] - first[1] * second[0]) / (fl * fl * fl);
         }
-
     };
 
     class SplineGeometry2d : public SplineGeometry
@@ -98,7 +91,7 @@ namespace meshit {
         double elto0;
 
      public:
-        SplineGeometry2d() : elto0{1.0} { }
+        SplineGeometry2d() : elto0{0.3} { }
 
         virtual ~SplineGeometry2d();
 
@@ -125,11 +118,9 @@ namespace meshit {
 
         void PartitionBoundary(MeshingParameters& mp, double h, Mesh& mesh2d);
 
-        void CopyEdgeMesh(size_t from, size_t to, Mesh& mesh2d, Point3dTree& searchtree);
+        void GetMaterial(size_t domnr, char*& material);
 
-        void GetMaterial(const int domnr, char*& material);
-
-        double GetDomainMaxh(const int domnr);
+        double GetDomainMaxh(size_t domnr);
 
         int GetDomainLayer(int domnr)
         {

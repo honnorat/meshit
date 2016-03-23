@@ -1,5 +1,5 @@
-#ifndef FILE_GEOMOPS
-#define FILE_GEOMOPS
+#ifndef FILE_GEOMOPS_HPP
+#define FILE_GEOMOPS_HPP
 
 /* *************************************************************************/
 /* File:   geomops.hpp                                                     */
@@ -10,17 +10,13 @@
 #include <iostream>
 #include "geomobjects.hpp"
 
-namespace meshit {
-
-    /*
-
-    Point - Vector operations
-
+namespace meshit
+{
+    /* Point - Vector operations
      */
 
-
     template<int D>
-    inline Vec<D> operator+(const Vec<D>& a, const Vec<D>& b)
+    inline Vec <D> operator+(const Vec <D>& a, const Vec <D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
@@ -29,7 +25,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Point<D> operator+(const Point<D>& a, const Vec<D>& b)
+    inline Point <D> operator+(const Point <D>& a, const Vec <D>& b)
     {
         Point<D> res;
         for (int i = 0; i < D; i++)
@@ -38,7 +34,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D> operator+(const Point<D>& a, const Point<D>& b)
+    inline Vec <D> operator+(const Point <D>& a, const Point <D>& b)
     {
         Point<D> res;
         for (int i = 0; i < D; i++)
@@ -47,7 +43,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D> operator-(const Point<D>& a, const Point<D>& b)
+    inline Vec <D> operator-(const Point <D>& a, const Point <D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
@@ -56,7 +52,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Point<D> operator-(const Point<D>& a, const Vec<D>& b)
+    inline Point <D> operator-(const Point <D>& a, const Vec <D>& b)
     {
         Point<D> res;
         for (int i = 0; i < D; i++)
@@ -65,7 +61,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D> operator-(const Vec<D>& a, const Vec<D>& b)
+    inline Vec <D> operator-(const Vec <D>& a, const Vec <D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
@@ -74,7 +70,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D> operator*(double s, const Vec<D>& b)
+    inline Vec <D> operator*(double s, const Vec <D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
@@ -83,7 +79,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline double operator*(const Vec<D>& a, const Vec<D>& b)
+    inline double operator*(const Vec <D>& a, const Vec <D>& b)
     {
         double sum = 0;
         for (int i = 0; i < D; i++)
@@ -92,7 +88,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D> operator-(const Vec<D>& b)
+    inline Vec <D> operator-(const Vec <D>& b)
     {
         Vec<D> res;
         for (int i = 0; i < D; i++)
@@ -101,7 +97,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Point<D>& operator+=(Point<D>& a, const Vec<D>& b)
+    inline Point <D>& operator+=(Point <D>& a, const Vec <D>& b)
     {
         for (int i = 0; i < D; i++)
             a[i] += b[i];
@@ -109,7 +105,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D>& operator+=(Vec<D>& a, const Vec<D>& b)
+    inline Vec <D>& operator+=(Vec <D>& a, const Vec <D>& b)
     {
         for (int i = 0; i < D; i++)
             a[i] += b[i];
@@ -117,7 +113,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Point<D>& operator-=(Point<D>& a, const Vec<D>& b)
+    inline Point <D>& operator-=(Point <D>& a, const Vec <D>& b)
     {
         for (int i = 0; i < D; i++)
             a[i] -= b[i];
@@ -125,7 +121,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D>& operator-=(Vec<D>& a, const Vec<D>& b)
+    inline Vec <D>& operator-=(Vec <D>& a, const Vec <D>& b)
     {
         for (int i = 0; i < D; i++)
             a[i] -= b[i];
@@ -133,7 +129,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D>& operator*=(Vec<D>& a, double s)
+    inline Vec <D>& operator*=(Vec <D>& a, double s)
     {
         for (int i = 0; i < D; i++)
             a[i] *= s;
@@ -141,7 +137,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline Vec<D>& operator/=(Vec<D>& a, double s)
+    inline Vec <D>& operator/=(Vec <D>& a, double s)
     {
         for (int i = 0; i < D; i++)
             a[i] /= s;
@@ -343,7 +339,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline std::ostream& operator<<(std::ostream& ost, const Vec<D>& a)
+    inline std::ostream& operator<<(std::ostream& ost, const Vec <D>& a)
     {
         ost << "(";
         for (int i = 0; i < D - 1; i++)
@@ -353,7 +349,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline std::ostream& operator<<(std::ostream& ost, const Point<D>& a)
+    inline std::ostream& operator<<(std::ostream& ost, const Point <D>& a)
     {
         ost << "(";
         for (int i = 0; i < D - 1; i++)
@@ -363,7 +359,7 @@ namespace meshit {
     }
 
     template<int D>
-    inline std::ostream& operator<<(std::ostream& ost, const Box<D>& b)
+    inline std::ostream& operator<<(std::ostream& ost, const Box <D>& b)
     {
         ost << b.PMin() << " - " << b.PMax();
         return ost;
@@ -381,7 +377,6 @@ namespace meshit {
         return ost;
     }
 
-
-}
+}  // namespace meshit
 
 #endif

@@ -4,10 +4,10 @@
 #include <iostream>
 #include "adfront2.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     FrontPoint2::FrontPoint2(const Point3d& ap, PointIndex agi)
-            : globalindex(agi)
+        : globalindex(agi)
     {
         p = ap;
         nlinetopoint = 0;
@@ -15,14 +15,13 @@ namespace meshit {
     }
 
     AdFront2::AdFront2(const Box3d& aboundingbox)
-            : boundingbox(aboundingbox),
-              linesearchtree(boundingbox.PMin(), boundingbox.PMax()),
-              pointsearchtree(boundingbox.PMin(), boundingbox.PMax()),
-              cpointsearchtree(boundingbox.PMin(), boundingbox.PMax())
+        : boundingbox(aboundingbox),
+          linesearchtree(boundingbox.PMin(), boundingbox.PMax()),
+          pointsearchtree(boundingbox.PMin(), boundingbox.PMax()),
+          cpointsearchtree(boundingbox.PMin(), boundingbox.PMax())
     {
         nfl = 0;
         allflines = 0;
-
         minval = 0;
         starti = 0;
     }

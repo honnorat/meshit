@@ -8,19 +8,13 @@
    Datatype Flags
 */
 
-#include <sstream>
-#include <fstream>
 #include "flags.hpp"
 
-namespace meshit {
+#include <sstream>
+#include <fstream>
 
-    Flags::Flags() { }
-
-    Flags::~Flags()
-    {
-        DeleteFlags();
-    }
-
+namespace meshit
+{
     void Flags::DeleteFlags()
     {
         for (size_t i = 0; i < strflags.Size(); i++) {

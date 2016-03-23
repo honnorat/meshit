@@ -2,18 +2,16 @@
 #include "improve2.hpp"
 #include "global.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     static const double c_trig0 = 0.144337567297406;  // sqrt(3.0) / 12
-    static const double c_trig2 = 0.288675134594813;  // sqrt(3.0) / 6
     static const double c_trig4 = 0.577350269189626;  // sqrt(3.0) / 3
 
-    double CalcTriangleBadness(
-            const Point3d& p1,
-            const Point3d& p2,
-            const Point3d& p3,
-            double metricweight,
-            double h)
+    double CalcTriangleBadness(const Point3d& p1,
+                               const Point3d& p2,
+                               const Point3d& p3,
+                               double metricweight,
+                               double h)
     {
         // badness = B = sqrt(3.0)/12 * (\sum l_i^2) / area - 1
         double dx12 = p2.X() - p1.X();  // x component of e12 = p2 - p1
@@ -49,13 +47,12 @@ namespace meshit {
         return badness;
     }
 
-    double CalcTriangleBadnessGrad(
-            const Point3d& p1,
-            const Point3d& p2,
-            const Point3d& p3,
-            Vec3d& d_bad,
-            double metricweight,
-            double h)
+    double CalcTriangleBadnessGrad(const Point3d& p1,
+                                   const Point3d& p2,
+                                   const Point3d& p3,
+                                   Vec3d& d_bad,
+                                   double metricweight,
+                                   double h)
     {
         // badness = B = sqrt(3.0)/12 * (\sum l_i^2) / area - 1
         double dx12 = p2.X() - p1.X();  // x component of e12 = p2 - p1
@@ -122,11 +119,10 @@ namespace meshit {
         return badness;
     }
 
-    double CalcTriangleBadness_2(
-            const Point3d& p1,
-            const Point3d& p2,
-            const Point3d& p3,
-            double n_z)
+    double CalcTriangleBadness_2(const Point3d& p1,
+                                 const Point3d& p2,
+                                 const Point3d& p3,
+                                 double n_z)
     {
         double dp12x = p2.X() - p1.X();  // v1 = p2 - p1
         double dp12y = p2.Y() - p1.Y();
@@ -143,7 +139,7 @@ namespace meshit {
         return CalcTriangleBadnessRect(x2, x3, y3);
     }
 
-    double MinFunction_2d::Func(const double* x) const
+    double MinFunction_2d::Func(const double* x)
     {
         double badness = 0;
 
@@ -167,11 +163,9 @@ namespace meshit {
         return badness;
     }
 
-    double MinFunction_2d::FuncGrad(const double* x, double* g) const
+    double MinFunction_2d::FuncGrad(const double* x, double* g)
     {
-
-        double badness = 0;
-
+        double badness = 0.0;
         Vec3d vgrad;
         Point3d pp1(ld.sp1.X() - x[1],
                     ld.sp1.Y() + x[0]);
@@ -197,7 +191,7 @@ namespace meshit {
         return badness;
     }
 
-    double MinFunction_2d::FuncDeriv(const double* x, const double* dir, double& deriv) const
+    double MinFunction_2d::FuncDeriv(const double* x, const double* dir, double& deriv)
     {
         deriv = 0;
         double badness = 0;
@@ -222,12 +216,6 @@ namespace meshit {
             }
         }
         return badness;
-    }
-
-    MeshOptimize2d::MeshOptimize2d()
-    {
-        SetFaceIndex(0);
-        SetMetricWeight(0);
     }
 
     void MeshOptimize2d::ImproveMesh(Mesh& mesh, const MeshingParameters& mp)
@@ -324,24 +312,11 @@ namespace meshit {
                     }
                 }
 
-                ld.normal = Vec3d(0, 0, 1);
-                ld.t1 = Vec3d(0, 1, 0);
-                ld.t2 = Vec3d(-1, 0, 0);
-
                 // save points, and project to tangential plane
                 for (size_t j = 0; j < ld.locelements.size(); j++) {
                     const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
                     for (size_t k = 0; k < 3; k++) {
                         savepoints[el[k]] = mesh[el[k]];
-                    }
-                }
-
-                for (size_t j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
-                    for (size_t k = 0; k < 3; k++) {
-                        PointIndex hhpi = el[k];
-                        double lam = ld.normal * (mesh[hhpi] - ld.sp1);
-                        mesh.Point(hhpi) -= lam * ld.normal;
                     }
                 }
 
@@ -367,7 +342,6 @@ namespace meshit {
                 mesh.Point(pi).Z() = hnp.Z();
             }
         }
-        mesh.SetNextTimeStamp();
     }
 
 }  // namespace meshit

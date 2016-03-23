@@ -1,5 +1,5 @@
-#ifndef FILE_VECTOR
-#define FILE_VECTOR
+#ifndef FILE_VECTOR_HPP
+#define FILE_VECTOR_HPP
 
 /* *************************************************************************/
 /* File:   vector.hpp                                                      */
@@ -11,8 +11,8 @@
 #include <iostream>
 #include <iomanip>
 
-namespace meshit {
-
+namespace meshit
+{
     class FlatVector
     {
      protected:
@@ -23,7 +23,7 @@ namespace meshit {
         FlatVector() { }
 
         explicit FlatVector(size_t as, double* adata = nullptr)
-                : s{as}, data{adata} { }
+            : s{as}, data{adata} { }
 
         size_t Size() const
         {
@@ -111,17 +111,17 @@ namespace meshit {
 
      public:
         Vector()
-                : FlatVector{0, nullptr}, ownmem{false} { }
+            : FlatVector{0, nullptr}, ownmem{false} { }
 
         explicit Vector(size_t as)
-                : FlatVector{as}
+            : FlatVector{as}
         {
             data = new double[s];
             ownmem = true;
         }
 
         Vector(size_t as, double* mem)
-                : FlatVector{as, mem}, ownmem{false} { }
+            : FlatVector{as, mem}, ownmem{false} { }
 
         ~Vector()
         {

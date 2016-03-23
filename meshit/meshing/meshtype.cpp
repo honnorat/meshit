@@ -3,8 +3,8 @@
 #include "meshtype.hpp"
 #include "meshclass.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     Segment::Segment()
     {
         pnums[0] = -1;
@@ -23,17 +23,17 @@ namespace meshit {
         pnums[2] = -1;
     }
 
-    Segment::Segment(const Segment& other) :
-            edgenr(other.edgenr),
-            seginfo(other.seginfo),
-            si(other.si),
-            domin(other.domin),
-            domout(other.domout),
-            tlosurf(other.tlosurf),
-            surfnr1(other.surfnr1),
-            surfnr2(other.surfnr2),
-            epgeominfo(),
-            hp_elnr(other.hp_elnr)
+    Segment::Segment(const Segment& other)
+        : edgenr(other.edgenr),
+          seginfo(other.seginfo),
+          si(other.si),
+          domin(other.domin),
+          domout(other.domout),
+          tlosurf(other.tlosurf),
+          surfnr1(other.surfnr1),
+          surfnr2(other.surfnr2),
+          epgeominfo(),
+          hp_elnr(other.hp_elnr)
     {
         for (int j = 0; j < 3; j++) {
             pnums[j] = other.pnums[j];
@@ -97,13 +97,13 @@ namespace meshit {
     }
 
     FaceDescriptor::FaceDescriptor(const FaceDescriptor& other)
-            : surfnr(other.surfnr), domin(other.domin), domout(other.domout),
-              tlosurf(other.tlosurf), bcprop(other.bcprop)
+        : surfnr(other.surfnr), domin(other.domin), domout(other.domout),
+          tlosurf(other.tlosurf), bcprop(other.bcprop)
     {
         firstelement = -1;
     }
 
-    FaceDescriptor::FaceDescriptor(int surfnri, int domini, int domouti, int tlosurfi)
+    FaceDescriptor::FaceDescriptor(size_t surfnri, size_t domini, size_t domouti, int tlosurfi)
     {
         surfnr = surfnri;
         domin = domini;
@@ -134,34 +134,16 @@ namespace meshit {
     }
 
     Identifications::Identifications(Mesh& amesh)
-            : mesh(amesh)
+        : mesh(amesh)
     {
         identifiedpoints = new INDEX_2_HASHTABLE<int>(100);
         identifiedpoints_nr = new INDEX_3_HASHTABLE<int>(100);
-        maxidentnr = 0;
     }
 
     Identifications::~Identifications()
     {
         delete identifiedpoints;
         delete identifiedpoints_nr;
-    }
-
-    void Identifications::Add(PointIndex pi1, PointIndex pi2, int identnr)
-    {
-        INDEX_2 pair(pi1, pi2);
-        identifiedpoints->Set(pair, identnr);
-
-        INDEX_3 tripl(pi1, pi2, identnr);
-        identifiedpoints_nr->Set(tripl, 1);
-
-        if (identnr > maxidentnr) maxidentnr = identnr;
-
-        if (identnr + 1 > idpoints_table.Size())
-            idpoints_table.ChangeSize(identnr + 1);
-        idpoints_table.Add(identnr, pair);
-
-        //  timestamp = NextTimeStamp();
     }
 
     int Identifications::Get(PointIndex pi1, PointIndex pi2) const
@@ -182,64 +164,6 @@ namespace meshit {
             return 0;
     }
 
-    void Identifications::GetMap(size_t identnr, std::vector<int>& identmap, bool symmetric) const
-    {
-        identmap.resize(mesh.GetNP(), 0);
-
-        if (identnr > 0) {
-            for (size_t i = 0; i < idpoints_table[identnr].size(); i++) {
-                INDEX_2 pair = idpoints_table[identnr][i];
-                identmap[pair.I1()] = pair.I2();
-                if (symmetric)
-                    identmap[pair.I2()] = pair.I1();
-            }
-        } else {
-            MESHIT_LOG_DEBUG("getmap, identnr = " << identnr);
-            for (size_t i = 0; i < identifiedpoints_nr->GetNBags(); i++) {
-                for (size_t j = 0; j < identifiedpoints_nr->GetBagSize(i); j++) {
-                    INDEX_3 i3;
-                    int dummy;
-                    identifiedpoints_nr->GetData(i, j, i3, dummy);
-
-                    if (i3.I3() == identnr || !identnr) {
-                        identmap[i3.I1() - 1] = i3.I2();
-                        if (symmetric)
-                            identmap[i3.I2() - 1] = i3.I1();
-                    }
-                }
-            }
-        }
-
-    }
-
-    void Identifications::GetPairs(int identnr, std::vector<INDEX_2>& identpairs) const
-    {
-        identpairs.resize(0);
-
-        if (identnr == 0) {
-            for (size_t i = 0; i < identifiedpoints->GetNBags(); i++) {
-                for (size_t j = 0; j < identifiedpoints->GetBagSize(i); j++) {
-                    INDEX_2 i2;
-                    int nr;
-                    identifiedpoints->GetData(i, j, i2, nr);
-                    identpairs.push_back(i2);
-                }
-            }
-        }
-        else {
-            for (size_t i = 0; i < identifiedpoints_nr->GetNBags(); i++) {
-                for (size_t j = 0; j < identifiedpoints_nr->GetBagSize(i); j++) {
-                    INDEX_3 i3;
-                    int dummy;
-                    identifiedpoints_nr->GetData(i, j, i3, dummy);
-
-                    if (i3.I3() == identnr)
-                        identpairs.push_back(INDEX_2(i3.I1(), i3.I2()));
-                }
-            }
-        }
-    }
-
     void Identifications::SetMaxPointNr(int maxpnum)
     {
         for (size_t i = 0; i < identifiedpoints->GetNBags(); i++) {
@@ -250,7 +174,7 @@ namespace meshit {
 
                 if (i2.I1() > maxpnum || i2.I2() > maxpnum) {
                     i2.I1() = i2.I2() = -1;
-                    identifiedpoints->SetData(i + 1, j + 1, i2, -1);
+                    identifiedpoints->SetData(i, j, i2, -1);
                 }
             }
         }

@@ -10,10 +10,10 @@
 
 #include "optmem.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     BlockAllocator::BlockAllocator(size_t asize, size_t ablocks)
-            : blocks{ablocks}, freelist{nullptr}
+        : blocks{ablocks}, freelist{nullptr}
     {
         if (asize < sizeof(void*))
             asize = sizeof(void*);
@@ -33,9 +33,9 @@ namespace meshit {
             char* hcp = new char[size * blocks];
             bablocks.push_back(hcp);
             for (size_t i = 0; i < blocks - 1; i++) {
-                *(void**) &(hcp[i * size]) = &(hcp[(i + 1) * size]);
+                *reinterpret_cast<void**>(&(hcp[i * size])) = &(hcp[(i + 1) * size]);
             }
-            *(void**) &(hcp[(blocks - 1) * size]) = nullptr;
+            *reinterpret_cast<void**>(&(hcp[(blocks - 1) * size])) = nullptr;
             freelist = hcp;
         }
 

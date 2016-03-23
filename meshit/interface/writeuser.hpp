@@ -1,5 +1,5 @@
-#ifndef WRITEUSER
-#define WRITEUSER
+#ifndef WRITEUSER_HPP
+#define WRITEUSER_HPP
 
 /**************************************************************************/
 /* File:    writeuser.hh                                                  */
@@ -10,28 +10,18 @@
 #include <string>
 #include <iostream>
 
-namespace meshit {
-
+namespace meshit
+{
     class Mesh;
+
     class SplineGeometry2d;
 
-    void WriteGmsh2Format(
-            const Mesh & mesh,
-            const std::string & filename);
+    void WriteGmsh2Format(const Mesh& mesh, const std::string& filename);
+    void WriteGmsh2Format(const Mesh& mesh, std::ostream& os);
 
-    void WriteGmsh2Format(
-            const Mesh & mesh,
-            std::ostream & os);
+    bool WriteUserFormat(const std::string& format, const Mesh& mesh, const std::string& filename);
+    bool WriteUserFormat(const std::string& format, const Mesh& mesh, std::ostream& ostream);
 
-    bool WriteUserFormat(
-            const std::string & format,
-            const Mesh & mesh,
-            const std::string & filename);
-
-    bool WriteUserFormat(
-            const std::string & format,
-            const Mesh & mesh,
-            std::ostream & ostream);
 }  // namespace meshit
 #endif
 

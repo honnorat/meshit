@@ -3,13 +3,12 @@
 
 #include <iostream>
 #include <vector>
-#include "../general/array.hpp"
 #include "../linalg/densemat.hpp"
 #include "../gprim/geom2d.hpp"
 #include "meshtype.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class netrule
     {
      private:
@@ -55,7 +54,7 @@ namespace meshit {
         double fzminx, fzmaxx, fzminy, fzmaxy;
 
         /// topological distance of line to base element
-        std::vector<int> lnearness;
+        std::vector<uint32_t> lnearness;
 
      public:
         netrule();
@@ -101,45 +100,45 @@ namespace meshit {
             return quality;
         }
 
-        int GetLNearness(size_t li) const
+        uint32_t GetLNearness(size_t li) const
         {
-            return lnearness[li - 1];
+            return lnearness[li];
         }
 
         const Point2d& GetPoint(size_t i) const
         {
-            return points[i - 1];
+            return points[i];
         }
 
         const INDEX_2& GetLine(size_t i) const
         {
-            return lines[i - 1];
+            return lines[i];
         }
 
         const Element2d& GetElement(size_t i) const
         {
-            return elements[i - 1];
+            return elements[i];
         }
 
         const threeint& GetOrientation(size_t i) const
         {
-            return orientations[i - 1];
+            return orientations[i];
         }
 
         int GetDelLine(size_t i) const
         {
-            return dellines[i - 1];
+            return dellines[i];
         }
 
         double CalcPointDist(size_t pi, const Point2d& p) const
         {
-            double dx = p.X() - points[pi - 1].X();
-            double dy = p.Y() - points[pi - 1].Y();
-            const threefloat* tfp = &tolerances[pi - 1];
+            double dx = p.X() - points[pi].X();
+            double dy = p.Y() - points[pi].Y();
+            const threefloat* tfp = &tolerances[pi];
             return tfp->f1 * dx * dx + tfp->f2 * dx * dy + tfp->f3 * dy * dy;
         }
 
-        double CalcLineError(int li, const Vec2d& v) const;
+        double CalcLineError(size_t li, const Vec2d& v) const;
 
         void SetFreeZoneTransformation(const Vector& u, int tolclass);
 
@@ -158,22 +157,12 @@ namespace meshit {
             return 1;
         }
 
-        int IsLineInFreeZone(const Point2d& p1, const Point2d& p2) const
-        {
-            if ((p1.X() > fzmaxx && p2.X() > fzmaxx) ||
-                (p1.X() < fzminx && p2.X() < fzminx) ||
-                (p1.Y() > fzmaxy && p2.Y() > fzmaxy) ||
-                (p1.Y() < fzminy && p2.Y() < fzminy))
-                return 0;
-            return IsLineInFreeZone2(p1, p2);
-        }
-
-        int IsLineInFreeZone2(const Point2d& p1, const Point2d& p2) const;
+        bool IsLineInFreeZone(const Point2d& p1, const Point2d& p2) const;
         int ConvexFreeZone() const;
 
         int GetPointNr(size_t ln, int endp) const
         {
-            return lines[ln - 1].I(endp);
+            return lines[ln].I(endp) - 1;
         }
 
         const DenseMatrix& GetOldUToNewU() const

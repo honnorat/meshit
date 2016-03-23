@@ -28,12 +28,12 @@
 #define _MESHIT_CURRENT_FUNCTION "(unknown)"
 #endif
 
-#define _MESHIT_LOG_POSITION(file, line, function)      \
-    do {                                        \
-        std::cerr << " (at " << file            \
-                  << ":"     << line            \
-                  << " in '" << function        \
-                  << "'";                       \
+#define _MESHIT_LOG_POSITION(file, line, function)  \
+    do {                                            \
+        std::cerr << " (at " << file                \
+                  << ":"     << line                \
+                  << " in '" << function            \
+                  << "'";                           \
     } while(0);
 
 #define _MESHIT_LOG_MACRO_BODY(logEvent, logLevel, retline)                             \
@@ -69,8 +69,8 @@
 #define MESHIT_LOG_INFO_CONT(logEvent)  _MESHIT_LOG_MACRO_BODY(logEvent, MESHIT_INFO_LOG_LEVEL, false)
 #define MESHIT_LOG_DEBUG_CONT(logEvent) _MESHIT_LOG_MACRO_BODY(logEvent, MESHIT_DEBUG_LOG_LEVEL, false)
 
-namespace meshit {
-
+namespace meshit
+{
     int GetLogLevel();
     void SetLogLevel(int logLevel);
 }

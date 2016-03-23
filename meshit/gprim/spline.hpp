@@ -17,14 +17,13 @@
 #include "geomfuncs.hpp"
 #include "geom2d.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     /*
       Spline curves for 2D mesh generation
      */
 
     /// Geometry point
-
     template<int D>
     class GeomPoint : public Point<D>
     {
@@ -36,8 +35,8 @@ namespace meshit {
 
         GeomPoint() { }
 
-        GeomPoint(const Point<D>& ap, double aref = 1, double ahmax=1e99)
-                : Point<D>(ap), refatpoint{aref}, hmax{ahmax} { }
+        explicit GeomPoint(const Point<D>& ap, double aref = 1, double ahmax = 1e99)
+            : Point<D>(ap), refatpoint{aref}, hmax{ahmax} { }
     };
 
 
@@ -56,13 +55,6 @@ namespace meshit {
         virtual Point<2> GetPoint(double t) const = 0;
 
         /// returns a (not necessarily unit-length) tangent vector for 0 <= t <= 1
-
-        virtual Vec<2> GetTangent(const double t) const
-        {
-            std::cerr << "GetTangent not implemented for spline base-class" << std::endl;
-            Vec<2> dummy;
-            return dummy;
-        }
 
         virtual void GetDerivatives(const double t,
                                     Point<2>& point,
@@ -90,13 +82,11 @@ namespace meshit {
     {
      public:
         LineSeg(const GeomPoint<2>& ap1, const GeomPoint<2>& ap2)
-                : p1(ap1), p2(ap2) { }
+            : p1(ap1), p2(ap2) { }
 
         virtual double Length() const;
 
         inline virtual Point<2> GetPoint(double t) const;
-
-        virtual Vec<2> GetTangent(const double t) const;
 
         virtual void GetDerivatives(const double t,
                                     Point<2>& point,
@@ -113,11 +103,6 @@ namespace meshit {
             return p2;
         }
 
-        virtual std::string GetType(void) const
-        {
-            return "line";
-        }
-
      protected:
         GeomPoint<2> p1, p2;
     };
@@ -126,18 +111,12 @@ namespace meshit {
 
     class SplineSeg3 : public SplineSeg
     {
-        GeomPoint<2> p1, p2, p3;
-        double weight;
-        mutable double proj_latest_t;
      public:
-
         SplineSeg3(const GeomPoint<2>& ap1,
                    const GeomPoint<2>& ap2,
                    const GeomPoint<2>& ap3);
 
         inline virtual Point<2> GetPoint(double t) const;
-
-        virtual Vec<2> GetTangent(const double t) const;
 
         virtual void GetDerivatives(const double t,
                                     Point<2>& point,
@@ -154,16 +133,11 @@ namespace meshit {
             return p3;
         }
 
-        virtual std::string GetType(void) const
-        {
-            return "spline3";
-        }
-
-        const GeomPoint<2>& TangentPoint(void) const
-        {
-            return p2;
-        }
+     protected:
+        GeomPoint<2> p1, p2, p3;
+        double weight;
     };
+
 }  // namespace meshit
 
 #endif

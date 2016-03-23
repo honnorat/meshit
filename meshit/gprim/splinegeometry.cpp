@@ -4,8 +4,8 @@
 
 #include "splinegeometry.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     SplineGeometry::~SplineGeometry()
     {
         for (size_t i = 0; i < splines.size(); i++) {
@@ -16,7 +16,7 @@ namespace meshit {
     void SplineGeometry::GetBoundingBox(Box<2>& box) const
     {
         if (!splines.size()) {
-            Point<2> auxp = 0.;
+            Point<2> auxp{0.0};
             box.Set(auxp);
             return;
         }
@@ -31,6 +31,5 @@ namespace meshit {
             }
         }
     }
-}
 
-
+}  // namespace meshit

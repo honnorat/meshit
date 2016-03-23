@@ -3,26 +3,19 @@
 
 #include "meshclass.hpp"
 
-namespace meshit {
-
+namespace meshit
+{
     class MeshOptimize2d
     {
-        int faceindex;
-        double metricweight;
-
      public:
-        MeshOptimize2d();
+        MeshOptimize2d()
+            : faceindex{0}, metricweight{0.0} { }
 
-        virtual ~MeshOptimize2d() { }
+        ~MeshOptimize2d() { }
 
         void ImproveMesh(Mesh& mesh2d, const MeshingParameters& mp);
         void EdgeSwapping(Mesh& mesh, int usemetric);
         void CombineImprove(Mesh& mesh);
-
-        void SetFaceIndex(int fi)
-        {
-            faceindex = fi;
-        }
 
         void SetMetricWeight(double mw)
         {
@@ -30,20 +23,25 @@ namespace meshit {
         }
 
         friend class Opti2SurfaceMinFunction;
+
+     protected:
+        size_t faceindex;
+        double metricweight;
     };
 
     double CalcTriangleBadness(
-            const Point3d& p1,
-            const Point3d& p2,
-            const Point3d& p3,
-            double metricweight,
-            double h);
+        const Point3d& p1,
+        const Point3d& p2,
+        const Point3d& p3,
+        double metricweight,
+        double h);
 
     double CalcTriangleBadness_2(
-            const Point3d& p1,
-            const Point3d& p2,
-            const Point3d& p3,
-            double n_z);
+        const Point3d& p1,
+        const Point3d& p2,
+        const Point3d& p3,
+        double n_z);
+
 }  // namespace meshit
 
 #endif
