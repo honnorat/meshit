@@ -10,13 +10,13 @@ namespace meshit
 
     double SplineSeg::Length() const
     {
-        int n = 100;
+        uint32_t n = 1000;
         double dt = 1.0 / n;
 
         Point<2> pold = GetPoint(0);
 
-        double l = 0;
-        for (int i = 1; i <= n; i++) {
+        double l = 0.0;
+        for (uint32_t i = 1; i <= n; i++) {
             Point<2> p = GetPoint(i * dt);
             l += Dist(p, pold);
             pold = p;

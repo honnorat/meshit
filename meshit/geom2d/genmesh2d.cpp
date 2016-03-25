@@ -66,7 +66,7 @@ namespace meshit
     {
         double fperel, oldf, f;
 
-        size_t n = 1000;
+        size_t n = 10000;
 
         std::vector<Point<2> > xi(n);
         std::vector<double> hi(n);
@@ -87,7 +87,7 @@ namespace meshit
             hi[i - 1] = std::min(hi[i - 1], hnext);
         }
 
-        points.resize(0);
+        points.clear();
 
         double len = spline.Length();
         double dt = len / n;
@@ -128,7 +128,7 @@ namespace meshit
                    Point3dTree& searchtree,
                    int segnr)
     {
-        size_t n = 100;
+        const size_t n = 10000;
 
         Point<2> mark, oldmark;
         std::vector<double> curvepoints;
@@ -225,8 +225,12 @@ namespace meshit
 
         for (size_t i = 0; i < splines.size(); i++) {
             for (int side = 0; side <= 1; side++) {
-                int dom = (side == 0) ? GetSpline(i).leftdom : GetSpline(i).rightdom;
-                if (dom != 0) GetSpline(i).layer = GetDomainLayer(dom);
+                SplineSegExt& sp = GetSpline(i);
+                int dom_l = sp.leftdom;
+                int dom_r = sp.rightdom;
+                if (dom_l != 0) sp.layer = GetDomainLayer(dom_l);
+                if (dom_r != 0) sp.layer = GetDomainLayer(dom_r);
+
             }
         }
 
@@ -252,7 +256,7 @@ namespace meshit
             if (hl > 0) hcurve = std::min(hcurve, hl);
             if (hr > 0) hcurve = std::min(hcurve, hr);
 
-            int np = 1000;
+            uint32_t np = 1000;
             for (double t = 0.5 / np; t < 1; t += 1.0 / np) {
                 Point<2> x = spline.GetPoint(t);
                 double hc = 1.0 / mp.curvature_safety / (1e-99 + spline.CalcCurvature(t));

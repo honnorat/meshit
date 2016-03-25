@@ -68,14 +68,13 @@ namespace meshit
         ey.Z() = 0;
     }
 
-    void Meshing2::TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h, int& zone)
+    void Meshing2::TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h)
     {
         Vec3d p1p(globp1, locpoint);
 
         p1p /= h;
         plainpoint.X() = p1p * ex;
         plainpoint.Y() = p1p * ey;
-        zone = 0;
     }
 
     int Meshing2::TransformFromPlain(Point2d& plainpoint, Point3d& locpoint, double h)
@@ -96,14 +95,13 @@ namespace meshit
         return -1;
     }
 
-    MESHING2_RESULT Meshing2::GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr)
+    bool Meshing2::GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr)
     {
         std::vector<int> pindex, lindex;
         std::vector<int> delpoints;
         std::vector<uint32_t> dellines;
         std::vector<Element2d> locelements;
 
-        int z1, z2;
         bool found;
         int rulenr(-1);
         Point3d p1, p2;
@@ -115,7 +113,6 @@ namespace meshit
         std::vector<Point3d> locpoints;
         std::vector<int> legalpoints;
         std::vector<Point2d> plainpoints;
-        std::vector<int> plainzones;
         std::vector<INDEX_2> loclines;
         int cntelem = 0, trials = 0, nfaces = 0;
         int qualclass;
@@ -168,13 +165,13 @@ namespace meshit
         double meshedarea_before = meshedarea;
 
         while (!adfront->Empty()) {
-            locpoints.resize(0);
-            loclines.resize(0);
-            pindex.resize(0);
-            lindex.resize(0);
-            delpoints.resize(0);
-            dellines.resize(0);
-            locelements.resize(0);
+            locpoints.clear();
+            loclines.clear();
+            pindex.clear();
+            lindex.clear();
+            delpoints.clear();
+            dellines.clear();
+            locelements.clear();
 
             // plot statistics
             if (trials > plotnexttrial) {
@@ -254,70 +251,17 @@ namespace meshit
                 DefineTransformation(p1, p2);
 
                 plainpoints.resize(locpoints.size());
-                plainzones.resize(locpoints.size());
 
                 if (debugflag) {
                     MESHIT_LOG_DEBUG("3d->2d transformation");
                 }
 
                 for (size_t i = 0; i < locpoints.size(); i++) {
-                    TransformToPlain(locpoints[i], plainpoints[i], h, plainzones[i]);
+                    TransformToPlain(locpoints[i], plainpoints[i], h);
                 }
 
                 p12d = plainpoints[0];
                 p22d = plainpoints[1];
-
-                for (size_t i = 1; i < loclines.size(); i++)  // don't remove first line
-                {
-                    z1 = plainzones[loclines[i].I1() - 1];
-                    z2 = plainzones[loclines[i].I2() - 1];
-
-                    // one inner point, one outer
-                    if ((z1 >= 0) != (z2 >= 0)) {
-                        int innerp = (z1 >= 0) ? 1 : 2;
-                        if (IsLineVertexOnChart(locpoints[loclines[i].I1() - 1],
-                                                locpoints[loclines[i].I2() - 1])) {
-                            // use one end of line
-                            int pini, pouti;
-                            Vec2d v;
-
-                            pini = loclines[i].I(innerp);
-                            pouti = loclines[i].I(3 - innerp);
-
-                            Point2d pin(plainpoints[pini - 1]);
-                            Point2d pout(plainpoints[pouti - 1]);
-                            v = pout - pin;
-                            double len = v.Length();
-                            if (len <= 1e-6)
-                                std::cerr << "WARNING(js): inner-outer: short vector" << std::endl;
-                            else
-                                v /= len;
-
-                            Point2d newpout = pin + 1000 * v;
-                            newpout = pout;
-
-                            plainpoints.push_back(newpout);
-                            Point3d pout3d = locpoints[pouti - 1];
-                            locpoints.push_back(pout3d);
-
-                            plainzones.push_back(0);
-                            pindex.push_back(-1);
-                            oldnp++;
-                            loclines[i - 1].I(3 - innerp) = oldnp;
-                        } else {
-                            // remove line
-                            loclines.erase(loclines.begin() + i - 1);
-                            lindex.erase(lindex.begin() + i - 1);
-                            oldnl--;
-                            i--;
-                        }
-                    } else if ((z1 > 0 && z2 > 0 && (z1 != z2)) || ((z1 < 0) && (z2 < 0))) {
-                        loclines.erase(loclines.begin() + i - 1);
-                        lindex.erase(lindex.begin() + i - 1);
-                        oldnl--;
-                        i--;
-                    }
-                }
 
                 legalpoints.assign(plainpoints.size(), 1);
                 double avy = 0;
@@ -328,10 +272,6 @@ namespace meshit
 
 
                 for (size_t i = 0; i < plainpoints.size(); i++) {
-                    if (plainzones[i] < 0) {
-                        plainpoints[i] = Point2d(1e4, 1e4);
-                        legalpoints[i] = 0;
-                    }
                     if (pindex[i] == -1) {
                         legalpoints[i] = 0;
                     }
@@ -596,7 +536,7 @@ namespace meshit
                         std::cerr << "meshed area = " << meshedarea - meshedarea_before << std::endl
                         << "maximal area = " << maxarea << std::endl
                         << "GIVING UP" << std::endl;
-                        return MESHING2_GIVEUP;
+                        return false;
                     }
 
                     for (size_t j = 1; j <= 3; j++) {
@@ -684,19 +624,11 @@ namespace meshit
 
         MESHIT_LOG_DEBUG("Surface meshing done");
 
-        adfront->
-            PrintOpenSegments(std::cout);
+        adfront->PrintOpenSegments(std::cout);
 
         EndMesh();
 
-        if (!adfront->
-            Empty()
-            )
-            return
-                MESHING2_GIVEUP;
-
-        return
-            MESHING2_OK;
+        return (!adfront->Empty());
     }
 
 }  // namespace meshit

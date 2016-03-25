@@ -101,10 +101,14 @@ namespace meshit
         void AddLine(const std::vector<Point2d>& point_list,
                      double hmax = 1e99,
                      bool hole = false,
-                     int bc = 1);
+                     int bc = 1,
+                     int face_left = 1,
+                     int face_right = 0);
         void AddStructureLine(const std::vector<Point2d>& point_list,
                               double hmax = 1e99,
                               int bc = 1);
+        int AddFace(const char* name, double maxh_f = 1e99);
+
         void FakeData();
 
         void TestComment(std::istream& infile);

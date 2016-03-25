@@ -13,12 +13,6 @@
 
 namespace meshit
 {
-    enum MESHING2_RESULT
-    {
-        MESHING2_OK = 0,
-        MESHING2_GIVEUP = 1
-    };
-
     /*
         The basis class for 2D mesh generation. 
         Has the method GenerateMesh
@@ -48,7 +42,7 @@ namespace meshit
         /// Load rules, either from file, or compiled rules
         void LoadRules(const char* filename);
 
-        MESHING2_RESULT GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr);
+        bool GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr);
 
         void AddPoint(const Point3d& p, PointIndex globind);
         void AddBoundaryElement(INDEX i1, INDEX i2);
@@ -60,7 +54,7 @@ namespace meshit
         double CalcLocalH(const Point3d& p, double gh) const;
 
         void DefineTransformation(const Point3d& p1, const Point3d& p2);
-        void TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h, int& zone);
+        void TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h);
         /// return 0 .. ok
         /// return >0 .. cannot transform point to true surface
         int TransformFromPlain(Point2d& plainpoint,

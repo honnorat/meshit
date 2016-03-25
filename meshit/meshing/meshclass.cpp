@@ -62,6 +62,7 @@ namespace meshit
             MESHIT_LOG_WARNING("grading is too small: " << grading << ". We reset it to 0.05");
             grading = 0.05;
         }
+        geometry.SetGrading(grading);
 
         double h = mp.maxh;
         Box<2> bbox = geometry.GetBoundingBox();

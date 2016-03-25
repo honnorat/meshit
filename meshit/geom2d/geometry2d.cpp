@@ -167,7 +167,7 @@ namespace meshit
                     i++;
                     TestComment(infile);
 
-                    SplineSeg* spline = 0;
+                    SplineSeg* spline = nullptr;
                     TestComment(infile);
 
                     infile >> leftdom >> rightdom;
@@ -281,7 +281,7 @@ namespace meshit
     void SplineGeometry2d::AddLine(const std::vector<Point2d>& point_list,
                                    double hmax,
                                    bool hole,
-                                   int bc)
+                                   int bc, int face_left, int face_right)
     {
         size_t nold_points = geompoints.size();
         size_t nnew_points = point_list.size();
@@ -356,6 +356,15 @@ namespace meshit
             materials[i] = new char[1];
             materials[i][0] = '\0';
         }
+    }
+
+    int SplineGeometry2d::AddFace(const char* name, double maxh_f)
+    {
+        materials.push_back(new char[1]);
+        maxh.push_back(maxh_f);
+        layer.push_back(1);
+
+        return materials.size();
     }
 
     void SplineGeometry2d::GetMaterial(size_t domnr, char*& material)
