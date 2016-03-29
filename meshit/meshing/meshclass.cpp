@@ -18,7 +18,7 @@ namespace meshit
         lochfunc = NULL;
         hglob = 1e10;
         hmin = 0;
-        numvertices = -1;
+        numvertices = 0;
 
         topology = new MeshTopology(*this);
         ident = new Identifications(*this);
@@ -58,9 +58,9 @@ namespace meshit
         if (grading < 0) {
             grading = geometry.GetGrading();
         }
-        if (grading < 0.05) {
+        if (grading < 0.01) {
             MESHIT_LOG_WARNING("grading is too small: " << grading << ". We reset it to 0.05");
-            grading = 0.05;
+            grading = 0.01;
         }
         geometry.SetGrading(grading);
 

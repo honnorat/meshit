@@ -19,6 +19,7 @@ namespace meshit
 
     void MeshTopology::Update()
     {
+        mesh.ComputeNVertices();
         size_t nse = mesh.GetNSE();
         size_t nseg = mesh.GetNSeg();
         size_t np = mesh.GetNP();
