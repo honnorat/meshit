@@ -162,24 +162,17 @@ namespace meshit
                 double h = mesh.GetH(Point3d(oldmark[0], oldmark[1], 0));
                 Vec3d v(1e-4 * h, 1e-4 * h, 1e-4 * h);
                 searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
-
-                for (size_t k = 0; k < locsearch.size(); k++) {
-                    if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
-                        pi1 = locsearch[k];
-                    }
-                }
-                searchtree.GetIntersecting(mark3 - v, mark3 + v, locsearch);
-                for (size_t k = 0; k < locsearch.size(); k++) {
-                    if (mesh[PointIndex(locsearch[k])].GetLayer() == spline.layer) {
-                        pi2 = locsearch[k];
-                    }
-                }
-                if (pi1 == -1) {
-                    pi1 = mesh.AddPoint(oldmark3, spline.layer);
+                if (locsearch.size() > 0) {
+                    pi1 = locsearch.back();
+                } else {
+                    pi1 = mesh.AddPoint(oldmark3);
                     searchtree.Insert(oldmark3, pi1);
                 }
-                if (pi2 == -1) {
-                    pi2 = mesh.AddPoint(mark3, spline.layer);
+                searchtree.GetIntersecting(mark3 - v, mark3 + v, locsearch);
+                if (locsearch.size() > 0) {
+                    pi2 = locsearch.back();
+                } else {
+                    pi2 = mesh.AddPoint(mark3);
                     searchtree.Insert(mark3, pi2);
                 }
 
@@ -221,19 +214,6 @@ namespace meshit
             pmax[j] = bbox.PMax()[j];
         }
 
-        Point3dTree searchtree(pmin, pmax);
-
-        for (size_t i = 0; i < splines.size(); i++) {
-            for (int side = 0; side <= 1; side++) {
-                SplineSegExt& sp = GetSpline(i);
-                int dom_l = sp.leftdom;
-                int dom_r = sp.rightdom;
-                if (dom_l != 0) sp.layer = GetDomainLayer(dom_l);
-                if (dom_r != 0) sp.layer = GetDomainLayer(dom_r);
-
-            }
-        }
-
         // mesh size restrictions ...
 
         for (size_t i = 0; i < splines.size(); i++) {
@@ -264,6 +244,7 @@ namespace meshit
             }
         }
 
+        Point3dTree searchtree(pmin, pmax);
         for (size_t i = 0; i < splines.size(); i++) {
             Partition(GetSpline(i), mp, elto0, mesh2d, searchtree, i + 1);
         }

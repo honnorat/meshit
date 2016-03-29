@@ -237,7 +237,6 @@ namespace meshit
                 for (int i = 0; i < numdomains; i++) {
                     maxh[i] = 1000;
                 }
-                layer.resize(numdomains, 1);
 
                 TestComment(infile);
 
@@ -266,7 +265,6 @@ namespace meshit
                     if (infile.good()) infile.putback(ch);
 
                     maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
-                    layer[domainnr - 1] = static_cast<int>(flags.GetNumFlag("layer", 1));
                 }
             }
         }
@@ -352,7 +350,6 @@ namespace meshit
         int numdomains = 1;
         materials.resize(numdomains);
         maxh.assign(numdomains, 1000);
-        layer.assign(numdomains, 1);
 
         for (int i = 0; i < numdomains; i++) {
             materials[i] = new char[1];
@@ -364,7 +361,6 @@ namespace meshit
     {
         materials.push_back(new char[1]);
         maxh.push_back(maxh_f);
-        layer.push_back(1);
 
         return materials.size();
     }

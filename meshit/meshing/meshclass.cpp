@@ -106,11 +106,9 @@ namespace meshit
             std::vector<int> compress(bnp, -1);
             int cnt = 0;
             for (size_t pi = 0; pi < bnp; pi++) {
-                if (points[pi].GetLayer() == geometry.GetDomainLayer(domnr)) {
-                    meshing.AddPoint(points[pi], pi);
-                    cnt++;
-                    compress[pi] = cnt;
-                }
+                meshing.AddPoint(points[pi], pi);
+                cnt++;
+                compress[pi] = cnt;
             }
             for (size_t si = 0; si < GetNSeg(); si++) {
                 if (segments[si].domin == domnr) {
@@ -153,10 +151,10 @@ namespace meshit
         Compress();
     }
 
-    size_t Mesh::AddPoint(const Point3d& p, int layer, POINTTYPE type)
+    size_t Mesh::AddPoint(const Point3d& p, POINTTYPE type)
     {
         size_t pi = points.size();
-        points.push_back(MeshPoint(p, layer, type));
+        points.push_back(MeshPoint(p, type));
 
         return pi;
     }
@@ -1367,8 +1365,7 @@ namespace meshit
         Box3dTree setree(pmin, pmax);
         std::vector<size_t> inters;
 
-        bool overlap = 0;
-        bool incons_layers = 0;
+        bool overlap = false;
 
         for (size_t i = 0; i < GetNSE(); i++) {
             const Element2d& tri = SurfaceElement(i);
@@ -1404,15 +1401,6 @@ namespace meshit
             for (size_t j = 0; j < inters.size(); j++) {
                 const Element2d& tri2 = SurfaceElement(inters[j] - 1);
 
-                if (points[tri[0]].GetLayer() != points[tri2[0]].GetLayer())
-                    continue;
-
-                if (points[tri[0]].GetLayer() != points[tri[1]].GetLayer() ||
-                    points[tri[0]].GetLayer() != points[tri[2]].GetLayer()) {
-                    incons_layers = 1;
-                    MESHIT_LOG_WARNING("inconsistent layers in triangle");
-                }
-
                 const meshit::Point3d* trip1[3], * trip2[3];
                 for (size_t k = 1; k <= 3; k++) {
                     trip1[k - 1] = &Point(tri.PNum(k));
@@ -1444,10 +1432,6 @@ namespace meshit
                 }
             }
         }
-
-        // bug 'fix'
-        if (incons_layers) overlap = 0;
-
         return overlap;
     }
 

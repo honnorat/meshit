@@ -52,20 +52,14 @@ namespace meshit
 
     /**
        Point in the mesh.
-       Contains layer (a new feature in 4.3 for overlapping meshes.
      */
     class MeshPoint : public Point3d
     {
      public:
         MeshPoint() { }
 
-        explicit MeshPoint(const Point3d& ap, int alayer = 1, POINTTYPE apt = INNERPOINT)
-            : Point3d(ap), layer(alayer), type(apt) { }
-
-        int GetLayer() const
-        {
-            return layer;
-        }
+        explicit MeshPoint(const Point3d& ap, POINTTYPE apt = INNERPOINT)
+            : Point3d(ap), type(apt) { }
 
         POINTTYPE Type() const
         {
@@ -78,7 +72,6 @@ namespace meshit
         }
 
      protected:
-        int layer;
         POINTTYPE type;
     };
 

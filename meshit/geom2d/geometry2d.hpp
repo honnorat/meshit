@@ -31,13 +31,9 @@ namespace meshit
         double reffak;      // refinement at line
         double hmax;        // maximal h
         int bc;             // boundary condition number
-        int layer;
 
         explicit SplineSegExt(const SplineSeg& hseg)
-            : seg(hseg)
-        {
-            layer = 1;
-        }
+            : seg(hseg) { }
 
         ~SplineSegExt()
         {
@@ -87,7 +83,6 @@ namespace meshit
      protected:
         std::vector<char*> materials;
         std::vector<double> maxh;
-        std::vector<int> layer;
         double elto0;
 
      public:
@@ -131,12 +126,6 @@ namespace meshit
         void GetMaterial(size_t domnr, char*& material);
 
         double GetDomainMaxh(size_t domnr);
-
-        int GetDomainLayer(int domnr)
-        {
-            if (layer.size()) return layer[domnr - 1];
-            else return 1;
-        }
 
         void SetGrading(const double grading)
         {
