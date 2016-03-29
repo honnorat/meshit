@@ -79,7 +79,7 @@ namespace meshit
 
         std::string keyword;
 
-        std::vector<GeomPoint<2> > infilepoints;
+        std::vector<GeomPoint<2>> infilepoints;
         std::vector<int> pointnrs;
         nump = 0;
         int numdomains = 0;
@@ -136,11 +136,9 @@ namespace meshit
                             infile.get(ch);
                         } while (isspace(ch) && ch != '\n');
                     }
-                    if (infile.good())
-                        infile.putback(ch);
+                    if (infile.good()) infile.putback(ch);
 
-                    if (hd == 1)
-                        hd = flags.GetNumFlag("ref", 1.0);
+                    if (hd == 1) hd = flags.GetNumFlag("ref", 1.0);
 
                     infilepoints.push_back(GeomPoint<2>(x, hd, flags.GetNumFlag("maxh", 1e99)));
 
@@ -212,8 +210,7 @@ namespace meshit
                         infile >> ch;
                     }
 
-                    if (infile.good())
-                        infile.putback(ch);
+                    if (infile.good()) infile.putback(ch);
 
                     spex->bc = static_cast<int>(flags.GetNumFlag("bc", i + 1));
                     spex->reffak = flags.GetNumFlag("ref", 1);
@@ -233,8 +230,7 @@ namespace meshit
                 int domainnr;
                 char material[100];
 
-                if (!infile.good())
-                    return;
+                if (!infile.good()) return;
 
                 materials.resize(numdomains);
                 maxh.resize(numdomains);
@@ -267,8 +263,7 @@ namespace meshit
                         infile >> ch;
                     }
 
-                    if (infile.good())
-                        infile.putback(ch);
+                    if (infile.good()) infile.putback(ch);
 
                     maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
                     layer[domainnr - 1] = static_cast<int>(flags.GetNumFlag("layer", 1));
@@ -278,36 +273,27 @@ namespace meshit
         return;
     }
 
-    void SplineGeometry2d::AddLine(const std::vector<Point2d>& point_list,
-                                   double hmax,
-                                   bool hole,
-                                   int bc, int face_left, int face_right)
+    void SplineGeometry2d::AddLine(
+        const std::vector<Point2d>& points, double hmax, int bc, int face_left, int face_right)
     {
         size_t nold_points = geompoints.size();
-        size_t nnew_points = point_list.size();
+        size_t nnew_points = points.size();
 
-        std::vector<GeomPoint<2> > gpts;
+        std::vector<GeomPoint<2>> gpts;
 
         gpts.reserve(nnew_points);
         geompoints.reserve(nold_points + nnew_points);
 
         for (size_t i = 0; i < nnew_points; i++) {
-            gpts.push_back(GeomPoint<2>(point_list[i]));
+            gpts.push_back(GeomPoint<2>(points[i]));
             geompoints.push_back(gpts[i]);
         }
-        for (size_t i = 0; i < nnew_points; i++) {
-            size_t i0 = (hole) ? nnew_points - i - 1 : i;
-            size_t i1 = (hole) ? (i0 == 0) ? nnew_points - 1 : i0 - 1
-                               : (i0 == nnew_points - 1) ? 0 : i0 + 1;
+        for (size_t i0 = 0; i0 < nnew_points; i0++) {
+            size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
             SplineSeg* spline = new LineSeg(gpts[i0], gpts[i1]);
             SplineSegExt* seg = new SplineSegExt(*spline);
-            if (hole) {
-                seg->leftdom = 0;
-                seg->rightdom = 1;
-            } else {
-                seg->leftdom = 1;
-                seg->rightdom = 0;
-            }
+            seg->leftdom = face_left;
+            seg->rightdom = face_right;
             seg->bc = bc;
             seg->reffak = 1;  // Refinement factor
             seg->hmax = hmax;
@@ -315,33 +301,49 @@ namespace meshit
         }
     }
 
-    void SplineGeometry2d::AddStructureLine(const std::vector<Point2d>& point_list,
-                                            double hmax,
-                                            int bc)
+    void SplineGeometry2d::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, int face)
     {
-        size_t nold_points = geompoints.size();
-        size_t nnew_points = point_list.size();
+        AddLine(point_list, hmax, bc, 0, face);
+    }
 
-        std::vector<GeomPoint<2> > gpts;
+    void SplineGeometry2d::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, int face)
+    {
+        AddLine(points, hmax, bc, face, face);
+    }
 
-        gpts.reserve(nnew_points);
-        geompoints.reserve(nold_points + nnew_points);
+    void SplineGeometry2d::AddSpline(const std::vector<Point2d>& points,
+                                     double hmax, int bc,
+                                     int face_left,
+                                     int face_right)
+    {
 
-        for (size_t i = 0; i < nnew_points; i++) {
-            gpts.push_back(GeomPoint<2>(point_list[i]));
-            geompoints.push_back(gpts[i]);
+        size_t nb_points = points.size();
+        size_t ip_0 = geompoints.size();
+        size_t ip = ip_0;
+
+        if (nb_points < 4 || nb_points % 2 > 0) {
+            throw std::runtime_error("SplineGeometry2d::AddSpline : wrong number of points.");
         }
-        for (size_t i = 0; i < nnew_points; i++) {
-            size_t i0 = i;
-            size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
-            SplineSeg* spline = new LineSeg(gpts[i0], gpts[i1]);
-            SplineSegExt* seg = new SplineSegExt(*spline);
-            seg->leftdom = 1;
-            seg->rightdom = 1;
-            seg->bc = bc;
-            seg->reffak = 2;  // Refinement factor
-            seg->hmax = hmax;
-            splines.push_back(seg);
+        for (size_t i = 0; i < nb_points; i++) {
+            geompoints.push_back(meshit::GeomPoint<2>(points[i]));
+        }
+
+        size_t nb_splines = nb_points / 2;
+
+        for (size_t i = 0; i < nb_splines; i++) {
+            size_t id0 = ip + 0;
+            size_t id1 = ip + 1;
+            size_t id2 = ip + 2;
+            if (i == nb_splines - 1) id2 = ip_0;
+            SplineSeg* spline = new SplineSeg3(geompoints[id0], geompoints[id1], geompoints[id2]);
+            SplineSegExt* spex = new SplineSegExt(*spline);
+            spex->leftdom = face_left;
+            spex->rightdom = face_right;
+            spex->bc = bc;
+            spex->reffak = 1;
+            spex->hmax = hmax;
+            splines.push_back(spex);
+            ip += 2;
         }
     }
 

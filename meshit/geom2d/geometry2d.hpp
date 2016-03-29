@@ -98,15 +98,21 @@ namespace meshit
         void Load(const std::string& filename);
         void LoadData(std::istream& infile);
 
-        void AddLine(const std::vector<Point2d>& point_list,
-                     double hmax = 1e99,
-                     bool hole = false,
-                     int bc = 1,
-                     int face_left = 1,
-                     int face_right = 0);
-        void AddStructureLine(const std::vector<Point2d>& point_list,
+        void AddLine(const std::vector<Point2d>& points,
+                     double hmax, int bc,
+                     int face_left = 1, int face_right = 0);
+        void AddHole(const std::vector<Point2d>& points,
+                     double hmax, int bc, int face = 1);
+        void AddStructureLine(const std::vector<Point2d>& points,
                               double hmax = 1e99,
-                              int bc = 1);
+                              int bc = 1,
+                              int face = 1);
+
+        void AddSpline(const std::vector<Point2d>& points,
+                       double hmax, int bc = 1,
+                       int face_left = 1,
+                       int face_right = 0);
+
         int AddFace(const char* name, double maxh_f = 1e99);
 
         void FakeData();

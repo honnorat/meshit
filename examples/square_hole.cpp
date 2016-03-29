@@ -21,19 +21,21 @@ int main(int argc, char** argv)
     // creates geometry structure
     meshit::SplineGeometry2d geom;
 
+    int face1 = geom.AddFace("face 1");
+
     std::vector<meshit::Point2d> list_outer;
     list_outer.push_back(meshit::Point2d(-1, -1));
     list_outer.push_back(meshit::Point2d(1, -1));
     list_outer.push_back(meshit::Point2d(1, 1));
     list_outer.push_back(meshit::Point2d(-1, 1));
-    geom.AddLine(list_outer, 0.25, false, 2);
+    geom.AddLine(list_outer, 0.25, 2, face1);
 
     std::vector<meshit::Point2d> line_inner;
     line_inner.push_back(meshit::Point2d(-0.5, -0.5));
-    line_inner.push_back(meshit::Point2d(-0.5, 0.5));
-    line_inner.push_back(meshit::Point2d(0.5, 0.5));
     line_inner.push_back(meshit::Point2d(0.5, -0.5));
-    geom.AddLine(line_inner, 0.05, true, 3);
+    line_inner.push_back(meshit::Point2d(0.5, 0.5));
+    line_inner.push_back(meshit::Point2d(-0.5, 0.5));
+    geom.AddHole(line_inner, 0.05, 3, face1);
 
     geom.FakeData();
 
