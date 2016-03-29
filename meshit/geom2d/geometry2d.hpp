@@ -108,6 +108,11 @@ namespace meshit
                        int face_left = 1,
                        int face_right = 0);
 
+        void AddCircle(const Point2d& center, double radius,
+                       double hmax, int bc = 1,
+                       int face_left = 1,
+                       int face_right = 0);
+
         int AddFace(const char* name, double maxh_f = 1e99);
 
         void FakeData();

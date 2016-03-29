@@ -345,6 +345,27 @@ namespace meshit
         }
     }
 
+    void SplineGeometry2d::AddCircle(const Point2d& center, double radius,
+                                     double hmax, int bc,
+                                     int face_left, int face_right)
+    {
+        std::vector<Point2d> spline_points;
+        double c_x = center.X();
+        double c_y = center.Y();
+
+        spline_points.reserve(8);
+        spline_points.push_back(Point2d(c_x + radius, c_y));
+        spline_points.push_back(Point2d(c_x + radius, c_y + radius));
+        spline_points.push_back(Point2d(c_x, c_y + radius));
+        spline_points.push_back(Point2d(c_x - radius, c_y + radius));
+        spline_points.push_back(Point2d(c_x - radius, c_y));
+        spline_points.push_back(Point2d(c_x - radius, c_y - radius));
+        spline_points.push_back(Point2d(c_x, c_y - radius));
+        spline_points.push_back(Point2d(c_x + radius, c_y - radius));
+
+        AddSpline(spline_points, hmax, bc, face_left, face_right);
+    }
+
     void SplineGeometry2d::FakeData()
     {
         int numdomains = 1;
