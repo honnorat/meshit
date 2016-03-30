@@ -10,14 +10,43 @@
 
 namespace meshit
 {
-    SplineGeometry2d::~SplineGeometry2d()
+    SplineGeometry::~SplineGeometry()
     {
+        for (size_t i = 0; i < splines.size(); i++) {
+            delete splines[i];
+        }
         for (size_t i = 0; i < materials.size(); i++) {
             delete[] materials[i];
         }
     }
 
-    void SplineGeometry2d::Load(const std::string& filename)
+    void SplineGeometry::GetBoundingBox(Box<2>& box) const
+    {
+        if (!splines.size()) {
+            Point<2> auxp{0.0};
+            box.Set(auxp);
+            return;
+        }
+
+        std::vector<Point<2> > points;
+        for (size_t i = 0; i < splines.size(); i++) {
+            splines[i]->GetPoints(20, points);
+
+            if (i == 0) box.Set(points[0]);
+            for (size_t j = 0; j < points.size(); j++) {
+                box.Add(points[j]);
+            }
+        }
+    }
+
+    Box<2> SplineGeometry::GetBoundingBox() const
+    {
+        Box<2> box;
+        GetBoundingBox(box);
+        return box;
+    }
+
+    void SplineGeometry::Load(const std::string& filename)
     {
         std::ifstream infile;
         char buf[50];
@@ -43,7 +72,7 @@ namespace meshit
         infile.close();
     }
 
-    void SplineGeometry2d::TestComment(std::istream& infile)
+    void SplineGeometry::TestComment(std::istream& infile)
     {
         bool comment = true;
         char ch;
@@ -67,7 +96,7 @@ namespace meshit
         return;
     }
 
-    void SplineGeometry2d::LoadData(std::istream& infile)
+    void SplineGeometry::LoadData(std::istream& infile)
     {
         MESHIT_LOG_INFO("Load 2D Geometry");
         int nump, leftdom, rightdom;
@@ -186,7 +215,7 @@ namespace meshit
                                                 geompoints[hi3 - 1]);
                     } else {
                         MESHIT_LOG_ERROR("Unknown segment type : " << buf);
-                        throw std::runtime_error("SplineGeometry2d::LoadData : unknown segment type");
+                        throw std::runtime_error("SplineGeometry::LoadData : unknown segment type");
                     }
 
                     SplineSegExt* spex = new SplineSegExt(*spline);
@@ -271,7 +300,7 @@ namespace meshit
         return;
     }
 
-    void SplineGeometry2d::AddLine(
+    void SplineGeometry::AddLine(
         const std::vector<Point2d>& points, double hmax, int bc, int face_left, int face_right)
     {
         size_t nold_points = geompoints.size();
@@ -299,28 +328,27 @@ namespace meshit
         }
     }
 
-    void SplineGeometry2d::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, int face)
+    void SplineGeometry::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, int face)
     {
         AddLine(point_list, hmax, bc, 0, face);
     }
 
-    void SplineGeometry2d::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, int face)
+    void SplineGeometry::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, int face)
     {
         AddLine(points, hmax, bc, face, face);
     }
 
-    void SplineGeometry2d::AddSpline(const std::vector<Point2d>& points,
+    void SplineGeometry::AddSpline(const std::vector<Point2d>& points,
                                      double hmax, int bc,
                                      int face_left,
                                      int face_right)
     {
-
         size_t nb_points = points.size();
         size_t ip_0 = geompoints.size();
         size_t ip = ip_0;
 
         if (nb_points < 4 || nb_points % 2 > 0) {
-            throw std::runtime_error("SplineGeometry2d::AddSpline : wrong number of points.");
+            throw std::runtime_error("SplineGeometry::AddSpline : wrong number of points.");
         }
         for (size_t i = 0; i < nb_points; i++) {
             geompoints.push_back(meshit::GeomPoint<2>(points[i]));
@@ -345,7 +373,7 @@ namespace meshit
         }
     }
 
-    void SplineGeometry2d::AddCircle(const Point2d& center, double radius,
+    void SplineGeometry::AddCircle(const Point2d& center, double radius,
                                      double hmax, int bc,
                                      int face_left, int face_right)
     {
@@ -366,7 +394,7 @@ namespace meshit
         AddSpline(spline_points, hmax, bc, face_left, face_right);
     }
 
-    void SplineGeometry2d::FakeData()
+    void SplineGeometry::FakeData()
     {
         int numdomains = 1;
         materials.resize(numdomains);
@@ -378,15 +406,16 @@ namespace meshit
         }
     }
 
-    int SplineGeometry2d::AddFace(const char* name, double maxh_f)
+    int SplineGeometry::AddFace(const std::string& name, double maxh_f)
     {
-        materials.push_back(new char[1]);
         maxh.push_back(maxh_f);
+        materials.push_back(new char[100]);
+        strncpy(materials.back(), name.c_str(), 100);
 
         return materials.size();
     }
 
-    void SplineGeometry2d::GetMaterial(size_t domnr, char*& material)
+    void SplineGeometry::GetMaterial(size_t domnr, char*& material)
     {
         if (domnr <= materials.size())
             material = materials[domnr - 1];
@@ -394,7 +423,7 @@ namespace meshit
             material = nullptr;
     }
 
-    double SplineGeometry2d::GetDomainMaxh(size_t domnr)
+    double SplineGeometry::GetDomainMaxh(size_t domnr)
     {
         if (domnr > 0 && domnr <= maxh.size()) {
             return maxh[domnr - 1];
@@ -403,9 +432,9 @@ namespace meshit
         }
     }
 
-    int SplineGeometry2d::GenerateMesh(Mesh*& mesh, MeshingParameters& mp)
+    int SplineGeometry::GenerateMesh(Mesh*& mesh, MeshingParameters& mp)
     {
-        mesh->BuildFromSpline2D(*this, mp);
+        mesh->BuildFromSplineGeometry(*this, mp);
         return 0;
     }
 

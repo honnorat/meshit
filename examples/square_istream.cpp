@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     meshit::Mesh mesh;
 
     // creates geometry structure
-    meshit::SplineGeometry2d geom;
+    meshit::SplineGeometry geom;
 
     double cc;
 
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     cc = uclock();
     mp.optsteps2d = 5;
     geom.SetGrading(0.1);
-    mesh.BuildFromSpline2D(geom, mp);
+    mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO(" . mesh created     in " << uclock() - cc << " s.");
 
     cc = uclock();

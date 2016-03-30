@@ -30,7 +30,7 @@ namespace meshit
         RESTRICTH_SURFACEELEMENT, RESTRICTH_POINT, RESTRICTH_SEGMENT
     };
 
-    class SplineGeometry2d;
+    class SplineGeometry;
 
     class Mesh
     {
@@ -102,7 +102,7 @@ namespace meshit
 
         Mesh& operator=(const Mesh& mesh2);
 
-        void BuildFromSpline2D(SplineGeometry2d& geometry, MeshingParameters& mp);
+        void BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp);
 
         size_t AddPoint(const Point3d& p, POINTTYPE type = INNERPOINT);
 

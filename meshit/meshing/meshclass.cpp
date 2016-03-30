@@ -49,7 +49,7 @@ namespace meshit
         return *this;
     }
 
-    void Mesh::BuildFromSpline2D(SplineGeometry2d& geometry, MeshingParameters& mp)
+    void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp)
     {
         MESHIT_LOG_DEBUG("Generate Mesh from spline geometry");
 

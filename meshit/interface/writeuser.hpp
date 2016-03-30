@@ -14,7 +14,7 @@ namespace meshit
 {
     class Mesh;
 
-    class SplineGeometry2d;
+    class SplineGeometry;
 
     void WriteGmsh2Format(const Mesh& mesh, const std::string& filename);
     void WriteGmsh2Format(const Mesh& mesh, std::ostream& os);

@@ -17,8 +17,7 @@ SET(src_GPRIM
     gprim/geom3d.cpp
     gprim/geomfuncs.cpp
     gprim/geomtest3d.cpp
-    gprim/spline.cpp
-    gprim/splinegeometry.cpp)
+    gprim/spline.cpp)
 
 SET(src_INTERFACE
     interface/writegmsh2.cpp

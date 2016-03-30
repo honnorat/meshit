@@ -199,7 +199,7 @@ namespace meshit
         }
     }
 
-    void SplineGeometry2d::PartitionBoundary(MeshingParameters& mp, double h, Mesh& mesh2d)
+    void SplineGeometry::PartitionBoundary(MeshingParameters& mp, double h, Mesh& mesh2d)
     {
         Box<2> bbox;
         GetBoundingBox(bbox);

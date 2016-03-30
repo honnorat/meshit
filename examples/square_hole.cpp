@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     meshit::Mesh mesh;
 
     // creates geometry structure
-    meshit::SplineGeometry2d geom;
+    meshit::SplineGeometry geom;
 
     int face1 = geom.AddFace("face 1");
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     MESHIT_LOG_INFO("== start meshing");
     mp.optsteps2d = 5;
     geom.SetGrading(0.1);
-    mesh.BuildFromSpline2D(geom, mp);
+    mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO("== meshing done");
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);

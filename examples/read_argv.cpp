@@ -44,13 +44,13 @@ int main(int argc, char** argv)
 
         // creates geometry structure
         cc = uclock();
-        meshit::SplineGeometry2d geom;
+        meshit::SplineGeometry geom;
         geom.Load(filename);
         MESHIT_LOG_INFO(" . geometry read in " << uclock() - cc << " s.");
 
         cc = uclock();
         mp.optsteps2d = 5;
-        mesh.BuildFromSpline2D(geom, mp);
+        mesh.BuildFromSplineGeometry(geom, mp);
         MESHIT_LOG_INFO(" . meshing done  in " << uclock() - cc << " s.");
 
         filename_export = "square_argv.msh";

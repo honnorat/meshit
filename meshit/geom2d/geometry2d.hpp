@@ -13,7 +13,6 @@
 #include <string>
 
 #include "../gprim/spline.hpp"
-#include "../gprim/splinegeometry.hpp"
 #include "../gprim/geomobjects.hpp"
 #include "../meshing/refine.hpp"
 
@@ -78,17 +77,22 @@ namespace meshit
         }
     };
 
-    class SplineGeometry2d : public SplineGeometry
+    class SplineGeometry
     {
      protected:
+        std::vector<GeomPoint<2> > geompoints;
+        std::vector<SplineSeg*> splines;
         std::vector<char*> materials;
         std::vector<double> maxh;
         double elto0;
 
      public:
-        SplineGeometry2d() : elto0{0.3} { }
+        SplineGeometry() : elto0{0.3} { }
 
-        virtual ~SplineGeometry2d();
+        ~SplineGeometry();
+
+        void GetBoundingBox(Box<2>& box) const;
+        Box<2> GetBoundingBox() const;
 
         void Load(const std::string& filename);
         void LoadData(std::istream& infile);
@@ -113,7 +117,7 @@ namespace meshit
                        int face_left = 1,
                        int face_right = 0);
 
-        int AddFace(const char* name, double maxh_f = 1e99);
+        int AddFace(const std::string& name, double maxh_f = 1e99);
 
         void FakeData();
 

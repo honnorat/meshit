@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     meshit::SetLogLevel(MESHIT_INFO_LOG_LEVEL);
 
     // creates geometry structure
-    meshit::SplineGeometry2d geom;
+    meshit::SplineGeometry geom;
     int bc_num = 1;
 
     // outer boundary
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     double cc;
 
     cc = uclock();
-    mesh.BuildFromSpline2D(geom, mp);
+    mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO("~ meshing  : " << uclock() - cc << " s.");
 
     cc = uclock();
@@ -80,6 +80,10 @@ int main(int argc, char** argv)
     cc = uclock();
     mesh.Export("circles.msh");
     MESHIT_LOG_INFO("~ export   : " << uclock() - cc << " s.");
+
+    cc = uclock();
+    mesh.Save("circles.meshit");
+    MESHIT_LOG_INFO("~ save     : " << uclock() - cc << " s.");
 
     meshit::Refinement ref;
     ref.Refine(mesh);
