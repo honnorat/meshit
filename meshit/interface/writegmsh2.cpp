@@ -56,7 +56,7 @@ namespace meshit
         int cnt = 0;
         for (size_t i = 0; i < np; i++) {
             const Point3d& p = mesh.Point(i);
-            os << cnt++ << " ";  // number of nodes
+            os << ++cnt << " ";  // number of nodes
             os << p.X() << " ";
             os << p.Y() << " ";
             os << p.Z() << "\n";
@@ -74,17 +74,16 @@ namespace meshit
         cnt = 0;
         for (size_t i = 0; i < ns; i++) {
             const Segment& seg = mesh.LineSegment(i);
-            os << cnt++ << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] << " " << seg[1] << std::endl;
+            os << ++cnt << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] + 1 << " " << seg[1] + 1 << std::endl;
         }
-        //            cnt += ns;
         for (size_t k = 0; k < nse; k++) {
             const Element2d& el = mesh.SurfaceElement(k);
-            os << cnt++ << " 2 2 ";   // GMSH Type for a 3 node triangle
-            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
-            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() << " ";
-            os << el.PNum(1) << " ";
-            os << el.PNum(2) << " ";
-            os << el.PNum(3) << "\n";
+            os << ++cnt << " 2 2 ";   // GMSH Type for a 3 node triangle
+            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";
+            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";
+            os << el.PNum(1) + 1 << " ";
+            os << el.PNum(2) + 1 << " ";
+            os << el.PNum(3) + 1 << "\n";
         }
         os << "$EndElements\n";
         /*
