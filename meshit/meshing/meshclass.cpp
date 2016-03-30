@@ -12,12 +12,12 @@ namespace meshit
     Mesh::Mesh()
         : surfarea(*this)
     {
-        boundaryedges = NULL;
-        surfelementht = NULL;
-        segmentht = NULL;
-        lochfunc = NULL;
-        hglob = 1e10;
-        hmin = 0;
+        boundaryedges = nullptr;
+        surfelementht = nullptr;
+        segmentht = nullptr;
+        lochfunc = nullptr;
+        hglob_ = 1e10;
+        hmin_ = 0;
         numvertices = 0;
 
         topology = new MeshTopology(*this);
@@ -74,7 +74,8 @@ namespace meshit
         Point3d pmax(bbox.PMax()[0], bbox.PMax()[1], bbox.Diam());
 
         SetLocalH(pmin, pmax, grading);
-        hglob = h;
+        hmin_ = mp.minh;
+        hglob_ = h;
 
         geometry.PartitionBoundary(mp, h, *this);
 
@@ -519,8 +520,7 @@ namespace meshit
     {
         delete boundaryedges;
 
-        boundaryedges = new INDEX_2_CLOSED_HASHTABLE<int>
-            (3 * (GetNSE() + GetNOpenElements()) + GetNSeg() + 1);
+        boundaryedges = new INDEX_2_CLOSED_HASHTABLE<int>(3 * (GetNSE() + GetNOpenElements()) + GetNSeg() + 1);
 
         for (size_t sei = 0; sei < GetNSE(); sei++) {
             const Element2d& sel = surfelements[sei];
@@ -865,8 +865,8 @@ namespace meshit
 
     void Mesh::RestrictLocalH(const Point3d& p, double hloc)
     {
-        if (hloc < hmin)
-            hloc = hmin;
+        if (hloc < hmin_)
+            hloc = hmin_;
 
         assert(lochfunc);
         lochfunc->SetH(p, hloc);
@@ -874,8 +874,8 @@ namespace meshit
 
     void Mesh::RestrictLocalHLine(const Point3d& p1, const Point3d& p2, double hloc)
     {
-        if (hloc < hmin) {
-            hloc = hmin;
+        if (hloc < hmin_) {
+            hloc = hmin_;
         }
         int steps = static_cast<int>(Dist(p1, p2) / hloc) + 2;
         Vec3d v(p1, p2);
@@ -886,38 +886,12 @@ namespace meshit
         }
     }
 
-    void Mesh::SetMinimalH(double h)
-    {
-        hmin = h;
-    }
-
-    void Mesh::SetGlobalH(double h)
-    {
-        hglob = h;
-    }
-
-    double Mesh::MaxHDomain(int dom) const
-    {
-        if (maxhdomain.size())
-            return maxhdomain[dom - 1];
-        else
-            return 1e10;
-    }
-
-    void Mesh::SetMaxHDomain(const std::vector<double>& mhd)
-    {
-        maxhdomain.resize(mhd.size());
-        for (size_t i = 0; i < mhd.size(); i++) {
-            maxhdomain[i] = mhd[i];
-        }
-    }
-
     double Mesh::GetH(const Point3d& p) const
     {
-        double hmin = hglob;
+        double hmin = hglob_;
         if (lochfunc) {
             double hl = lochfunc->GetH(p);
-            if (hl < hglob)
+            if (hl < hglob_)
                 hmin = hl;
         }
         return hmin;
@@ -925,7 +899,7 @@ namespace meshit
 
     double Mesh::GetMinH(const Point3d& pmin, const Point3d& pmax)
     {
-        double hmin = hglob;
+        double hmin = hglob_;
         if (lochfunc) {
             double hl = lochfunc->GetMinH(pmin, pmax);
             if (hl < hmin)
@@ -998,96 +972,14 @@ namespace meshit
         }
     }
 
-    void Mesh::CalcLocalHFromPointDistances()
-    {
-        MESHIT_LOG_DEBUG("Calculating local h from point distances");
-
-        assert(lochfunc);
-
-        for (size_t i = 0; i < GetNP(); i++) {
-            for (size_t j = i + 1; j < GetNP(); j++) {
-                const Point3d& p1 = points[i];
-                const Point3d& p2 = points[j];
-                double hl = Dist(p1, p2);
-                RestrictLocalH(p1, hl);
-                RestrictLocalH(p2, hl);
-            }
-        }
-    }
-
-    void Mesh::CalcLocalHFromSurfaceCurvature(double elperr)
-    {
-        MESHIT_LOG_DEBUG("Calculating local h from surface curvature");
-
-        assert(lochfunc);
-
-        INDEX_2_HASHTABLE<int> edges(3 * GetNP() + 2);
-        INDEX_2_HASHTABLE<int> bedges(GetNSeg() + 2);
-        int j;
-
-        for (size_t i = 0; i < GetNSeg(); i++) {
-            const Segment& seg = LineSegment(i);
-            INDEX_2 i2(seg[0], seg[1]);
-            i2.Sort();
-            bedges.Set(i2, 1);
-        }
-        for (size_t i = 0; i < GetNSE(); i++) {
-            const Element2d& sel = SurfaceElement(i);
-            if (!sel.PNum(1))
-                continue;
-            for (j = 1; j <= 3; j++) {
-                INDEX_2 i2(sel.PNumMod(j), sel.PNumMod(j + 1));
-                i2.Sort();
-                if (bedges.Used(i2)) continue;
-
-                if (edges.Used(i2)) {
-                    int other = edges.Get(i2);
-
-                    const Element2d& elother = SurfaceElement(other - 1);
-
-                    int pi3 = 1;
-                    while ((sel.PNum(pi3) == i2.I1()) ||
-                           (sel.PNum(pi3) == i2.I2()))
-                        pi3++;
-                    pi3 = sel.PNum(pi3);
-
-                    int pi4 = 1;
-                    while ((elother.PNum(pi4) == i2.I1()) ||
-                           (elother.PNum(pi4) == i2.I2()))
-                        pi4++;
-                    pi4 = elother.PNum(pi4);
-
-                    double rad = ComputeCylinderRadius(points[i2.I1() - 1],
-                                                       points[i2.I2() - 1],
-                                                       points[pi3 - 1],
-                                                       points[pi4 - 1]);
-
-                    RestrictLocalHLine(points[i2.I1() - 1], points[i2.I2() - 1], rad / elperr);
-                }
-                else
-                    edges.Set(i2, i + 1);
-            }
-        }
-
-
-        // Restrict h due to line segments
-
-        for (size_t i = 0; i < GetNSeg(); i++) {
-            const Segment& seg = LineSegment(i);
-            const Point3d& p1 = Point(seg[0]);
-            const Point3d& p2 = Point(seg[1]);
-            RestrictLocalH(Center(p1, p2), Dist(p1, p2));
-        }
-    }
-
-    void Mesh::RestrictLocalH(resthtype rht, size_t nr, double loch)
+    void Mesh::RestrictLocalH(resthtype rht, size_t nr, double loc_h)
     {
         switch (rht) {
             case RESTRICTH_FACE: {
                 for (size_t i = 0; i < GetNSE(); i++) {
                     const Element2d& sel = SurfaceElement(i);
                     if (sel.GetIndex() == nr)
-                        RestrictLocalH(RESTRICTH_SURFACEELEMENT, i + 1, loch);
+                        RestrictLocalH(RESTRICTH_SURFACEELEMENT, i + 1, loc_h);
                 }
                 break;
             }
@@ -1095,12 +987,12 @@ namespace meshit
                 for (size_t i = 0; i < GetNSeg(); i++) {
                     const Segment& seg = LineSegment(i);
                     if (seg.edgenr == static_cast<int>(nr))
-                        RestrictLocalH(RESTRICTH_SEGMENT, i + 1, loch);
+                        RestrictLocalH(RESTRICTH_SEGMENT, i + 1, loc_h);
                 }
                 break;
             }
             case RESTRICTH_POINT: {
-                RestrictLocalH(points[nr - 1], loch);
+                RestrictLocalH(points[nr - 1], loc_h);
                 break;
             }
 
@@ -1109,78 +1001,15 @@ namespace meshit
                 Point3d p = Center(Point(sel.PNum(1)),
                                    Point(sel.PNum(2)),
                                    Point(sel.PNum(3)));
-                RestrictLocalH(p, loch);
+                RestrictLocalH(p, loc_h);
                 break;
             }
             case RESTRICTH_SEGMENT: {
                 const Segment& seg = LineSegment(nr + 1);
-                RestrictLocalHLine(Point(seg[0]), Point(seg[1]), loch);
+                RestrictLocalHLine(Point(seg[0]), Point(seg[1]), loc_h);
                 break;
             }
         }
-    }
-
-    void Mesh::LoadLocalMeshSize(const char* meshsizefilename)
-    {
-        // Philippose - 10/03/2009
-        // Improve error checking when loading and reading
-        // the local mesh size file
-
-        if (!meshsizefilename) return;
-
-        std::ifstream msf(meshsizefilename);
-
-        // Philippose - 09/03/2009
-        // Adding print message information in case the specified
-        // does not exist, or does not load successfully due to
-        // other reasons such as access rights, etc...
-        if (!msf) {
-            MESHIT_LOG_ERROR("Error loading mesh size file: " << meshsizefilename << "....  Skipping!");
-            return;
-        }
-
-        MESHIT_LOG_DEBUG("Load local mesh-size file: " << meshsizefilename);
-
-        int nmsp = 0;
-        int nmsl = 0;
-
-        msf >> nmsp;
-        if (!msf.good())
-            throw std::runtime_error("Mesh-size file error: No points found\n");
-
-        if (nmsp > 0)
-            MESHIT_LOG_DEBUG("Number of mesh-size restriction points: " << nmsp);
-
-        for (int i = 0; i < nmsp; i++) {
-            Point3d pi;
-            double hi;
-            msf >> pi.X() >> pi.Y() >> pi.Z();
-            msf >> hi;
-            if (!msf.good())
-                throw std::runtime_error("Mesh-size file error: Number of points don't match specified list size\n");
-            RestrictLocalH(pi, hi);
-        }
-
-        msf >> nmsl;
-        if (!msf.good())
-            throw std::runtime_error("Mesh-size file error: No line definitions found\n");
-
-        if (nmsl > 0)
-            MESHIT_LOG_DEBUG("Number of mesh-size restriction lines: " << nmsl);
-
-        for (int i = 0; i < nmsl; i++) {
-            Point3d p1, p2;
-            double hi;
-            msf >> p1.X() >> p1.Y() >> p1.Z();
-            msf >> p2.X() >> p2.Y() >> p2.Z();
-            msf >> hi;
-            if (!msf.good())
-                throw std::runtime_error(
-                    "Mesh-size file error: Number of line definitions don't match specified list size\n");
-            RestrictLocalHLine(p1, p2, hi);
-        }
-
-        msf.close();
     }
 
     void Mesh::GetBox(Point3d& pmin, Point3d& pmax) const

@@ -184,7 +184,6 @@ namespace meshit
     {
         optimize2d = "smsmsmSmSmSm";
         optsteps2d = 3;
-        uselocalh = 1;
         grading = -1.0;
         maxh = 1e10;
         minh = 0;
@@ -197,12 +196,26 @@ namespace meshit
         n_steps = 0;
     }
 
+    MeshingParameters::MeshingParameters(const MeshingParameters& other)
+    {
+        optimize2d = other.optimize2d;
+        optsteps2d = other.optsteps2d;
+        grading = other.grading;
+        minh = other.minh;
+        maxh = other.maxh;
+        check_overlap = other.check_overlap;
+        check_chart_boundary = other.check_chart_boundary;
+        curvature_safety = other.curvature_safety;
+        segments_per_edge = other.segments_per_edge;
+        giveup_tol2d = other.giveup_tol2d;
+        n_steps = other.n_steps;
+    }
+
     void MeshingParameters::Print(std::ostream& ost) const
     {
         ost << "Meshing parameters: " << std::endl
         << "  optimize2d = " << optimize2d << std::endl
         << "  optsteps2d = " << optsteps2d << std::endl
-        << "  uselocalh = " << uselocalh << std::endl
         << "  grading = " << grading << std::endl
         << "  maxh = " << maxh << std::endl
         << "  check_overlap = " << check_overlap << std::endl
@@ -210,20 +223,6 @@ namespace meshit
         << "  curvature_safety = " << curvature_safety << std::endl
         << "  segments_per_edge = " << segments_per_edge << std::endl
         << "  giveup_tol2d = " << giveup_tol2d << std::endl;
-    }
-
-    void MeshingParameters::CopyFrom(const MeshingParameters& other)
-    {
-        optimize2d = other.optimize2d;
-        optsteps2d = other.optsteps2d;
-        uselocalh = other.uselocalh;
-        grading = other.grading;
-        maxh = other.maxh;
-        check_overlap = other.check_overlap;
-        check_chart_boundary = other.check_chart_boundary;
-        curvature_safety = other.curvature_safety;
-        segments_per_edge = other.segments_per_edge;
-        giveup_tol2d = other.giveup_tol2d;
     }
 
     DebugParameters::DebugParameters()

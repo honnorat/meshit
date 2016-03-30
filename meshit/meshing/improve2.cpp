@@ -175,10 +175,15 @@ namespace meshit
                     PointIndex pi3 = mesh.SurfaceElement(t1).PNumMod(o1 + 1);
                     PointIndex pi4 = mesh.SurfaceElement(t2).PNumMod(o2 + 1);
 
+                    const Point3d& p_1 = mesh.Point(pi1);
+                    const Point3d& p_2 = mesh.Point(pi2);
+                    const Point3d& p_3 = mesh.Point(pi3);
+                    const Point3d& p_4 = mesh.Point(pi4);
+
                     bool allowswap = true;
 
-                    Vec3d auxvec1 = mesh.Point(pi3) - mesh.Point(pi4);
-                    Vec3d auxvec2 = mesh.Point(pi1) - mesh.Point(pi4);
+                    Vec3d auxvec1 = p_3 - p_4;
+                    Vec3d auxvec2 = p_1 - p_4;
 
                     allowswap &= fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
@@ -188,8 +193,8 @@ namespace meshit
                     // normal of new
                     Vec3d nv1 = Cross(auxvec1, auxvec2);
 
-                    auxvec1 = mesh.Point(pi4) - mesh.Point(pi3);
-                    auxvec2 = mesh.Point(pi2) - mesh.Point(pi3);
+                    auxvec1 = p_4 - p_3;
+                    auxvec2 = p_2 - p_3;
                     allowswap &= fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
                     if (!allowswap)
@@ -198,8 +203,8 @@ namespace meshit
                     Vec3d nv2 = Cross(auxvec1, auxvec2);
 
                     // normals of original
-                    Vec3d nv3 = Cross(mesh.Point(pi1) - mesh.Point(pi4), mesh.Point(pi2) - mesh.Point(pi4));
-                    Vec3d nv4 = Cross(mesh.Point(pi2) - mesh.Point(pi3), mesh.Point(pi1) - mesh.Point(pi3));
+                    Vec3d nv3 = Cross(p_1 - p_4, p_2 - p_4);
+                    Vec3d nv4 = Cross(p_2 - p_3, p_1 - p_3);
 
                     nv3 *= -1;
                     nv4 *= -1;
@@ -215,27 +220,23 @@ namespace meshit
                                  (nv3.Z() > critval) &&
                                  (nv4.Z() > critval);
 
-                    double horder = Dist(mesh.Point(pi1), mesh.Point(pi2));
+                    double horder = Dist(p_1, p_2);
 
                     if (allowswap &&
                         nv1.Length() > 1e-3 * horder * horder &&
                         nv2.Length() > 1e-3 * horder * horder) {
                         if (!usemetric) {
                             int e = pdef[pi1] + pdef[pi2] - pdef[pi3] - pdef[pi4];
-                            double d = Dist2(mesh.Point(pi1), mesh.Point(pi2)) -
-                                       Dist2(mesh.Point(pi3), mesh.Point(pi4));
+                            double d = Dist2(p_1, p_2) -
+                                       Dist2(p_3, p_4);
 
                             should = e >= t && (e > 2 || d > 0);
                         } else {
-                            double loch = mesh.GetH(mesh.Point(pi1));
-                            double bad1 = CalcTriangleBadness(mesh.Point(pi4), mesh.Point(pi3), mesh.Point(pi1),
-                                                              metricweight, loch);
-                            double bad2 = CalcTriangleBadness(mesh.Point(pi3), mesh.Point(pi4), mesh.Point(pi2),
-                                                              metricweight, loch);
-                            double bad3 = CalcTriangleBadness(mesh.Point(pi1), mesh.Point(pi2), mesh.Point(pi3),
-                                                              metricweight, loch);
-                            double bad4 = CalcTriangleBadness(mesh.Point(pi2), mesh.Point(pi1), mesh.Point(pi4),
-                                                              metricweight, loch);
+                            double loc_h = mesh.GetH(p_1);
+                            double bad1 = CalcTriangleBadness(p_4, p_3, p_1, metricweight, loc_h);
+                            double bad2 = CalcTriangleBadness(p_3, p_4, p_2, metricweight, loc_h);
+                            double bad3 = CalcTriangleBadness(p_1, p_2, p_3, metricweight, loc_h);
+                            double bad4 = CalcTriangleBadness(p_2, p_1, p_4, metricweight, loc_h);
                             should = (bad1 + bad2) < (bad3 + bad4);
                         }
 

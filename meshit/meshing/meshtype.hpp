@@ -286,8 +286,6 @@ namespace meshit
         const char* optimize2d;
         /// number of 2d optimization steps
         int optsteps2d;
-        /// use local h ?
-        int uselocalh;
         /// grading for local h
         double grading;
         /// maximal mesh size
@@ -308,6 +306,8 @@ namespace meshit
         int n_steps;
 
         MeshingParameters();
+        MeshingParameters(const MeshingParameters& other);
+        
         void Print(std::ostream& ost) const;
 
         void CopyFrom(const MeshingParameters& other);

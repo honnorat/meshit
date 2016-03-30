@@ -146,16 +146,15 @@ namespace meshit
         Point3d pp1(ld.sp1.X() - x[1],
                     ld.sp1.Y() + x[0]);
 
-        for (size_t j = 0; j < ld.locelements.size(); j++) {
+        for (size_t j = 0; j < ld.loc_elements.size(); j++) {
+            double loc_h = ld.lochs[j];
             const Point3d& pe2 = ld.loc_pnts2[j];
             const Point3d& pe3 = ld.loc_pnts3[j];
             Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
             Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
 
-            if (ld.uselocalh) ld.loch = ld.lochs[j];
-
-            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
-                badness += CalcTriangleBadness(pp1, pe2, pe3, ld.locmetricweight, ld.loch);
+            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * loc_h * loc_h) {
+                badness += CalcTriangleBadness(pp1, pe2, pe3, ld.loc_metric_weight, loc_h);
             } else {
                 badness += 1e8;
             }
@@ -170,17 +169,16 @@ namespace meshit
         Point3d pp1(ld.sp1.X() - x[1],
                     ld.sp1.Y() + x[0]);
 
-        for (size_t j = 0; j < ld.locelements.size(); j++) {
+        for (size_t j = 0; j < ld.loc_elements.size(); j++) {
+            double loc_h = ld.lochs[j];
             const Point3d& pe2 = ld.loc_pnts2[j];
             const Point3d& pe3 = ld.loc_pnts3[j];
             Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
             Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
 
-            if (ld.uselocalh) ld.loch = ld.lochs[j];
-
-            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
+            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * loc_h * loc_h) {
                 Vec3d hgrad;
-                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.locmetricweight, ld.loch);
+                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.loc_metric_weight, loc_h);
                 vgrad += hgrad;
             } else {
                 badness += 1e8;
@@ -199,17 +197,16 @@ namespace meshit
         Point3d pp1(ld.sp1.X() - x[1],
                     ld.sp1.Y() + x[0]);
 
-        for (size_t j = 0; j < ld.locelements.size(); j++) {
+        for (size_t j = 0; j < ld.loc_elements.size(); j++) {
+            double loc_h = ld.lochs[j];
             const Point3d& pe2 = ld.loc_pnts2[j];
             const Point3d& pe3 = ld.loc_pnts3[j];
             Point3d e2(pe2.X() - pp1.X(), pe2.Y() - pp1.Y());
             Point3d e3(pe3.X() - pp1.X(), pe3.Y() - pp1.Y());
 
-            if (ld.uselocalh) ld.loch = ld.lochs[j];
-
-            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * ld.loch * ld.loch) {
+            if (e2.X() * e3.Y() - e2.Y() * e3.X() > 1e-8 * loc_h * loc_h) {
                 Vec3d hgrad;
-                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.locmetricweight, ld.loch);
+                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.loc_metric_weight, loc_h);
                 deriv += dir[0] * hgrad.Y() - dir[1] * hgrad.X();
             } else {
                 badness += 1e8;
@@ -237,9 +234,6 @@ namespace meshit
 
 
         std::vector<MeshPoint> savepoints(mesh.GetNP());
-
-        ld.uselocalh = mp.uselocalh;
-
         std::vector<int> compress(mesh.GetNP());
         std::vector<PointIndex> icompress;
         for (size_t i = 0; i < seia.size(); i++) {
@@ -272,8 +266,7 @@ namespace meshit
             }
         }
 
-        ld.loch = mp.maxh;
-        ld.locmetricweight = metricweight;
+        ld.loc_metric_weight = metricweight;
 
         MinFunction_2d surfminf(mesh, ld);
         OptiParameters par;
@@ -282,39 +275,39 @@ namespace meshit
 
         for (size_t hi = 0; hi < icompress.size(); hi++) {
             PointIndex pi = icompress[hi];
-            if (mesh[pi].Type() == SURFACEPOINT) {
-                std::vector<SurfaceElementIndex> elem_idx = elements_on_point[hi];
-                if (elem_idx.size() == 0) continue;
+            MeshPoint& pp = mesh.Point(pi);
 
-                ld.sp1 = mesh[pi];
-                ld.locelements.resize(0);
-                ld.locrots.resize(0);
-                ld.lochs.resize(0);
+            if (pp.Type() == SURFACEPOINT) {
+                std::vector<SurfaceElementIndex> elem_idx = elements_on_point[hi];
+                size_t n_elems = elem_idx.size();
+
+                if (n_elems == 0) continue;
+
+                ld.sp1 = pp;
+                ld.loc_elements.resize(n_elems);
+                ld.lochs.resize(n_elems);
                 ld.loc_pnts2.resize(0);
                 ld.loc_pnts3.resize(0);
 
-                for (size_t j = 0; j < elem_idx.size(); j++) {
+                for (size_t j = 0; j < n_elems; j++) {
                     SurfaceElementIndex sei = elem_idx[j];
-                    const Element2d& bel = mesh.SurfaceElement(sei);
-                    ld.locelements.push_back(sei);
+                    ld.loc_elements[j] = sei;
 
+                    const Element2d& bel = mesh.SurfaceElement(sei);
                     for (size_t k = 1; k <= 3; k++) {
                         if (bel.PNum(k) == pi) {
-                            ld.locrots.push_back(k);
                             ld.loc_pnts2.push_back(mesh[bel.PNumMod(k + 1)]);
                             ld.loc_pnts3.push_back(mesh[bel.PNumMod(k + 2)]);
                             break;
                         }
                     }
-                    if (ld.uselocalh) {
-                        Point3d pmid = Center(mesh[bel[0]], mesh[bel[1]], mesh[bel[2]]);
-                        ld.lochs.push_back(mesh.GetH(pmid));
-                    }
+                    Point3d pmid = Center(mesh[bel[0]], mesh[bel[1]], mesh[bel[2]]);
+                    ld.lochs[j] = mesh.GetH(pmid);
                 }
 
                 // save points, and project to tangential plane
-                for (size_t j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
+                for (size_t j = 0; j < n_elems; j++) {
+                    const Element2d& el = mesh.SurfaceElement(ld.loc_elements[j]);
                     for (size_t k = 0; k < 3; k++) {
                         savepoints[el[k]] = mesh[el[k]];
                     }
@@ -325,21 +318,17 @@ namespace meshit
                 BFGS_2d(x, surfminf, par, 1e-6);
 
                 // restore other points
-                for (size_t j = 0; j < ld.locelements.size(); j++) {
-                    const Element2d& el = mesh.SurfaceElement(ld.locelements[j]);
+                for (size_t j = 0; j < n_elems; j++) {
+                    const Element2d& el = mesh.SurfaceElement(ld.loc_elements[j]);
                     for (size_t k = 0; k < 3; k++) {
                         PointIndex hhpi = el[k];
-                        if (hhpi != pi) mesh[hhpi] = savepoints[hhpi];
+                        if (hhpi != pi) mesh.Point(hhpi) = savepoints[hhpi];
                     }
                 }
 
                 // optimizer pass (if whole distance is not possible, move only a bit!!!!)
-                Vec3d hv(-x[1], x[0], 0.0);
-                Point3d origp = mesh[pi];
-                Point3d hnp = origp + hv;
-                mesh.Point(pi).X() = hnp.X();
-                mesh.Point(pi).Y() = hnp.Y();
-                mesh.Point(pi).Z() = hnp.Z();
+                pp.X() -= x[1];
+                pp.Y() += x[0];
             }
         }
     }

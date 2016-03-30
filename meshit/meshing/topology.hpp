@@ -20,7 +20,7 @@ namespace meshit
 
     class MeshTopology
     {
-        const Mesh& mesh;
+        Mesh& mesh;
         bool buildedges;
         bool buildfaces;
 
@@ -30,7 +30,7 @@ namespace meshit
         TABLE<size_t>* vert2segment;
 
      public:
-        explicit MeshTopology(const Mesh& amesh);
+        explicit MeshTopology(Mesh& amesh);
         ~MeshTopology();
 
         void Update();

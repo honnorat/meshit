@@ -16,19 +16,16 @@ namespace meshit
     {
      public:
         MeshPoint sp1;
-        std::vector<SurfaceElementIndex> locelements;
-        std::vector<int> locrots;
+        std::vector<SurfaceElementIndex> loc_elements;
         std::vector<double> lochs;
         std::vector<Point3d> loc_pnts2;
         std::vector<Point3d> loc_pnts3;
-        double locmetricweight;
-        double loch;
-        int uselocalh;
+        double loc_metric_weight;
 
      public:
         Opti2dLocalData()
         {
-            locmetricweight = 0;
+            loc_metric_weight = 0;
         }
     };
 

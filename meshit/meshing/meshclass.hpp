@@ -61,9 +61,8 @@ namespace meshit
            Representation of local mesh-size h
          */
         LocalH* lochfunc;
-        double hglob;
-        double hmin;
-        std::vector<double> maxhdomain;
+        double hglob_;
+        double hmin_;
 
         /**
            the face-index of the surface element maps into
@@ -122,12 +121,12 @@ namespace meshit
             return points[pi];
         }
 
-        const MeshPoint& operator[](size_t pi) const
+        MeshPoint& operator[](size_t pi)
         {
             return points[pi];
         }
 
-        MeshPoint& operator[](size_t pi)
+        const MeshPoint& operator[](size_t pi) const
         {
             return points[pi];
         }
@@ -229,15 +228,7 @@ namespace meshit
         void RestrictLocalH(const Point3d& p, double hloc);
         void RestrictLocalHLine(const Point3d& p1, const Point3d& p2,
                                 double hloc);
-        /// number of elements per radius
-        void CalcLocalHFromSurfaceCurvature(double elperr);
-        void CalcLocalHFromPointDistances();
-        void RestrictLocalH(resthtype rht, size_t nr, double loch);
-        void LoadLocalMeshSize(const char* meshsizefilename);
-        void SetGlobalH(double h);
-        void SetMinimalH(double h);
-        double MaxHDomain(int dom) const;
-        void SetMaxHDomain(const std::vector<double>& mhd);
+        void RestrictLocalH(resthtype rht, size_t nr, double loc_h);
         double GetH(const Point3d& p) const;
         double GetMinH(const Point3d& pmin, const Point3d& pmax);
 

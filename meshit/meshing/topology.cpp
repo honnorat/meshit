@@ -2,7 +2,7 @@
 
 namespace meshit
 {
-    MeshTopology::MeshTopology(const Mesh& amesh)
+    MeshTopology::MeshTopology(Mesh& amesh)
         : mesh(amesh)
     {
         buildedges = 1;

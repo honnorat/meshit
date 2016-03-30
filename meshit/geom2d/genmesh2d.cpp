@@ -159,7 +159,7 @@ namespace meshit
                 Point3d mark3(mark[0], mark[1], 0);
                 Point3d oldmark3(oldmark[0], oldmark[1], 0);
 
-                double h = mesh.GetH(Point3d(oldmark[0], oldmark[1], 0));
+                double h = mesh.GetH(oldmark3);
                 Vec3d v(1e-4 * h, 1e-4 * h, 1e-4 * h);
                 searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
                 if (locsearch.size() > 0) {
