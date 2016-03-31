@@ -292,46 +292,39 @@ namespace meshit
 
         freesetinequ.SetSize(freezone.size());
 
-        {
-            std::vector<uint32_t> pnearness(noldp);
+        std::vector<uint32_t> pnearness(noldp, 1000);
 
-            for (size_t i = 0; i < pnearness.size(); i++) {
-                pnearness[i] = 1000;
-            }
-            for (int j = 1; j <= 2; j++) {
-                pnearness[GetPointNr(0, j)] = 0;
-            }
+        pnearness[lines[0].I1() - 1] = 0;
+        pnearness[lines[0].I2() - 1] = 0;
 
-            bool ok;
-            do {
-                ok = true;
-
-                for (size_t i = 0; i < noldl; i++) {
-                    uint32_t minn = 1000;
-                    for (int j = 1; j <= 2; j++) {
-                        minn = std::min(minn, pnearness[GetPointNr(i, j)]);
-                    }
-                    for (int j = 1; j <= 2; j++) {
-                        if (pnearness[GetPointNr(i, j)] > minn + 1) {
-                            pnearness[GetPointNr(i, j)] = minn + 1;
-                            ok = false;
-                        }
-                    }
-                }
-            } while (!ok);
-
-            lnearness.resize(noldl);
-
+        bool ok;
+        do {
+            ok = true;
             for (size_t i = 0; i < noldl; i++) {
-                lnearness[i] = 0;
-                for (int j = 1; j <= 2; j++) {
-                    lnearness[i] += pnearness[GetPointNr(i, j)];
+                INDEX idx1 = lines[i].I1() - 1;
+                INDEX idx2 = lines[i].I2() - 1;
+                uint32_t minn = 1000;
+                minn = std::min(minn, pnearness[idx1]);
+                minn = std::min(minn, pnearness[idx2]);
+                if (pnearness[idx1] > minn + 1) {
+                    pnearness[idx1] = minn + 1;
+                    ok = false;
+                }
+                if (pnearness[idx2] > minn + 1) {
+                    pnearness[idx2] = minn + 1;
+                    ok = false;
                 }
             }
+        } while (!ok);
+
+        lnearness.resize(noldl);
+        for (size_t i = 0; i < noldl; i++) {
+            lnearness[i] = pnearness[lines[i].I1() - 1] +
+                           pnearness[lines[i].I2() - 1];
         }
 
-        oldutofreearea_i.resize(10);
         freezone_i.resize(10);
+        oldutofreearea_i.resize(10);
 
         for (size_t i = 0; i < oldutofreearea_i.size(); i++) {
             double lam1 = 1.0 / (i + 1);

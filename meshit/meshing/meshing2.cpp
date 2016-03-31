@@ -505,60 +505,11 @@ namespace meshit
                             mtonnode = trigsonnode[gpi];
                     }
                 }
-
                 for (size_t i = 0; i < dellines.size(); i++) {
                     adfront->DeleteLine(lindex[dellines[i] - 1]);
                 }
-
-                if (debugparam.haltsuccess || debugflag) {
-
-                    std::cout << "success of rule" << rules[rulenr - 1]->Name() << std::endl;
-                    std::cerr << "trials = " << trials << std::endl;
-                    std::cerr << "locpoints " << std::endl;
-                    for (size_t i = 0; i < pindex.size(); i++) {
-                        std::cerr << adfront->GetGlobalIndex(pindex[i]) << std::endl;
-                    }
-                    std::cerr << "old number of lines = " << oldnl << std::endl;
-                    for (size_t i = 0; i < loclines.size(); i++) {
-                        std::cerr << "line ";
-                        for (size_t j = 1; j <= 2; j++) {
-                            int hi = 0;
-                            if (loclines[i].I(j) >= 1 &&
-                                loclines[i].I(j) <= static_cast<INDEX>(pindex.size())) {
-                                hi = adfront->GetGlobalIndex(pindex[loclines[i].I(j) - 1]);
-                            }
-                            std::cerr << hi << " ";
-                        }
-                        std::cerr << " : "
-                        << plainpoints[loclines[i].I1() - 1] << " - "
-                        << plainpoints[loclines[i].I2() - 1] << " 3d: "
-                        << locpoints[loclines[i].I1() - 1] << " - "
-                        << locpoints[loclines[i].I2() - 1] << std::endl;
-                    }
-                }
             } else {
                 adfront->IncrementClass(lindex[0]);
-
-                if (debugparam.haltnosuccess || debugflag) {
-                    std::cerr << "Problem with seg " << gpi1 << " - " << gpi2 << ", class = " << qualclass << std::endl;
-
-                    for (size_t i = 0; i < loclines.size(); i++) {
-                        std::cerr << "line ";
-                        for (size_t j = 1; j <= 2; j++) {
-                            int hi = 0;
-                            if (loclines[i].I(j) >= 1 &&
-                                loclines[i].I(j) <= static_cast<INDEX>(pindex.size()))
-                                hi = adfront->GetGlobalIndex(pindex[loclines[i].I(j) - 1]);
-
-                            std::cerr << hi << " ";
-                        }
-                        std::cerr << " : "
-                        << plainpoints[loclines[i].I1() - 1] << " - "
-                        << plainpoints[loclines[i].I2() - 1] << " 3d: "
-                        << locpoints[loclines[i].I1() - 1] << " - "
-                        << locpoints[loclines[i].I2() - 1] << std::endl;
-                    }
-                }
             }
         }
 

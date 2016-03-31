@@ -64,7 +64,7 @@ namespace meshit
         mesh.GetSurfaceElementsOfFace(faceindex, seia);
 
         std::vector<Neighbour> neighbors(mesh.GetNSE());
-        INDEX_2_HASHTABLE<trionedge> other(seia.size() + 2);
+        INDEX_2_map<trionedge> other(seia.size() + 2);
 
         std::vector<char> swapped(mesh.GetNSE());
         std::vector<int> pdef(mesh.GetNP());
@@ -78,7 +78,6 @@ namespace meshit
                 pangle[sel[j]] = 0.0;
             }
         }
-        // pangle = 0;
 
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
@@ -134,15 +133,15 @@ namespace meshit
                     continue;
 
                 INDEX_2 ii2(pi1, pi2);
-                if (other.Used(ii2)) {
-                    INDEX i2 = other.Get(ii2).tnr;
-                    size_t j2 = other.Get(ii2).sidenr;
+                if (other.count(ii2)) {
+                    INDEX i2 = other[ii2].tnr;
+                    size_t j2 = other[ii2].sidenr;
                     neighbors[seia[i]].SetNeighborIndex(j, i2);
                     neighbors[seia[i]].SetOrientation(j, j2);
                     neighbors[i2].SetNeighborIndex(j2, seia[i]);
                     neighbors[i2].SetOrientation(j2, j);
                 } else {
-                    other.Set(INDEX_2(pi2, pi1), trionedge(seia[i], j));
+                    other[INDEX_2(pi2, pi1)] = trionedge(seia[i], j);
                 }
             }
         }

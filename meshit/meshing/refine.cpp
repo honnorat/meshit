@@ -14,7 +14,7 @@ namespace meshit
         // reduce 2nd order
         mesh.ComputeNVertices();
         mesh.SetNP(mesh.GetNV());
-        INDEX_2_HASHTABLE<PointIndex> between(mesh.GetNP() + 5);
+        INDEX_2_map<PointIndex> between(mesh.GetNP() + 5);
 
         // refine edges
         std::vector<EdgePointGeomInfo> epgi;
@@ -23,19 +23,20 @@ namespace meshit
         for (size_t si = 0; si < oldns; si++) {
             const Segment& el = mesh.LineSegment(si);
 
-            INDEX_2 i2 = INDEX_2::Sort(el[0], el[1]);
+            INDEX_2 i2(el[0], el[1]);
+            i2.Sort();
             PointIndex pinew;
             EdgePointGeomInfo ngi;
 
-            if (between.Used(i2)) {
-                pinew = between.Get(i2);
+            if (between.count(i2) == 1) {
+                pinew = between[i2];
                 ngi = epgi[pinew];
             } else {
                 Point3d pnew;
                 PointBetween(mesh.Point(el[0]),
                              mesh.Point(el[1]), 0.5, pnew);
                 pinew = mesh.AddPoint(pnew);
-                between.Set(i2, pinew);
+                between[i2] = pinew;
 
                 if (pinew >= static_cast<PointIndex>(epgi.size())) {
                     epgi.resize(pinew + 1);
@@ -79,15 +80,12 @@ namespace meshit
                 INDEX_2 i2(pi1, pi2);
                 i2.Sort();
 
-                Point3d pb;
-                PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
-
-                if (between.Used(i2)) {
-                    pnums[3 + j] = between.Get(i2);
-                } else {
-                    pnums[3 + j] = mesh.AddPoint(pb);
-                    between.Set(i2, pnums[3 + j]);
+                if (between.count(i2) == 0) {
+                    Point3d pb;
+                    PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
+                    between[i2] = mesh.AddPoint(pb);
                 }
+                pnums[3 + j] = between[i2];
             }
 
             static int reftab[4][3] = {

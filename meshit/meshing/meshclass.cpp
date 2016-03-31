@@ -12,7 +12,6 @@ namespace meshit
     Mesh::Mesh()
         : surfarea(*this)
     {
-        segment_ht = nullptr;
         lochfunc = nullptr;
         hglob_ = 1e10;
         hmin_ = 0;
@@ -22,7 +21,6 @@ namespace meshit
     Mesh::~Mesh()
     {
         delete lochfunc;
-        delete segment_ht;
 
         for (size_t i = 0; i < materials.size(); i++) {
             delete[] materials[i];
@@ -403,7 +401,6 @@ namespace meshit
             if (strcmp(str, "endmesh") == 0) {
                 endmesh = true;
             }
-//            strcpy(str, "");
         }
 
         CalcSurfacesOfNode();
@@ -412,9 +409,7 @@ namespace meshit
     void Mesh::CalcSurfacesOfNode()
     {
         surfaces_on_node.SetSize(GetNP());
-
-        delete segment_ht;
-        segment_ht = new INDEX_2_CLOSED_HASHTABLE<int>(3 * GetNSeg() + 1);
+        segment_ht.reserve(3 * GetNSeg());
 
         for (size_t sei = 0; sei < GetNSE(); sei++) {
             const Element2d& sel = surf_elements[sei];
@@ -452,9 +447,7 @@ namespace meshit
         for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = segments[i];
             INDEX_2 i2(seg[0], seg[1]);
-            i2.Sort();
-
-            segment_ht->Set(i2, i);
+            segment_ht[i2.Sort()] = i;
         }
     }
 

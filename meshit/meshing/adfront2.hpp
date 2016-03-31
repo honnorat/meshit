@@ -149,7 +149,7 @@ namespace meshit
         std::vector<int> dellinel;   // list of deleted front lines
 
         int nfl;  // number of front lines;
-        INDEX_2_HASHTABLE<int>* allflines;  // all front lines ever have been
+        INDEX_2_map<int> allflines;  // all front lines ever have been
 
         std::vector<int> invpindex;
 
@@ -158,7 +158,8 @@ namespace meshit
 
      public:
         explicit AdFront2(const Box3d& aboundingbox);
-        ~AdFront2();
+
+        ~AdFront2() { }
 
         bool Empty() const
         {

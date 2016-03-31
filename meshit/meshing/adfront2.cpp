@@ -21,14 +21,8 @@ namespace meshit
           cpointsearchtree(boundingbox.PMin(), boundingbox.PMax())
     {
         nfl = 0;
-        allflines = 0;
         minval = 0;
         starti = 0;
-    }
-
-    AdFront2::~AdFront2()
-    {
-        delete allflines;
     }
 
     void AdFront2::PrintOpenSegments(std::ostream& ost) const
@@ -93,39 +87,36 @@ namespace meshit
 
         linesearchtree.Insert(lbox.PMin(), lbox.PMax(), li);
 
-        if (allflines) {
-            if (allflines->Used(INDEX_2(GetGlobalIndex(pi1),
-                                        GetGlobalIndex(pi2)))) {
-                std::cerr << "ERROR Adfront2::AddLine: line exists" << std::endl;
-            }
-
-            allflines->Set(INDEX_2(GetGlobalIndex(pi1),
-                                   GetGlobalIndex(pi2)), 1);
+        INDEX_2 globline(GetGlobalIndex(pi1), GetGlobalIndex(pi2));
+        if (allflines.count(globline)) {
+            MESHIT_LOG_ERROR("Adfront2::AddLine: line exists");
         }
+        allflines[globline] = 1;
 
         return li;
     }
 
     void AdFront2::DeleteLine(int li)
     {
-        int pi;
-
         nfl--;
 
-        for (size_t i = 1; i <= 2; i++) {
-            pi = lines[li].L().I(i);
-            points[pi].RemoveLine();
+        const INDEX_2& lidx = lines[li].L();
 
-            if (!points[pi].Valid()) {
-                delpointl.push_back(pi);
-                pointsearchtree.DeleteElement(pi);
-            }
+        INDEX pi1 = lidx.I1();
+        points[pi1].RemoveLine();
+        if (!points[pi1].Valid()) {
+            delpointl.push_back(pi1);
+            pointsearchtree.DeleteElement(pi1);
+        }
+        INDEX pi2 = lidx.I2();
+        points[pi2].RemoveLine();
+        if (!points[pi2].Valid()) {
+            delpointl.push_back(pi2);
+            pointsearchtree.DeleteElement(pi2);
         }
 
-        if (allflines) {
-            allflines->Set(INDEX_2(GetGlobalIndex(lines[li].L().I1()),
-                                   GetGlobalIndex(lines[li].L().I2())), 2);
-        }
+        allflines[INDEX_2(GetGlobalIndex(pi1),
+                          GetGlobalIndex(pi2))] = 2;
 
         lines[li].Invalidate();
         linesearchtree.DeleteElement(li);
@@ -135,12 +126,12 @@ namespace meshit
 
     int AdFront2::ExistsLine(int pi1, int pi2)
     {
-        if (!allflines)
+        INDEX_2 line(pi1, pi2);
+        if (allflines.count(line) == 1) {
+            return allflines[line];
+        } else {
             return 0;
-        if (allflines->Used(INDEX_2(pi1, pi2)))
-            return allflines->Get(INDEX_2(pi1, pi2));
-        else
-            return 0;
+        }
     }
 
     int AdFront2::SelectBaseLine(Point3d& p1, Point3d& p2, int& qualclass)
@@ -238,9 +229,9 @@ namespace meshit
                     invpindex[pi] = pindex.size();
                     locpoints.push_back(points[pi].P());
                     loclines[i][j] = locpoints.size();
-                }
-                else
+                } else {
                     loclines[i][j] = invpindex[pi];
+                }
             }
         }
 
@@ -259,9 +250,8 @@ namespace meshit
     {
         for (size_t i = 0; i < lines.size(); i++) {
             if (lines[i].Valid()) {
-                for (size_t j = 1; j <= 2; j++) {
-                    points[lines[i].L().I(j)].DecFrontNr(0);
-                }
+                points[lines[i].L().I1()].DecFrontNr(0);
+                points[lines[i].L().I2()].DecFrontNr(0);
             }
         }
     }

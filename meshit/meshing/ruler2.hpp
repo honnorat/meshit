@@ -160,10 +160,9 @@ namespace meshit
         bool IsLineInFreeZone(const Point2d& p1, const Point2d& p2) const;
         int ConvexFreeZone() const;
 
-        int GetPointNr(size_t ln, int endp) const
-        {
-            return lines[ln].I(endp) - 1;
-        }
+        int GetPointNr1(size_t ln) const { return lines[ln].I1() - 1; }
+
+        int GetPointNr2(size_t ln) const { return lines[ln].I2() - 1; }
 
         const DenseMatrix& GetOldUToNewU() const
         {

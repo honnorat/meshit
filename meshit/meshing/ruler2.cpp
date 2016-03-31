@@ -404,14 +404,10 @@ namespace meshit
 
                     lused[lmap[nlok] - 1] = false;
 
-                    for (int j = 1; j <= 2; j++) {
-                        int refpi = rule->GetPointNr(nlok, j);
-                        pused[pmap[refpi] - 1]--;
-
-                        if (pused[pmap[refpi] - 1] == 0) {
-                            pmap[refpi] = 0;
-                        }
-                    }
+                    int refpi1 = rule->GetPointNr1(nlok);
+                    int refpi2 = rule->GetPointNr2(nlok);
+                    if (--pused[pmap[refpi1] - 1] == 0) pmap[refpi1] = 0;
+                    if (--pused[pmap[refpi2] - 1] == 0) pmap[refpi2] = 0;
                 }
             }
         }

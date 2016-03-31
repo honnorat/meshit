@@ -9,11 +9,13 @@
 
 #include <iostream>
 #include <string>
+
 #include "meshtype.hpp"
 #include "localh.hpp"
 #include "../gprim/adtree.hpp"
 #include "../general/bitarray.hpp"
 #include "../general/symbolta.hpp"
+#include "../general/table.hpp"
 #include "../gprim/geomops.hpp"
 
 /*
@@ -46,7 +48,7 @@ namespace meshit
         /// surface indices at boundary nodes
         TABLE<int> surfaces_on_node;
         /// boundary edges  (1..normal bedge, 2..segment)
-        INDEX_2_CLOSED_HASHTABLE<int>* segment_ht;
+        INDEX_2_map<int> segment_ht;
 
         /**
            Representation of local mesh-size h
@@ -180,8 +182,7 @@ namespace meshit
         bool IsSegment(PointIndex pi1, PointIndex pi2) const
         {
             INDEX_2 i2(pi1, pi2);
-            i2.Sort();
-            return segment_ht->Used(i2);
+            return segment_ht.count(i2.Sort()) == 1;
         }
 
         /**
@@ -219,7 +220,8 @@ namespace meshit
         void ComputeNVertices();
 
         /// number of vertices (no edge-midpoints)
-        size_t GetNV() const {
+        size_t GetNV() const
+        {
             return numvertices;
         }
 

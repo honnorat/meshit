@@ -9,7 +9,7 @@ namespace meshit
         MESHIT_LOG_DEBUG("Check Surface mesh");
 
         size_t nf = mesh.GetNSE();
-        INDEX_2_HASHTABLE<int> edges(nf + 2);
+        INDEX_2_map<int> edges(nf + 2);
         INDEX_2 i2;
         int cnt1 = 0, cnt2 = 0;
 
@@ -17,15 +17,15 @@ namespace meshit
             for (size_t j = 1; j <= 3; j++) {
                 i2.I1() = mesh.SurfaceElement(i).PNumMod(j);
                 i2.I2() = mesh.SurfaceElement(i).PNumMod(j + 1);
-                if (edges.Used(i2)) {
-                    int hi = edges.Get(i2);
+                if (edges.count(i2)) {
+                    int hi = edges[i2];
                     if (hi != 1)
                         MESHIT_LOG_ERROR("CheckSurfaceMesh, hi = " << hi);
-                    edges.Set(i2, 2);
+                    edges[i2] = 2;
                     cnt2++;
                 } else {
                     std::swap(i2.I1(), i2.I2());
-                    edges.Set(i2, 1);
+                    edges[i2] = 1;
                     cnt1++;
                 }
             }

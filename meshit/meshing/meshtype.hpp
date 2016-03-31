@@ -13,7 +13,6 @@
 #include "msghandler.hpp"
 #include "../linalg/densemat.hpp"
 #include "../gprim/geom3d.hpp"
-#include "../general/hashtabl.hpp"
 
 namespace meshit
 {
