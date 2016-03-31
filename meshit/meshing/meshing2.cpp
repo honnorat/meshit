@@ -65,34 +65,21 @@ namespace meshit
         ex /= ex.Length();
         ey.X() = -ex.Y();
         ey.Y() = ex.X();
-        ey.Z() = 0;
+        ey.Z() = 0.0;
     }
 
     void Meshing2::TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h)
     {
         Vec3d p1p(globp1, locpoint);
 
-        p1p /= h;
-        plainpoint.X() = p1p * ex;
-        plainpoint.Y() = p1p * ey;
+        plainpoint.X() = (p1p * ex) / h;
+        plainpoint.Y() = (p1p * ey) / h;
     }
 
-    int Meshing2::TransformFromPlain(Point2d& plainpoint, Point3d& locpoint, double h)
+    void Meshing2::TransformFromPlain(Point2d& plainpoint, Point3d& locpoint, double h)
     {
-        Vec3d p1p = plainpoint.X() * ex + plainpoint.Y() * ey;
-        p1p *= h;
-        locpoint = globp1 + p1p;
-        return 0;
-    }
-
-    int Meshing2::IsLineVertexOnChart(const Point3d& p1, const Point3d& p2)
-    {
-        return 1;
-    }
-
-    double Meshing2::Area() const
-    {
-        return -1;
+        locpoint.X() = globp1.X() + h * (plainpoint.X() * ex.X() + plainpoint.Y() * ey.X());
+        locpoint.Y() = globp1.Y() + h * (plainpoint.X() * ex.Y() + plainpoint.Y() * ey.Y());
     }
 
     bool Meshing2::GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr)
@@ -128,17 +115,12 @@ namespace meshit
 
         StartMesh();
 
-        std::vector<Point2d> chartboundpoints;
-        std::vector<Point3d> chartboundpoints3d;
-        std::vector<INDEX_2> chartboundlines;
-
         std::vector<int> trigsonnode;
         std::vector<int> illegalpoint;
 
         trigsonnode.resize(mesh.GetNP(), 0);
         illegalpoint.resize(mesh.GetNP(), 0);
 
-        double totalarea = Area();
         double meshedarea = 0;
 
         std::vector<SurfaceElementIndex> seia;
@@ -155,7 +137,7 @@ namespace meshit
             surfeltree.Insert(box, seia[i]);
         }
 
-        if (totalarea > 0 || maxarea > 0)
+        if (maxarea > 0)
             meshedarea = mesh.SurfaceArea();
 
         adfront->SetStartFront();
@@ -236,18 +218,10 @@ namespace meshit
                 found = false;
             }
 
-            Point2d p12d, p22d;
-
             size_t oldnl = 0;
             size_t oldnp = 0;
 
             if (found) {
-                oldnp = locpoints.size();
-                oldnl = loclines.size();
-
-                if (debugflag)
-                    std::cerr << "define new transformation" << std::endl;
-
                 DefineTransformation(p1, p2);
 
                 plainpoints.resize(locpoints.size());
@@ -259,9 +233,6 @@ namespace meshit
                 for (size_t i = 0; i < locpoints.size(); i++) {
                     TransformToPlain(locpoints[i], plainpoints[i], h);
                 }
-
-                p12d = plainpoints[0];
-                p22d = plainpoints[1];
 
                 legalpoints.assign(plainpoints.size(), 1);
                 double avy = 0;
@@ -281,27 +252,8 @@ namespace meshit
                     }
                 }
 
-                chartboundpoints.resize(0);
-                chartboundpoints3d.resize(0);
-                chartboundlines.resize(0);
-
-                oldnp = plainpoints.size();
                 size_t maxlegalpoint = locpoints.size();
                 size_t maxlegalline = loclines.size();
-
-                if (mp.check_chart_boundary) {
-                    for (size_t i = 0; i < chartboundpoints.size(); i++) {
-                        plainpoints.push_back(chartboundpoints[i]);
-                        locpoints.push_back(chartboundpoints3d[i]);
-                        legalpoints.push_back(0);
-                    }
-
-                    for (size_t i = 0; i < chartboundlines.size(); i++) {
-                        INDEX_2 line(chartboundlines[i].I1() + oldnp,
-                                     chartboundlines[i].I2() + oldnp);
-                        loclines.push_back(line);
-                    }
-                }
 
                 oldnl = loclines.size();
                 oldnp = plainpoints.size();
@@ -331,20 +283,9 @@ namespace meshit
                 locpoints.resize(plainpoints.size());
 
                 for (size_t i = oldnp; i < plainpoints.size(); i++) {
-                    int err = TransformFromPlain(plainpoints[i], locpoints[i], h);
-
-                    if (err) {
-                        found = false;
-
-                        if (debugflag || debugparam.haltnosuccess)
-                            MESHIT_LOG_ERROR("meshing2, Backtransformation failed");
-
-                        break;
-                    }
+                    TransformFromPlain(plainpoints[i], locpoints[i], h);
                 }
-            }
 
-            if (found) {
                 double violateminh = 3 + 0.1 * qualclass * qualclass;
                 double minh = 1e8;
                 double newedgemaxh = 0;
@@ -583,9 +524,9 @@ namespace meshit
                         for (size_t j = 1; j <= 2; j++) {
                             int hi = 0;
                             if (loclines[i].I(j) >= 1 &&
-                                loclines[i].I(j) <= static_cast<INDEX>(pindex.size()))
+                                loclines[i].I(j) <= static_cast<INDEX>(pindex.size())) {
                                 hi = adfront->GetGlobalIndex(pindex[loclines[i].I(j) - 1]);
-
+                            }
                             std::cerr << hi << " ";
                         }
                         std::cerr << " : "
@@ -599,8 +540,7 @@ namespace meshit
                 adfront->IncrementClass(lindex[0]);
 
                 if (debugparam.haltnosuccess || debugflag) {
-                    std::cerr << "Problem with seg " << gpi1 << " - " << gpi2
-                    << ", class = " << qualclass << std::endl;
+                    std::cerr << "Problem with seg " << gpi1 << " - " << gpi2 << ", class = " << qualclass << std::endl;
 
                     for (size_t i = 0; i < loclines.size(); i++) {
                         std::cerr << "line ";

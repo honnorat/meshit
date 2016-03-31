@@ -16,8 +16,6 @@
 #include "../general/symbolta.hpp"
 #include "../gprim/geomops.hpp"
 
-#include "topology.hpp"
-
 /*
   The mesh class
  */
@@ -41,21 +39,14 @@ namespace meshit
         /// line-segments at edges
         std::vector<Segment> segments;
         /// surface elements, 2d-inner elements
-        std::vector<Element2d> surfelements;
+        std::vector<Element2d> surf_elements;
         /// points will be fixed forever
         std::vector<PointIndex> lockedpoints;
 
         /// surface indices at boundary nodes
-        TABLE<int> surfacesonnode;
+        TABLE<int> surfaces_on_node;
         /// boundary edges  (1..normal bedge, 2..segment)
-        INDEX_2_CLOSED_HASHTABLE<int>* boundaryedges;
-        INDEX_2_CLOSED_HASHTABLE<int>* segmentht;
-        INDEX_3_CLOSED_HASHTABLE<int>* surfelementht;
-
-        /// faces of rest-solid
-        std::vector<Element2d> openelements;
-        /// open segmenets for surface meshing
-        std::vector<Segment> opensegments;
+        INDEX_2_CLOSED_HASHTABLE<int>* segment_ht;
 
         /**
            Representation of local mesh-size h
@@ -73,28 +64,8 @@ namespace meshit
         /// sub-domain materials
         std::vector<char*> materials;
 
-        /// Periodic surface, close surface, etc. identifications
-        Identifications* ident;
-
         /// number of vertices
         size_t numvertices;
-
-        /// element -> face, element -> edge etc ...
-        class MeshTopology* topology;
-
-     public:
-        /// refinement hierarchy
-        std::vector<INDEX_2> mlbetweennodes;
-
-     private:
-        void BuildBoundaryEdges(void);
-
-     public:
-        bool PointContainedIn2DElement(
-            const Point3d& p,
-            double lami[3],
-            const int element,
-            bool consider3D = false) const;
 
      public:
         Mesh();
@@ -152,17 +123,17 @@ namespace meshit
 
         size_t GetNSE() const
         {
-            return surfelements.size();
+            return surf_elements.size();
         }
 
         Element2d& SurfaceElement(size_t i)
         {
-            return surfelements[i];
+            return surf_elements[i];
         }
 
         const Element2d& SurfaceElement(size_t i) const
         {
-            return surfelements[i];
+            return surf_elements[i];
         }
 
         void RebuildSurfaceElementLists();
@@ -176,46 +147,14 @@ namespace meshit
             return lockedpoints;
         }
 
-        /// Returns number of domains
-        int GetNDomains() const;
-
         /// sets internal tables
         void CalcSurfacesOfNode();
-
-        /**
-           finds elements without neighbour and
-           boundary elements without inner element.
-           Results are stored in openelements.
-           if dom == 0, all sub-domains, else subdomain dom */
-        void FindOpenElements(size_t dom = 0);
-
-        /**
-           finds segments without surface element,
-           and surface elements without neighbours.
-           store in opensegmentsy
-         */
-        void FindOpenSegments(size_t surfnr = 0);
-
-        size_t GetNOpenSegments()
-        {
-            return opensegments.size();
-        }
-
-        const Segment& GetOpenSegment(int nr)
-        {
-            return opensegments[nr];
-        }
 
         /**
            Checks overlap of boundary
            return == 1, iff overlap
          */
         int CheckOverlappingBoundary();
-        /**
-           Checks consistent boundary
-           return == 0, everything ok
-         */
-        int CheckConsistentBoundary() const;
 
         /**
            finds average h of surface surfnr if surfnr > 0,
@@ -235,16 +174,6 @@ namespace meshit
         /// Find bounding box
         void GetBox(Point3d& pmin, Point3d& pmax) const;
 
-        size_t GetNOpenElements() const
-        {
-            return openelements.size();
-        }
-
-        const Element2d& OpenElement(size_t i) const
-        {
-            return openelements[i];
-        }
-
         /// Refines mesh and projects points to true surface
         // void Refine (int levels, const CSGeometry * geom);
 
@@ -252,7 +181,7 @@ namespace meshit
         {
             INDEX_2 i2(pi1, pi2);
             i2.Sort();
-            return segmentht->Used(i2);
+            return segment_ht->Used(i2);
         }
 
         /**
@@ -286,14 +215,6 @@ namespace meshit
             return facedecoding[i - 1];
         }
 
-        /// return periodic, close surface etc. identifications
-
-        Identifications& GetIdentifications()
-        {
-            return *ident;
-        }
-        /// return periodic, close surface etc. identifications
-
         /// find number of vertices
         void ComputeNVertices();
 
@@ -305,7 +226,10 @@ namespace meshit
         /// remove edge points
         void SetNP(size_t np);
 
-        void UpdateTopology();
+        bool PointContainedIn2DElement(
+            const Point3d& p,
+            double lami[3],
+            const int element) const;
 
         class CSurfaceArea
         {
@@ -314,7 +238,7 @@ namespace meshit
             double area;
 
          public:
-            CSurfaceArea(const Mesh& amesh)
+            explicit CSurfaceArea(const Mesh& amesh)
                 : mesh(amesh), valid(false) { }
 
             void Add(const Element2d& sel)

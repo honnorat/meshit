@@ -42,7 +42,6 @@ SET(src_MESHING
     meshing/refine.cpp
     meshing/ruler2.cpp
     meshing/smoothing2.cpp
-    meshing/topology.cpp
     meshing/triarls.cpp)
 
 #######################

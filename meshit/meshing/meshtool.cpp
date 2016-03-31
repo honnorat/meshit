@@ -38,31 +38,6 @@ namespace meshit
         return 1;
     }
 
-    int CheckSurfaceMesh2(const Mesh& mesh)
-    {
-        const Point3d* tri1[3], * tri2[3];
-
-        for (size_t i = 0; i < mesh.GetNOpenElements(); i++) {
-            for (size_t j = 0; j < i; j++) {
-                for (size_t k = 0; k < 3; k++) {
-                    tri1[k] = &mesh.Point(mesh.OpenElement(i).PNum(k + 1));
-                    tri2[k] = &mesh.Point(mesh.OpenElement(j).PNum(k + 1));
-                }
-                if (IntersectTriangleTriangle(&tri1[0], &tri2[0])) {
-                    MESHIT_LOG_ERROR("Surface elements are intersecting :");
-                    for (int k = 0; k <= 2; k++) {
-                        MESHIT_LOG_ERROR_CONT(*tri1[k] << "  ");
-                    }
-                    std::cerr << std::endl;
-                    for (int k = 0; k <= 2; k++)
-                        std::cerr << *tri2[k] << "   ";
-                    std::cerr << std::endl;
-                }
-            }
-        }
-        return 0;
-    }
-
     static double TriangleQualityInst(const Point3d& p1, const Point3d& p2, const Point3d& p3)
     {
         // quality 0 (worst) .. 1 (optimal)

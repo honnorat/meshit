@@ -46,9 +46,7 @@ int main(int argc, char** argv)
     MESHIT_LOG_INFO("== meshing done");
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);
-    meshit::CheckSurfaceMesh2(mesh);
     mesh.CheckOverlappingBoundary();
-    mesh.CheckConsistentBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO(" - averageH(0) = " << mesh.AverageH(0));
     MESHIT_LOG_INFO(" - averageH(1) = " << mesh.AverageH(1));
@@ -64,9 +62,7 @@ int main(int argc, char** argv)
     ref.Refine(mesh);
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);
-    meshit::CheckSurfaceMesh2(mesh);
     mesh.CheckOverlappingBoundary();
-    mesh.CheckConsistentBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO(" - averageH(0) = " << mesh.AverageH(0));
     MESHIT_LOG_INFO(" - averageH(1) = " << mesh.AverageH(1));

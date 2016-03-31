@@ -218,12 +218,7 @@ namespace meshit
     {
         /// which surface, 0 if not available
         size_t surfnr;
-        /// domain nr inside
-        size_t domin;
-        /// domain nr outside
-        size_t domout;
-        /// top level object number of surface
-        int tlosurf;
+
         /// boundary condition property
         size_t bcprop;
 
@@ -233,29 +228,13 @@ namespace meshit
      public:
         FaceDescriptor();
         FaceDescriptor(const FaceDescriptor& other);
-        FaceDescriptor(size_t surfnri, size_t domini, size_t domouti, int tlosurfi);
-        explicit FaceDescriptor(const Segment& seg);
+        explicit FaceDescriptor(size_t surfnri);
 
         ~FaceDescriptor() { }
 
         size_t SurfNr() const
         {
             return surfnr;
-        }
-
-        size_t DomainIn() const
-        {
-            return domin;
-        }
-
-        size_t DomainOut() const
-        {
-            return domout;
-        }
-
-        int TLOSurface() const
-        {
-            return tlosurf;
         }
 
         size_t BCProperty() const
@@ -282,6 +261,7 @@ namespace meshit
            // S .. Swap, optimal elements
            // m .. move nodes
            // c .. combine
+           // p .. print for debug
          **/
         const char* optimize2d;
         /// number of 2d optimization steps
@@ -294,8 +274,6 @@ namespace meshit
         double minh;
         /// check overlapping surfaces (debug)
         int check_overlap;
-        /// check chart boundary (sometimes too restrictive)
-        int check_chart_boundary;
         /// safty factor for curvatures (elemetns per radius)
         double curvature_safety;
         /// minimal number of segments per edge
@@ -307,10 +285,6 @@ namespace meshit
 
         MeshingParameters();
         MeshingParameters(const MeshingParameters& other);
-        
-        void Print(std::ostream& ost) const;
-
-        void CopyFrom(const MeshingParameters& other);
     };
 
     class DebugParameters
@@ -347,40 +321,6 @@ namespace meshit
             }
         }
     }
-
-    /**
-       Identification of periodic surfaces, close surfaces, etc. 
-     */
-
-    class Mesh;
-
-    class Identifications
-    {
-     public:
-        explicit Identifications(Mesh& amesh);
-        ~Identifications();
-
-        int Get(PointIndex pi1, PointIndex pi2) const;
-        bool Get(PointIndex pi1, PointIndex pi2, int identnr) const;
-
-        bool UsedSymmetric(PointIndex pi1, PointIndex pi2)
-        {
-            return identifiedpoints->Used(INDEX_2(pi1, pi2)) ||
-                   identifiedpoints->Used(INDEX_2(pi2, pi1));
-        }
-
-        /// remove secondorder
-        void SetMaxPointNr(int maxpnum);
-
-     private:
-        Mesh& mesh;
-
-        /// identify points (thin layers, periodic b.c.)
-        INDEX_2_HASHTABLE<PointIndex>* identifiedpoints;
-
-        /// the same, with info about the id-nr
-        INDEX_3_HASHTABLE<PointIndex>* identifiedpoints_nr;
-    };
 
 }  // namespace meshit
 

@@ -57,18 +57,7 @@ namespace meshit
         void TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h);
         /// return 0 .. ok
         /// return >0 .. cannot transform point to true surface
-        int TransformFromPlain(Point2d& plainpoint,
-                               Point3d& locpoint,
-                               double h);
-
-        /*
-          tests, whether endpoint (= 1 or 2) of line segment p1-p2
-          is inside of the selected chart. The endpoint must be on the
-          chart
-         */
-        int IsLineVertexOnChart(const Point3d& p1, const Point3d& p2);
-
-        double Area() const;
+        void TransformFromPlain(Point2d& plainpoint, Point3d& locpoint, double h);
 
         /** Applies 2D rules.
          Tests all 2D rules */

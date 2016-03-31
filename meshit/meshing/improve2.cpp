@@ -5,28 +5,28 @@ namespace meshit
 {
     class Neighbour
     {
-        int nr[3];
-        int orient[3];
+        PointIndex nr[3];
+        size_t orient[3];
 
      public:
         Neighbour() { }
 
-        void SetNr(int side, int anr)
+        void SetNeighborIndex(size_t side, PointIndex anr)
         {
             nr[side] = anr;
         }
 
-        int GetNr(int side)
+        PointIndex GetNeighborIndex(size_t side)
         {
             return nr[side];
         }
 
-        void SetOrientation(size_t side, int aorient)
+        void SetOrientation(size_t side, size_t aorient)
         {
             orient[side] = aorient;
         }
 
-        int GetOrientation(size_t side)
+        size_t GetOrientation(size_t side)
         {
             return orient[side];
         }
@@ -35,12 +35,12 @@ namespace meshit
     class trionedge
     {
      public:
-        size_t tnr;
+        INDEX tnr;
         size_t sidenr;
 
         trionedge() : tnr{0}, sidenr{0} { }
 
-        trionedge(size_t atnr, size_t asidenr) : tnr{atnr}, sidenr{asidenr} { }
+        trionedge(INDEX atnr, size_t asidenr) : tnr{atnr}, sidenr{asidenr} { }
     };
 
     void MeshOptimize2d::EdgeSwapping(Mesh& mesh, int usemetric)
@@ -115,7 +115,7 @@ namespace meshit
 
         for (size_t i = 0; i < seia.size(); i++) {
             for (size_t j = 0; j < 3; j++) {
-                neighbors[seia[i]].SetNr(j, -1);
+                neighbors[seia[i]].SetNeighborIndex(j, -1);
                 neighbors[seia[i]].SetOrientation(j, 0);
             }
         }
@@ -135,11 +135,11 @@ namespace meshit
 
                 INDEX_2 ii2(pi1, pi2);
                 if (other.Used(ii2)) {
-                    size_t i2 = other.Get(ii2).tnr;
+                    INDEX i2 = other.Get(ii2).tnr;
                     size_t j2 = other.Get(ii2).sidenr;
-                    neighbors[seia[i]].SetNr(j, i2);
+                    neighbors[seia[i]].SetNeighborIndex(j, i2);
                     neighbors[seia[i]].SetOrientation(j, j2);
-                    neighbors[i2].SetNr(j2, seia[i]);
+                    neighbors[i2].SetNeighborIndex(j2, seia[i]);
                     neighbors[i2].SetOrientation(j2, j);
                 } else {
                     other.Set(INDEX_2(pi2, pi1), trionedge(seia[i], j));
@@ -164,7 +164,7 @@ namespace meshit
                 for (size_t o1 = 0; o1 < 3; o1++) {
                     bool should;
 
-                    SurfaceElementIndex t2 = neighbors[t1].GetNr(o1);
+                    SurfaceElementIndex t2 = neighbors[t1].GetNeighborIndex(o1);
                     size_t o2 = neighbors[t1].GetOrientation(o1);
 
                     if (t2 == -1) continue;

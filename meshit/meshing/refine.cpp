@@ -24,7 +24,7 @@ namespace meshit
             const Segment& el = mesh.LineSegment(si);
 
             INDEX_2 i2 = INDEX_2::Sort(el[0], el[1]);
-            size_t pinew;
+            PointIndex pinew;
             EdgePointGeomInfo ngi;
 
             if (between.Used(i2)) {
@@ -37,7 +37,7 @@ namespace meshit
                 pinew = mesh.AddPoint(pnew);
                 between.Set(i2, pinew);
 
-                if (pinew >= epgi.size()) {
+                if (pinew >= static_cast<PointIndex>(epgi.size())) {
                     epgi.resize(pinew + 1);
                 }
                 epgi[pinew] = ngi;

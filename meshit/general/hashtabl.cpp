@@ -35,15 +35,6 @@ namespace meshit
         }
     }
 
-    void BASE_INDEX_2_CLOSED_HASHTABLE::
-    BaseSetSize(size_t size)
-    {
-        hash.resize(size);
-        for (size_t i = 0; i < size; i++) {
-            hash[i].I1() = invalid;
-        }
-    }
-
     bool BASE_INDEX_2_CLOSED_HASHTABLE::
     PositionCreate2(const INDEX_2& ind, size_t& apos)
     {
@@ -64,48 +55,6 @@ namespace meshit
             if (i == startpos) {
                 throw std::runtime_error("Try to set new element in full closed hashtable");
             }
-        }
-    }
-
-    size_t BASE_INDEX_2_CLOSED_HASHTABLE::UsedElements() const
-    {
-        size_t n = hash.size();
-        size_t cnt = 0;
-        for (size_t i = 0; i < n; i++) {
-            if (hash[i].I1() != invalid) {
-                cnt++;
-            }
-        }
-        return cnt;
-    }
-
-    void BASE_INDEX_3_CLOSED_HASHTABLE::
-    BaseSetSize(size_t size)
-    {
-        hash.resize(size);
-        for (size_t i = 0; i < size; i++) {
-            hash[i].I1() = invalid;
-        }
-    }
-
-    bool BASE_INDEX_3_CLOSED_HASHTABLE::
-    PositionCreate2(const INDEX_3& ind, size_t& apos)
-    {
-        size_t i = HashValue(ind);
-        size_t startpos = i;
-        while (true) {
-            i = (i + 1) % hash.size();
-            if (hash[i] == ind) {
-                apos = i;
-                return false;
-            }
-            if (hash[i].I1() == invalid) {
-                hash[i] = ind;
-                apos = i;
-                return true;
-            }
-            if (i == startpos)
-                throw std::runtime_error("Try to set new element in full closed hashtable");
         }
     }
 

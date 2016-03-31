@@ -175,7 +175,7 @@ namespace meshit
                 }
             }
         }
-        starti = baselineindex + 1;
+        starti = static_cast<size_t>(baselineindex + 1);
 
         p1 = points[lines[baselineindex].L().I1()].P();
         p2 = points[lines[baselineindex].L().I2()].P();

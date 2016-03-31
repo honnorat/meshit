@@ -29,7 +29,9 @@ namespace meshit
         }
     };
 
-    /** 
+    class Mesh;
+
+    /**
         Function to be minimized.
      */
     class MinFunction_2d

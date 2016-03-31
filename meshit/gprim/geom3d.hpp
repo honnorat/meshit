@@ -193,14 +193,14 @@ namespace meshit
      public:
         Vec3d()
         {
-            x[0] = x[1] = x[2] = 0;
+            x[0] = x[1] = x[2] = 0.0;
         }
 
         Vec3d(double ax, double ay)
         {
             x[0] = ax;
             x[1] = ay;
-            x[2] = 0;
+            x[2] = 0.0;
         }
 
         Vec3d(double ax, double ay, double az)

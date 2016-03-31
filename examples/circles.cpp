@@ -47,35 +47,21 @@ int main(int argc, char** argv)
     MESHIT_LOG_INFO("~ meshing  : " << uclock() - cc << " s.");
 
     cc = uclock();
-    mesh.FindOpenElements(0);
-    mesh.FindOpenElements(face1);
-    mesh.FindOpenElements(face2);
-    MESHIT_LOG_INFO("~ findopen : " << uclock() - cc << " s.");
-
-    cc = uclock();
     meshit::MeshQuality2d(mesh);
     MESHIT_LOG_INFO("~ quality  : " << uclock() - cc << " s.");
 
     cc = uclock();
-    meshit::CheckSurfaceMesh2(mesh);
+    meshit::CheckSurfaceMesh(mesh);
     MESHIT_LOG_INFO("~ checksurf: " << uclock() - cc << " s.");
 
     cc = uclock();
     mesh.CheckOverlappingBoundary();
     MESHIT_LOG_INFO("~ checkover: " << uclock() - cc << " s.");
 
-    cc = uclock();
-    mesh.CheckConsistentBoundary();
-    MESHIT_LOG_INFO("~ checkcons: " << uclock() - cc << " s.");
-
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO("AverageH(0) = " << mesh.AverageH(0));
     MESHIT_LOG_INFO("AverageH(1) = " << mesh.AverageH(face1));
     MESHIT_LOG_INFO("AverageH(2) = " << mesh.AverageH(face2));
-
-    cc = uclock();
-    mesh.UpdateTopology();
-    MESHIT_LOG_INFO("~ updatetop: " << uclock() - cc << " s.");
 
     cc = uclock();
     mesh.Export("circles.msh");
@@ -88,9 +74,8 @@ int main(int argc, char** argv)
     meshit::Refinement ref;
     ref.Refine(mesh);
     meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh2(mesh);
+    meshit::CheckSurfaceMesh(mesh);
     mesh.CheckOverlappingBoundary();
-    mesh.CheckConsistentBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO("AverageH(0) = " << mesh.AverageH(0));
     MESHIT_LOG_INFO("AverageH(1) = " << mesh.AverageH(face1));

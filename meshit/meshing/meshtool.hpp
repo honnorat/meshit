@@ -8,7 +8,6 @@ namespace meshit
     void MeshQuality2d(const Mesh& mesh);
 
     int CheckSurfaceMesh(const Mesh& mesh);
-    int CheckSurfaceMesh2(const Mesh& mesh);
 
 }
 #endif
