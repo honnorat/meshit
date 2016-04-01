@@ -142,10 +142,8 @@ namespace meshit
 
     size_t Mesh::AddPoint(const Point3d& p, PointType type)
     {
-        size_t pi = points.size();
         points.push_back(MeshPoint(p, type));
-
-        return pi;
+        return points.size() - 1;
     }
 
     void Mesh::AddSegment(const Segment& s)
@@ -161,19 +159,6 @@ namespace meshit
 
     void Mesh::AddSurfaceElement(const Element2d& el)
     {
-        PointIndex maxn = el[0];
-        for (size_t i = 1; i < 3; i++) {
-            if (el[i] > maxn) maxn = el[i];
-        }
-        maxn += 1;
-
-        if (static_cast<size_t>(maxn) <= points.size()) {
-            for (size_t i = 0; i < 3; i++) {
-                if (points[el[i]].Type() > SURFACE_POINT)
-                    points[el[i]].SetType(SURFACE_POINT);
-            }
-        }
-
         size_t si = surf_elements.size();
         surf_elements.push_back(el);
 
@@ -356,13 +341,10 @@ namespace meshit
                 infile >> n;
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
-                    int hi;
-                    infile >> seg.si >> hi >> seg[0] >> seg[1] >> hi >> hi
-                    >> seg.surfnr1 >> seg.surfnr2
-                    >> seg.edgenr
-                    >> seg.epgeominfo[1].edgenr
-                    >> seg.epgeominfo[0].dist
-                    >> seg.epgeominfo[1].dist;
+                    infile >> seg.si >> seg[0] >> seg[1];
+                    infile >> seg.surfnr1 >> seg.surfnr2;
+                    infile >> seg.edgenr >> seg.epgeominfo[1].edgenr;
+                    infile >> seg.epgeominfo[0].dist >> seg.epgeominfo[1].dist;
 
                     seg.epgeominfo[0].edgenr = seg.epgeominfo[1].edgenr;
 
@@ -400,6 +382,7 @@ namespace meshit
             if (strcmp(str, "endmesh") == 0) {
                 endmesh = true;
             }
+            str[0] = '\0';
         }
 
         CalcSurfacesOfNode();
@@ -435,8 +418,8 @@ namespace meshit
             const Segment& seg = segments[i];
             MeshPoint& mp1 = points[seg[0]];
             MeshPoint& mp2 = points[seg[1]];
-            if (mp1.Type() == INNER_POINT || mp1.Type() == SURFACE_POINT) mp1.SetType(EDGE_POINT);
-            if (mp2.Type() == INNER_POINT || mp2.Type() == SURFACE_POINT) mp2.SetType(EDGE_POINT);
+            if (mp1.Type() == INNER_POINT) mp1.SetType(EDGE_POINT);
+            if (mp2.Type() == INNER_POINT) mp2.SetType(EDGE_POINT);
         }
 
         for (size_t i = 0; i < GetNSeg(); i++) {
@@ -843,11 +826,7 @@ namespace meshit
     void Mesh::SetMaterial(size_t domnr, const char* mat)
     {
         if (domnr > materials.size()) {
-            size_t olds = materials.size();
-            materials.resize(domnr);
-            for (size_t i = olds; i < domnr; i++) {
-                materials[i] = 0;
-            }
+            materials.resize(domnr, nullptr);
         }
         materials[domnr - 1] = new char[strlen(mat) + 1];
         strcpy(materials[domnr - 1], mat);

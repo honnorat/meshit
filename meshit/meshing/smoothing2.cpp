@@ -277,7 +277,7 @@ namespace meshit
             PointIndex pi = icompress[hi];
             MeshPoint& pp = mesh.Point(pi);
 
-            if (pp.Type() == SURFACE_POINT) {
+            if (pp.Type() == INNER_POINT) {
                 std::vector<SurfaceElementIndex> elem_idx = elements_on_point[hi];
                 size_t n_elems = elem_idx.size();
 

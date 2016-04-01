@@ -16,7 +16,6 @@ namespace meshit
 
         domin = -1;
         domout = -1;
-        tlosurf = -1;
 
         surfnr1 = -1;
         surfnr2 = -1;
@@ -29,7 +28,6 @@ namespace meshit
           si(other.si),
           domin(other.domin),
           domout(other.domout),
-          tlosurf(other.tlosurf),
           surfnr1(other.surfnr1),
           surfnr2(other.surfnr2),
           epgeominfo(),
@@ -52,7 +50,6 @@ namespace meshit
             si = other.si;
             domin = other.domin;
             domout = other.domout;
-            tlosurf = other.tlosurf;
             surfnr1 = other.surfnr1;
             surfnr2 = other.surfnr2;
             epgeominfo[0] = other.epgeominfo[0];

@@ -94,7 +94,7 @@ namespace meshit
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
-                if (mesh.Point(pi).Type() == INNER_POINT || mesh.Point(pi).Type() == SURFACE_POINT) {
+                if (mesh.Point(pi).Type() == INNER_POINT) {
                     pdef[pi] = -6;
                 } else {
                     for (int k = 0; k < 8; k++) {

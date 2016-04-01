@@ -18,7 +18,7 @@ namespace meshit
 {
     enum PointType
     {
-        EDGE_POINT = 2, SURFACE_POINT = 3, INNER_POINT = 4
+        EDGE_POINT = 2, INNER_POINT = 3
     };
 
     class EdgePointGeomInfo
@@ -176,8 +176,6 @@ namespace meshit
         size_t domin;
         /// domain number outer side
         size_t domout;
-        /// top-level object number of surface
-        int tlosurf;
 
         /// surfaces describing edge
         int surfnr1, surfnr2;
