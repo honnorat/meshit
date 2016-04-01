@@ -69,27 +69,6 @@ namespace meshit
         }
     }
 
-    void BASE_TABLE::ChangeSize(size_t size)
-    {
-        size_t oldsize = data.size();
-        if (size == oldsize)
-            return;
-
-        if (size < oldsize) {
-            for (size_t i = size; i < oldsize; i++) {
-                delete[] reinterpret_cast<char*>(data[i].col);
-            }
-        }
-
-        data.resize(size);
-
-        for (size_t i = oldsize; i < size; i++) {
-            data[i].maxsize = 0;
-            data[i].size = 0;
-            data[i].col = NULL;
-        }
-    }
-
     void BASE_TABLE::IncSize2(size_t i, size_t elsize)
     {
 #ifdef DEBUG

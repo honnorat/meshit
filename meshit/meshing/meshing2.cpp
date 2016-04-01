@@ -497,7 +497,7 @@ namespace meshit
 
                         if (trigsonnode[gpi] > 20) {
                             illegalpoint[gpi] = 1;
-                            std::cerr << "illegal point: " << gpi << std::endl;
+                            std::cerr << "illegal point: " << gpi << ": trigs_on_node = " << trigsonnode[gpi] << std::endl;
                         }
 
                         static int mtonnode = 0;

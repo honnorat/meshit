@@ -72,7 +72,7 @@ namespace meshit
         infile.close();
     }
 
-    void SplineGeometry::TestComment(std::istream& infile)
+    char SplineGeometry::TestComment(std::istream& infile)
     {
         bool comment = true;
         char ch;
@@ -85,15 +85,18 @@ namespace meshit
                 }
             } else if (ch == '\n') {
                 // skip empty lines
-            } else if (isspace(ch)) {
+            } else if (isblank(ch)) {
                 // skip whitespaces
+            } else if (ch == '-') {
+                // do not unget '-'
+                comment = false;
             } else {
                 // end of comment
-                infile.putback(ch);
+                infile.unget();
                 comment = false;
             }
         }
-        return;
+        return ch;
     }
 
     void SplineGeometry::LoadData(std::istream& infile)
@@ -102,11 +105,11 @@ namespace meshit
         int nump, leftdom, rightdom;
         Point<2> x;
         int hi1, hi2, hi3;
-        double hd;
         char buf[50], ch;
         int pointnr;
 
         std::string keyword;
+        std::string flag;
 
         std::vector<GeomPoint<2>> infilepoints;
         std::vector<int> pointnrs;
@@ -116,92 +119,46 @@ namespace meshit
         TestComment(infile);
         // refinement factor
         infile >> elto0;
-        TestComment(infile);
 
         while (infile.good()) {
+            TestComment(infile);
             infile >> keyword;
+            ch = TestComment(infile);
 
             if (keyword == "points") {
-                MESHIT_LOG_DEBUG("load points");
-                infile.get(ch);
-                infile.putback(ch);
-
                 while (!isalpha(static_cast<int>(ch))) {
-                    TestComment(infile);
-                    infile >> pointnr;
-                    // pointnrs 1-based
+                    infile >> pointnr;  // pointnrs is 1-based
                     if (pointnr > nump) nump = pointnr;
                     pointnrs.push_back(pointnr);
 
-                    for (int j = 0; j < 2; j++) {
-                        infile >> x[j];
-                    }
-                    // hd is now optional, default 1
-                    //  infile >> hd;
-                    hd = 1;
+                    infile >> x[0] >> x[1];
+                    infile >> ch;
 
                     Flags flags;
-
-                    // get flags,
-                    ch = 'a';
-
-                    do {
-                        infile.get(ch);
-                        // if another int-value, set refinement flag to this value
-                        // (corresponding to old files)
-                        if (isdigit(static_cast<int>(ch))) {
-                            infile.putback(ch);
-                            infile >> hd;
-                            infile.get(ch);
-                        }
-                    } while (isspace(ch) && ch != '\n');
                     while (ch == '-') {
-                        char flag[100];
-                        flag[0] = '-';
-                        infile >> (flag + 1);
+                        infile >> flag;
                         flags.SetCommandLineFlag(flag);
-                        ch = 'a';
-                        do {
-                            infile.get(ch);
-                        } while (isspace(ch) && ch != '\n');
+                        ch = TestComment(infile);
                     }
-                    if (infile.good()) infile.putback(ch);
+                    infile.unget();
 
-                    if (hd == 1) hd = flags.GetNumFlag("ref", 1.0);
-
-                    infilepoints.push_back(GeomPoint<2>(x, hd, flags.GetNumFlag("maxh", 1e99)));
-
-                    TestComment(infile);
-                    infile.get(ch);
-                    infile.putback(ch);
+                    infilepoints.push_back(
+                        GeomPoint<2>(x, flags.GetNumFlag("ref", 1.0), flags.GetNumFlag("maxh", 1e99)));
+                    ch = TestComment(infile);
                 }
-
                 geompoints.resize(nump);
                 for (int i = 0; i < nump; i++) {
                     geompoints[pointnrs[i] - 1] = infilepoints[i];
                 }
-                TestComment(infile);
             }
-
             else if (keyword == "segments") {
-                MESHIT_LOG_DEBUG("load segments");
-
-                infile.get(ch);
-                infile.putback(ch);
-                int i = 0;
-
+                int i = 1;
                 while (!isalpha(static_cast<int>(ch))) {
-                    i++;
-                    TestComment(infile);
-
-                    SplineSeg* spline = nullptr;
-                    TestComment(infile);
-
                     infile >> leftdom >> rightdom;
-
                     if (leftdom > numdomains) numdomains = leftdom;
                     if (rightdom > numdomains) numdomains = rightdom;
 
+                    SplineSeg* spline = nullptr;
                     infile >> buf;
                     // type of spline segement
                     if (strcmp(buf, "2") == 0) {  // a line
@@ -224,42 +181,25 @@ namespace meshit
                     spex->rightdom = rightdom;
                     splines.push_back(spex);
 
-                    // hd is now optional, default 1
-                    hd = 1;
-                    infile >> ch;
-
-                    // get flags
                     Flags flags;
+
+                    infile >> ch;
                     while (ch == '-') {
-                        char flag[100];
-                        flag[0] = '-';
-                        infile >> (flag + 1);
+                        infile >> flag;
                         flags.SetCommandLineFlag(flag);
-                        ch = 'a';
-                        infile >> ch;
+                        ch = TestComment(infile);
                     }
+                    infile.unget();
 
-                    if (infile.good()) infile.putback(ch);
-
-                    spex->bc = static_cast<int>(flags.GetNumFlag("bc", i + 1));
+                    spex->bc = static_cast<int>(flags.GetNumFlag("bc", ++i));
                     spex->reffak = flags.GetNumFlag("ref", 1);
                     spex->hmax = flags.GetNumFlag("maxh", 1e99);
-                    if (hd != 1) spex->reffak = hd;
-
-                    TestComment(infile);
-                    infile.get(ch);
-                    infile.putback(ch);
+                    ch = TestComment(infile);
                 }
-                infile.get(ch);
-                infile.putback(ch);
             }
-
             else if (keyword == "materials") {
-                TestComment(infile);
                 int domainnr;
                 char material[100];
-
-                if (!infile.good()) return;
 
                 materials.resize(numdomains);
                 maxh.resize(numdomains);
@@ -267,33 +207,24 @@ namespace meshit
                     maxh[i] = 1000;
                 }
 
-                TestComment(infile);
-
                 for (int i = 0; i < numdomains; i++) {
                     materials[i] = new char[100];
                 }
                 for (int i = 0; i < numdomains && infile.good(); i++) {
-                    TestComment(infile);
                     infile >> domainnr;
                     infile >> material;
-
                     strncpy(materials[domainnr - 1], material, 100);
 
                     Flags flags;
-                    ch = 'a';
                     infile >> ch;
                     while (ch == '-') {
-                        char flag[100];
-                        flag[0] = '-';
-                        infile >> (flag + 1);
+                        infile >> flag;
                         flags.SetCommandLineFlag(flag);
-                        ch = 'a';
-                        infile >> ch;
+                        ch = TestComment(infile);
                     }
-
-                    if (infile.good()) infile.putback(ch);
-
+                    infile.unget();
                     maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
+                    ch = TestComment(infile);
                 }
             }
         }
@@ -339,9 +270,9 @@ namespace meshit
     }
 
     void SplineGeometry::AddSpline(const std::vector<Point2d>& points,
-                                     double hmax, int bc,
-                                     int face_left,
-                                     int face_right)
+                                   double hmax, int bc,
+                                   int face_left,
+                                   int face_right)
     {
         size_t nb_points = points.size();
         size_t ip_0 = geompoints.size();
@@ -374,8 +305,8 @@ namespace meshit
     }
 
     void SplineGeometry::AddCircle(const Point2d& center, double radius,
-                                     double hmax, int bc,
-                                     int face_left, int face_right)
+                                   double hmax, int bc,
+                                   int face_left, int face_right)
     {
         std::vector<Point2d> spline_points;
         double c_x = center.X();

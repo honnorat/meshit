@@ -9,11 +9,9 @@
 /**************************************************************************/
 
 #include <iostream>
+#include <unordered_map>
 
 #include <cstring>
-
-#include "../meshit.hpp"
-#include "symbolta.hpp"
 
 namespace meshit
 {
@@ -25,31 +23,17 @@ namespace meshit
     class Flags
     {
      protected:
-        SYMBOLTABLE<char*> strflags;
-        SYMBOLTABLE<double> numflags;
-        SYMBOLTABLE<int> defflags;
+        std::unordered_map<std::string, double> num_flags;
 
      public:
         Flags() { }
 
-        ~Flags()
-        {
-            DeleteFlags();
-        }
+        ~Flags() { }
 
-        /// Deletes all flags
-        void DeleteFlags();
-
-        /// Sets string flag, overwrite if exists
-        void SetFlag(const char* name, const char* val);
-        void SetFlag(const char* name);
-        void SetFlag(const char* name, double val);
-
-        /// set flag of form -name=hello -val=0.5 -defined
-        void SetCommandLineFlag(const char* st);
+        void SetCommandLineFlag(const std::string& st);
 
         /// Returns numerical flag, default value if not exists
-        double GetNumFlag(const char* name, double def) const;
+        double GetNumFlag(const std::string& name, double default_value);
     };
 
 }  // namespace meshit

@@ -32,7 +32,6 @@ namespace meshit
         ~BASE_TABLE();
 
         void SetSize(size_t size);
-        void ChangeSize(size_t size);
 
         /// increment size of entry i by one, i is 0-based
 
@@ -75,37 +74,10 @@ namespace meshit
             static_cast<T*>(data[i].col)[data[i].size - 1] = acont;
         }
 
-        /// Inserts element acont into row i. Does not test if already used, assumes to have enough memory
-        inline void AddSave(size_t i, const T& acont)
-        {
-            static_cast<T*>(data[i].col)[data[i].size] = acont;
-            data[i].size++;
-        }
-
-        /** Set the nr-th element in the i-th row to acont.
-          Does not check for overflow. */
-        inline void Set(size_t i, size_t nr, const T& acont)
-        {
-            static_cast<T*>(data[i].col)[nr] = acont;
-        }
-
-        /** Returns the nr-th element in the i-th row.
-          Does not check for overflow. */
-        inline const T& Get(size_t i, size_t nr) const
-        {
-            return static_cast<T*>(data[i].col)[nr];
-        }
-
         /// Returns size of the table.
         inline size_t Size() const
         {
             return data.size();
-        }
-
-        /// Returns size of the i-th row.
-        inline size_t EntrySize(int i) const
-        {
-            return data[i].size;
         }
 
         inline void PrintMemInfo(std::ostream& ost) const

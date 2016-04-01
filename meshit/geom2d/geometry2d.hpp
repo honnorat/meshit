@@ -121,7 +121,7 @@ namespace meshit
 
         void FakeData();
 
-        void TestComment(std::istream& infile);
+        char TestComment(std::istream& infile);
 
         SplineSegExt& GetSpline(const size_t i)
         {

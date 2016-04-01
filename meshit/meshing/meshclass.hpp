@@ -14,7 +14,6 @@
 #include "localh.hpp"
 #include "../gprim/adtree.hpp"
 #include "../general/bitarray.hpp"
-#include "../general/symbolta.hpp"
 #include "../general/table.hpp"
 #include "../gprim/geomops.hpp"
 

@@ -10,73 +10,40 @@
 
 #include "flags.hpp"
 
-#include <sstream>
-#include <fstream>
+#include <string>
+
+#include "../meshing/msghandler.hpp"
 
 namespace meshit
 {
-    void Flags::DeleteFlags()
+
+    double Flags::GetNumFlag(const std::string& name, double default_value)
     {
-        for (size_t i = 0; i < strflags.Size(); i++) {
-            delete[] strflags[i];
+        if (num_flags.count(name)) {
+            return num_flags[name];
+        } else {
+            return default_value;
         }
-        strflags.DeleteAll();
-        numflags.DeleteAll();
-        defflags.DeleteAll();
     }
 
-    void Flags::SetFlag(const char* name, const char* val)
+    void Flags::SetCommandLineFlag(const std::string& st)
     {
-        char* hval = new char[strlen(val) + 1];
-        strcpy(hval, val);
-        strflags.Set(name, hval);
-    }
-
-    void Flags::SetFlag(const char* name, double val)
-    {
-        numflags.Set(name, val);
-    }
-
-    void Flags::SetFlag(const char* name)
-    {
-        defflags.Set(name, 1);
-    }
-
-    double Flags::GetNumFlag(const char* name, double def) const
-    {
-        if (numflags.Used(name))
-            return numflags.Get(name);
-        else
-            return def;
-    }
-
-
-    void Flags::SetCommandLineFlag(const char* st)
-    {
-        if (st[0] != '-') {
-            std::cerr << "flag must start with '-'" << std::endl;
+        size_t eq_pos = st.find('=');
+        if (eq_pos == std::string::npos) {
+            MESHIT_LOG_WARNING("invalid flag: " << st);
             return;
         }
 
-        const char* pos = strchr(st, '=');
-
-        if (!pos) {
-            SetFlag(st + 1);
-        } else {
-            char name[100];
-            strncpy(name, st + 1, (pos - st) - 1);
-            name[pos - st - 1] = 0;
-            pos++;
-            char* endptr = NULL;
-
-            double val = strtod(pos, &endptr);
-
-            if (endptr == pos) {
-                SetFlag(name, pos);
-            } else {
-                SetFlag(name, val);
-            }
+        double value;
+        try {
+            value = std::stod(st.substr(eq_pos + 1));
+        } catch (const std::invalid_argument& e) {
+            MESHIT_LOG_WARNING("Invalid argument for flag: '" << st << "' (" << e.what() << ").");
+            return;
         }
+
+        std::string name = st.substr(0, eq_pos);
+        num_flags[name] = value;
     }
 
 }  // namespace meshit
