@@ -81,9 +81,9 @@ namespace meshit
             os << ++cnt << " 2 2 ";   // GMSH Type for a 3 node triangle
             os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";
             os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";
-            os << el.PNum(1) + 1 << " ";
-            os << el.PNum(2) + 1 << " ";
-            os << el.PNum(3) + 1 << "\n";
+            os << el.PointID(0) + 1 << " ";
+            os << el.PointID(1) + 1 << " ";
+            os << el.PointID(2) + 1 << "\n";
         }
         os << "$EndElements\n";
         /*

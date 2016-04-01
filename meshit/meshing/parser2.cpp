@@ -225,15 +225,15 @@ namespace meshit
                     elements.push_back(Element2d());
                     Element2d& last = elements.back();
 
-                    ist >> last.PNum(1);
+                    ist >> last.PointID(0);
                     ist >> ch;  // ','
 
                     if (ch == COMMASIGN) {
-                        ist >> last.PNum(2);
+                        ist >> last.PointID(1);
                         ist >> ch;  // ','
                     }
                     if (ch == COMMASIGN) {
-                        ist >> last.PNum(3);
+                        ist >> last.PointID(2);
                         ist >> ch;  // ','
                     }
                     if (ch == COMMASIGN) {

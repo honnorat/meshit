@@ -11,9 +11,9 @@ namespace meshit
         double l12, l13, l23, cir, area;
         static const double c = sqrt(3.0) / 36;
 
-        v12 = points[elem.PNum(2) - 1] - points[elem.PNum(1) - 1];
-        v13 = points[elem.PNum(3) - 1] - points[elem.PNum(1) - 1];
-        v23 = points[elem.PNum(3) - 1] - points[elem.PNum(2) - 1];
+        v12 = points[elem.PointID(1) - 1] - points[elem.PointID(0) - 1];
+        v13 = points[elem.PointID(2) - 1] - points[elem.PointID(0) - 1];
+        v23 = points[elem.PointID(2) - 1] - points[elem.PointID(1) - 1];
 
         l12 = v12.Length();
         l13 = v13.Length();
@@ -369,8 +369,8 @@ namespace meshit
                             // insert new elements:
                             for (size_t i = 0; i < rule->GetNE(); i++) {
                                 elements.push_back(rule->GetElement(i));
-                                for (size_t j = 1; j <= 3; j++) {
-                                    elements[i].PNum(j) = pmap[elements[i].PNum(j) - 1];
+                                for (size_t j = 0; j < 3; j++) {
+                                    elements[i].PointID(j) = pmap[elements[i].PointID(j) - 1];
                                 }
                             }
 

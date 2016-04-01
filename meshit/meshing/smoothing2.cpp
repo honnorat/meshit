@@ -277,7 +277,7 @@ namespace meshit
             PointIndex pi = icompress[hi];
             MeshPoint& pp = mesh.Point(pi);
 
-            if (pp.Type() == SURFACEPOINT) {
+            if (pp.Type() == SURFACE_POINT) {
                 std::vector<SurfaceElementIndex> elem_idx = elements_on_point[hi];
                 size_t n_elems = elem_idx.size();
 
@@ -294,10 +294,10 @@ namespace meshit
                     ld.loc_elements[j] = sei;
 
                     const Element2d& bel = mesh.SurfaceElement(sei);
-                    for (size_t k = 1; k <= 3; k++) {
-                        if (bel.PNum(k) == pi) {
-                            ld.loc_pnts2.push_back(mesh[bel.PNumMod(k + 1)]);
-                            ld.loc_pnts3.push_back(mesh[bel.PNumMod(k + 2)]);
+                    for (size_t k = 0; k < 3; k++) {
+                        if (bel.PointID(k) == pi) {
+                            ld.loc_pnts2.push_back(mesh[bel.PointID((k + 1) % 3)]);
+                            ld.loc_pnts3.push_back(mesh[bel.PointID((k + 2) % 3)]);
                             break;
                         }
                     }

@@ -69,8 +69,8 @@ namespace meshit
                 {0, 1, 5}
             };
 
-            for (j = 1; j <= 3; j++) {
-                pnums[j - 1] = el.PNum(j);
+            for (j = 0; j < 3; j++) {
+                pnums[j] = el.PointID(j);
             }
 
             for (j = 0; j < 3; j++) {
@@ -98,8 +98,8 @@ namespace meshit
             int ind = el.GetIndex();
             for (j = 0; j < 4; j++) {
                 Element2d nel;
-                for (k = 1; k <= 3; k++) {
-                    nel.PNum(k) = pnums[reftab[j][k - 1]];
+                for (k = 0; k < 3; k++) {
+                    nel.PointID(k) = pnums[reftab[j][k]];
                 }
                 nel.SetIndex(ind);
 

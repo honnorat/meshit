@@ -82,8 +82,8 @@ namespace meshit
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
-                POINTTYPE typ = mesh.Point(sel[j]).Type();
-                if (typ == FIXEDPOINT || typ == EDGEPOINT) {
+                PointType typ = mesh.Point(sel[j]).Type();
+                if (typ == EDGE_POINT) {
                     pangle[sel[j]] += Angle(mesh.Point(sel[(j + 1) % 3]) - mesh.Point(sel[j]),
                                             mesh.Point(sel[(j + 2) % 3]) - mesh.Point(sel[j]));
                 }
@@ -94,7 +94,7 @@ namespace meshit
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
-                if (mesh.Point(pi).Type() == INNERPOINT || mesh.Point(pi).Type() == SURFACEPOINT) {
+                if (mesh.Point(pi).Type() == INNER_POINT || mesh.Point(pi).Type() == SURFACE_POINT) {
                     pdef[pi] = -6;
                 } else {
                     for (int k = 0; k < 8; k++) {
@@ -123,8 +123,8 @@ namespace meshit
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
 
             for (size_t j = 0; j < 3; j++) {
-                PointIndex pi1 = sel.PNumMod(j + 2);
-                PointIndex pi2 = sel.PNumMod(j + 3);
+                PointIndex pi1 = sel.PointID((j + 1) % 3);
+                PointIndex pi2 = sel.PointID((j + 2) % 3);
 
                 INDEX_2 edge(pi1, pi2);
                 edge.Sort();
@@ -169,10 +169,10 @@ namespace meshit
                     if (t2 == -1) continue;
                     if (swapped[t1] || swapped[t2]) continue;
 
-                    PointIndex pi1 = mesh.SurfaceElement(t1).PNumMod(o1 + 1 + 1);
-                    PointIndex pi2 = mesh.SurfaceElement(t1).PNumMod(o1 + 1 + 2);
-                    PointIndex pi3 = mesh.SurfaceElement(t1).PNumMod(o1 + 1);
-                    PointIndex pi4 = mesh.SurfaceElement(t2).PNumMod(o2 + 1);
+                    PointIndex pi1 = mesh.SurfaceElement(t1).PointID((o1 + 1) % 3);
+                    PointIndex pi2 = mesh.SurfaceElement(t1).PointID((o1 + 2) % 3);
+                    PointIndex pi3 = mesh.SurfaceElement(t1).PointID(o1 % 3);
+                    PointIndex pi4 = mesh.SurfaceElement(t2).PointID(o2 % 3);
 
                     const Point3d& p_1 = mesh.Point(pi1);
                     const Point3d& p_2 = mesh.Point(pi2);
@@ -243,13 +243,13 @@ namespace meshit
                             // do swapping !
                             done = true;
 
-                            mesh.SurfaceElement(t1).PNum(1) = pi1;
-                            mesh.SurfaceElement(t1).PNum(2) = pi4;
-                            mesh.SurfaceElement(t1).PNum(3) = pi3;
+                            mesh.SurfaceElement(t1).PointID(0) = pi1;
+                            mesh.SurfaceElement(t1).PointID(1) = pi4;
+                            mesh.SurfaceElement(t1).PointID(2) = pi3;
 
-                            mesh.SurfaceElement(t2).PNum(1) = pi2;
-                            mesh.SurfaceElement(t2).PNum(2) = pi3;
-                            mesh.SurfaceElement(t2).PNum(3) = pi4;
+                            mesh.SurfaceElement(t2).PointID(0) = pi2;
+                            mesh.SurfaceElement(t2).PointID(1) = pi3;
+                            mesh.SurfaceElement(t2).PointID(2) = pi4;
 
                             pdef[pi1]--;
                             pdef[pi2]--;
@@ -298,8 +298,8 @@ namespace meshit
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& sel = mesh.SurfaceElement(seia[i]);
             for (size_t j = 0; j < 3; j++) {
-                PointIndex pi1 = sel.PNumMod(j + 2);
-                PointIndex pi2 = sel.PNumMod(j + 3);
+                PointIndex pi1 = sel.PointID((j + 1) % 3);
+                PointIndex pi2 = sel.PointID((j + 2) % 3);
                 if (mesh.IsSegment(pi1, pi2)) {
                     fixed[pi1] = true;
                     fixed[pi2] = true;

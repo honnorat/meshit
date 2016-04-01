@@ -16,11 +16,9 @@
 
 namespace meshit
 {
-    typedef int ELEMENT_EDGE[2];  // initial point, end point
-
-    enum POINTTYPE
+    enum PointType
     {
-        FIXEDPOINT = 1, EDGEPOINT = 2, SURFACEPOINT = 3, INNERPOINT = 4
+        EDGE_POINT = 2, SURFACE_POINT = 3, INNER_POINT = 4
     };
 
     class EdgePointGeomInfo
@@ -57,21 +55,21 @@ namespace meshit
      public:
         MeshPoint() { }
 
-        explicit MeshPoint(const Point3d& ap, POINTTYPE apt = INNERPOINT)
+        explicit MeshPoint(const Point3d& ap, PointType apt = INNER_POINT)
             : Point3d(ap), type(apt) { }
 
-        POINTTYPE Type() const
+        PointType Type() const
         {
             return type;
         }
 
-        void SetType(POINTTYPE at)
+        void SetType(PointType at)
         {
             type = at;
         }
 
      protected:
-        POINTTYPE type;
+        PointType type;
     };
 
     /**
@@ -107,24 +105,14 @@ namespace meshit
             return pnum[i];
         }
 
-        PointIndex& PNum(size_t i)
+        PointIndex& PointID(size_t i)
         {
-            return pnum[i - 1];
+            return pnum[i];
         }
 
-        const PointIndex& PNum(size_t i) const
+        const PointIndex& PointID(size_t i) const
         {
-            return pnum[i - 1];
-        }
-
-        PointIndex& PNumMod(size_t i)
-        {
-            return pnum[(i - 1) % 3];
-        }
-
-        const PointIndex& PNumMod(size_t i) const
-        {
-            return pnum[(i - 1) % 3];
+            return pnum[i];
         }
 
         void SetIndex(int si)
@@ -304,19 +292,19 @@ namespace meshit
 
     inline void Element2d::NormalizeNumbering()
     {
-        if (PNum(1) < PNum(2) && PNum(1) < PNum(3)) {
+        if (pnum[0] < pnum[1] && pnum[0] < pnum[2]) {
             return;
         } else {
-            if (PNum(2) < PNum(3)) {
-                PointIndex pi1 = PNum(2);
-                PNum(2) = PNum(3);
-                PNum(3) = PNum(1);
-                PNum(1) = pi1;
+            if (pnum[1] < pnum[2]) {
+                PointIndex pi1 = pnum[1];
+                pnum[1] = pnum[2];
+                pnum[2] = pnum[0];
+                pnum[0] = pi1;
             } else {
-                PointIndex pi1 = PNum(3);
-                PNum(3) = PNum(2);
-                PNum(2) = PNum(1);
-                PNum(1) = pi1;
+                PointIndex pi1 = pnum[2];
+                pnum[2] = pnum[1];
+                pnum[1] = pnum[0];
+                pnum[0] = pi1;
             }
         }
     }

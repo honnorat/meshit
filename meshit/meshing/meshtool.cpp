@@ -14,9 +14,9 @@ namespace meshit
         int cnt1 = 0, cnt2 = 0;
 
         for (size_t i = 0; i < nf; i++) {
-            for (size_t j = 1; j <= 3; j++) {
-                i2.I1() = mesh.SurfaceElement(i).PNumMod(j);
-                i2.I2() = mesh.SurfaceElement(i).PNumMod(j + 1);
+            for (size_t j = 0; j < 3; j++) {
+                i2.I1() = mesh.SurfaceElement(i).PointID(j);
+                i2.I2() = mesh.SurfaceElement(i).PointID((j + 1) % 3);
                 if (edges.count(i2)) {
                     int hi = edges[i2];
                     if (hi != 1)

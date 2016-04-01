@@ -74,7 +74,7 @@ namespace meshit
 
         void BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp);
 
-        size_t AddPoint(const Point3d& p, POINTTYPE type = INNERPOINT);
+        size_t AddPoint(const Point3d& p, PointType type = INNER_POINT);
 
         size_t GetNP() const
         {

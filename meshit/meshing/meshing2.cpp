@@ -115,13 +115,9 @@ namespace meshit
 
         StartMesh();
 
-        std::vector<int> trigsonnode;
-        std::vector<int> illegalpoint;
-
-        trigsonnode.resize(mesh.GetNP(), 0);
-        illegalpoint.resize(mesh.GetNP(), 0);
-
-        double meshedarea = 0;
+        std::vector<int> trigsonnode(mesh.GetNP(), 0);
+        std::vector<bool> illegalpoint(mesh.GetNP(), false);
+        double meshedarea = 0.0;
 
         std::vector<SurfaceElementIndex> seia;
         mesh.GetSurfaceElementsOfFace(facenr, seia);
@@ -271,8 +267,8 @@ namespace meshit
             if (found) {
                 for (size_t i = 0; i < locelements.size() && found; i++) {
                     const Element2d& el = locelements[i];
-                    for (size_t j = 1; j <= 3; j++) {
-                        if (el.PNum(j) <= static_cast<PointIndex>(oldnp) && pindex[el.PNum(j) - 1] == -1) {
+                    for (size_t j = 0; j < 3; j++) {
+                        if (el.PointID(j) <= static_cast<PointIndex>(oldnp) && pindex[el.PointID(j) - 1] == -1) {
                             found = false;
                             MESHIT_LOG_ERROR("meshing2, index missing");
                         }
@@ -297,11 +293,10 @@ namespace meshit
                 }
 
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    Point3d pmin = locpoints[locelements[i].PNum(1) - 1];
+                    Point3d pmin = locpoints[locelements[i].PointID(0) - 1];
                     Point3d pmax = pmin;
-                    for (size_t j = 2; j <= 3; j++) {
-                        const Point3d& hp =
-                            locpoints[locelements[i].PNum(j) - 1];
+                    for (size_t j = 1; j < 3; j++) {
+                        const Point3d& hp = locpoints[locelements[i].PointID(j) - 1];
                         pmin.SetToMin(hp);
                         pmax.SetToMax(hp);
                     }
@@ -311,8 +306,8 @@ namespace meshit
                 }
 
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    for (size_t j = 1; j <= 3; j++) {
-                        if (Dist2(locpoints[locelements[i].PNum(j) - 1], pmid) > hinner * hinner)
+                    for (size_t j = 0; j < 3; j++) {
+                        if (Dist2(locpoints[locelements[i].PointID(j) - 1], pmid) > hinner * hinner)
                             found = false;
                     }
                 }
@@ -338,8 +333,8 @@ namespace meshit
                 Point3d hullmax(-1e10, -1e10, -1e10);
 
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    for (size_t j = 1; j <= 3; j++) {
-                        const Point3d& p = locpoints[locelements[i].PNum(j) - 1];
+                    for (size_t j = 0; j < 3; j++) {
+                        const Point3d& p = locpoints[locelements[i].PointID(j) - 1];
                         hullmin.SetToMin(p);
                         hullmax.SetToMax(p);
                     }
@@ -355,9 +350,9 @@ namespace meshit
                 }
                 for (size_t i = 0; i < locelements.size(); i++) {
                     const Element2d& tri = locelements[i];
-                    const Point3d& tp1 = locpoints[tri.PNum(1) - 1];
-                    const Point3d& tp2 = locpoints[tri.PNum(2) - 1];
-                    const Point3d& tp3 = locpoints[tri.PNum(3) - 1];
+                    const Point3d& tp1 = locpoints[tri.PointID(0) - 1];
+                    const Point3d& tp2 = locpoints[tri.PointID(1) - 1];
+                    const Point3d& tp3 = locpoints[tri.PointID(2) - 1];
 
                     Vec3d tv1(tp1, tp2);
                     Vec3d tv2(tp1, tp3);
@@ -378,9 +373,9 @@ namespace meshit
                         SurfaceElementIndex j = intersecttrias[jj];
                         const Element2d& el = mesh.SurfaceElement(j);
 
-                        Point3d tp1 = mesh.Point(el.PNum(1));
-                        Point3d tp2 = mesh.Point(el.PNum(2));
-                        Point3d tp3 = mesh.Point(el.PNum(3));
+                        Point3d tp1 = mesh.Point(el.PointID(0));
+                        Point3d tp2 = mesh.Point(el.PointID(1));
+                        Point3d tp3 = mesh.Point(el.PointID(2));
 
                         Vec3d e1(tp1, tp2);
                         Vec3d e2(tp1, tp3);
@@ -448,9 +443,9 @@ namespace meshit
                     mtri = locelements[i];
                     mtri.SetIndex(facenr);
 
-                    for (size_t j = 1; j <= 3; j++) {
-                        mtri.PNum(j) = locelements[i].PNum(j) =
-                            adfront->GetGlobalIndex(pindex[locelements[i].PNum(j) - 1]);
+                    for (size_t j = 0; j < 3; j++) {
+                        mtri.PointID(j) = locelements[i].PointID(j) =
+                            adfront->GetGlobalIndex(pindex[locelements[i].PointID(j) - 1]);
                     }
 
                     mesh.AddSurfaceElement(mtri);
@@ -462,9 +457,9 @@ namespace meshit
                     box.Add(mesh[mtri[2]]);
                     surfeltree.Insert(box, mesh.GetNSE() - 1);
 
-                    const Point3d& sep1 = mesh.Point(mtri.PNum(1));
-                    const Point3d& sep2 = mesh.Point(mtri.PNum(2));
-                    const Point3d& sep3 = mesh.Point(mtri.PNum(3));
+                    const Point3d& sep1 = mesh.Point(mtri.PointID(0));
+                    const Point3d& sep2 = mesh.Point(mtri.PointID(1));
+                    const Point3d& sep3 = mesh.Point(mtri.PointID(2));
 
                     double trigarea = Cross(Vec3d(sep1, sep2),
                                             Vec3d(sep1, sep3)).Length() / 2;
@@ -478,24 +473,20 @@ namespace meshit
                         return false;
                     }
 
-                    for (size_t j = 1; j <= 3; j++) {
+                    for (size_t j = 0; j < 3; j++) {
 
-                        int gpi = locelements[i].PNum(j);
-                        int oldts = trigsonnode.size();
-                        if (gpi >= oldts) {
-                            trigsonnode.resize(gpi + 1);
-                            illegalpoint.resize(gpi + 1);
-                            for (int k = oldts; k <= gpi; k++) {
-                                trigsonnode[k] = 0;
-                                illegalpoint[k] = 0;
-                            }
+                        PointIndex gpi = locelements[i].PointID(j);
+                        size_t oldts = trigsonnode.size();
+                        if (gpi >= static_cast<PointIndex>(oldts)) {
+                            trigsonnode.resize(gpi + 1, 0);
+                            illegalpoint.resize(gpi + 1, false);
                         }
-
                         trigsonnode[gpi]++;
 
                         if (trigsonnode[gpi] > 20) {
-                            illegalpoint[gpi] = 1;
-                            std::cerr << "illegal point: " << gpi << ": trigs_on_node = " << trigsonnode[gpi] << std::endl;
+                            illegalpoint[gpi] = true;
+                            std::cerr << "illegal point: " << gpi << ": trigs_on_node = " << trigsonnode[gpi] <<
+                            std::endl;
                         }
 
                         static int mtonnode = 0;

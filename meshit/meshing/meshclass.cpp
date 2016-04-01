@@ -140,7 +140,7 @@ namespace meshit
         Compress();
     }
 
-    size_t Mesh::AddPoint(const Point3d& p, POINTTYPE type)
+    size_t Mesh::AddPoint(const Point3d& p, PointType type)
     {
         size_t pi = points.size();
         points.push_back(MeshPoint(p, type));
@@ -153,8 +153,8 @@ namespace meshit
         PointIndex maxn = std::max(s[0], s[1]);
 
         if (maxn < static_cast<PointIndex>(points.size())) {
-            if (points[s[0]].Type() > EDGEPOINT) points[s[0]].SetType(EDGEPOINT);
-            if (points[s[1]].Type() > EDGEPOINT) points[s[1]].SetType(EDGEPOINT);
+            if (points[s[0]].Type() > EDGE_POINT) points[s[0]].SetType(EDGE_POINT);
+            if (points[s[1]].Type() > EDGE_POINT) points[s[1]].SetType(EDGE_POINT);
         }
         segments.push_back(s);
     }
@@ -169,8 +169,8 @@ namespace meshit
 
         if (static_cast<size_t>(maxn) <= points.size()) {
             for (size_t i = 0; i < 3; i++) {
-                if (points[el[i]].Type() > SURFACEPOINT)
-                    points[el[i]].SetType(SURFACEPOINT);
+                if (points[el[i]].Type() > SURFACE_POINT)
+                    points[el[i]].SetType(SURFACE_POINT);
             }
         }
 
@@ -346,8 +346,8 @@ namespace meshit
                     Element2d tri;
                     tri.SetIndex(faceind);
 
-                    for (int j = 1; j <= nep; j++) {
-                        infile >> tri.PNum(j);
+                    for (int j = 0; j < nep; j++) {
+                        infile >> tri.PointID(j);
                     }
                     AddSurfaceElement(tri);
                 }
@@ -435,8 +435,8 @@ namespace meshit
             const Segment& seg = segments[i];
             MeshPoint& mp1 = points[seg[0]];
             MeshPoint& mp2 = points[seg[1]];
-            if (mp1.Type() == INNERPOINT || mp1.Type() == SURFACEPOINT) mp1.SetType(EDGEPOINT);
-            if (mp2.Type() == INNERPOINT || mp2.Type() == SURFACEPOINT) mp2.SetType(EDGEPOINT);
+            if (mp1.Type() == INNER_POINT || mp1.Type() == SURFACE_POINT) mp1.SetType(EDGE_POINT);
+            if (mp2.Type() == INNER_POINT || mp2.Type() == SURFACE_POINT) mp2.SetType(EDGE_POINT);
         }
 
         for (size_t i = 0; i < GetNSeg(); i++) {
@@ -510,12 +510,9 @@ namespace meshit
         for (size_t i = 0; i < GetNSE(); i++) {
             const Element2d& el = SurfaceElement(i);
             if (surfnr == 0 || el.GetIndex() == surfnr) {
-                for (size_t j = 1; j <= 3; j++) {
-                    double hi = Dist(Point(el.PNumMod(j)),
-                                     Point(el.PNumMod(j + 1)));
-
+                for (size_t j = 0; j < 3; j++) {
+                    double hi = Dist(points[el.PointID(j)], points[el.PointID((j + 1) % 3)]);
                     hsum += hi;
-
                     if (hi > maxh) maxh = hi;
                     if (hi < minh) minh = hi;
                     n++;
@@ -537,16 +534,16 @@ namespace meshit
         for (size_t i = 0; i < GetNSE(); i++) {
             const Element2d& el = surf_elements[i];
             double hel = -1;
-            for (size_t j = 1; j <= 3; j++) {
-                const Point3d& p1 = points[el.PNumMod(j)];
-                const Point3d& p2 = points[el.PNumMod(j + 1)];
+            for (size_t j = 0; j < 3; j++) {
+                const Point3d& p1 = points[el.PointID(j)];
+                const Point3d& p2 = points[el.PointID((j + 1) % 3)];
                 double hedge = Dist(p1, p2);
                 if (hedge > hel) hel = hedge;
             }
             if (hel > 0) {
-                const Point3d& p1 = points[el.PNum(1)];
-                const Point3d& p2 = points[el.PNum(2)];
-                const Point3d& p3 = points[el.PNum(3)];
+                const Point3d& p1 = points[el.PointID(0)];
+                const Point3d& p2 = points[el.PointID(1)];
+                const Point3d& p3 = points[el.PointID(2)];
                 lochfunc->SetH(Center(p1, p2, p3), hel);
             }
         }
@@ -585,9 +582,9 @@ namespace meshit
 
             case RESTRICTH_SURFACEELEMENT: {
                 const Element2d& sel = SurfaceElement(nr - 1);
-                Point3d p = Center(Point(sel.PNum(1)),
-                                   Point(sel.PNum(2)),
-                                   Point(sel.PNum(3)));
+                Point3d p = Center(points[sel.PointID(0)],
+                                   points[sel.PointID(1)],
+                                   points[sel.PointID(2)]);
                 RestrictLocalH(p, loc_h);
                 break;
             }
@@ -704,12 +701,12 @@ namespace meshit
         for (size_t i = 0; i < GetNSE(); i++) {
             const Element2d& tri = SurfaceElement(i);
 
-            Point3d tpmin(Point(tri[0]));
+            Point3d tpmin(points[tri[0]]);
             Point3d tpmax(tpmin);
 
             for (size_t k = 1; k < 3; k++) {
-                tpmin.SetToMin(Point(tri[k]));
-                tpmax.SetToMax(Point(tri[k]));
+                tpmin.SetToMin(points[tri[k]]);
+                tpmax.SetToMax(points[tri[k]]);
             }
             Vec3d diag(tpmin, tpmax);
 
@@ -736,9 +733,9 @@ namespace meshit
                 const Element2d& tri2 = SurfaceElement(inters[j] - 1);
 
                 const meshit::Point3d* trip1[3], * trip2[3];
-                for (size_t k = 1; k <= 3; k++) {
-                    trip1[k - 1] = &Point(tri1.PNum(k));
-                    trip2[k - 1] = &Point(tri2.PNum(k));
+                for (size_t k = 0; k < 3; k++) {
+                    trip1[k] = &points[tri1.PointID(k)];
+                    trip2[k] = &points[tri2.PointID(k)];
                 }
 
                 if (IntersectTriangleTriangle(&trip1[0], &trip2[0])) {
@@ -747,17 +744,17 @@ namespace meshit
                     MESHIT_LOG_DEBUG(" el1 = " << tri1);
                     MESHIT_LOG_DEBUG(" el2 = " << tri2);
 
-                    for (size_t k = 1; k <= 3; k++)
-                        MESHIT_LOG_DEBUG_CONT(tri1.PNum(k) << "  ");
+                    for (size_t k = 0; k < 3; k++)
+                        MESHIT_LOG_DEBUG_CONT(tri1.PointID(k) << "  ");
                     MESHIT_LOG_DEBUG("");
-                    for (size_t k = 1; k <= 3; k++)
-                        MESHIT_LOG_DEBUG_CONT(tri2.PNum(k) << "  ");
+                    for (size_t k = 0; k < 3; k++)
+                        MESHIT_LOG_DEBUG_CONT(tri2.PointID(k) << "  ");
                     MESHIT_LOG_DEBUG("");
 
-                    for (size_t k = 0; k <= 2; k++)
+                    for (size_t k = 0; k < 3; k++)
                         MESHIT_LOG_DEBUG_CONT(*trip1[k] << "   ");
                     MESHIT_LOG_DEBUG("");
-                    for (size_t k = 0; k <= 2; k++)
+                    for (size_t k = 0; k < 3; k++)
                         MESHIT_LOG_DEBUG_CONT(*trip2[k] << "   ");
                     MESHIT_LOG_DEBUG("");
 
@@ -776,9 +773,9 @@ namespace meshit
         const double eps = 1e-6;
 
         const Element2d& el = SurfaceElement(element);
-        const Point3d& p1 = Point(el.PNum(1));
-        const Point3d& p2 = Point(el.PNum(2));
-        const Point3d& p3 = Point(el.PNum(3));
+        const Point3d& p1 = points[el.PointID(0)];
+        const Point3d& p2 = points[el.PointID(1)];
+        const Point3d& p3 = points[el.PointID(2)];
 
         Vec3d col1(p1, p2);
         Vec3d col2(p1, p3);
@@ -816,7 +813,7 @@ namespace meshit
         SurfaceElementIndex si = facedecoding[facenr - 1].firstelement;
         while (si != -1) {
             const Element2d& se = SurfaceElement(si);
-            if (se.GetIndex() == facenr && se.PNum(1) >= 0 && !se.IsDeleted()) {
+            if (se.GetIndex() == facenr && se.PointID(0) >= 0 && !se.IsDeleted()) {
                 sei.push_back(si);
             }
             si = se.next;
@@ -828,9 +825,9 @@ namespace meshit
         numvertices = 0;
         for (size_t i = 0; i < surf_elements.size(); i++) {
             const Element2d& el = SurfaceElement(i);
-            for (size_t j = 1; j <= 3; j++) {
-                if (el.PNum(j) > static_cast<PointIndex>(numvertices)) {
-                    numvertices = static_cast<size_t>(el.PNum(j));
+            for (size_t j = 0; j < 3; j++) {
+                if (el.PointID(j) > static_cast<PointIndex>(numvertices)) {
+                    numvertices = static_cast<size_t>(el.PointID(j));
                 }
             }
         }
@@ -861,8 +858,8 @@ namespace meshit
         ost << "Mesh Mem:" << std::endl;
 
         ost << GetNP() << " Points, of size "
-        << sizeof(Point3d) << " + " << sizeof(POINTTYPE) << " = "
-        << GetNP() * (sizeof(Point3d) + sizeof(POINTTYPE)) << std::endl;
+        << sizeof(Point3d) << " + " << sizeof(PointType) << " = "
+        << GetNP() * (sizeof(Point3d) + sizeof(PointType)) << std::endl;
 
         ost << GetNSE() << " Surface elements, of size "
         << sizeof(Element2d) << " = "

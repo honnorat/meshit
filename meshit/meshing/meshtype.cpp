@@ -84,7 +84,7 @@ namespace meshit
     std::ostream& operator<<(std::ostream& s, const Element2d& el)
     {
         for (size_t j = 0; j < 3; j++) {
-            s << " " << el.PNum(j + 1);
+            s << " " << el.PointID(j);
         }
         return s;
     }
