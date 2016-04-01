@@ -342,17 +342,11 @@ namespace meshit
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
                     infile >> seg.si >> seg[0] >> seg[1];
-                    infile >> seg.surfnr1 >> seg.surfnr2;
+                    infile >> seg.domin >> seg.domout;
                     infile >> seg.edgenr >> seg.epgeominfo[1].edgenr;
                     infile >> seg.epgeominfo[0].dist >> seg.epgeominfo[1].dist;
 
                     seg.epgeominfo[0].edgenr = seg.epgeominfo[1].edgenr;
-
-                    seg.domin = seg.surfnr1;
-                    seg.domout = seg.surfnr2;
-
-                    seg.surfnr1--;
-                    seg.surfnr2--;
 
                     AddSegment(seg);
                 }

@@ -9,6 +9,8 @@ namespace meshit
     {
         pnums[0] = -1;
         pnums[1] = -1;
+        pnums[2] = -1;
+
         edgenr = -1;
         seginfo = 0;
 
@@ -16,10 +18,6 @@ namespace meshit
 
         domin = -1;
         domout = -1;
-
-        surfnr1 = -1;
-        surfnr2 = -1;
-        pnums[2] = -1;
     }
 
     Segment::Segment(const Segment& other)
@@ -28,8 +26,6 @@ namespace meshit
           si(other.si),
           domin(other.domin),
           domout(other.domout),
-          surfnr1(other.surfnr1),
-          surfnr2(other.surfnr2),
           epgeominfo(),
           hp_elnr(other.hp_elnr)
     {
@@ -50,8 +46,6 @@ namespace meshit
             si = other.si;
             domin = other.domin;
             domout = other.domout;
-            surfnr1 = other.surfnr1;
-            surfnr2 = other.surfnr2;
             epgeominfo[0] = other.epgeominfo[0];
             epgeominfo[1] = other.epgeominfo[1];
             pnums[2] = other.pnums[2];

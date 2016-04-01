@@ -177,8 +177,6 @@ namespace meshit
         /// domain number outer side
         size_t domout;
 
-        /// surfaces describing edge
-        int surfnr1, surfnr2;
         EdgePointGeomInfo epgeominfo[2];
 
      public:
