@@ -36,7 +36,7 @@ namespace meshit
         Point3d globp1;
 
      public:
-        Meshing2(const MeshingParameters& mp, const Box<3>& aboundingbox);
+        explicit Meshing2(const Box<3>& aboundingbox);
         ~Meshing2();
 
         /// Load rules, either from file, or compiled rules

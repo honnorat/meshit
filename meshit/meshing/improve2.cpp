@@ -306,9 +306,6 @@ namespace meshit
                 }
             }
         }
-        for (size_t i = 0; i < mesh.LockedPoints().size(); i++) {
-            fixed[mesh.LockedPoints()[i]] = true;
-        }
 
         for (size_t i = 0; i < seia.size(); i++) {
             SurfaceElementIndex sei = seia[i];

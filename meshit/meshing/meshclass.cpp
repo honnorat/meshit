@@ -32,7 +32,6 @@ namespace meshit
         points = mesh2.points;
         segments = mesh2.segments;
         surf_elements = mesh2.surf_elements;
-        lockedpoints = mesh2.lockedpoints;
         facedecoding = mesh2.facedecoding;
 
         return *this;
@@ -91,7 +90,7 @@ namespace meshit
 
             size_t oldnf = GetNSE();
 
-            Meshing2 meshing(mp, Box<3>(pmin, pmax));
+            Meshing2 meshing(Box<3>(pmin, pmax));
 
             std::vector<int> compress(bnp, -1);
             int cnt = 0;
@@ -440,10 +439,6 @@ namespace meshit
             if (mp2.Type() == INNERPOINT || mp2.Type() == SURFACEPOINT) mp2.SetType(EDGEPOINT);
         }
 
-        for (size_t i = 0; i < lockedpoints.size(); i++) {
-            points[lockedpoints[i]].SetType(FIXEDPOINT);
-        }
-
         for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = segments[i];
             INDEX_2 i2(seg[0], seg[1]);
@@ -622,16 +617,6 @@ namespace meshit
         }
     }
 
-    void Mesh::AddLockedPoint(PointIndex pi)
-    {
-        lockedpoints.push_back(pi);
-    }
-
-    void Mesh::ClearLockedPoints()
-    {
-        lockedpoints.resize(0);
-    }
-
     void Mesh::Compress()
     {
         std::vector<PointIndex> op2np(GetNP());
@@ -665,16 +650,11 @@ namespace meshit
             pused.Set(seg[1]);
         }
 
-        for (size_t i = 0; i < lockedpoints.size(); i++) {
-            pused.Set(lockedpoints[i]);
-        }
-
-        int npi = -1;
+        int npi = 0;
 
         for (size_t pi = 0; pi < points.size(); pi++) {
             if (pused.Test(pi)) {
-                npi++;
-                op2np[pi] = npi;
+                op2np[pi] = npi++;
                 hpoints.push_back(points[pi]);
             }
             else
@@ -699,13 +679,10 @@ namespace meshit
             seg[1] = op2np[seg[1]];
         }
 
-        for (size_t i = 0; i < lockedpoints.size(); i++) {
-            lockedpoints[i] = op2np[lockedpoints[i]];
-        }
-
         for (size_t i = 0; i < facedecoding.size(); i++) {
             facedecoding[i].firstelement = -1;
         }
+
         for (int i = surf_elements.size() - 1; i >= 0; i--) {
             int ind = surf_elements[i].GetIndex();
             surf_elements[i].next = facedecoding[ind - 1].firstelement;

@@ -5,7 +5,7 @@
 
 namespace meshit
 {
-    Meshing2::Meshing2(const MeshingParameters& mp, const Box<3>& aboundingbox)
+    Meshing2::Meshing2(const Box<3>& aboundingbox)
     {
         boundingbox = aboundingbox;
 
@@ -90,7 +90,7 @@ namespace meshit
         std::vector<Element2d> locelements;
 
         bool found;
-        int rulenr(-1);
+        int rulenr{-1};
         Point3d p1, p2;
 
         bool debugflag;
@@ -378,11 +378,9 @@ namespace meshit
                         SurfaceElementIndex j = intersecttrias[jj];
                         const Element2d& el = mesh.SurfaceElement(j);
 
-                        Point3d tp1, tp2, tp3;
-
-                        tp1 = mesh.Point(el.PNum(1));
-                        tp2 = mesh.Point(el.PNum(2));
-                        tp3 = mesh.Point(el.PNum(3));
+                        Point3d tp1 = mesh.Point(el.PNum(1));
+                        Point3d tp2 = mesh.Point(el.PNum(2));
+                        Point3d tp3 = mesh.Point(el.PNum(3));
 
                         Vec3d e1(tp1, tp2);
                         Vec3d e2(tp1, tp3);

@@ -41,8 +41,6 @@ namespace meshit
         std::vector<Segment> segments;
         /// surface elements, 2d-inner elements
         std::vector<Element2d> surf_elements;
-        /// points will be fixed forever
-        std::vector<PointIndex> lockedpoints;
 
         /// surface indices at boundary nodes
         TABLE<int> surfaces_on_node;
@@ -139,14 +137,6 @@ namespace meshit
 
         void RebuildSurfaceElementLists();
         void GetSurfaceElementsOfFace(size_t facenr, std::vector<SurfaceElementIndex>& sei) const;
-
-        void AddLockedPoint(PointIndex pi);
-        void ClearLockedPoints();
-
-        const std::vector<PointIndex>& LockedPoints() const
-        {
-            return lockedpoints;
-        }
 
         /// sets internal tables
         void CalcSurfacesOfNode();
