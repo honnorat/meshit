@@ -77,11 +77,11 @@ namespace meshit
         bool comment = true;
         char ch;
         while (comment && !infile.eof()) {
-            infile.get(ch);
+            infile >> ch;
             if (ch == '#') {
                 // skip comments
                 while (ch != '\n' && !infile.eof()) {
-                    infile.get(ch);
+                    infile >> ch;
                 }
             } else if (ch == '\n') {
                 // skip empty lines
