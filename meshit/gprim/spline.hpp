@@ -14,7 +14,7 @@
 #include <cmath>
 
 #include "../linalg/vector.hpp"
-#include "geomfuncs.hpp"
+#include "geomobjects.hpp"
 #include "geom2d.hpp"
 
 namespace meshit

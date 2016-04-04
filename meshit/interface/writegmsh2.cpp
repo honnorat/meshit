@@ -55,7 +55,7 @@ namespace meshit
         os << np << "\n";
         int cnt = 0;
         for (size_t i = 0; i < np; i++) {
-            const Point3d& p = mesh.Point(i);
+            const MeshPoint& p = mesh.Point(i);
             os << ++cnt << " ";  // number of nodes
             os << p.X() << " ";
             os << p.Y() << " ";

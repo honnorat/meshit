@@ -13,7 +13,7 @@ namespace meshit
 
         // static DenseMatrix a(3), ainv(3);
         // static Vector rs(3), lami(3);
-        Mat<3, 3> a, ainv;
+        Mat3x3 a, ainv;
         Vec3d rs, lami;
         int i;
 
@@ -24,7 +24,7 @@ namespace meshit
             rs.X(i + 1) = vrs.X(i + 1);
         }
 
-        double det = Det(a);
+        double det = a.Det();
         double arel = vl.Length() * vt1.Length() * vt2.Length();
 
         // new !!!!
@@ -32,7 +32,7 @@ namespace meshit
             return 0;
         }
 
-        CalcInverse(a, ainv);
+        a.CalcInverse(ainv);
         lami = ainv * rs;
 
         if (lami.X() >= 0 && lami.X() <= 1 &&

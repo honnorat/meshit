@@ -11,7 +11,7 @@
 #include <algorithm>
 
 #include "../general/index.hpp"
-#include "geomfuncs.hpp"
+#include "geomobjects.hpp"
 
 namespace meshit
 {

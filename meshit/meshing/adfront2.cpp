@@ -23,6 +23,8 @@ namespace meshit
         nfl = 0;
         minval = 0;
         starti = 0;
+        nearlines.reserve(1000);
+        nearpoints.reserve(1000);
     }
 
     void AdFront2::PrintOpenSegments(std::ostream& ost) const
@@ -182,20 +184,11 @@ namespace meshit
                             std::vector<INDEX>& lindex,
                             double xh)
     {
-        int pstind;
-        Point3d p0;
-
-        pstind = lines[baselineindex].L().I1();
-        p0 = points[pstind].P();
+        int pstind = lines[baselineindex].L().I1();
+        Point3d p0 = points[pstind].P();
 
         loclines.push_back(lines[baselineindex].L());
         lindex.push_back(baselineindex);
-
-        std::vector<size_t> nearlines;
-        std::vector<size_t> nearpoints;
-
-        nearlines.reserve(1000);
-        nearpoints.reserve(1000);
 
         const Point3d pmin(p0.X() - xh, p0.Y() - xh);
         const Point3d pmax(p0.X() + xh, p0.Y() + xh);

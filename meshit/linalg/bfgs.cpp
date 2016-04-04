@@ -15,7 +15,7 @@
 
 namespace meshit
 {
-    void MultLDLt(const DenseMatrix& l, const double* d, const double* g, double* p)
+    void MultLDLt(const Mat2x2& l, const double* d, const double* g, double* p)
     {
         p[0] = g[0] * l(0, 0) + g[1] * l(1, 0);
         p[1] = g[1] * l(1, 1);
@@ -27,7 +27,7 @@ namespace meshit
         p[0] = p[0] * l(0, 0);
     }
 
-    void SolveLDLt(const DenseMatrix& l, const double* d, const double* g, double* p)
+    void SolveLDLt(const Mat2x2& l, const double* d, const double* g, double* p)
     {
         p[0] = g[0];
         p[1] = g[1] - g[0] * l(1, 0);
@@ -38,13 +38,13 @@ namespace meshit
         p[0] -= p[1] * l(1, 0);
     }
 
-    int LDLtUpdate(DenseMatrix& l, double* d, double a, const double* u)
+    int LDLtUpdate(Mat2x2& l, double* d, double a, const double* u)
     {
         double t0 = 1.0 + a * (u[0] * u[0]) / d[0];
         if (t0 <= 0.0) return 1;
 
-        double v1 = u[1] - u[0] * l.Elem(1, 0);
-        l.Elem(1, 0) += v1 * a * u[0] / (d[0] * t0);
+        double v1 = u[1] - u[0] * l(1, 0);
+        l(1, 0) += v1 * a * u[0] / (d[0] * t0);
 
         double t1 = t0 + a * (v1 * v1) / d[1];
         if (t1 <= 0.0) return 1;
@@ -68,7 +68,7 @@ namespace meshit
               double mu1,      // i: Parameter mu_1 of Alg.2.1
               double sigma,    // i: Parameter sigma of Alg.2.1
               double xi1,      // i: Parameter xi_1 of Alg.2.1
-              double xi2,      // i: Parameter xi_1 of Alg.2.1
+              double xi2,      // i: Parameter xi_2 of Alg.2.1
               double tau,      // i: Parameter tau of Alg.2.1
               double tau1,     // i: Parameter tau_1 of Alg.2.1
               double tau2)     // i: Parameter tau_2 of Alg.2.1
@@ -159,25 +159,21 @@ namespace meshit
         return ifail;
     }
 
-    double BFGS_2d(
-            double* x,  // i: Startwert, o: Loesung, falls IFAIL = 0
-            MinFunction_2d& fun,
-            const OptiParameters& par,
-            double eps)
+    double BFGS_2d(double* x, MinFunction_2d& fun, const OptiParameters& par, double eps)
     {
         bool a1crit;
         bool a3acrit;
 
         double /* normg, */ alphahat, hd, fold;
         double a1, a2;
-        const double mu1 = 0.1, sigma = 0.1, xi1 = 1, xi2 = 10;
-        const double tau = 0.1, tau1 = 0.1, tau2 = 0.6;
+        constexpr double mu1 = 0.1, sigma = 0.1, xi1 = 1, xi2 = 10;
+        constexpr double tau = 0.1, tau1 = 0.1, tau2 = 0.6;
 
         double typx[2];  // i: typische Groessenordnung der Komponenten
         double f, f0;
         double typf;  // i: typische Groessenordnung der Loesung
-        double fmin = -1e5;  // i: untere Schranke fuer Funktionswert
-        double tauf = 0.1;  // i: Abbruchschranke fuer die relative Aenderung der
+        constexpr double fmin = -1e5;  // i: untere Schranke fuer Funktionswert
+        constexpr double tauf = 0.1;  // i: Abbruchschranke fuer die relative Aenderung der
         //    Funktionswerte
         int ifail;   // o:  0 .. Erfolg
         //    -1 .. Unterschreitung von fmin
@@ -187,11 +183,7 @@ namespace meshit
         typx[0] = typx[1] = par.typx;
         typf = par.typf;
 
-        DenseMatrix l(2);
-        l.Elem(0, 0) = 1;
-        l.Elem(0, 1) = 0;
-        l.Elem(1, 0) = 0;
-        l.Elem(1, 1) = 1;
+        Mat2x2 l = {1.0, 0.0, 0.0, 1.0};    // Eye(2)
 
         double d[2], g[2], p[2], bs[2], xneu[2], y[2], s[2], x0[2];
 
@@ -203,14 +195,10 @@ namespace meshit
         size_t it = 0;
         do {
             // Restart
-            if (it % (5 * 2) == 0) {
+            if (it % (100) == 0) {
                 d[0] = typf / (typx[0] * typx[0]);
                 d[1] = typf / (typx[1] * typx[1]);
-                for (size_t i = 1; i < 2; i++) {
-                    for (size_t j = 0; j < 1; j++) {
-                        l.Elem(i, j) = 0;
-                    }
-                }
+                l(1, 0) = 0.0;
             }
 
             it++;
@@ -233,7 +221,7 @@ namespace meshit
 
             alphahat = 1;
             ifail = lines(x, xneu, p, f, g, fun, par, alphahat, fmin,
-                  mu1, sigma, xi1, xi2, tau, tau1, tau2);
+                          mu1, sigma, xi1, xi2, tau, tau1, tau2);
 
             if (ifail == 1)
                 std::cerr << "no success with linesearch" << std::endl;

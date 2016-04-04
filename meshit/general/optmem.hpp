@@ -24,7 +24,7 @@ namespace meshit
         std::vector<char*> bablocks;
 
      public:
-        explicit BlockAllocator(size_t asize, size_t ablocks = 100);
+        explicit BlockAllocator(size_t asize, size_t ablocks = 512);
         ~BlockAllocator();
 
         void* Alloc();

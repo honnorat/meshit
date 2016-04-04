@@ -2,8 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(src_GENERAL
     general/flags.cpp
-    general/optmem.cpp
-    general/table.cpp)
+    general/optmem.cpp)
 
 SET(src_GEOM2D
     geom2d/genmesh2d.cpp
@@ -13,7 +12,7 @@ SET(src_GPRIM
     gprim/adtree.cpp
     gprim/geom2d.cpp
     gprim/geom3d.cpp
-    gprim/geomfuncs.cpp
+    gprim/geomobjects.cpp
     gprim/geomtest3d.cpp
     gprim/spline.cpp)
 

@@ -143,9 +143,7 @@ namespace meshit
             int baselineindex = adfront->SelectBaseLine(p1, p2, qualclass);
 
             Point3d pmid = Center(p1, p2);
-            hshould = CalcLocalH(pmid, mesh.GetH(pmid));
-            if (gh < hshould) hshould = gh;
-
+            hshould = std::min(gh, mesh.GetH(pmid));
             mesh.RestrictLocalH(pmid, hshould);
 
             h = hshould;

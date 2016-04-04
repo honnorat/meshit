@@ -51,10 +51,6 @@ int main(int argc, char** argv)
     MESHIT_LOG_INFO("~ quality  : " << uclock() - cc << " s.");
 
     cc = uclock();
-    meshit::CheckSurfaceMesh(mesh);
-    MESHIT_LOG_INFO("~ checksurf: " << uclock() - cc << " s.");
-
-    cc = uclock();
     mesh.CheckOverlappingBoundary();
     MESHIT_LOG_INFO("~ checkover: " << uclock() - cc << " s.");
 

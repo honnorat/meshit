@@ -12,7 +12,7 @@ namespace meshit
     Mesh::Mesh()
         : surfarea(*this)
     {
-        lochfunc = nullptr;
+        loc_h_func = nullptr;
         hglob_ = 1e10;
         hmin_ = 0;
         numvertices = 0;
@@ -20,7 +20,7 @@ namespace meshit
 
     Mesh::~Mesh()
     {
-        delete lochfunc;
+        delete loc_h_func;
 
         for (size_t i = 0; i < materials.size(); i++) {
             delete[] materials[i];
@@ -58,8 +58,8 @@ namespace meshit
             h = bbox.Diam();
             mp.maxh = h;
         }
-        Point3d pmin(bbox.PMin().X(), bbox.PMin().Y(), -bbox.Diam());
-        Point3d pmax(bbox.PMax().X(), bbox.PMax().Y(), +bbox.Diam());
+        Point3d pmin(bbox.PMin().X(), bbox.PMin().Y(), 0.0);
+        Point3d pmax(bbox.PMax().X(), bbox.PMax().Y(), 0.0);
 
         SetLocalH(pmin, pmax, grading);
         hmin_ = mp.minh;
@@ -402,8 +402,9 @@ namespace meshit
                         break;
                     }
                 }
-                if (!found)
+                if (!found) {
                     surfaces_on_node.Add(pi, si);
+                }
             }
         }
 
@@ -424,13 +425,16 @@ namespace meshit
 
     void Mesh::SetLocalH(const Point3d& pmin, const Point3d& pmax, double grading)
     {
-        Point3d c = Center(pmin, pmax);
-        double d = 0.5 * std::max(pmax.X() - pmin.X(), std::max(pmax.Y() - pmin.Y(), pmax.Z() - pmin.Z()));
-        Point3d pmin2 = c - Vec3d(d, d, d);
-        Point3d pmax2 = c + Vec3d(d, d, d);
+        double d = 0.5 * std::max(pmax.X() - pmin.X(),
+                                  pmax.Y() - pmin.Y());
 
-        delete lochfunc;
-        lochfunc = new LocalH(pmin2, pmax2, grading);
+        Point3d c = Center(pmin, pmax);
+        Point3d pmin2 = {c.X() - d, c.Y() - d, 0.0};
+        Point3d pmax2 = {c.X() + d, c.Y() + d, 0.0};
+
+        delete loc_h_func;
+        loc_h_func = new LocalH();
+        loc_h_func->Init(pmin2, pmax2, grading);
     }
 
     void Mesh::RestrictLocalH(const Point3d& p, double hloc)
@@ -438,8 +442,8 @@ namespace meshit
         if (hloc < hmin_)
             hloc = hmin_;
 
-        assert(lochfunc);
-        lochfunc->SetH(p, hloc);
+        assert(loc_h_func);
+        loc_h_func->SetH(p, hloc);
     }
 
     void Mesh::RestrictLocalHLine(const Point3d& p1, const Point3d& p2, double hloc)
@@ -459,8 +463,8 @@ namespace meshit
     double Mesh::GetH(const Point3d& p) const
     {
         double hmin = hglob_;
-        if (lochfunc) {
-            double hl = lochfunc->GetH(p);
+        if (loc_h_func) {
+            double hl = loc_h_func->GetH(p);
             if (hl < hglob_)
                 hmin = hl;
         }
@@ -470,8 +474,8 @@ namespace meshit
     double Mesh::GetMinH(const Point3d& pmin, const Point3d& pmax)
     {
         double hmin = hglob_;
-        if (lochfunc) {
-            double hl = lochfunc->GetMinH(pmin, pmax);
+        if (loc_h_func) {
+            double hl = loc_h_func->GetMinH(pmin, pmax);
             if (hl < hmin)
                 hmin = hl;
         }
@@ -502,7 +506,7 @@ namespace meshit
 
     void Mesh::CalcLocalH()
     {
-        assert(lochfunc);
+        assert(loc_h_func);
 
         MESHIT_LOG_DEBUG("CalcLocalH: " << GetNP() << " points, "
                          << GetNSE() << " surface elements.");
@@ -520,7 +524,7 @@ namespace meshit
                 const Point3d& p1 = points[el.PointID(0)];
                 const Point3d& p2 = points[el.PointID(1)];
                 const Point3d& p3 = points[el.PointID(2)];
-                lochfunc->SetH(Center(p1, p2, p3), hel);
+                loc_h_func->SetH(Center(p1, p2, p3), hel);
             }
         }
 
@@ -528,7 +532,7 @@ namespace meshit
             const Segment& seg = segments[i];
             const Point3d& p1 = points[seg[0]];
             const Point3d& p2 = points[seg[1]];
-            lochfunc->SetH(Center(p1, p2), Dist(p1, p2));
+            loc_h_func->SetH(Center(p1, p2), Dist(p1, p2));
         }
     }
 
@@ -836,9 +840,6 @@ namespace meshit
         ost << GetNSE() << " Surface elements, of size "
         << sizeof(Element2d) << " = "
         << GetNSE() * sizeof(Element2d) << std::endl;
-
-        ost << "surfs on node:";
-        surfaces_on_node.PrintMemInfo(ost);
     }
 
 }  // namespace meshit

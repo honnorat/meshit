@@ -60,9 +60,8 @@ namespace meshit
         std::vector<uint32_t> pnearness(noldlp, 1000);
         std::vector<uint32_t> lnearness(llines1.size());
 
-        for (int j = 0; j < 2; j++) {
-            pnearness[llines1[0][j] - 1] = 0;
-        }
+        pnearness[llines1[0][0] - 1] = 0;
+        pnearness[llines1[0][1] - 1] = 0;
 
         const size_t MAX_NEARNESS = 3;
 

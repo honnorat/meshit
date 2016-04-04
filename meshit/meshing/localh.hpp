@@ -45,8 +45,13 @@ namespace meshit
         double grading;
 
      public:
-        LocalH(const Point3d& pmin, const Point3d& pmax, double grading);
+        LocalH()
+            : root{nullptr} { }
+
         ~LocalH();
+
+        void Init(const Point3d& pmin, const Point3d& pmax, double grading);
+        void CleanRoot();
 
         void SetH(const Point3d& x, double h);
         double GetH(const Point3d& x) const;

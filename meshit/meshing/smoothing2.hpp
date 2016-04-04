@@ -18,15 +18,13 @@ namespace meshit
         MeshPoint sp1;
         std::vector<SurfaceElementIndex> loc_elements;
         std::vector<double> lochs;
-        std::vector<Point3d> loc_pnts2;
-        std::vector<Point3d> loc_pnts3;
+        std::vector<MeshPoint> loc_pnts2;
+        std::vector<MeshPoint> loc_pnts3;
         double loc_metric_weight;
 
      public:
         Opti2dLocalData()
-        {
-            loc_metric_weight = 0;
-        }
+            : loc_metric_weight{0.0} { }
     };
 
     class Mesh;
@@ -42,7 +40,7 @@ namespace meshit
 
      public:
         MinFunction_2d(const Mesh& amesh, Opti2dLocalData& ald)
-            : mesh(amesh), ld(ald) { }
+            : mesh{amesh}, ld(ald) { }
 
         double Func(const double* x);
 

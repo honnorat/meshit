@@ -12,11 +12,10 @@
 
 #include "meshtype.hpp"
 #include "localh.hpp"
-#include "../gprim/adtree.hpp"
 #include "../general/bitarray.hpp"
 #include "../general/table.hpp"
-#include "../gprim/geomops.hpp"
-
+#include "../gprim/adtree.hpp"
+#include "../gprim/geomobjects.hpp"
 /*
   The mesh class
  */
@@ -50,7 +49,7 @@ namespace meshit
         /**
            Representation of local mesh-size h
          */
-        LocalH* lochfunc;
+        LocalH* loc_h_func;
         double hglob_;
         double hmin_;
 

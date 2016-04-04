@@ -35,7 +35,6 @@ namespace meshit
     void Transpose(Vec3d& v1, Vec3d& v2, Vec3d& v3);
     int SolveLinearSystem(const Vec3d& col1, const Vec3d& col2, const Vec3d& col3,
                           const Vec3d& rhs, Vec3d& sol);
-    double Determinant(const Vec3d& col1, const Vec3d& col2, const Vec3d& col3);
 
     inline double Dist2(const Point3d& p1, const Point3d& p2);
 
@@ -344,9 +343,6 @@ namespace meshit
                                      const Vec3d& col3,
                                      const Vec3d& rhs,
                                      Vec3d& sol);
-        friend double Determinant(const Vec3d& col1,
-                                  const Vec3d& col2,
-                                  const Vec3d& col3);
     };
 
     inline Point3d Center(const Point3d& p1, const Point3d& p2)
@@ -460,7 +456,7 @@ namespace meshit
     }
 
 
-    inline Vec3d operator*(const Mat<3, 3>& m, const Vec3d& v)
+    inline Vec3d operator*(const Mat3x3& m, const Vec3d& v)
     {
         Vec3d res;
         for (int i = 0; i < 3; i++) {
@@ -477,17 +473,6 @@ namespace meshit
             v1.Y() * v2.Z() - v1.Z() * v2.Y(),
             v1.Z() * v2.X() - v1.X() * v2.Z(),
             v1.X() * v2.Y() - v1.Y() * v2.X());
-    }
-
-    inline double Determinant(
-        const Vec3d& col1,
-        const Vec3d& col2,
-        const Vec3d& col3)
-    {
-        return
-            col1.x[0] * (col2.x[1] * col3.x[2] - col2.x[2] * col3.x[1]) +
-            col1.x[1] * (col2.x[2] * col3.x[0] - col2.x[0] * col3.x[2]) +
-            col1.x[2] * (col2.x[0] * col3.x[1] - col2.x[1] * col3.x[0]);
     }
 
     class Box3d

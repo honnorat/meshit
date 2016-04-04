@@ -58,6 +58,9 @@ namespace meshit
         explicit MeshPoint(const Point3d& ap, PointType apt = INNER_POINT)
             : Point3d(ap), type(apt) { }
 
+        explicit MeshPoint(double px, double py, PointType apt = INNER_POINT)
+            : Point3d(px, py), type(apt) { }
+
         PointType Type() const
         {
             return type;

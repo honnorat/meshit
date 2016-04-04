@@ -174,91 +174,79 @@ namespace meshit
                     PointIndex pi3 = mesh.Element(t1).PointID(o1 % 3);
                     PointIndex pi4 = mesh.Element(t2).PointID(o2 % 3);
 
-                    const Point3d& p_1 = mesh.Point(pi1);
-                    const Point3d& p_2 = mesh.Point(pi2);
-                    const Point3d& p_3 = mesh.Point(pi3);
-                    const Point3d& p_4 = mesh.Point(pi4);
+                    const MeshPoint& p_1 = mesh.Point(pi1);
+                    const MeshPoint& p_2 = mesh.Point(pi2);
+                    const MeshPoint& p_3 = mesh.Point(pi3);
+                    const MeshPoint& p_4 = mesh.Point(pi4);
 
-                    bool allowswap = true;
+                    bool allowswap;
 
                     Vec3d auxvec1 = p_3 - p_4;
                     Vec3d auxvec2 = p_1 - p_4;
 
-                    allowswap &= fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
+                    allowswap = fabs(1.0 - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
 
                     if (!allowswap)
                         continue;
 
                     // normal of new
-                    Vec3d nv1 = Cross(auxvec1, auxvec2);
+                    double bv1 = auxvec1.X() * auxvec2.Y() - auxvec1.Y() * auxvec2.X() > 0;
 
-                    auxvec1 = p_4 - p_3;
-                    auxvec2 = p_2 - p_3;
-                    allowswap &= fabs(1. - (auxvec1 * auxvec2) / (auxvec1.Length() * auxvec2.Length())) > 1e-4;
+                    Vec3d auxvec3 = p_4 - p_3;
+                    Vec3d auxvec4 = p_2 - p_3;
+
+                    allowswap = fabs(1. - (auxvec3 * auxvec4) / (auxvec3.Length() * auxvec4.Length())) > 1e-4;
 
                     if (!allowswap)
                         continue;
 
-                    Vec3d nv2 = Cross(auxvec1, auxvec2);
+                    bool bv2 = auxvec3.X() * auxvec4.Y() - auxvec3.Y() * auxvec4.X() > 0.0;
 
                     // normals of original
-                    Vec3d nv3 = Cross(p_1 - p_4, p_2 - p_4);
-                    Vec3d nv4 = Cross(p_2 - p_3, p_1 - p_3);
+                    Vec3d auxvec5 = p_2 - p_4;
+                    Vec3d auxvec6 = p_1 - p_3;
 
-                    nv3 *= -1;
-                    nv4 *= -1;
-                    nv3.Normalize();
-                    nv4.Normalize();
+                    bool bv3 = auxvec2.X() * auxvec5.Y() - auxvec2.Y() * auxvec5.X() < 0.0;
+                    bool bv4 = auxvec4.X() * auxvec6.Y() - auxvec4.Y() * auxvec6.X() < 0.0;
 
-                    nv1.Normalize();
-                    nv2.Normalize();
+                    allowswap = bv1 && bv2 && bv3 && bv4;
 
-                    double critval = cos(M_PI / 6);  // 30 degree
-                    allowswap &= (nv1.Z() > critval) &&
-                                 (nv2.Z() > critval) &&
-                                 (nv3.Z() > critval) &&
-                                 (nv4.Z() > critval);
+                    if (!allowswap)
+                        continue;
 
-                    double horder = Dist(p_1, p_2);
+                    if (usemetric) {
+                        double loc_h = mesh.GetH(p_1);
+                        double bad1 = CalcTriangleBadness(p_4, p_3, p_1, metricweight, loc_h);
+                        double bad2 = CalcTriangleBadness(p_3, p_4, p_2, metricweight, loc_h);
+                        double bad3 = CalcTriangleBadness(p_1, p_2, p_3, metricweight, loc_h);
+                        double bad4 = CalcTriangleBadness(p_2, p_1, p_4, metricweight, loc_h);
+                        should = (bad1 + bad2) < (bad3 + bad4);
+                    } else {
+                        int e = pdef[pi1] + pdef[pi2] - pdef[pi3] - pdef[pi4];
+                        double d = Dist2(p_1, p_2) - Dist2(p_3, p_4);
 
-                    if (allowswap &&
-                        nv1.Length() > 1e-3 * horder * horder &&
-                        nv2.Length() > 1e-3 * horder * horder) {
-                        if (!usemetric) {
-                            int e = pdef[pi1] + pdef[pi2] - pdef[pi3] - pdef[pi4];
-                            double d = Dist2(p_1, p_2) -
-                                       Dist2(p_3, p_4);
+                        should = e >= t && (e > 2 || d > 0);
+                    }
 
-                            should = e >= t && (e > 2 || d > 0);
-                        } else {
-                            double loc_h = mesh.GetH(p_1);
-                            double bad1 = CalcTriangleBadness(p_4, p_3, p_1, metricweight, loc_h);
-                            double bad2 = CalcTriangleBadness(p_3, p_4, p_2, metricweight, loc_h);
-                            double bad3 = CalcTriangleBadness(p_1, p_2, p_3, metricweight, loc_h);
-                            double bad4 = CalcTriangleBadness(p_2, p_1, p_4, metricweight, loc_h);
-                            should = (bad1 + bad2) < (bad3 + bad4);
-                        }
+                    if (should) {
+                        // do swapping !
+                        done = true;
 
-                        if (should) {
-                            // do swapping !
-                            done = true;
+                        mesh.Element(t1).PointID(0) = pi1;
+                        mesh.Element(t1).PointID(1) = pi4;
+                        mesh.Element(t1).PointID(2) = pi3;
 
-                            mesh.Element(t1).PointID(0) = pi1;
-                            mesh.Element(t1).PointID(1) = pi4;
-                            mesh.Element(t1).PointID(2) = pi3;
+                        mesh.Element(t2).PointID(0) = pi2;
+                        mesh.Element(t2).PointID(1) = pi3;
+                        mesh.Element(t2).PointID(2) = pi4;
 
-                            mesh.Element(t2).PointID(0) = pi2;
-                            mesh.Element(t2).PointID(1) = pi3;
-                            mesh.Element(t2).PointID(2) = pi4;
+                        pdef[pi1]--;
+                        pdef[pi2]--;
+                        pdef[pi3]++;
+                        pdef[pi4]++;
 
-                            pdef[pi1]--;
-                            pdef[pi2]--;
-                            pdef[pi3]++;
-                            pdef[pi4]++;
-
-                            swapped[t1] = 1;
-                            swapped[t2] = 1;
-                        }
+                        swapped[t1] = 1;
+                        swapped[t2] = 1;
                     }
                 }
             }
@@ -387,9 +375,9 @@ namespace meshit
                 double bad2 = 0;
                 for (size_t k = 0; k < has_one_pi.size(); k++) {
                     const Element2d& el = mesh.Element(has_one_pi[k]);
-                    const Point3d& p1 = mesh.Point(el[0]);
-                    const Point3d& p2 = mesh.Point(el[1]);
-                    const Point3d& p3 = mesh.Point(el[2]);
+                    const MeshPoint& p1 = mesh.Point(el[0]);
+                    const MeshPoint& p2 = mesh.Point(el[1]);
+                    const MeshPoint& p3 = mesh.Point(el[2]);
                     bad2 += CalcTriangleBadness_2(p1, p2, p3, nv_z);
 
                     // Vec3d hnv = Cross(p2 - p1, p3 - p1);

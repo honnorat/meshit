@@ -43,7 +43,12 @@ namespace meshit
             }
     }
 
-    LocalH::LocalH(const Point3d& pmin, const Point3d& pmax, double agrading)
+    LocalH::~LocalH()
+    {
+        CleanRoot();
+    }
+
+    void LocalH::Init(const Point3d& pmin, const Point3d& pmax, double agrading)
     {
         grading = agrading;
 
@@ -70,13 +75,16 @@ namespace meshit
         x2[1] = x1[1] + hmax;
         x2[2] = x1[2] + hmax;
 
+        CleanRoot();
         root = new GradingBox(x1, x2);
     }
 
-    LocalH::~LocalH()
+    void LocalH::CleanRoot()
     {
-        root->DeleteChilds();
-        delete root;
+        if (root) {
+            root->DeleteChilds();
+            delete root;
+        }
     }
 
     void LocalH::SetH(const Point3d& p, double h)

@@ -148,6 +148,10 @@ namespace meshit
         std::vector<int> delpointl;  // list of deleted front points
         std::vector<int> dellinel;   // list of deleted front lines
 
+        std::vector<size_t> nearlines;
+        std::vector<size_t> nearpoints;
+
+
         int nfl;  // number of front lines;
         INDEX_2_map<int> allflines;  // all front lines ever have been
 

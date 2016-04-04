@@ -88,20 +88,6 @@ namespace meshit
             }
         }
 
-        double Det() const;
-
-        friend void CalcABt(const DenseMatrix& a, const DenseMatrix& b, DenseMatrix& m2);
-
-        const double* DataP() const
-        {
-            return data;
-        }
-
-        double* DataP()
-        {
-            return data;
-        }
-
         double& Elem(size_t i, size_t j)
         {
             return data[i * width + j];
