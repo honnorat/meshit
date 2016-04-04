@@ -256,7 +256,7 @@ namespace meshit
         /// minimal mesh size
         double minh;
         /// check overlapping surfaces (debug)
-        int check_overlap;
+        bool check_overlap;
         /// safty factor for curvatures (elemetns per radius)
         double curvature_safety;
         /// minimal number of segments per edge

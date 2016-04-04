@@ -64,11 +64,11 @@ namespace meshit
             x[2] = p2.x[2];
         }
 
-        explicit Point3d(const Point<3>& p2)
+        explicit Point3d(const Point2d& p2)
         {
-            x[0] = p2[0];
-            x[1] = p2[1];
-            x[2] = p2[2];
+            x[0] = p2.X();
+            x[1] = p2.Y();
+            x[2] = 0.0;
         }
 
         Point3d& operator=(const Point3d& p2)
@@ -178,11 +178,6 @@ namespace meshit
         friend class Vec3d;
 
         friend class Box3d;
-
-        operator Point<3>() const
-        {
-            return Point<3>(x[0], x[1], x[2]);
-        }
     };
 
     class Vec3d
@@ -224,11 +219,11 @@ namespace meshit
             x[2] = p1.x[2];
         }
 
-        explicit Vec3d(const Vec<3>& v2)
+        Vec3d(const Point2d& p1, const Point2d& p2)
         {
-            x[0] = v2[0];
-            x[1] = v2[1];
-            x[2] = v2[2];
+            x[0] = p2.px - p1.px;
+            x[1] = p2.py - p1.py;
+            x[2] = 0.0;
         }
 
         Vec3d(const Point3d& p1, const Point3d& p2)
@@ -507,7 +502,6 @@ namespace meshit
               double aminz, double amaxz);
         Box3d(const Box3d& b2);
         Box3d(const Point3d& p1, const Point3d& p2);
-        Box3d(const Box<3>& b2);
 
         Point3d PMin() const
         {

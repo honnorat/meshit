@@ -59,7 +59,7 @@ namespace meshit
             os << ++cnt << " ";  // number of nodes
             os << p.X() << " ";
             os << p.Y() << " ";
-            os << p.Z() << "\n";
+            os << 0.0 << "\n";
         }
         os << "$EndNodes\n";
 
@@ -77,7 +77,7 @@ namespace meshit
             os << ++cnt << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] + 1 << " " << seg[1] + 1 << std::endl;
         }
         for (size_t k = 0; k < nse; k++) {
-            const Element2d& el = mesh.SurfaceElement(k);
+            const Element2d& el = mesh.Element(k);
             os << ++cnt << " 2 2 ";   // GMSH Type for a 3 node triangle
             os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";
             os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";

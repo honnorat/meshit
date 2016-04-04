@@ -3,6 +3,7 @@
 #include "geometry2d.hpp"
 #include "../meshing/meshing2.hpp"
 #include "../meshing/global.hpp"
+#include "../gprim/geom3d.hpp"
 
 namespace meshit
 {
@@ -68,12 +69,12 @@ namespace meshit
 
         size_t n = 10000;
 
-        std::vector<Point<2> > xi(n);
+        std::vector<Point2d> xi(n);
         std::vector<double> hi(n);
 
         for (size_t i = 0; i < n; i++) {
             xi[i] = spline.GetPoint((i + 0.5) / n);
-            hi[i] = mesh.GetH(Point3d(xi[i][0], xi[i][1], 0));
+            hi[i] = mesh.GetH(Point3d(xi[i].X(), xi[i].Y(), 0));
         }
 
         // limit slope
@@ -130,7 +131,7 @@ namespace meshit
     {
         const size_t n = 10000;
 
-        Point<2> mark, oldmark;
+        Point2d mark, oldmark;
         std::vector<double> curvepoints;
         double edgelength, edgelengthold;
 
@@ -140,7 +141,7 @@ namespace meshit
 
         size_t j = 1;
 
-        Point<2> pold = spline.GetPoint(0);
+        Point2d pold = spline.GetPoint(0);
         double lold = 0.0;
         oldmark = pold;
         edgelengthold = 0;
@@ -148,7 +149,7 @@ namespace meshit
 
         for (size_t i = 1; i <= n; i++) {
             double t = static_cast<double>(i) * dt;
-            Point<2> p = spline.GetPoint(t);
+            Point2d p = spline.GetPoint(t);
             double l = lold + Dist(p, pold);
             while (j < curvepoints.size() && (l >= curvepoints[j] || i == n)) {
                 double frac = (curvepoints[j] - l) / (l - lold);
@@ -156,8 +157,8 @@ namespace meshit
                 mark = spline.GetPoint(edgelength);
 
                 PointIndex pi1{-1}, pi2{-1};
-                Point3d mark3(mark[0], mark[1], 0);
-                Point3d oldmark3(oldmark[0], oldmark[1], 0);
+                Point3d mark3{mark};
+                Point3d oldmark3{oldmark};
 
                 double h = mesh.GetH(oldmark3);
                 Vec3d v(1e-4 * h, 1e-4 * h, 1e-4 * h);
@@ -201,34 +202,25 @@ namespace meshit
 
     void SplineGeometry::PartitionBoundary(MeshingParameters& mp, double h, Mesh& mesh2d)
     {
-        Box<2> bbox;
+        Box2d bbox;
         GetBoundingBox(bbox);
         double dist = Dist(bbox.PMin(), bbox.PMax());
-        Point3d pmin;
-        Point3d pmax;
-
-        pmin[2] = -dist;
-        pmax[2] = dist;
-        for (int j = 0; j < 2; j++) {
-            pmin[j] = bbox.PMin()[j];
-            pmax[j] = bbox.PMax()[j];
-        }
+        Point3d pmin(bbox.PMin().X(), bbox.PMin().Y(), -dist);
+        Point3d pmax(bbox.PMax().X(), bbox.PMax().Y(), +dist);
 
         // mesh size restrictions ...
-
         for (size_t i = 0; i < splines.size(); i++) {
             const SplineSeg& spline = *splines[i];
-            const GeomPoint<2>& p1 = spline.StartPI();
-            const GeomPoint<2>& p2 = spline.EndPI();
+            const GeomPoint& p1 = spline.StartPI();
+            const GeomPoint& p2 = spline.EndPI();
 
             double h1 = std::min(p1.hmax, h / p1.refatpoint);
             double h2 = std::min(p2.hmax, h / p2.refatpoint);
-            mesh2d.RestrictLocalH(Point3d(p1[0], p1[1], 0), h1);
-            mesh2d.RestrictLocalH(Point3d(p2[0], p2[1], 0), h2);
+            mesh2d.RestrictLocalH(Point3d(p1), h1);
+            mesh2d.RestrictLocalH(Point3d(p2), h2);
 
             double len = spline.Length();
-            mesh2d.RestrictLocalHLine(Point3d(p1[0], p1[1], 0),
-                                      Point3d(p2[0], p2[1], 0), len / mp.segments_per_edge);
+            mesh2d.RestrictLocalHLine(Point3d(p1), Point3d(p2), len / mp.segments_per_edge);
 
             double hcurve = std::min(spline.hmax, h / spline.reffak);
             double hl = GetDomainMaxh(spline.leftdom);
@@ -238,9 +230,9 @@ namespace meshit
 
             uint32_t np = 1000;
             for (double t = 0.5 / np; t < 1; t += 1.0 / np) {
-                Point<2> x = spline.GetPoint(t);
+                Point2d x = spline.GetPoint(t);
                 double hc = 1.0 / mp.curvature_safety / (1e-99 + spline.CalcCurvature(t));
-                mesh2d.RestrictLocalH(Point3d(x[0], x[1], 0), std::min(hc, hcurve));
+                mesh2d.RestrictLocalH(Point3d(x), std::min(hc, hcurve));
             }
         }
 

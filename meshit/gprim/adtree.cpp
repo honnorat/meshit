@@ -435,18 +435,6 @@ namespace meshit
         tree->GetIntersecting(pmi, pma, pis);
     }
 
-    Box3dTree::Box3dTree(const Box<3>& abox)
-        : boxpmin(abox.PMin()),
-          boxpmax(abox.PMax())
-    {
-        double tpmin[6], tpmax[6];
-        for (size_t i = 0; i < 3; i++) {
-            tpmin[i] = tpmin[i + 3] = boxpmin[i];
-            tpmax[i] = tpmax[i + 3] = boxpmax[i];
-        }
-        tree = new ADTree6(tpmin, tpmax);
-    }
-
     Box3dTree::Box3dTree(const Point3d& apmin, const Point3d& apmax)
         : boxpmin(apmin),
           boxpmax(apmax)

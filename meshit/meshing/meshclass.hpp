@@ -40,7 +40,7 @@ namespace meshit
         /// line-segments at edges
         std::vector<Segment> segments;
         /// surface elements, 2d-inner elements
-        std::vector<Element2d> surf_elements;
+        std::vector<Element2d> elements;
 
         /// surface indices at boundary nodes
         TABLE<int> surfaces_on_node;
@@ -91,16 +91,6 @@ namespace meshit
             return points[pi];
         }
 
-        MeshPoint& operator[](size_t pi)
-        {
-            return points[pi];
-        }
-
-        const MeshPoint& operator[](size_t pi) const
-        {
-            return points[pi];
-        }
-
         void AddSegment(const Segment& s);
 
         size_t GetNSeg() const
@@ -122,17 +112,17 @@ namespace meshit
 
         size_t GetNSE() const
         {
-            return surf_elements.size();
+            return elements.size();
         }
 
-        Element2d& SurfaceElement(size_t i)
+        Element2d& Element(size_t i)
         {
-            return surf_elements[i];
+            return elements[i];
         }
 
-        const Element2d& SurfaceElement(size_t i) const
+        const Element2d& Element(size_t i) const
         {
-            return surf_elements[i];
+            return elements[i];
         }
 
         void RebuildSurfaceElementLists();
@@ -234,8 +224,17 @@ namespace meshit
 
             void Add(const Element2d& sel)
             {
-                area += Cross(mesh.Point(sel[1]) - mesh.Point(sel[0]),
-                              mesh.Point(sel[2]) - mesh.Point(sel[0])).Length() / 2;
+                const MeshPoint& p0 = mesh.Point(sel[0]);
+                const MeshPoint& p1 = mesh.Point(sel[1]);
+                const MeshPoint& p2 = mesh.Point(sel[2]);
+
+                double v1_x = p1.X() - p0.X();   // v1 = p1 - p0
+                double v1_y = p1.Y() - p0.Y();
+                double v2_x = p2.X() - p0.X();   // v2 = p2 - p0
+                double v2_y = p2.Y() - p0.Y();
+
+                // (1/2) * || (p1-p0) x (p2-p0) ||
+                area += 0.5 * fabs(v1_x * v2_y - v1_y * v2_x);
             }
 
             double Area() const { return area; }

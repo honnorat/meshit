@@ -29,14 +29,14 @@ namespace meshit
         std::vector<netrule*> rules;
         /// statistics
         std::vector<int> ruleused, canuse, foundmap;
-        Box<3> boundingbox;
-        double maxarea;
+
+        double max_area;
 
         Vec3d ex, ey;
         Point3d globp1;
 
      public:
-        explicit Meshing2(const Box<3>& aboundingbox);
+        explicit Meshing2(const Box3d& aboundingbox);
         ~Meshing2();
 
         /// Load rules, either from file, or compiled rules
@@ -49,7 +49,6 @@ namespace meshit
         void SetMaxArea(double amaxarea);
 
      protected:
-        void StartMesh();
         void EndMesh();
         double CalcLocalH(const Point3d& p, double gh) const;
 

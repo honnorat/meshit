@@ -15,8 +15,8 @@ namespace meshit
 
         for (size_t i = 0; i < nf; i++) {
             for (size_t j = 0; j < 3; j++) {
-                i2.I1() = mesh.SurfaceElement(i).PointID(j);
-                i2.I2() = mesh.SurfaceElement(i).PointID((j + 1) % 3);
+                i2.I1() = mesh.Element(i).PointID(j);
+                i2.I2() = mesh.Element(i).PointID((j + 1) % 3);
                 if (edges.count(i2)) {
                     int hi = edges[i2];
                     if (hi != 1)
@@ -70,9 +70,9 @@ namespace meshit
 
         for (size_t sei = 0; sei < mesh.GetNSE(); sei++) {
             qual = TriangleQualityInst(
-                mesh[mesh.SurfaceElement(sei)[0]],
-                mesh[mesh.SurfaceElement(sei)[1]],
-                mesh[mesh.SurfaceElement(sei)[2]]);
+                mesh.Point(mesh.Element(sei)[0]),
+                mesh.Point(mesh.Element(sei)[1]),
+                mesh.Point(mesh.Element(sei)[2]));
 
             cl = static_cast<size_t>((ncl - 1e-3) * qual);
             incl[cl]++;

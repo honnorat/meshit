@@ -237,32 +237,32 @@ namespace meshit
         std::vector<int> compress(mesh.GetNP());
         std::vector<PointIndex> icompress;
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < 3; j++) {
-                compress[el[j]] = -1;
-            }
+            const Element2d& el = mesh.Element(seia[i]);
+            compress[el.PointID(0)] = -1;
+            compress[el.PointID(1)] = -1;
+            compress[el.PointID(2)] = -1;
         }
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            const Element2d& el = mesh.Element(seia[i]);
             for (size_t j = 0; j < 3; j++) {
-                if (compress[el[j]] == -1) {
-                    compress[el[j]] = icompress.size();
-                    icompress.push_back(el[j]);
+                if (compress[el.PointID(j)] == -1) {
+                    compress[el.PointID(j)] = icompress.size();
+                    icompress.push_back(el.PointID(j));
                 }
             }
         }
         std::vector<int> cnta(icompress.size(), 0);
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            const Element2d& el = mesh.Element(seia[i]);
             for (size_t j = 0; j < 3; j++) {
-                cnta[compress[el[j]]]++;
+                cnta[compress[el.PointID(j)]]++;
             }
         }
         TABLE<SurfaceElementIndex> elements_on_point(cnta);
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.SurfaceElement(seia[i]);
+            const Element2d& el = mesh.Element(seia[i]);
             for (size_t j = 0; j < 3; j++) {
-                elements_on_point.Add(compress[el[j]], seia[i]);
+                elements_on_point.Add(compress[el.PointID(j)], seia[i]);
             }
         }
 
@@ -293,23 +293,23 @@ namespace meshit
                     SurfaceElementIndex sei = elem_idx[j];
                     ld.loc_elements[j] = sei;
 
-                    const Element2d& bel = mesh.SurfaceElement(sei);
+                    const Element2d& bel = mesh.Element(sei);
                     for (size_t k = 0; k < 3; k++) {
                         if (bel.PointID(k) == pi) {
-                            ld.loc_pnts2.push_back(mesh[bel.PointID((k + 1) % 3)]);
-                            ld.loc_pnts3.push_back(mesh[bel.PointID((k + 2) % 3)]);
+                            ld.loc_pnts2.push_back(mesh.Point(bel.PointID((k + 1) % 3)));
+                            ld.loc_pnts3.push_back(mesh.Point(bel.PointID((k + 2) % 3)));
                             break;
                         }
                     }
-                    Point3d pmid = Center(mesh[bel[0]], mesh[bel[1]], mesh[bel[2]]);
+                    Point3d pmid = Center(mesh.Point(bel[0]), mesh.Point(bel[1]), mesh.Point(bel[2]));
                     ld.lochs[j] = mesh.GetH(pmid);
                 }
 
                 // save points, and project to tangential plane
                 for (size_t j = 0; j < n_elems; j++) {
-                    const Element2d& el = mesh.SurfaceElement(ld.loc_elements[j]);
+                    const Element2d& el = mesh.Element(ld.loc_elements[j]);
                     for (size_t k = 0; k < 3; k++) {
-                        savepoints[el[k]] = mesh[el[k]];
+                        savepoints[el[k]] = mesh.Point(el[k]);
                     }
                 }
 
@@ -319,7 +319,7 @@ namespace meshit
 
                 // restore other points
                 for (size_t j = 0; j < n_elems; j++) {
-                    const Element2d& el = mesh.SurfaceElement(ld.loc_elements[j]);
+                    const Element2d& el = mesh.Element(ld.loc_elements[j]);
                     for (size_t k = 0; k < 3; k++) {
                         PointIndex hhpi = el[k];
                         if (hhpi != pi) mesh.Point(hhpi) = savepoints[hhpi];

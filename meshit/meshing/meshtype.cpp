@@ -112,7 +112,7 @@ namespace meshit
         grading = -1.0;
         maxh = 1e10;
         minh = 0;
-        check_overlap = 1;
+        check_overlap = false;
         curvature_safety = 2;
         segments_per_edge = 1;
 

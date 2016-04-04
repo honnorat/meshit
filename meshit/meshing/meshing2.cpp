@@ -5,15 +5,13 @@
 
 namespace meshit
 {
-    Meshing2::Meshing2(const Box<3>& aboundingbox)
+    Meshing2::Meshing2(const Box3d& boundingbox)
     {
-        boundingbox = aboundingbox;
-
         LoadRules(NULL);
         // LoadRules ("rules/triangle.rls");
 
         adfront = new AdFront2(boundingbox);
-        maxarea = -1;
+        max_area = -1;
     }
 
     Meshing2::~Meshing2()
@@ -34,13 +32,6 @@ namespace meshit
         adfront->AddLine(i1 - 1, i2 - 1);
     }
 
-    void Meshing2::StartMesh()
-    {
-        foundmap.resize(rules.size(), 0);
-        canuse.resize(rules.size(), 0);
-        ruleused.resize(rules.size(), 0);
-    }
-
     void Meshing2::EndMesh()
     {
         for (size_t i = 0; i < ruleused.size(); i++) {
@@ -50,7 +41,7 @@ namespace meshit
 
     void Meshing2::SetMaxArea(double amaxarea)
     {
-        maxarea = amaxarea;
+        max_area = amaxarea;
     }
 
     double Meshing2::CalcLocalH(const Point3d& /* p */, double gh) const
@@ -95,52 +86,31 @@ namespace meshit
 
         bool debugflag;
 
-        double h, his, hshould;
+        double h, hshould;
 
         std::vector<Point3d> locpoints;
         std::vector<int> legalpoints;
         std::vector<Point2d> plainpoints;
         std::vector<INDEX_2> loclines;
-        int cntelem = 0, trials = 0, nfaces = 0;
+        int trials = 0, nfaces = 0;
         int qualclass;
 
-        // test for 3d overlaps
-        Box3dTree surfeltree(static_cast<Point3d>(boundingbox.PMin()),
-                             static_cast<Point3d>(boundingbox.PMax()));
+        std::vector<int> elements_on_node(mesh.GetNP(), 0);
+        std::vector<bool> illegal_point(mesh.GetNP(), false);
+        double meshed_area = 0.0;
 
-        std::vector<size_t> intersecttrias;
-        std::vector<Point3d> critpoints;
+        if (max_area > 0)
+            meshed_area = mesh.SurfaceArea();
 
-        // test for doubled edges
-
-        StartMesh();
-
-        std::vector<int> trigsonnode(mesh.GetNP(), 0);
-        std::vector<bool> illegalpoint(mesh.GetNP(), false);
-        double meshedarea = 0.0;
-
-        std::vector<SurfaceElementIndex> seia;
-        mesh.GetSurfaceElementsOfFace(facenr, seia);
-        for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& sel = mesh.SurfaceElement(seia[i]);
-
-            if (sel.IsDeleted()) continue;
-
-            Box<3> box;
-            box.Set(mesh[sel[0]]);
-            box.Add(mesh[sel[1]]);
-            box.Add(mesh[sel[2]]);
-            surfeltree.Insert(box, seia[i]);
-        }
-
-        if (maxarea > 0)
-            meshedarea = mesh.SurfaceArea();
+        foundmap.resize(rules.size(), 0);
+        canuse.resize(rules.size(), 0);
+        ruleused.resize(rules.size(), 0);
 
         adfront->SetStartFront();
 
         int plotnexttrial = 999;
 
-        double meshedarea_before = meshedarea;
+        double meshedarea_before = meshed_area;
 
         while (!adfront->Empty()) {
             locpoints.clear();
@@ -172,9 +142,6 @@ namespace meshit
 
             int baselineindex = adfront->SelectBaseLine(p1, p2, qualclass);
 
-            found = true;
-            his = Dist(p1, p2);
-
             Point3d pmid = Center(p1, p2);
             hshould = CalcLocalH(pmid, mesh.GetH(pmid));
             if (gh < hshould) hshould = gh;
@@ -183,7 +150,7 @@ namespace meshit
 
             h = hshould;
 
-            double hinner = (3 + qualclass) * std::max(his, hshould);
+            double hinner = (3 + qualclass) * std::max(Dist(p1, p2), hshould);
 
             adfront->GetLocals(baselineindex, locpoints, loclines, pindex, lindex, 2 * hinner);
 
@@ -207,12 +174,9 @@ namespace meshit
                 debugflag = true;
 
             // problem recognition !
-            if (found
-                && gpi1 < static_cast<PointIndex>(illegalpoint.size())
-                && gpi2 < static_cast<PointIndex>(illegalpoint.size())
-                && (illegalpoint[gpi1] || illegalpoint[gpi2])) {
-                found = false;
-            }
+            found = gpi1 >= static_cast<PointIndex>(illegal_point.size()) ||
+                    gpi2 >= static_cast<PointIndex>(illegal_point.size()) ||
+                    (!illegal_point[gpi1] && !illegal_point[gpi2]);
 
             size_t oldnl = 0;
             size_t oldnp = 0;
@@ -327,80 +291,8 @@ namespace meshit
                 }
             }
 
-            if (found && mp.check_overlap) {
-
-                Point3d hullmin(1e10, 1e10, 1e10);
-                Point3d hullmax(-1e10, -1e10, -1e10);
-
-                for (size_t i = 0; i < locelements.size(); i++) {
-                    for (size_t j = 0; j < 3; j++) {
-                        const Point3d& p = locpoints[locelements[i].PointID(j) - 1];
-                        hullmin.SetToMin(p);
-                        hullmax.SetToMax(p);
-                    }
-                }
-                hullmin += Vec3d(-his, -his, -his);
-                hullmax += Vec3d(his, his, his);
-
-                surfeltree.GetIntersecting(hullmin, hullmax, intersecttrias);
-
-                critpoints.resize(0);
-                for (size_t i = oldnp; i < locpoints.size(); i++) {
-                    critpoints.push_back(locpoints[i]);
-                }
-                for (size_t i = 0; i < locelements.size(); i++) {
-                    const Element2d& tri = locelements[i];
-                    const Point3d& tp1 = locpoints[tri.PointID(0) - 1];
-                    const Point3d& tp2 = locpoints[tri.PointID(1) - 1];
-                    const Point3d& tp3 = locpoints[tri.PointID(2) - 1];
-
-                    Vec3d tv1(tp1, tp2);
-                    Vec3d tv2(tp1, tp3);
-
-                    double lam1, lam2;
-                    for (lam1 = 0.2; lam1 <= 0.8; lam1 += 0.2) {
-                        for (lam2 = 0.2; lam2 + lam1 <= 0.8; lam2 += 0.2) {
-                            Point3d hp = tp1 + lam1 * tv1 + lam2 * tv2;
-                            critpoints.push_back(hp);
-                        }
-                    }
-                }
-
-                for (size_t i = 0; i < critpoints.size(); i++) {
-                    const Point3d& p = critpoints[i];
-
-                    for (size_t jj = 0; jj < intersecttrias.size(); jj++) {
-                        SurfaceElementIndex j = intersecttrias[jj];
-                        const Element2d& el = mesh.SurfaceElement(j);
-
-                        Point3d tp1 = mesh.Point(el.PointID(0));
-                        Point3d tp2 = mesh.Point(el.PointID(1));
-                        Point3d tp3 = mesh.Point(el.PointID(2));
-
-                        Vec3d e1(tp1, tp2);
-                        Vec3d e2(tp1, tp3);
-                        Vec3d n = Cross(e1, e2);
-                        n /= n.Length();
-                        double lam1, lam2, lam3;
-                        lam3 = n * Vec3d(tp1, p);
-                        LocalCoordinates(e1, e2, Vec3d(tp1, p), lam1, lam2);
-
-                        if (fabs(lam3) < 0.1 * hshould && lam1 > 0 && lam2 > 0 && (lam1 + lam2) < 1.0) {
-                            for (int k = 1; k <= 5; k++) {
-                                adfront->IncrementClass(lindex[0]);
-                            }
-                            found = false;
-
-                            if (debugflag || debugparam.haltnosuccess)
-                                MESHIT_LOG_WARNING("overlapping");
-                        }
-                    }
-                }
-            }
-
             if (found) {
                 // check, whether new front line already exists
-
                 for (size_t i = oldnl; i < loclines.size(); i++) {
                     int nlgpi1 = loclines[i].I1();
                     int nlgpi2 = loclines[i].I2();
@@ -449,13 +341,6 @@ namespace meshit
                     }
 
                     mesh.AddSurfaceElement(mtri);
-                    cntelem++;
-
-                    Box<3> box;
-                    box.Set(mesh[mtri[0]]);
-                    box.Add(mesh[mtri[1]]);
-                    box.Add(mesh[mtri[2]]);
-                    surfeltree.Insert(box, mesh.GetNSE() - 1);
 
                     const Point3d& sep1 = mesh.Point(mtri.PointID(0));
                     const Point3d& sep2 = mesh.Point(mtri.PointID(1));
@@ -464,11 +349,11 @@ namespace meshit
                     double trigarea = Cross(Vec3d(sep1, sep2),
                                             Vec3d(sep1, sep3)).Length() / 2;
 
-                    meshedarea += trigarea;
+                    meshed_area += trigarea;
 
-                    if (maxarea > 0 && meshedarea - meshedarea_before > maxarea) {
-                        std::cerr << "meshed area = " << meshedarea - meshedarea_before << std::endl
-                        << "maximal area = " << maxarea << std::endl
+                    if (max_area > 0 && meshed_area - meshedarea_before > max_area) {
+                        std::cerr << "meshed area = " << meshed_area - meshedarea_before << std::endl
+                        << "maximal area = " << max_area << std::endl
                         << "GIVING UP" << std::endl;
                         return false;
                     }
@@ -476,22 +361,22 @@ namespace meshit
                     for (size_t j = 0; j < 3; j++) {
 
                         PointIndex gpi = locelements[i].PointID(j);
-                        size_t oldts = trigsonnode.size();
+                        size_t oldts = elements_on_node.size();
                         if (gpi >= static_cast<PointIndex>(oldts)) {
-                            trigsonnode.resize(gpi + 1, 0);
-                            illegalpoint.resize(gpi + 1, false);
+                            elements_on_node.resize(gpi + 1, 0);
+                            illegal_point.resize(gpi + 1, false);
                         }
-                        trigsonnode[gpi]++;
+                        elements_on_node[gpi]++;
 
-                        if (trigsonnode[gpi] > 20) {
-                            illegalpoint[gpi] = true;
-                            std::cerr << "illegal point: " << gpi << ": trigs_on_node = " << trigsonnode[gpi] <<
+                        if (elements_on_node[gpi] > 20) {
+                            illegal_point[gpi] = true;
+                            std::cerr << "illegal point: " << gpi << ": trigs_on_node = " << elements_on_node[gpi] <<
                             std::endl;
                         }
 
                         static int mtonnode = 0;
-                        if (trigsonnode[gpi] > mtonnode)
-                            mtonnode = trigsonnode[gpi];
+                        if (elements_on_node[gpi] > mtonnode)
+                            mtonnode = elements_on_node[gpi];
                     }
                 }
                 for (size_t i = 0; i < dellines.size(); i++) {

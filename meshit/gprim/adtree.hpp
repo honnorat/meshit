@@ -122,17 +122,10 @@ namespace meshit
         Point3d boxpmin, boxpmax;
 
      public:
-        explicit Box3dTree(const Box<3>& abox);
         Box3dTree(const Point3d& apmin, const Point3d& apmax);
         ~Box3dTree();
 
         void Insert(const Point3d& bmin, const Point3d& bmax, int pi);
-
-        void Insert(const Box<3>& box, int pi)
-        {
-            Insert(static_cast<Point3d>(box.PMin()),
-                   static_cast<Point3d>(box.PMax()), pi);
-        }
 
         void DeleteElement(int pi)
         {

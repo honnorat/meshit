@@ -24,9 +24,7 @@ namespace meshit
             rs.X(i + 1) = vrs.X(i + 1);
         }
 
-        // double det = a.Det();
         double det = Det(a);
-
         double arel = vl.Length() * vt1.Length() * vt2.Length();
 
         // new !!!!

@@ -20,15 +20,15 @@ namespace meshit
         }
     }
 
-    void SplineGeometry::GetBoundingBox(Box<2>& box) const
+    void SplineGeometry::GetBoundingBox(Box2d& box) const
     {
         if (!splines.size()) {
-            Point<2> auxp{0.0};
+            Point2d auxp{0.0, 0.0};
             box.Set(auxp);
             return;
         }
 
-        std::vector<Point<2> > points;
+        std::vector<Point2d> points;
         for (size_t i = 0; i < splines.size(); i++) {
             splines[i]->GetPoints(20, points);
 
@@ -39,9 +39,9 @@ namespace meshit
         }
     }
 
-    Box<2> SplineGeometry::GetBoundingBox() const
+    Box2d SplineGeometry::GetBoundingBox() const
     {
-        Box<2> box;
+        Box2d box;
         GetBoundingBox(box);
         return box;
     }
@@ -103,7 +103,7 @@ namespace meshit
     {
         MESHIT_LOG_INFO("Load 2D Geometry");
         int nump, leftdom, rightdom;
-        Point<2> x;
+        Point2d x;
         int hi1, hi2, hi3;
         char buf[50], ch;
         int pointnr;
@@ -111,7 +111,7 @@ namespace meshit
         std::string keyword;
         std::string flag;
 
-        std::vector<GeomPoint<2>> infilepoints;
+        std::vector<GeomPoint> infilepoints;
         std::vector<int> pointnrs;
         nump = 0;
         int numdomains = 0;
@@ -131,7 +131,7 @@ namespace meshit
                     if (pointnr > nump) nump = pointnr;
                     pointnrs.push_back(pointnr);
 
-                    infile >> x[0] >> x[1];
+                    infile >> x.X() >> x.Y();
                     infile >> ch;
 
                     Flags flags;
@@ -142,8 +142,9 @@ namespace meshit
                     }
                     infile.unget();
 
-                    infilepoints.push_back(
-                        GeomPoint<2>(x, flags.GetNumFlag("ref", 1.0), flags.GetNumFlag("maxh", 1e99)));
+                    infilepoints.push_back(GeomPoint(x,
+                                                     flags.GetNumFlag("ref", 1.0),
+                                                     flags.GetNumFlag("maxh", 1e99)));
                     ch = TestComment(infile);
                 }
                 geompoints.resize(nump);
@@ -235,13 +236,13 @@ namespace meshit
         size_t nold_points = geompoints.size();
         size_t nnew_points = points.size();
 
-        std::vector<GeomPoint<2>> gpts;
+        std::vector<GeomPoint> gpts;
 
         gpts.reserve(nnew_points);
         geompoints.reserve(nold_points + nnew_points);
 
         for (size_t i = 0; i < nnew_points; i++) {
-            gpts.push_back(GeomPoint<2>(points[i]));
+            gpts.push_back(GeomPoint(points[i]));
             geompoints.push_back(gpts[i]);
         }
         for (size_t i0 = 0; i0 < nnew_points; i0++) {
@@ -279,7 +280,7 @@ namespace meshit
             throw std::runtime_error("SplineGeometry::AddSpline : wrong number of points.");
         }
         for (size_t i = 0; i < nb_points; i++) {
-            geompoints.push_back(meshit::GeomPoint<2>(points[i]));
+            geompoints.push_back(meshit::GeomPoint(points[i]));
         }
 
         size_t nb_splines = nb_points / 2;

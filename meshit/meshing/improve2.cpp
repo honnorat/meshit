@@ -73,14 +73,14 @@ namespace meshit
         static const double minangle[] = {0, 1.481, 2.565, 3.627, 4.683, 5.736, 7, 9};
 
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.Element(seia[i]);
             for (int j = 0; j < 3; j++) {
                 pangle[sel[j]] = 0.0;
             }
         }
 
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.Element(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 PointType typ = mesh.Point(sel[j]).Type();
                 if (typ == EDGE_POINT) {
@@ -91,7 +91,7 @@ namespace meshit
         }
 
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.Element(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi = sel[j];
                 if (mesh.Point(pi).Type() == INNER_POINT) {
@@ -107,7 +107,7 @@ namespace meshit
         }
 
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.Element(seia[i]);
             for (size_t j = 0; j < 3; j++)
                 pdef[sel[j]]++;
         }
@@ -120,7 +120,7 @@ namespace meshit
         }
 
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.Element(seia[i]);
 
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi1 = sel.PointID((j + 1) % 3);
@@ -154,10 +154,10 @@ namespace meshit
             for (size_t i = 0; i < seia.size(); i++) {
                 SurfaceElementIndex t1 = seia[i];
 
-                if (mesh.SurfaceElement(t1).IsDeleted())
+                if (mesh.Element(t1).IsDeleted())
                     continue;
 
-                if (mesh.SurfaceElement(t1).GetIndex() != faceindex)
+                if (mesh.Element(t1).GetIndex() != faceindex)
                     continue;
 
                 for (size_t o1 = 0; o1 < 3; o1++) {
@@ -169,10 +169,10 @@ namespace meshit
                     if (t2 == -1) continue;
                     if (swapped[t1] || swapped[t2]) continue;
 
-                    PointIndex pi1 = mesh.SurfaceElement(t1).PointID((o1 + 1) % 3);
-                    PointIndex pi2 = mesh.SurfaceElement(t1).PointID((o1 + 2) % 3);
-                    PointIndex pi3 = mesh.SurfaceElement(t1).PointID(o1 % 3);
-                    PointIndex pi4 = mesh.SurfaceElement(t2).PointID(o2 % 3);
+                    PointIndex pi1 = mesh.Element(t1).PointID((o1 + 1) % 3);
+                    PointIndex pi2 = mesh.Element(t1).PointID((o1 + 2) % 3);
+                    PointIndex pi3 = mesh.Element(t1).PointID(o1 % 3);
+                    PointIndex pi4 = mesh.Element(t2).PointID(o2 % 3);
 
                     const Point3d& p_1 = mesh.Point(pi1);
                     const Point3d& p_2 = mesh.Point(pi2);
@@ -243,13 +243,13 @@ namespace meshit
                             // do swapping !
                             done = true;
 
-                            mesh.SurfaceElement(t1).PointID(0) = pi1;
-                            mesh.SurfaceElement(t1).PointID(1) = pi4;
-                            mesh.SurfaceElement(t1).PointID(2) = pi3;
+                            mesh.Element(t1).PointID(0) = pi1;
+                            mesh.Element(t1).PointID(1) = pi4;
+                            mesh.Element(t1).PointID(2) = pi3;
 
-                            mesh.SurfaceElement(t2).PointID(0) = pi2;
-                            mesh.SurfaceElement(t2).PointID(1) = pi3;
-                            mesh.SurfaceElement(t2).PointID(2) = pi4;
+                            mesh.Element(t2).PointID(0) = pi2;
+                            mesh.Element(t2).PointID(1) = pi3;
+                            mesh.Element(t2).PointID(2) = pi4;
 
                             pdef[pi1]--;
                             pdef[pi2]--;
@@ -287,16 +287,16 @@ namespace meshit
         std::vector<SurfaceElementIndex> has_one_pi, has_both_pi;
 
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.SurfaceElement(seia[i]);
-            for (size_t j = 0; j < 3; j++) {
-                elements_on_node.Add(el[j], seia[i]);
-            }
+            const Element2d& el = mesh.Element(seia[i]);
+            elements_on_node.Add(el.PointID(0), seia[i]);
+            elements_on_node.Add(el.PointID(1), seia[i]);
+            elements_on_node.Add(el.PointID(2), seia[i]);
         }
 
         std::vector<bool> fixed(np, false);
 
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& sel = mesh.SurfaceElement(seia[i]);
+            const Element2d& sel = mesh.Element(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi1 = sel.PointID((j + 1) % 3);
                 PointIndex pi2 = sel.PointID((j + 2) % 3);
@@ -309,7 +309,7 @@ namespace meshit
 
         for (size_t i = 0; i < seia.size(); i++) {
             SurfaceElementIndex sei = seia[i];
-            Element2d& elem = mesh.SurfaceElement(sei);
+            Element2d& elem = mesh.Element(sei);
             if (elem.IsDeleted()) continue;
 
             for (size_t j = 0; j < 3; j++) {
@@ -338,7 +338,7 @@ namespace meshit
                 std::vector<SurfaceElementIndex> elem_idx_2 = elements_on_node[pi2];
 
                 for (size_t k = 0; k < elem_idx_1.size(); k++) {
-                    const Element2d& el2 = mesh.SurfaceElement(elem_idx_1[k]);
+                    const Element2d& el2 = mesh.Element(elem_idx_1[k]);
 
                     if (el2.IsDeleted()) continue;
 
@@ -357,7 +357,7 @@ namespace meshit
                 }
 
                 for (size_t k = 0; k < elem_idx_2.size(); k++) {
-                    const Element2d& el2 = mesh.SurfaceElement(elem_idx_2[k]);
+                    const Element2d& el2 = mesh.Element(elem_idx_2[k]);
                     if (el2.IsDeleted()) continue;
 
                     if (el2[0] != pi1 && el2[1] != pi1 && el2[2] != pi1) {
@@ -367,26 +367,26 @@ namespace meshit
 
                 double bad1 = 0.0;
                 for (size_t k = 0; k < has_one_pi.size(); k++) {
-                    const Element2d& el = mesh.SurfaceElement(has_one_pi[k]);
+                    const Element2d& el = mesh.Element(has_one_pi[k]);
                     bad1 += CalcTriangleBadness_2(mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv_z);
                 }
 
                 for (size_t k = 0; k < has_both_pi.size(); k++) {
-                    const Element2d& el = mesh.SurfaceElement(has_both_pi[k]);
+                    const Element2d& el = mesh.Element(has_both_pi[k]);
                     bad1 += CalcTriangleBadness_2(mesh.Point(el[0]), mesh.Point(el[1]), mesh.Point(el[2]), nv_z);
                 }
                 bad1 /= (has_one_pi.size() + has_both_pi.size());
 
-                MeshPoint p1_save = mesh[pi1];
-                MeshPoint p2_save = mesh[pi2];
+                MeshPoint p1_save = mesh.Point(pi1);
+                MeshPoint p2_save = mesh.Point(pi2);
 
                 MeshPoint pnew = p1_save;
-                mesh[pi1] = pnew;
-                mesh[pi2] = pnew;
+                mesh.Point(pi1) = pnew;
+                mesh.Point(pi2) = pnew;
 
                 double bad2 = 0;
                 for (size_t k = 0; k < has_one_pi.size(); k++) {
-                    const Element2d& el = mesh.SurfaceElement(has_one_pi[k]);
+                    const Element2d& el = mesh.Element(has_one_pi[k]);
                     const Point3d& p1 = mesh.Point(el[0]);
                     const Point3d& p2 = mesh.Point(el[1]);
                     const Point3d& p3 = mesh.Point(el[2]);
@@ -403,15 +403,15 @@ namespace meshit
                 }
                 bad2 /= has_one_pi.size();
 
-                mesh[pi1] = p1_save;
-                mesh[pi2] = p2_save;
+                mesh.Point(pi1) = p1_save;
+                mesh.Point(pi2) = p2_save;
 
                 bool should = (bad2 < bad1 && bad2 < 1e4);
 
                 if (should) {
-                    mesh[pi1] = pnew;
+                    mesh.Point(pi1) = pnew;
                     for (size_t k = 0; k < elem_idx_2.size(); k++) {
-                        Element2d& el = mesh.SurfaceElement(elem_idx_2[k]);
+                        Element2d& el = mesh.Element(elem_idx_2[k]);
                         if (el.IsDeleted()) continue;
                         elements_on_node.Add(pi1, elem_idx_2[k]);
 
@@ -430,7 +430,7 @@ namespace meshit
                         }
                     }
                     for (size_t k = 0; k < has_both_pi.size(); k++) {
-                        mesh.SurfaceElement(has_both_pi[k]).Delete();
+                        mesh.Element(has_both_pi[k]).Delete();
                     }
                 }
             }

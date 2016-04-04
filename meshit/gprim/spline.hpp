@@ -24,8 +24,7 @@ namespace meshit
      */
 
     /// Geometry point
-    template<int D>
-    class GeomPoint : public Point<D>
+    class GeomPoint : public Point2d
     {
      public:
         /// refinement factor at point
@@ -35,8 +34,8 @@ namespace meshit
 
         GeomPoint() { }
 
-        explicit GeomPoint(const Point<D>& ap, double aref = 1, double ahmax = 1e99)
-            : Point<D>(ap), refatpoint{aref}, hmax{ahmax} { }
+        explicit GeomPoint(const Point2d& ap, double aref = 1, double ahmax = 1e99)
+            : Point2d{ap}, refatpoint{aref}, hmax{ahmax} { }
     };
 
 
@@ -52,25 +51,25 @@ namespace meshit
         virtual double Length() const;
 
         /// returns point at curve, 0 <= t <= 1
-        virtual Point<2> GetPoint(double t) const = 0;
+        virtual Point2d GetPoint(double t) const = 0;
 
         /// returns a (not necessarily unit-length) tangent vector for 0 <= t <= 1
-        virtual void GetDerivatives(const double t, Point<2>& point, Vec<2>& first, Vec<2>& second) const = 0;
+        virtual void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const = 0;
 
         /// returns initial point on curve
-        virtual const GeomPoint<2>& StartPI() const = 0;
+        virtual const GeomPoint& StartPI() const = 0;
         /// returns terminal point on curve
-        virtual const GeomPoint<2>& EndPI() const = 0;
+        virtual const GeomPoint& EndPI() const = 0;
 
-        virtual void GetPoints(size_t n, std::vector<Point<2> >& points) const;
+        virtual void GetPoints(size_t n, std::vector<Point2d>& points) const;
 
         double CalcCurvature(double t) const
         {
-            Point<2> point;
-            Vec<2> first, second;
+            Point2d point;
+            Vec2d first, second;
             GetDerivatives(t, point, first, second);
             double fl = first.Length();
-            return fabs(first[0] * second[1] - first[1] * second[0]) / (fl * fl * fl);
+            return fabs(first.X() * second.Y() - first.Y() * second.X()) / (fl * fl * fl);
         }
 
      public:
@@ -85,30 +84,27 @@ namespace meshit
     class LineSeg : public SplineSeg
     {
      public:
-        LineSeg(const GeomPoint<2>& ap1, const GeomPoint<2>& ap2)
+        LineSeg(const GeomPoint& ap1, const GeomPoint& ap2)
             : p1(ap1), p2(ap2) { }
 
         virtual double Length() const;
 
-        inline virtual Point<2> GetPoint(double t) const;
+        inline virtual Point2d GetPoint(double t) const;
 
-        virtual void GetDerivatives(const double t,
-                                    Point<2>& point,
-                                    Vec<2>& first,
-                                    Vec<2>& second) const;
+        virtual void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const;
 
-        virtual const GeomPoint<2>& StartPI() const
+        virtual const GeomPoint& StartPI() const
         {
             return p1;
         };
 
-        virtual const GeomPoint<2>& EndPI() const
+        virtual const GeomPoint& EndPI() const
         {
             return p2;
         }
 
      protected:
-        GeomPoint<2> p1, p2;
+        GeomPoint p1, p2;
     };
 
     /// curve given by a rational, quadratic spline (including ellipses)
@@ -116,29 +112,26 @@ namespace meshit
     class SplineSeg3 : public SplineSeg
     {
      public:
-        SplineSeg3(const GeomPoint<2>& ap1,
-                   const GeomPoint<2>& ap2,
-                   const GeomPoint<2>& ap3);
+        SplineSeg3(const GeomPoint& ap1,
+                   const GeomPoint& ap2,
+                   const GeomPoint& ap3);
 
-        inline virtual Point<2> GetPoint(double t) const;
+        inline virtual Point2d GetPoint(double t) const;
 
-        virtual void GetDerivatives(const double t,
-                                    Point<2>& point,
-                                    Vec<2>& first,
-                                    Vec<2>& second) const;
+        virtual void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const;
 
-        virtual const GeomPoint<2>& StartPI() const
+        virtual const GeomPoint& StartPI() const
         {
             return p1;
         };
 
-        virtual const GeomPoint<2>& EndPI() const
+        virtual const GeomPoint& EndPI() const
         {
             return p3;
         }
 
      protected:
-        GeomPoint<2> p1, p2, p3;
+        GeomPoint p1, p2, p3;
         double weight;
     };
 

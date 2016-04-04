@@ -23,7 +23,7 @@ namespace meshit
     class SplineGeometry
     {
      protected:
-        std::vector<GeomPoint<2> > geompoints;
+        std::vector<GeomPoint> geompoints;
         std::vector<SplineSeg*> splines;
         std::vector<char*> materials;
         std::vector<double> maxh;
@@ -34,8 +34,8 @@ namespace meshit
 
         ~SplineGeometry();
 
-        void GetBoundingBox(Box<2>& box) const;
-        Box<2> GetBoundingBox() const;
+        void GetBoundingBox(Box2d& box) const;
+        Box2d GetBoundingBox() const;
 
         void Load(const std::string& filename);
         void LoadData(std::istream& infile);

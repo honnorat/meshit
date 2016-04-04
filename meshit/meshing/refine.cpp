@@ -59,7 +59,7 @@ namespace meshit
         size_t oldnf = mesh.GetNSE();
         for (size_t sei = 0; sei < oldnf; sei++) {
             int j, k;
-            const Element2d& el = mesh.SurfaceElement(sei);
+            const Element2d& el = mesh.Element(sei);
 
             PointIndex pnums[6];
 
@@ -104,7 +104,7 @@ namespace meshit
                 nel.SetIndex(ind);
 
                 if (j == 0)
-                    mesh.SurfaceElement(sei) = nel;
+                    mesh.Element(sei) = nel;
                 else
                     mesh.AddSurfaceElement(nel);
             }

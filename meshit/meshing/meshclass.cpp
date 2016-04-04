@@ -31,7 +31,7 @@ namespace meshit
     {
         points = mesh2.points;
         segments = mesh2.segments;
-        surf_elements = mesh2.surf_elements;
+        elements = mesh2.elements;
         facedecoding = mesh2.facedecoding;
 
         return *this;
@@ -53,13 +53,13 @@ namespace meshit
         geometry.SetGrading(grading);
 
         double h = mp.maxh;
-        Box<2> bbox = geometry.GetBoundingBox();
+        Box2d bbox = geometry.GetBoundingBox();
         if (bbox.Diam() < h) {
             h = bbox.Diam();
             mp.maxh = h;
         }
-        Point3d pmin(bbox.PMin()[0], bbox.PMin()[1], -bbox.Diam());
-        Point3d pmax(bbox.PMax()[0], bbox.PMax()[1], bbox.Diam());
+        Point3d pmin(bbox.PMin().X(), bbox.PMin().Y(), -bbox.Diam());
+        Point3d pmax(bbox.PMax().X(), bbox.PMax().Y(), +bbox.Diam());
 
         SetLocalH(pmin, pmax, grading);
         hmin_ = mp.minh;
@@ -90,7 +90,7 @@ namespace meshit
 
             size_t oldnf = GetNSE();
 
-            Meshing2 meshing(Box<3>(pmin, pmax));
+            Meshing2 meshing(Box3d(pmin, pmax));
 
             std::vector<int> compress(bnp, -1);
             int cnt = 0;
@@ -110,11 +110,10 @@ namespace meshit
                 }
             }
 
-            mp.check_overlap = 0;
             meshing.GenerateMesh(*this, mp, h, domnr);
 
             for (size_t sei = oldnf; sei < GetNSE(); sei++) {
-                surf_elements[sei].SetIndex(domnr);
+                elements[sei].SetIndex(domnr);
             }
 
             // astrid
@@ -159,14 +158,14 @@ namespace meshit
 
     void Mesh::AddSurfaceElement(const Element2d& el)
     {
-        size_t si = surf_elements.size();
-        surf_elements.push_back(el);
+        size_t si = elements.size();
+        elements.push_back(el);
 
         if (el.index > facedecoding.size()) {
             MESHIT_LOG_ERROR("has no facedecoding: fd.size = " << facedecoding.size() << ", ind = " << el.index);
         }
 
-        Element2d& bref = surf_elements.back();
+        Element2d& bref = elements.back();
         bref.next = facedecoding[bref.index - 1].firstelement;
         facedecoding[bref.index - 1].firstelement = si;
 
@@ -214,14 +213,14 @@ namespace meshit
         outfile << "surface_elements" << std::endl << GetNSE() << std::endl;
 
         for (size_t sei = 0; sei < GetNSE(); sei++) {
-            if (surf_elements[sei].GetIndex()) {
-                outfile << std::setw(8) << GetFaceDescriptor(surf_elements[sei].GetIndex()).SurfNr() + 1;
-                outfile << std::setw(8) << GetFaceDescriptor(surf_elements[sei].GetIndex()).BCProperty();
+            if (elements[sei].GetIndex()) {
+                outfile << std::setw(8) << GetFaceDescriptor(elements[sei].GetIndex()).SurfNr() + 1;
+                outfile << std::setw(8) << GetFaceDescriptor(elements[sei].GetIndex()).BCProperty();
             } else {
                 outfile << "       0       0";
             }
 
-            const Element2d& sel = surf_elements[sei];
+            const Element2d& sel = elements[sei];
             outfile << std::setw(8) << 3;
             outfile << std::setw(8) << sel[0];
             outfile << std::setw(8) << sel[1];
@@ -388,7 +387,7 @@ namespace meshit
         segment_ht.reserve(3 * GetNSeg());
 
         for (size_t sei = 0; sei < GetNSE(); sei++) {
-            const Element2d& sel = surf_elements[sei];
+            const Element2d& sel = elements[sei];
             if (sel.IsDeleted()) continue;
 
             int si = sel.GetIndex();
@@ -485,7 +484,7 @@ namespace meshit
         double hsum = 0;
         size_t n = 0;
         for (size_t i = 0; i < GetNSE(); i++) {
-            const Element2d& el = SurfaceElement(i);
+            const Element2d& el = Element(i);
             if (surfnr == 0 || el.GetIndex() == surfnr) {
                 for (size_t j = 0; j < 3; j++) {
                     double hi = Dist(points[el.PointID(j)], points[el.PointID((j + 1) % 3)]);
@@ -509,7 +508,7 @@ namespace meshit
                          << GetNSE() << " surface elements.");
 
         for (size_t i = 0; i < GetNSE(); i++) {
-            const Element2d& el = surf_elements[i];
+            const Element2d& el = elements[i];
             double hel = -1;
             for (size_t j = 0; j < 3; j++) {
                 const Point3d& p1 = points[el.PointID(j)];
@@ -538,7 +537,7 @@ namespace meshit
         switch (rht) {
             case RESTRICTH_FACE: {
                 for (size_t i = 0; i < GetNSE(); i++) {
-                    const Element2d& sel = SurfaceElement(i);
+                    const Element2d& sel = Element(i);
                     if (sel.GetIndex() == nr)
                         RestrictLocalH(RESTRICTH_SURFACEELEMENT, i + 1, loc_h);
                 }
@@ -558,7 +557,7 @@ namespace meshit
             }
 
             case RESTRICTH_SURFACEELEMENT: {
-                const Element2d& sel = SurfaceElement(nr - 1);
+                const Element2d& sel = Element(nr - 1);
                 Point3d p = Center(points[sel.PointID(0)],
                                    points[sel.PointID(1)],
                                    points[sel.PointID(2)]);
@@ -597,9 +596,9 @@ namespace meshit
         std::vector<MeshPoint> hpoints;
         BitArrayChar pused(GetNP());
 
-        for (size_t i = 0; i < surf_elements.size(); i++) {
-            if (surf_elements[i].IsDeleted()) {
-                surf_elements.erase(surf_elements.begin() + i);
+        for (size_t i = 0; i < elements.size(); i++) {
+            if (elements[i].IsDeleted()) {
+                elements.erase(elements.begin() + i);
                 i--;
             }
         }
@@ -611,8 +610,8 @@ namespace meshit
         }
         pused.Clear();
 
-        for (size_t i = 0; i < surf_elements.size(); i++) {
-            const Element2d& el = surf_elements[i];
+        for (size_t i = 0; i < elements.size(); i++) {
+            const Element2d& el = elements[i];
             for (size_t j = 0; j < 3; j++) {
                 pused.Set(el[j]);
             }
@@ -640,8 +639,8 @@ namespace meshit
             points.push_back(hpoints[i]);
         }
 
-        for (size_t i = 0; i < surf_elements.size(); i++) {
-            Element2d& el = SurfaceElement(i);
+        for (size_t i = 0; i < elements.size(); i++) {
+            Element2d& el = Element(i);
             for (size_t j = 0; j < 3; j++) {
                 el[j] = op2np[el[j]];
             }
@@ -657,9 +656,9 @@ namespace meshit
             facedecoding[i].firstelement = -1;
         }
 
-        for (int i = surf_elements.size() - 1; i >= 0; i--) {
-            int ind = surf_elements[i].GetIndex();
-            surf_elements[i].next = facedecoding[ind - 1].firstelement;
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            int ind = elements[i].GetIndex();
+            elements[i].next = facedecoding[ind - 1].firstelement;
             facedecoding[ind - 1].firstelement = i;
         }
 
@@ -676,7 +675,7 @@ namespace meshit
         bool overlap = false;
 
         for (size_t i = 0; i < GetNSE(); i++) {
-            const Element2d& tri = SurfaceElement(i);
+            const Element2d& tri = Element(i);
 
             Point3d tpmin(points[tri[0]]);
             Point3d tpmax(tpmin);
@@ -694,7 +693,7 @@ namespace meshit
         }
 
         for (size_t i = 0; i < GetNSE(); i++) {
-            const Element2d& tri1 = SurfaceElement(i);
+            const Element2d& tri1 = Element(i);
 
             Point3d tpmin(Point(tri1[0]));
             Point3d tpmax(tpmin);
@@ -707,7 +706,7 @@ namespace meshit
             setree.GetIntersecting(tpmin, tpmax, inters);
 
             for (size_t j = 0; j < inters.size(); j++) {
-                const Element2d& tri2 = SurfaceElement(inters[j] - 1);
+                const Element2d& tri2 = Element(inters[j] - 1);
 
                 const meshit::Point3d* trip1[3], * trip2[3];
                 for (size_t k = 0; k < 3; k++) {
@@ -749,7 +748,7 @@ namespace meshit
     {
         const double eps = 1e-6;
 
-        const Element2d& el = SurfaceElement(element);
+        const Element2d& el = Element(element);
         const Point3d& p1 = points[el.PointID(0)];
         const Point3d& p2 = points[el.PointID(1)];
         const Point3d& p3 = points[el.PointID(2)];
@@ -776,9 +775,9 @@ namespace meshit
         for (size_t i = 0; i < facedecoding.size(); i++) {
             facedecoding[i].firstelement = -1;
         }
-        for (int i = surf_elements.size() - 1; i >= 0; i--) {
-            int ind = surf_elements[i].GetIndex();
-            surf_elements[i].next = facedecoding[ind - 1].firstelement;
+        for (int i = elements.size() - 1; i >= 0; i--) {
+            int ind = elements[i].GetIndex();
+            elements[i].next = facedecoding[ind - 1].firstelement;
             facedecoding[ind - 1].firstelement = i;
         }
     }
@@ -789,7 +788,7 @@ namespace meshit
 
         SurfaceElementIndex si = facedecoding[facenr - 1].firstelement;
         while (si != -1) {
-            const Element2d& se = SurfaceElement(si);
+            const Element2d& se = Element(si);
             if (se.GetIndex() == facenr && se.PointID(0) >= 0 && !se.IsDeleted()) {
                 sei.push_back(si);
             }
@@ -800,8 +799,8 @@ namespace meshit
     void Mesh::ComputeNVertices()
     {
         numvertices = 0;
-        for (size_t i = 0; i < surf_elements.size(); i++) {
-            const Element2d& el = SurfaceElement(i);
+        for (size_t i = 0; i < elements.size(); i++) {
+            const Element2d& el = Element(i);
             for (size_t j = 0; j < 3; j++) {
                 if (el.PointID(j) > static_cast<PointIndex>(numvertices)) {
                     numvertices = static_cast<size_t>(el.PointID(j));

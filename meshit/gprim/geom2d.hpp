@@ -41,6 +41,8 @@ namespace meshit
     {
         friend class Vec2d;
 
+        friend class Vec3d;
+
      protected:
         double px, py;
 
@@ -52,9 +54,6 @@ namespace meshit
 
         Point2d(const Point2d& p2)
             : px(p2.px), py(p2.py) { }
-
-        explicit Point2d(const Point<2>& p2)
-            : px(p2[0]), py(p2[1]) { }
 
         Point2d& operator=(const Point2d& p2)
         {
@@ -88,15 +87,11 @@ namespace meshit
             return py;
         }
 
-        operator Point<2>() const
-        {
-            return Point<2>(px, py);
-        }
-
         friend Vec2d operator-(const Point2d& p1, const Point2d& p2);
         friend Point2d operator-(const Point2d& p1, const Vec2d& v);
         friend Point2d operator+(const Point2d& p1, const Vec2d& v);
 
+        friend double Dist(const Point2d& p1, const Point2d& p2);
         friend double Dist2(const Point2d& p1, const Point2d& p2);
 
         friend bool CW(const Point2d& p1, const Point2d& p2, const Point2d& p3);
@@ -105,6 +100,11 @@ namespace meshit
         friend std::ostream& operator<<(std::ostream& s, const Point2d& p);
     };
 
+
+    inline double Dist(const Point2d& p1, const Point2d& p2)
+    {
+        return sqrt(Dist2(p1, p2));
+    }
 
     inline double Dist2(const Point2d& p1, const Point2d& p2)
     {
@@ -142,14 +142,17 @@ namespace meshit
      public:
         Vec2d() { /* vx = vy = 0; */ }
 
-        Vec2d(double ax, double ay)
-            : vx{ax}, vy{ay} { }
-
         Vec2d(const Vec2d& v2)
             : vx{v2.vx}, vy{v2.vy} { }
 
-        explicit Vec2d(const Vec<2>& v2)
-            : vx{v2[0]}, vy{v2[1]} { }
+        Vec2d(double ax, double ay)
+            : vx{ax}, vy{ay} { }
+
+        explicit Vec2d(double d)
+            : vx{d}, vy{d} { }
+
+        explicit Vec2d(const Point2d& p2)
+            : vx{p2.X()}, vy{p2.Y()} { }
 
         Vec2d(const Point2d& p1, const Point2d& p2)
         {
@@ -207,6 +210,7 @@ namespace meshit
         friend Vec2d operator*(double scal, const Vec2d& v);
         friend double operator*(const Vec2d& v1, const Vec2d& v2);
 
+        friend double Angle(const Vec2d& v1, const Vec2d& v2);
         friend double Cross(const Vec2d& v1, const Vec2d& v2);
 
         friend std::ostream& operator<<(std::ostream& s, const Vec2d& v);
@@ -283,6 +287,108 @@ namespace meshit
     {
         return v1.X() * v2.Y() - v1.Y() * v2.X();
     }
+
+    inline double Angle(const Vec2d& v1, const Vec2d& v2)
+    {
+        double ps = v1.vx * v2.vx + v1.vy * v2.vy;
+        double n1 = v1.vx * v1.vx + v1.vy * v1.vy;
+        double n2 = v2.vx * v2.vx + v2.vy * v2.vy;
+        double norm = sqrt(n1 * n2);
+        return acos(std::max(-1.0, std::min(1.0, ps / norm)));
+    }
+
+    class Box2d
+    {
+     protected:
+        Point2d pmin, pmax;
+
+     public:
+        Box2d() { }
+
+        Box2d(const Point2d& p1, const Point2d& p2)
+        {
+            pmin.X() = std::min(p1.X(), p2.X());
+            pmax.X() = std::max(p1.X(), p2.X());
+            pmin.Y() = std::min(p1.Y(), p2.Y());
+            pmax.Y() = std::max(p1.Y(), p2.Y());
+        }
+
+        const Point2d& PMin() const
+        {
+            return pmin;
+        }
+
+        const Point2d& PMax() const
+        {
+            return pmax;
+        }
+
+        void Set(const Point2d& p)
+        {
+            pmin = pmax = p;
+        }
+
+        void Add(const Point2d& p)
+        {
+            if (p.X() < pmin.X()) pmin.X() = p.X();
+            else if (p.X() > pmax.X()) pmax.X() = p.X();
+            if (p.Y() < pmin.Y()) pmin.Y() = p.Y();
+            else if (p.Y() > pmax.Y()) pmax.Y() = p.Y();
+
+        }
+
+        inline Point2d Center() const
+        {
+            return Point2d(0.5 * (pmin.X() + pmax.X()),
+                           0.5 * (pmin.Y() + pmax.Y()));
+        }
+
+        double Diam() const
+        {
+            double dx = pmax.X() - pmin.X();
+            double dy = pmax.Y() - pmin.Y();
+            return sqrt(dx * dx + dy * dy);
+        }
+
+        Point2d GetPointNr(int nr) const
+        {
+            Point2d p;
+            p.X() = (nr & 1) ? pmax.X() : pmin.X();
+            nr >>= 1;
+            p.Y() = (nr & 1) ? pmax.Y() : pmin.Y();
+            return p;
+        }
+
+        bool Intersect(const Box2d& box2) const
+        {
+            if (pmin.X() > box2.pmax.X() || pmax.X() < box2.pmin.X()) return false;
+            if (pmin.Y() > box2.pmax.Y() || pmax.Y() < box2.pmin.Y()) return false;
+            return true;
+        }
+
+        bool IsIn(const Point2d& p) const
+        {
+            if (p.X() < pmin.X() || p.X() > pmax.X()) return false;
+            if (p.Y() < pmin.Y() || p.Y() > pmax.Y()) return false;
+            return true;
+        }
+
+        void Increase(double dist)
+        {
+            pmin.X() -= dist;
+            pmax.X() += dist;
+            pmin.Y() -= dist;
+            pmax.Y() += dist;
+
+        }
+    };
+
+    inline std::ostream& operator<<(std::ostream& ost, const Box2d& b)
+    {
+        ost << b.PMin() << " - " << b.PMax();
+        return ost;
+    }
+
 
 }  // namespace meshit
 
