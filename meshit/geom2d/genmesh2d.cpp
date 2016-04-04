@@ -58,7 +58,7 @@ namespace meshit
         }
     }
 
-    void CalcPartition(const SplineSegExt& spline,
+    void CalcPartition(const SplineSeg& spline,
                        MeshingParameters& mp,
                        Mesh& mesh,
                        double elto0,
@@ -121,7 +121,7 @@ namespace meshit
 
     // partitionizes spline curve
 
-    void Partition(const SplineSegExt& spline,
+    void Partition(const SplineSeg& spline,
                    MeshingParameters& mp,
                    double elto0,
                    Mesh& mesh,
@@ -217,7 +217,7 @@ namespace meshit
         // mesh size restrictions ...
 
         for (size_t i = 0; i < splines.size(); i++) {
-            const SplineSegExt& spline = GetSpline(i);
+            const SplineSeg& spline = *splines[i];
             const GeomPoint<2>& p1 = spline.StartPI();
             const GeomPoint<2>& p2 = spline.EndPI();
 
@@ -246,7 +246,7 @@ namespace meshit
 
         Point3dTree searchtree(pmin, pmax);
         for (size_t i = 0; i < splines.size(); i++) {
-            Partition(GetSpline(i), mp, elto0, mesh2d, searchtree, i + 1);
+            Partition(*splines[i], mp, elto0, mesh2d, searchtree, i + 1);
         }
     }
 

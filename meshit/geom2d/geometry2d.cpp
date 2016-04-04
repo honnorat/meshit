@@ -175,11 +175,9 @@ namespace meshit
                         throw std::runtime_error("SplineGeometry::LoadData : unknown segment type");
                     }
 
-                    SplineSegExt* spex = new SplineSegExt(*spline);
-
-                    spex->leftdom = leftdom;
-                    spex->rightdom = rightdom;
-                    splines.push_back(spex);
+                    spline->leftdom = leftdom;
+                    spline->rightdom = rightdom;
+                    splines.push_back(spline);
 
                     Flags flags;
 
@@ -191,9 +189,9 @@ namespace meshit
                     }
                     infile.unget();
 
-                    spex->bc = static_cast<int>(flags.GetNumFlag("bc", ++i));
-                    spex->reffak = flags.GetNumFlag("ref", 1);
-                    spex->hmax = flags.GetNumFlag("maxh", 1e99);
+                    spline->bc = static_cast<int>(flags.GetNumFlag("bc", ++i));
+                    spline->reffak = flags.GetNumFlag("ref", 1);
+                    spline->hmax = flags.GetNumFlag("maxh", 1e99);
                     ch = TestComment(infile);
                 }
             }
@@ -249,13 +247,12 @@ namespace meshit
         for (size_t i0 = 0; i0 < nnew_points; i0++) {
             size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
             SplineSeg* spline = new LineSeg(gpts[i0], gpts[i1]);
-            SplineSegExt* seg = new SplineSegExt(*spline);
-            seg->leftdom = face_left;
-            seg->rightdom = face_right;
-            seg->bc = bc;
-            seg->reffak = 1;  // Refinement factor
-            seg->hmax = hmax;
-            splines.push_back(seg);
+            spline->leftdom = face_left;
+            spline->rightdom = face_right;
+            spline->bc = bc;
+            spline->reffak = 1;  // Refinement factor
+            spline->hmax = hmax;
+            splines.push_back(spline);
         }
     }
 
@@ -293,13 +290,12 @@ namespace meshit
             size_t id2 = ip + 2;
             if (i == nb_splines - 1) id2 = ip_0;
             SplineSeg* spline = new SplineSeg3(geompoints[id0], geompoints[id1], geompoints[id2]);
-            SplineSegExt* spex = new SplineSegExt(*spline);
-            spex->leftdom = face_left;
-            spex->rightdom = face_right;
-            spex->bc = bc;
-            spex->reffak = 1;
-            spex->hmax = hmax;
-            splines.push_back(spex);
+            spline->leftdom = face_left;
+            spline->rightdom = face_right;
+            spline->bc = bc;
+            spline->reffak = 1;
+            spline->hmax = hmax;
+            splines.push_back(spline);
             ip += 2;
         }
     }
@@ -361,12 +357,6 @@ namespace meshit
         } else {
             return -1.0;
         }
-    }
-
-    int SplineGeometry::GenerateMesh(Mesh*& mesh, MeshingParameters& mp)
-    {
-        mesh->BuildFromSplineGeometry(*this, mp);
-        return 0;
     }
 
 }  // namespace meshit

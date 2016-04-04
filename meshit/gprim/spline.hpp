@@ -55,19 +55,7 @@ namespace meshit
         virtual Point<2> GetPoint(double t) const = 0;
 
         /// returns a (not necessarily unit-length) tangent vector for 0 <= t <= 1
-
-        virtual void GetDerivatives(const double t,
-                                    Point<2>& point,
-                                    Vec<2>& first,
-                                    Vec<2>& second) const
-        {
-            double eps = 1e-6;
-            point = GetPoint(t);
-            Point<2> pl = GetPoint(t - eps);
-            Point<2> pr = GetPoint(t + eps);
-            first = 1.0 / (2 * eps) * (pr - pl);
-            second = 1.0 / (eps * eps) * ((pr - point) + (pl - point));
-        }
+        virtual void GetDerivatives(const double t, Point<2>& point, Vec<2>& first, Vec<2>& second) const = 0;
 
         /// returns initial point on curve
         virtual const GeomPoint<2>& StartPI() const = 0;
@@ -75,6 +63,22 @@ namespace meshit
         virtual const GeomPoint<2>& EndPI() const = 0;
 
         virtual void GetPoints(size_t n, std::vector<Point<2> >& points) const;
+
+        double CalcCurvature(double t) const
+        {
+            Point<2> point;
+            Vec<2> first, second;
+            GetDerivatives(t, point, first, second);
+            double fl = first.Length();
+            return fabs(first[0] * second[1] - first[1] * second[0]) / (fl * fl * fl);
+        }
+
+     public:
+        size_t leftdom;     // left domain
+        size_t rightdom;    // right domain
+        double reffak;      // refinement at line
+        double hmax;        // maximal h
+        int bc;             // boundary condition number
     };
 
     /// Straight line form p1 to p2
