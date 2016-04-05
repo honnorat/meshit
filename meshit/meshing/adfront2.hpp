@@ -23,7 +23,7 @@ namespace meshit
     class FrontPoint2
     {
         /// coordinates
-        Point3d p;
+        Point2d p;
         /// global node index
         PointIndex globalindex;
         /// number of front lines connected to point
@@ -32,22 +32,16 @@ namespace meshit
         int frontnr;
 
      public:
-        FrontPoint2()
-        {
-            nlinetopoint = 0;
-            frontnr = INT_MAX - 10;  // attention: overflow on calculating  INT_MAX + 1
-        }
-
-        FrontPoint2(const Point3d& ap, PointIndex agi);
+        FrontPoint2(const Point2d& ap, PointIndex agi);
 
         ~FrontPoint2() { }
 
-        const Point3d& P() const
+        const Point2d& P() const
         {
             return p;
         }
 
-        operator const Point3d&() const
+        operator const Point2d&() const
         {
             return p;
         }
@@ -140,7 +134,7 @@ namespace meshit
         std::vector<FrontPoint2> points;  // front points
         std::vector<FrontLine> lines;     // front lines
 
-        Box3d boundingbox;
+        Box2d boundingbox;
         Box3dTree linesearchtree;      // search tree for lines
         Point3dTree pointsearchtree;   // search tree for points
         Point3dTree cpointsearchtree;  // search tree for cone points (not used ???)
@@ -161,7 +155,7 @@ namespace meshit
         size_t starti;
 
      public:
-        explicit AdFront2(const Box3d& aboundingbox);
+        explicit AdFront2(const Box2d& aboundingbox);
 
         ~AdFront2() { }
 
@@ -175,10 +169,10 @@ namespace meshit
             return nfl;
         }
 
-        int SelectBaseLine(Point3d& p1, Point3d& p2, int& qualclass);
+        int SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass);
 
         int GetLocals(int baseline,
-                      std::vector<Point3d>& locpoints,
+                      std::vector<Point2d>& locpoints,
                       std::vector<INDEX_2>& loclines,  // local index
                       std::vector<int>& pindex,
                       std::vector<int>& lindex,
@@ -186,7 +180,7 @@ namespace meshit
 
         void DeleteLine(int li);
 
-        int AddPoint(const Point3d& p, PointIndex globind);
+        int AddPoint(const Point2d& p, PointIndex globind);
 
         int AddLine(int pi1, int pi2);
 

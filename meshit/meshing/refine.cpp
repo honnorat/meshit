@@ -2,11 +2,11 @@
 
 namespace meshit
 {
-    void Refinement::PointBetween(const Point3d& p1, const Point3d& p2, double secpoint, Point3d& newp) const
+    void Refinement::PointBetween(const MeshPoint& p1, const MeshPoint& p2, double secpoint, Point2d& newp) const
     {
-        newp[0] = p1[0] + secpoint * (p2[0] - p1[0]);
-        newp[1] = p1[1] + secpoint * (p2[1] - p1[1]);
-        newp[2] = p1[2] + secpoint * (p2[2] - p1[2]);
+        newp.X() = p1.X() + secpoint * (p2.X() - p1.X());
+        newp.Y() = p1.Y() + secpoint * (p2.Y() - p1.Y());
+//        newp[2] = p1[2] + secpoint * (p2[2] - p1[2]);
     }
 
     void Refinement::Refine(Mesh& mesh)
@@ -32,9 +32,8 @@ namespace meshit
                 pinew = between[i2];
                 ngi = epgi[pinew];
             } else {
-                Point3d pnew;
-                PointBetween(mesh.Point(el[0]),
-                             mesh.Point(el[1]), 0.5, pnew);
+                Point2d pnew;
+                PointBetween(mesh.Point(el[0]), mesh.Point(el[1]), 0.5, pnew);
                 pinew = mesh.AddPoint(pnew);
                 between[i2] = pinew;
 
@@ -81,7 +80,7 @@ namespace meshit
                 i2.Sort();
 
                 if (between.count(i2) == 0) {
-                    Point3d pb;
+                    Point2d pb;
                     PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
                     between[i2] = mesh.AddPoint(pb);
                 }

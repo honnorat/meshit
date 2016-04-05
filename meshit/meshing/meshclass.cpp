@@ -58,8 +58,8 @@ namespace meshit
             h = bbox.Diam();
             mp.maxh = h;
         }
-        Point3d pmin(bbox.PMin().X(), bbox.PMin().Y(), 0.0);
-        Point3d pmax(bbox.PMax().X(), bbox.PMax().Y(), 0.0);
+        Point2d pmin = {bbox.PMin().X(), bbox.PMin().Y()};
+        Point2d pmax = {bbox.PMax().X(), bbox.PMax().Y()};
 
         SetLocalH(pmin, pmax, grading);
         hmin_ = mp.minh;
@@ -90,12 +90,12 @@ namespace meshit
 
             size_t oldnf = GetNSE();
 
-            Meshing2 meshing(Box3d(pmin, pmax));
+            Meshing2 meshing(Box2d(pmin, pmax));
 
             std::vector<int> compress(bnp, -1);
             int cnt = 0;
             for (size_t pi = 0; pi < bnp; pi++) {
-                meshing.AddPoint(points[pi], pi);
+                meshing.AddPoint(Point2d(points[pi]), pi);
                 cnt++;
                 compress[pi] = cnt;
             }
@@ -139,7 +139,7 @@ namespace meshit
         Compress();
     }
 
-    size_t Mesh::AddPoint(const Point3d& p, PointType type)
+    size_t Mesh::AddPoint(const Point2d& p, PointType type)
     {
         points.push_back(MeshPoint(p, type));
         return points.size() - 1;
@@ -202,8 +202,6 @@ namespace meshit
 
     void Mesh::Save(std::ostream& outfile) const
     {
-        double scale = 1;    // globflags.GetNumFlag ("scale", 1);
-
         outfile.setf(std::ios::fixed, std::ios::floatfield);
         outfile.setf(std::ios::showpoint);
         outfile.precision(15);
@@ -250,9 +248,9 @@ namespace meshit
         outfile << "#                    X                     Y                     Z\n";
         outfile << "points" << std::endl << GetNP() << std::endl;
         for (size_t pi = 0; pi < GetNP(); pi++) {
-            outfile << std::setw(22) << points[pi].X() / scale;
-            outfile << std::setw(22) << points[pi].Y() / scale;
-            outfile << std::setw(22) << points[pi].Z() / scale << std::endl;
+            outfile << std::setw(22) << points[pi].X();
+            outfile << std::setw(22) << points[pi].Y();
+            outfile << std::setw(22) << 0.0 << std::endl;
         }
 
         int cntmat = 0;
@@ -283,8 +281,6 @@ namespace meshit
     {
         char str[100];
         int n;
-
-        double scale = 1;    // globflags.GetNumFlag ("scale", 1);
 
         facedecoding.resize(0);
 
@@ -354,11 +350,9 @@ namespace meshit
                 infile >> n;
                 MESHIT_LOG_DEBUG(n << " points");
                 for (int i = 1; i <= n; i++) {
-                    Point3d p;
-                    infile >> p.X() >> p.Y() >> p.Z();
-                    p.X() *= scale;
-                    p.Y() *= scale;
-                    p.Z() *= scale;
+                    Point2d p;
+                    double dummy;
+                    infile >> p.X() >> p.Y() >> dummy;
                     AddPoint(p);
                 }
             }
@@ -423,63 +417,50 @@ namespace meshit
         }
     }
 
-    void Mesh::SetLocalH(const Point3d& pmin, const Point3d& pmax, double grading)
+    void Mesh::SetLocalH(const Point2d& pmin, const Point2d& pmax, double grading)
     {
         double d = 0.5 * std::max(pmax.X() - pmin.X(),
                                   pmax.Y() - pmin.Y());
 
-        Point3d c = Center(pmin, pmax);
-        Point3d pmin2 = {c.X() - d, c.Y() - d, 0.0};
-        Point3d pmax2 = {c.X() + d, c.Y() + d, 0.0};
+        Point2d c = Center(pmin, pmax);
+        Point2d pmin2 = {c.X() - d, c.Y() - d};
+        Point2d pmax2 = {c.X() + d, c.Y() + d};
 
         delete loc_h_func;
         loc_h_func = new LocalH();
         loc_h_func->Init(pmin2, pmax2, grading);
     }
 
-    void Mesh::RestrictLocalH(const Point3d& p, double hloc)
+    void Mesh::RestrictLocalH(const Point2d& p, double hloc)
     {
-        if (hloc < hmin_)
-            hloc = hmin_;
-
         assert(loc_h_func);
-        loc_h_func->SetH(p, hloc);
+        loc_h_func->SetH(p, std::max(hloc, hmin_));
     }
 
-    void Mesh::RestrictLocalHLine(const Point3d& p1, const Point3d& p2, double hloc)
+    void Mesh::RestrictLocalHLine(const Point2d& p1, const Point2d& p2, double hloc)
     {
         if (hloc < hmin_) {
             hloc = hmin_;
         }
-        int steps = static_cast<int>(Dist(p1, p2) / hloc) + 2;
-        Vec3d v(p1, p2);
+        Vec2d v(p1, p2);
+        int steps = static_cast<int>(v.Length() / hloc) + 1;
+        v /= static_cast<double>(steps);
 
         for (int i = 0; i <= steps; i++) {
-            Point3d p = p1 + (static_cast<double>(i) / static_cast<double>(steps) * v);
-            RestrictLocalH(p, hloc);
+            RestrictLocalH(p1 + static_cast<double>(i) * v, hloc);
         }
     }
 
-    double Mesh::GetH(const Point3d& p) const
+    double Mesh::GetH(const Point2d& p) const
     {
-        double hmin = hglob_;
-        if (loc_h_func) {
-            double hl = loc_h_func->GetH(p);
-            if (hl < hglob_)
-                hmin = hl;
-        }
-        return hmin;
+        assert(loc_h_func);
+        return std::min(hglob_, loc_h_func->GetH(p));
     }
 
-    double Mesh::GetMinH(const Point3d& pmin, const Point3d& pmax)
+    double Mesh::GetMinH(const Point2d& pmin, const Point2d& pmax)
     {
-        double hmin = hglob_;
-        if (loc_h_func) {
-            double hl = loc_h_func->GetMinH(pmin, pmax);
-            if (hl < hmin)
-                hmin = hl;
-        }
-        return hmin;
+        assert(loc_h_func);
+        return std::min(hglob_, loc_h_func->GetMinH(pmin, pmax));
     }
 
     double Mesh::AverageH(size_t surfnr) const
@@ -515,82 +496,42 @@ namespace meshit
             const Element2d& el = elements[i];
             double hel = -1;
             for (size_t j = 0; j < 3; j++) {
-                const Point3d& p1 = points[el.PointID(j)];
-                const Point3d& p2 = points[el.PointID((j + 1) % 3)];
+                const MeshPoint& p1 = points[el.PointID(j)];
+                const MeshPoint& p2 = points[el.PointID((j + 1) % 3)];
                 double hedge = Dist(p1, p2);
                 if (hedge > hel) hel = hedge;
             }
             if (hel > 0) {
-                const Point3d& p1 = points[el.PointID(0)];
-                const Point3d& p2 = points[el.PointID(1)];
-                const Point3d& p3 = points[el.PointID(2)];
+                const MeshPoint& p1 = points[el.PointID(0)];
+                const MeshPoint& p2 = points[el.PointID(1)];
+                const MeshPoint& p3 = points[el.PointID(2)];
                 loc_h_func->SetH(Center(p1, p2, p3), hel);
             }
         }
 
         for (size_t i = 0; i < GetNSeg(); i++) {
             const Segment& seg = segments[i];
-            const Point3d& p1 = points[seg[0]];
-            const Point3d& p2 = points[seg[1]];
+            const MeshPoint& p1 = points[seg[0]];
+            const MeshPoint& p2 = points[seg[1]];
             loc_h_func->SetH(Center(p1, p2), Dist(p1, p2));
         }
     }
 
-    void Mesh::RestrictLocalH(resthtype rht, size_t nr, double loc_h)
-    {
-        switch (rht) {
-            case RESTRICTH_FACE: {
-                for (size_t i = 0; i < GetNSE(); i++) {
-                    const Element2d& sel = Element(i);
-                    if (sel.GetIndex() == nr)
-                        RestrictLocalH(RESTRICTH_SURFACEELEMENT, i + 1, loc_h);
-                }
-                break;
-            }
-            case RESTRICTH_EDGE: {
-                for (size_t i = 0; i < GetNSeg(); i++) {
-                    const Segment& seg = LineSegment(i);
-                    if (seg.edgenr == static_cast<int>(nr))
-                        RestrictLocalH(RESTRICTH_SEGMENT, i + 1, loc_h);
-                }
-                break;
-            }
-            case RESTRICTH_POINT: {
-                RestrictLocalH(points[nr - 1], loc_h);
-                break;
-            }
-
-            case RESTRICTH_SURFACEELEMENT: {
-                const Element2d& sel = Element(nr - 1);
-                Point3d p = Center(points[sel.PointID(0)],
-                                   points[sel.PointID(1)],
-                                   points[sel.PointID(2)]);
-                RestrictLocalH(p, loc_h);
-                break;
-            }
-            case RESTRICTH_SEGMENT: {
-                const Segment& seg = LineSegment(nr + 1);
-                RestrictLocalHLine(Point(seg[0]), Point(seg[1]), loc_h);
-                break;
-            }
-        }
-    }
-
-    void Mesh::GetBox(Point3d& pmin, Point3d& pmax) const
+    void Mesh::GetBox(Point2d& pmin, Point2d& pmax) const
     {
         if (points.size() == 0) {
-            pmin = pmax = Point3d(0, 0, 0);
+            pmin = pmax = Point2d(0, 0);
             return;
         }
 
-        pmin = Point3d(1e10, 1e10, 1e10);
-        pmax = Point3d(-1e10, -1e10, -1e10);
+        pmin = Point2d(1e10, 1e10);
+        pmax = Point2d(-1e10, -1e10);
         for (size_t pi = 0; pi < points.size(); pi++) {
-            pmin.SetToMin(points[pi]);
-            pmax.SetToMax(points[pi]);
+            pmin.SetToMin(Point2d(points[pi]));
+            pmax.SetToMax(Point2d(points[pi]));
         }
         if (pmin.X() > 0.5e10) {
-            pmin = pmax = Point3d(0, 0, 0);
+            pmin = pmax = Point2d(0, 0);
         }
     }
 
@@ -671,7 +612,7 @@ namespace meshit
 
     int Mesh::CheckOverlappingBoundary()
     {
-        Point3d pmin, pmax;
+        Point2d pmin, pmax;
         GetBox(pmin, pmax);
         Box3dTree setree(pmin, pmax);
         std::vector<size_t> inters;
@@ -681,14 +622,14 @@ namespace meshit
         for (size_t i = 0; i < GetNSE(); i++) {
             const Element2d& tri = Element(i);
 
-            Point3d tpmin(points[tri[0]]);
-            Point3d tpmax(tpmin);
+            Point2d tpmin{points[tri[0]]};
+            Point2d tpmax = tpmin;
 
             for (size_t k = 1; k < 3; k++) {
-                tpmin.SetToMin(points[tri[k]]);
-                tpmax.SetToMax(points[tri[k]]);
+                tpmin.SetToMin(Point2d(points[tri[k]]));
+                tpmax.SetToMax(Point2d(points[tri[k]]));
             }
-            Vec3d diag(tpmin, tpmax);
+            Vec2d diag(tpmin, tpmax);
 
             tpmax = tpmax + 0.1 * diag;
             tpmin = tpmin - 0.1 * diag;
@@ -699,12 +640,12 @@ namespace meshit
         for (size_t i = 0; i < GetNSE(); i++) {
             const Element2d& tri1 = Element(i);
 
-            Point3d tpmin(Point(tri1[0]));
-            Point3d tpmax(tpmin);
+            Point2d tpmin{points[tri1[0]]};
+            Point2d tpmax = tpmin;
 
             for (size_t k = 1; k < 3; k++) {
-                tpmin.SetToMin(Point(tri1[k]));
-                tpmax.SetToMax(Point(tri1[k]));
+                tpmin.SetToMin(Point2d(points[tri1[k]]));
+                tpmax.SetToMax(Point2d(points[tri1[k]]));
             }
 
             setree.GetIntersecting(tpmin, tpmax, inters);
@@ -712,7 +653,7 @@ namespace meshit
             for (size_t j = 0; j < inters.size(); j++) {
                 const Element2d& tri2 = Element(inters[j] - 1);
 
-                const meshit::Point3d* trip1[3], * trip2[3];
+                const Point2d* trip1[3], * trip2[3];
                 for (size_t k = 0; k < 3; k++) {
                     trip1[k] = &points[tri1.PointID(k)];
                     trip2[k] = &points[tri2.PointID(k)];
@@ -746,16 +687,16 @@ namespace meshit
         return overlap;
     }
 
-    bool Mesh::PointContainedIn2DElement(const Point3d& p,
+    bool Mesh::PointContainedIn2DElement(const Point2d& p,
                                          double lami[3],
                                          const int element) const
     {
         const double eps = 1e-6;
 
         const Element2d& el = Element(element);
-        const Point3d& p1 = points[el.PointID(0)];
-        const Point3d& p2 = points[el.PointID(1)];
-        const Point3d& p3 = points[el.PointID(2)];
+        const MeshPoint& p1 = points[el.PointID(0)];
+        const MeshPoint& p2 = points[el.PointID(1)];
+        const MeshPoint& p3 = points[el.PointID(2)];
 
         Vec3d col1(p1, p2);
         Vec3d col2(p1, p3);

@@ -30,16 +30,16 @@ namespace meshit
     };
 
     double CalcTriangleBadness(
-        const MeshPoint& p1,
-        const MeshPoint& p2,
-        const MeshPoint& p3,
+        const Point2d& p1,
+        const Point2d& p2,
+        const Point2d& p3,
         double metricweight,
         double h);
 
     double CalcTriangleBadness_2(
-        const MeshPoint& p1,
-        const MeshPoint& p2,
-        const MeshPoint& p3,
+        const Point2d& p1,
+        const Point2d& p2,
+        const Point2d& p3,
         double n_z);
 
 }  // namespace meshit

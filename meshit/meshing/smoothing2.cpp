@@ -7,9 +7,9 @@ namespace meshit
     static const double c_trig0 = 0.144337567297406;  // sqrt(3.0) / 12
     static const double c_trig4 = 0.577350269189626;  // sqrt(3.0) / 3
 
-    double CalcTriangleBadness(const MeshPoint& p1,
-                               const MeshPoint& p2,
-                               const MeshPoint& p3,
+    double CalcTriangleBadness(const Point2d& p1,
+                               const Point2d& p2,
+                               const Point2d& p3,
                                double metricweight,
                                double h)
     {
@@ -47,10 +47,10 @@ namespace meshit
         return badness;
     }
 
-    double CalcTriangleBadnessGrad(const MeshPoint& p1,
-                                   const MeshPoint& p2,
-                                   const MeshPoint& p3,
-                                   Vec3d& d_bad,
+    double CalcTriangleBadnessGrad(const Point2d& p1,
+                                   const Point2d& p2,
+                                   const Point2d& p3,
+                                   Vec2d& d_bad,
                                    double metricweight,
                                    double h)
     {
@@ -84,7 +84,6 @@ namespace meshit
         double beta = 0.125 * c_2 * cross_z / (area * area);
         d_bad.X() = -2.0 * (c_trig0 / area) * (dx12 + dx13 - beta * dy23);
         d_bad.Y() = -2.0 * (c_trig0 / area) * (dy12 + dy13 + beta * dx23);
-        d_bad.Z() = 0.0;
 
         if (metricweight > 0) {
             // add:  metricweight * (A / h^2 + h^2 / A - 2)
@@ -119,9 +118,9 @@ namespace meshit
         return badness;
     }
 
-    double CalcTriangleBadness_2(const MeshPoint& p1,
-                                 const MeshPoint& p2,
-                                 const MeshPoint& p3,
+    double CalcTriangleBadness_2(const Point2d& p1,
+                                 const Point2d& p2,
+                                 const Point2d& p3,
                                  double n_z)
     {
         double dp12x = p2.X() - p1.X();  // v1 = p2 - p1
@@ -143,8 +142,8 @@ namespace meshit
     {
         double badness = 0;
 
-        MeshPoint pp1(ld.sp1.X() - x[1],
-                      ld.sp1.Y() + x[0]);
+        Point2d pp1(ld.sp1.X() - x[1],
+                    ld.sp1.Y() + x[0]);
 
         for (size_t j = 0; j < ld.loc_elements.size(); j++) {
             double loc_h = ld.lochs[j];
@@ -156,7 +155,7 @@ namespace meshit
             double e3y = pe3.Y() - pp1.Y();
 
             if (e2x * e3y - e2y * e3x > 1e-8 * loc_h * loc_h) {
-                badness += CalcTriangleBadness(pp1, pe2, pe3, ld.loc_metric_weight, loc_h);
+                badness += CalcTriangleBadness(pp1, Point2d(pe2), Point2d(pe3), ld.loc_metric_weight, loc_h);
             } else {
                 badness += 1e8;
             }
@@ -167,9 +166,9 @@ namespace meshit
     double MinFunction_2d::FuncGrad(const double* x, double* g)
     {
         double badness = 0.0;
-        Vec3d vgrad;
-        MeshPoint pp1(ld.sp1.X() - x[1],
-                      ld.sp1.Y() + x[0]);
+        Vec2d vgrad;
+        Point2d pp1(ld.sp1.X() - x[1],
+                    ld.sp1.Y() + x[0]);
 
         for (size_t j = 0; j < ld.loc_elements.size(); j++) {
             double loc_h = ld.lochs[j];
@@ -181,8 +180,8 @@ namespace meshit
             double e3y = pe3.Y() - pp1.Y();
 
             if (e2x * e3y - e2y * e3x > 1e-8 * loc_h * loc_h) {
-                Vec3d hgrad;
-                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.loc_metric_weight, loc_h);
+                Vec2d hgrad;
+                badness += CalcTriangleBadnessGrad(pp1, Point2d(pe2), Point2d(pe3), hgrad, ld.loc_metric_weight, loc_h);
                 vgrad += hgrad;
             } else {
                 badness += 1e8;
@@ -198,8 +197,8 @@ namespace meshit
         deriv = 0;
         double badness = 0;
 
-        MeshPoint pp1(ld.sp1.X() - x[1],
-                      ld.sp1.Y() + x[0]);
+        Point2d pp1(ld.sp1.X() - x[1],
+                    ld.sp1.Y() + x[0]);
 
         for (size_t j = 0; j < ld.loc_elements.size(); j++) {
             double loc_h = ld.lochs[j];
@@ -211,8 +210,8 @@ namespace meshit
             double e3y = pe3.Y() - pp1.Y();
 
             if (e2x * e3y - e2y * e3x > 1e-8 * loc_h * loc_h) {
-                Vec3d hgrad;
-                badness += CalcTriangleBadnessGrad(pp1, pe2, pe3, hgrad, ld.loc_metric_weight, loc_h);
+                Vec2d hgrad;
+                badness += CalcTriangleBadnessGrad(pp1, Point2d(pe2), Point2d(pe3), hgrad, ld.loc_metric_weight, loc_h);
                 deriv += dir[0] * hgrad.Y() - dir[1] * hgrad.X();
             } else {
                 badness += 1e8;
@@ -300,13 +299,13 @@ namespace meshit
 
                     const Element2d& bel = mesh.Element(sei);
                     for (size_t k = 0; k < 3; k++) {
-                        if (bel.PointID(k) == pi) {
-                            ld.loc_pnts2.push_back(mesh.Point(bel.PointID((k + 1) % 3)));
-                            ld.loc_pnts3.push_back(mesh.Point(bel.PointID((k + 2) % 3)));
+                        if (bel[k] == pi) {
+                            ld.loc_pnts2.push_back(mesh.Point(bel[(k + 1) % 3]));
+                            ld.loc_pnts3.push_back(mesh.Point(bel[(k + 2) % 3]));
                             break;
                         }
                     }
-                    Point3d pmid = Center(mesh.Point(bel[0]), mesh.Point(bel[1]), mesh.Point(bel[2]));
+                    Point2d pmid = Center(Point2d(mesh.Point(bel[0])), Point2d(mesh.Point(bel[1])), Point2d(mesh.Point(bel[2])));
                     ld.lochs[j] = mesh.GetH(pmid);
                 }
 

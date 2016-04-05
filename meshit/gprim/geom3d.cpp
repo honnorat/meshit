@@ -40,49 +40,6 @@ namespace meshit
             n /= len;
     }
 
-    Box3d::Box3d(
-        double aminx, double amaxx,
-        double aminy, double amaxy,
-        double aminz, double amaxz)
-    {
-        minx[0] = aminx;
-        maxx[0] = amaxx;
-        minx[1] = aminy;
-        maxx[1] = amaxy;
-        minx[2] = aminz;
-        maxx[2] = amaxz;
-    }
-
-    Box3d::Box3d(const Box3d& b2)
-    {
-        for (int i = 0; i < 3; i++) {
-            minx[i] = b2.minx[i];
-            maxx[i] = b2.maxx[i];
-        }
-    }
-
-    Box3d::Box3d(const Point3d& p1, const Point3d& p2)
-    {
-        minx[0] = std::min(p1.X(), p2.X());
-        minx[1] = std::min(p1.Y(), p2.Y());
-        minx[2] = std::min(p1.Z(), p2.Z());
-        maxx[0] = std::max(p1.X(), p2.X());
-        maxx[1] = std::max(p1.Y(), p2.Y());
-        maxx[2] = std::max(p1.Z(), p2.Z());
-    }
-
-    const Box3d& Box3d::operator+=(const Box3d& b)
-    {
-        minx[0] = std::min(minx[0], b.minx[0]);
-        minx[1] = std::min(minx[1], b.minx[1]);
-        minx[2] = std::min(minx[2], b.minx[2]);
-        maxx[0] = std::max(maxx[0], b.maxx[0]);
-        maxx[1] = std::max(maxx[1], b.maxx[1]);
-        maxx[2] = std::max(maxx[2], b.maxx[2]);
-
-        return *this;
-    }
-
     void Transpose(Vec3d& v1, Vec3d& v2, Vec3d& v3)
     {
         std::swap(v1.Y(), v2.X());

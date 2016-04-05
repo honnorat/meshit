@@ -4,7 +4,7 @@
 
 namespace meshit
 {
-    int IntersectTriangleLine(const Point3d** tri, const Point3d** line)
+    int IntersectTriangleLine(const Point2d** tri, const Point2d** line)
     {
         Vec3d vl(*line[0], *line[1]);
         Vec3d vt1(*tri[0], *tri[1]);
@@ -43,7 +43,7 @@ namespace meshit
         return 0;
     }
 
-    int IntersectTriangleTriangle(const Point3d** tri1, const Point3d** tri2)
+    int IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2)
     {
         int i, j;
         double diam = Dist(*tri1[0], *tri1[1]);
@@ -64,7 +64,7 @@ namespace meshit
 
         switch (cnt) {
             case 0: {
-                const Point3d* line[2];
+                const Point2d* line[2];
 
                 for (i = 0; i <= 2; i++) {
                     line[0] = tri2[i];
@@ -127,81 +127,6 @@ namespace meshit
 
         c = *pts[0] + sol;
         return 0;
-    }
-
-    double ComputeCylinderRadius(
-        const Point3d& p1,
-        const Point3d& p2,
-        const Point3d& p3,
-        const Point3d& p4)
-    {
-        Vec3d v12(p1, p2);
-        Vec3d v13(p1, p3);
-        Vec3d v14(p1, p4);
-
-        Vec3d n1 = Cross(v12, v13);
-        Vec3d n2 = Cross(v14, v12);
-
-        double n1l = n1.Length();
-        double n2l = n2.Length();
-        n1 /= n1l;
-        n2 /= n2l;
-
-        double v12len = v12.Length();
-        double h1 = n1l / v12len;
-        double h2 = n2l / v12len;
-
-        /*
-        std::cerr << "n1 = " << n1 << " n2 = " << n2 
-               << "h1 = " << h1 << " h2 = " << h2 <<std::endl;
-         */
-        return ComputeCylinderRadius(n1, n2, h1, h2);
-    }
-
-    /*
-      Two triangles T1 and T2 have normals n1 and n2.
-      The height over the common edge is h1, and h2.
-     */
-    double ComputeCylinderRadius(const Vec3d& n1, const Vec3d& n2,
-                                 double h1, double h2)
-    {
-        Vec3d t1, t2;
-        double n11 = n1 * n1;
-        double n12 = n1 * n2;
-        double n22 = n2 * n2;
-        double det = n11 * n22 - n12 * n12;
-
-        if (fabs(det) < 1e-14 * n11 * n22)
-            return 1e20;
-
-        // a biorthogonal bases   (ti * nj) = delta_ij:
-        t1 = (n22 / det) * n1 + (-n12 / det) * n2;
-        t2 = (-n12 / det) * n1 + (n11 / det) * n2;
-
-        // normalize:
-        t1 /= t1.Length();
-        t2 /= t2.Length();
-
-        /*
-          vector to center point has form
-          v = lam1 n1 + lam2 n2
-          and fulfills
-          t2 v = h1/2
-          t1 v = h2/2
-         */
-
-        double lam1 = 0.5 * h2 / (n1 * t1);
-        double lam2 = 0.5 * h1 / (n2 * t2);
-
-        double rad = (lam1 * n1 + lam2 * n2).Length();
-        /*
-        std::cerr << "n1 = " << n1
-               << " n2 = " << n2
-               << " t1 = " << t1
-               << " t2 = " << t2
-               << " rad = " << rad <<std::endl;
-         */
-        return rad;
     }
 
     double MinDistLP2(const Point2d& lp1, const Point2d& lp2, const Point2d& p)

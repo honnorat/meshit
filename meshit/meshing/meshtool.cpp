@@ -38,11 +38,11 @@ namespace meshit
         return 1;
     }
 
-    static double TriangleQualityInst(const Point3d& p1, const Point3d& p2, const Point3d& p3)
+    static double TriangleQualityInst(const MeshPoint& p1, const MeshPoint& p2, const MeshPoint& p3)
     {
         // quality 0 (worst) .. 1 (optimal)
 
-        Vec3d v1, v2, v3;
+        Vec2d v1, v2, v3;
         double s1, s2, s3;
         double an1, an2, an3;
 

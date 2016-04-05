@@ -22,29 +22,17 @@
 
 namespace meshit
 {
-    enum resthtype
-    {
-        RESTRICTH_FACE, RESTRICTH_EDGE,
-        RESTRICTH_SURFACEELEMENT, RESTRICTH_POINT, RESTRICTH_SEGMENT
-    };
-
     class SplineGeometry;
 
     class Mesh
     {
      private:
-        /// point coordinates
-        std::vector<MeshPoint> points;
+        std::vector<MeshPoint> points;      // point coordinates
+        std::vector<Segment> segments;      // line-segments at edges
+        std::vector<Element2d> elements;    // 2d-inner elements
 
-        /// line-segments at edges
-        std::vector<Segment> segments;
-        /// surface elements, 2d-inner elements
-        std::vector<Element2d> elements;
-
-        /// surface indices at boundary nodes
-        TABLE<int> surfaces_on_node;
-        /// boundary edges  (1..normal bedge, 2..segment)
-        INDEX_2_map<int> segment_ht;
+        TABLE<int> surfaces_on_node;        // surface indices at boundary nodes
+        INDEX_2_map<int> segment_ht;        // boundary edges  (1..normal bedge, 2..segment)
 
         /**
            Representation of local mesh-size h
@@ -73,7 +61,7 @@ namespace meshit
 
         void BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp);
 
-        size_t AddPoint(const Point3d& p, PointType type = INNER_POINT);
+        size_t AddPoint(const Point2d& p, PointType type = INNER_POINT);
 
         size_t GetNP() const
         {
@@ -143,16 +131,14 @@ namespace meshit
         double AverageH(size_t surfnr = 0) const;
         /// Calculates localh
         void CalcLocalH();
-        void SetLocalH(const Point3d& pmin, const Point3d& pmax, double grading);
-        void RestrictLocalH(const Point3d& p, double hloc);
-        void RestrictLocalHLine(const Point3d& p1, const Point3d& p2,
-                                double hloc);
-        void RestrictLocalH(resthtype rht, size_t nr, double loc_h);
-        double GetH(const Point3d& p) const;
-        double GetMinH(const Point3d& pmin, const Point3d& pmax);
+        void SetLocalH(const Point2d& pmin, const Point2d& pmax, double grading);
+        void RestrictLocalH(const Point2d& p, double hloc);
+        void RestrictLocalHLine(const Point2d& p1, const Point2d& p2, double hloc);
+        double GetH(const Point2d& p) const;
+        double GetMinH(const Point2d& pmin, const Point2d& pmax);
 
         /// Find bounding box
-        void GetBox(Point3d& pmin, Point3d& pmax) const;
+        void GetBox(Point2d& pmin, Point2d& pmax) const;
 
         /// Refines mesh and projects points to true surface
         // void Refine (int levels, const CSGeometry * geom);
@@ -207,7 +193,7 @@ namespace meshit
         void SetNP(size_t np);
 
         bool PointContainedIn2DElement(
-            const Point3d& p,
+            const Point2d& p,
             double lami[3],
             const int element) const;
 

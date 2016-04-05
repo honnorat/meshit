@@ -50,16 +50,16 @@ namespace meshit
     /**
        Point in the mesh.
      */
-    class MeshPoint : public Point3d
+    class MeshPoint : public Point2d
     {
      public:
         MeshPoint() { }
 
-        explicit MeshPoint(const Point3d& ap, PointType apt = INNER_POINT)
-            : Point3d(ap), type(apt) { }
+        explicit MeshPoint(const Point2d& ap, PointType apt = INNER_POINT)
+            : Point2d{ap}, type{apt} { }
 
         explicit MeshPoint(double px, double py, PointType apt = INNER_POINT)
-            : Point3d(px, py), type(apt) { }
+            : Point2d{px, py}, type{apt} { }
 
         PointType Type() const
         {

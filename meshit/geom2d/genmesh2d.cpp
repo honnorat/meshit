@@ -74,7 +74,7 @@ namespace meshit
 
         for (size_t i = 0; i < n; i++) {
             xi[i] = spline.GetPoint((i + 0.5) / n);
-            hi[i] = mesh.GetH(Point3d(xi[i].X(), xi[i].Y(), 0));
+            hi[i] = mesh.GetH(xi[i]);
         }
 
         // limit slope
@@ -157,24 +157,22 @@ namespace meshit
                 mark = spline.GetPoint(edgelength);
 
                 PointIndex pi1{-1}, pi2{-1};
-                Point3d mark3{mark};
-                Point3d oldmark3{oldmark};
 
-                double h = mesh.GetH(oldmark3);
-                Vec3d v(1e-4 * h, 1e-4 * h, 1e-4 * h);
-                searchtree.GetIntersecting(oldmark3 - v, oldmark3 + v, locsearch);
+                double h = mesh.GetH(oldmark);
+                Vec2d v(1e-4 * h, 1e-4 * h);
+                searchtree.GetIntersecting(oldmark - v, oldmark + v, locsearch);
                 if (locsearch.size() > 0) {
                     pi1 = locsearch.back();
                 } else {
-                    pi1 = mesh.AddPoint(oldmark3);
-                    searchtree.Insert(oldmark3, pi1);
+                    pi1 = mesh.AddPoint(oldmark);
+                    searchtree.Insert(oldmark, pi1);
                 }
-                searchtree.GetIntersecting(mark3 - v, mark3 + v, locsearch);
+                searchtree.GetIntersecting(mark - v, mark + v, locsearch);
                 if (locsearch.size() > 0) {
                     pi2 = locsearch.back();
                 } else {
-                    pi2 = mesh.AddPoint(mark3);
-                    searchtree.Insert(mark3, pi2);
+                    pi2 = mesh.AddPoint(mark);
+                    searchtree.Insert(mark, pi2);
                 }
 
                 Segment seg;
@@ -204,9 +202,8 @@ namespace meshit
     {
         Box2d bbox;
         GetBoundingBox(bbox);
-        double dist = Dist(bbox.PMin(), bbox.PMax());
-        Point3d pmin(bbox.PMin().X(), bbox.PMin().Y(), -dist);
-        Point3d pmax(bbox.PMax().X(), bbox.PMax().Y(), +dist);
+        Point2d pmin = {bbox.PMin().X(), bbox.PMin().Y()};
+        Point2d pmax = {bbox.PMax().X(), bbox.PMax().Y()};
 
         // mesh size restrictions ...
         for (size_t i = 0; i < splines.size(); i++) {
@@ -216,11 +213,11 @@ namespace meshit
 
             double h1 = std::min(p1.hmax, h / p1.refatpoint);
             double h2 = std::min(p2.hmax, h / p2.refatpoint);
-            mesh2d.RestrictLocalH(Point3d(p1), h1);
-            mesh2d.RestrictLocalH(Point3d(p2), h2);
+            mesh2d.RestrictLocalH(p1, h1);
+            mesh2d.RestrictLocalH(p2, h2);
 
             double len = spline.Length();
-            mesh2d.RestrictLocalHLine(Point3d(p1), Point3d(p2), len / mp.segments_per_edge);
+            mesh2d.RestrictLocalHLine(p1, p2, len / mp.segments_per_edge);
 
             double hcurve = std::min(spline.hmax, h / spline.reffak);
             double hl = GetDomainMaxh(spline.leftdom);
@@ -232,7 +229,7 @@ namespace meshit
             for (double t = 0.5 / np; t < 1; t += 1.0 / np) {
                 Point2d x = spline.GetPoint(t);
                 double hc = 1.0 / mp.curvature_safety / (1e-99 + spline.CalcCurvature(t));
-                mesh2d.RestrictLocalH(Point3d(x), std::min(hc, hcurve));
+                mesh2d.RestrictLocalH(x, std::min(hc, hcurve));
             }
         }
 

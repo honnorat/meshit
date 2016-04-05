@@ -135,17 +135,17 @@ namespace meshit
 
         const Point3d& SetToMin(const Point3d& p2)
         {
-            if (p2.x[0] < x[0]) x[0] = p2.x[0];
-            if (p2.x[1] < x[1]) x[1] = p2.x[1];
-            if (p2.x[2] < x[2]) x[2] = p2.x[2];
+            x[0] = std::min(x[0], p2.x[0]);
+            x[1] = std::min(x[1], p2.x[1]);
+            x[2] = std::min(x[2], p2.x[2]);
             return *this;
         }
 
         const Point3d& SetToMax(const Point3d& p2)
         {
-            if (p2.x[0] > x[0]) x[0] = p2.x[0];
-            if (p2.x[1] > x[1]) x[1] = p2.x[1];
-            if (p2.x[2] > x[2]) x[2] = p2.x[2];
+            x[0] = std::max(x[0], p2.x[0]);
+            x[1] = std::max(x[1], p2.x[1]);
+            x[2] = std::max(x[2], p2.x[2]);
             return *this;
         }
 
@@ -175,8 +175,6 @@ namespace meshit
         friend std::ostream& operator<<(std::ostream& s, const Point3d& p);
 
         friend class Vec3d;
-
-        friend class Box3d;
     };
 
     class Vec3d
@@ -474,49 +472,6 @@ namespace meshit
             v1.Z() * v2.X() - v1.X() * v2.Z(),
             v1.X() * v2.Y() - v1.Y() * v2.X());
     }
-
-    class Box3d
-    {
-     protected:
-        double minx[3], maxx[3];
-
-     public:
-        Box3d() { }
-        Box3d(double aminx, double amaxx,
-              double aminy, double amaxy,
-              double aminz, double amaxz);
-        Box3d(const Box3d& b2);
-        Box3d(const Point3d& p1, const Point3d& p2);
-
-        Point3d PMin() const
-        {
-            return Point3d(minx[0], minx[1], minx[2]);
-        }
-
-        Point3d PMax() const
-        {
-            return Point3d(maxx[0], maxx[1], maxx[2]);
-        }
-
-        inline void SetPoint(const Point3d& p)
-        {
-            minx[0] = maxx[0] = p.X();
-            minx[1] = maxx[1] = p.Y();
-            minx[2] = maxx[2] = p.Z();
-        }
-
-        inline void AddPoint(const Point3d& p)
-        {
-            if (p.x[0] < minx[0]) minx[0] = p.x[0];
-            if (p.x[0] > maxx[0]) maxx[0] = p.x[0];
-            if (p.x[1] < minx[1]) minx[1] = p.x[1];
-            if (p.x[1] > maxx[1]) maxx[1] = p.x[1];
-            if (p.x[2] < minx[2]) minx[2] = p.x[2];
-            if (p.x[2] > maxx[2]) maxx[2] = p.x[2];
-        }
-
-        const Box3d& operator+=(const Box3d& b);
-    };
 
 }  // namespace meshit
 

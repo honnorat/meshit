@@ -12,28 +12,15 @@
 
 namespace meshit
 {
-    int IntersectTriangleLine(const Point3d** tri, const Point3d** line);
+    int IntersectTriangleLine(const Point2d** tri, const Point2d** line);
 
     // 1, iff not regular triangulation
-    int IntersectTriangleTriangle(const Point3d** tri1, const Point3d** tri2);
+    int IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2);
 
     void LocalCoordinates(const Vec3d& e1, const Vec3d& e2, const Vec3d& v, double& lam1, double& lam2);
 
     /// return 1 = degenerated sphere
     int CalcSphereCenter(const Point3d** pts, Point3d& c);
-
-    /*
-      Compute radius of cylinder fitting 4 points.
-      cylinder axis is in the direction of p1-p2
-     */
-    double ComputeCylinderRadius(const Point3d& p1, const Point3d& p2, const Point3d& p3, const Point3d& p4);
-
-    /*
-      Two triangles T1 and T2 have normals n1 and n2.
-      The height over the common edge is h1, and h2.
-      Radius of cylinder fitting both triangles
-     */
-    double ComputeCylinderRadius(const Vec3d& n1, const Vec3d& n2, double h1, double h2);
 
     /// Minimal distance of point p to the line segment [lp1,lp2]
     double MinDistLP2(const Point2d& lp1, const Point2d& lp2, const Point2d& p);

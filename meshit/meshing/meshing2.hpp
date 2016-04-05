@@ -32,11 +32,11 @@ namespace meshit
 
         double max_area;
 
-        Vec3d ex, ey;
-        Point3d globp1;
+        Vec2d ex, ey;
+        Point2d globp1;
 
      public:
-        explicit Meshing2(const Box3d& aboundingbox);
+        explicit Meshing2(const Box2d& aboundingbox);
         ~Meshing2();
 
         /// Load rules, either from file, or compiled rules
@@ -44,19 +44,18 @@ namespace meshit
 
         bool GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr);
 
-        void AddPoint(const Point3d& p, PointIndex globind);
+        void AddPoint(const Point2d& p, PointIndex globind);
         void AddBoundaryElement(INDEX i1, INDEX i2);
         void SetMaxArea(double amaxarea);
 
      protected:
         void EndMesh();
-        double CalcLocalH(const Point3d& p, double gh) const;
 
-        void DefineTransformation(const Point3d& p1, const Point3d& p2);
-        void TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h);
+        void DefineTransformation(const Point2d& p1, const Point2d& p2);
+        void TransformToPlain(const Point2d& locpoint, Point2d& plainpoint, double h);
         /// return 0 .. ok
         /// return >0 .. cannot transform point to true surface
-        void TransformFromPlain(Point2d& plainpoint, Point3d& locpoint, double h);
+        void TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, double h);
 
         /** Applies 2D rules.
          Tests all 2D rules */

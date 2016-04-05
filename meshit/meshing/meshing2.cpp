@@ -5,7 +5,7 @@
 
 namespace meshit
 {
-    Meshing2::Meshing2(const Box3d& boundingbox)
+    Meshing2::Meshing2(const Box2d& boundingbox)
     {
         LoadRules(NULL);
         // LoadRules ("rules/triangle.rls");
@@ -22,7 +22,7 @@ namespace meshit
         }
     }
 
-    void Meshing2::AddPoint(const Point3d& p, PointIndex globind)
+    void Meshing2::AddPoint(const Point2d& p, PointIndex globind)
     {
         adfront->AddPoint(p, globind);
     }
@@ -44,30 +44,25 @@ namespace meshit
         max_area = amaxarea;
     }
 
-    double Meshing2::CalcLocalH(const Point3d& /* p */, double gh) const
-    {
-        return gh;
-    }
-
-    void Meshing2::DefineTransformation(const Point3d& p1, const Point3d& p2)
+    void Meshing2::DefineTransformation(const Point2d& p1, const Point2d& p2)
     {
         globp1 = p1;
-        ex = p2 - p1;
+        ex.X() = p2.X() - p1.X();
+        ex.Y() = p2.Y() - p1.Y();
         ex /= ex.Length();
         ey.X() = -ex.Y();
         ey.Y() = ex.X();
-        ey.Z() = 0.0;
     }
 
-    void Meshing2::TransformToPlain(const Point3d& locpoint, Point2d& plainpoint, double h)
+    void Meshing2::TransformToPlain(const Point2d& locpoint, Point2d& plainpoint, double h)
     {
-        Vec3d p1p(globp1, locpoint);
+        Vec2d p1p(globp1, locpoint);
 
         plainpoint.X() = (p1p * ex) / h;
         plainpoint.Y() = (p1p * ey) / h;
     }
 
-    void Meshing2::TransformFromPlain(Point2d& plainpoint, Point3d& locpoint, double h)
+    void Meshing2::TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, double h)
     {
         locpoint.X() = globp1.X() + h * (plainpoint.X() * ex.X() + plainpoint.Y() * ey.X());
         locpoint.Y() = globp1.Y() + h * (plainpoint.X() * ex.Y() + plainpoint.Y() * ey.Y());
@@ -82,13 +77,9 @@ namespace meshit
 
         bool found;
         int rulenr{-1};
-        Point3d p1, p2;
+        Point2d p1, p2;
 
-        bool debugflag;
-
-        double h, hshould;
-
-        std::vector<Point3d> locpoints;
+        std::vector<Point2d> locpoints;
         std::vector<int> legalpoints;
         std::vector<Point2d> plainpoints;
         std::vector<INDEX_2> loclines;
@@ -142,13 +133,12 @@ namespace meshit
 
             int baselineindex = adfront->SelectBaseLine(p1, p2, qualclass);
 
-            Point3d pmid = Center(p1, p2);
-            hshould = std::min(gh, mesh.GetH(pmid));
+            Point2d pmid = Center(p1, p2);
+            double pdist = Dist(p1, p2);
+            double hshould = std::min(gh, mesh.GetH(pmid));
+            double hinner = (3 + qualclass) * std::max(pdist, hshould);
+
             mesh.RestrictLocalH(pmid, hshould);
-
-            h = hshould;
-
-            double hinner = (3 + qualclass) * std::max(Dist(p1, p2), hshould);
 
             adfront->GetLocals(baselineindex, locpoints, loclines, pindex, lindex, 2 * hinner);
 
@@ -161,7 +151,7 @@ namespace meshit
             PointIndex gpi1 = adfront->GetGlobalIndex(pindex[loclines[0].I1() - 1]);
             PointIndex gpi2 = adfront->GetGlobalIndex(pindex[loclines[0].I2() - 1]);
 
-            debugflag = false;
+            bool debugflag = false;
 
             if (debugparam.haltface && debugparam.haltfacenr == facenr) {
                 debugflag = true;
@@ -189,7 +179,7 @@ namespace meshit
                 }
 
                 for (size_t i = 0; i < locpoints.size(); i++) {
-                    TransformToPlain(locpoints[i], plainpoints[i], h);
+                    TransformToPlain(locpoints[i], plainpoints[i], hshould);
                 }
 
                 legalpoints.assign(plainpoints.size(), 1);
@@ -241,7 +231,7 @@ namespace meshit
                 locpoints.resize(plainpoints.size());
 
                 for (size_t i = oldnp; i < plainpoints.size(); i++) {
-                    TransformFromPlain(plainpoints[i], locpoints[i], h);
+                    TransformFromPlain(plainpoints[i], locpoints[i], hshould);
                 }
 
                 double violateminh = 3 + 0.1 * qualclass * qualclass;
@@ -255,23 +245,20 @@ namespace meshit
                 }
 
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    Point3d pmin = locpoints[locelements[i].PointID(0) - 1];
-                    Point3d pmax = pmin;
+                    Point2d pmin = locpoints[locelements[i].PointID(0) - 1];
+                    Point2d pmax = pmin;
                     for (size_t j = 1; j < 3; j++) {
-                        const Point3d& hp = locpoints[locelements[i].PointID(j) - 1];
+                        const Point2d& hp = locpoints[locelements[i].PointID(j) - 1];
                         pmin.SetToMin(hp);
                         pmax.SetToMax(hp);
                     }
-                    double eh = mesh.GetMinH(pmin, pmax);
-                    if (eh < minh)
-                        minh = eh;
+                    minh = std::min(minh, mesh.GetMinH(pmin, pmax));
                 }
 
                 for (size_t i = 0; i < locelements.size(); i++) {
-                    for (size_t j = 0; j < 3; j++) {
-                        if (Dist2(locpoints[locelements[i].PointID(j) - 1], pmid) > hinner * hinner)
-                            found = false;
-                    }
+                    found &= Dist2(locpoints[locelements[i].PointID(0) - 1], pmid) <= hinner * hinner;
+                    found &= Dist2(locpoints[locelements[i].PointID(1) - 1], pmid) <= hinner * hinner;
+                    found &= Dist2(locpoints[locelements[i].PointID(2) - 1], pmid) <= hinner * hinner;
                 }
 
                 static double maxviolate = 0;
@@ -340,12 +327,12 @@ namespace meshit
 
                     mesh.AddSurfaceElement(mtri);
 
-                    const Point3d& sep1 = mesh.Point(mtri.PointID(0));
-                    const Point3d& sep2 = mesh.Point(mtri.PointID(1));
-                    const Point3d& sep3 = mesh.Point(mtri.PointID(2));
+                    const MeshPoint& sep1 = mesh.Point(mtri.PointID(0));
+                    const MeshPoint& sep2 = mesh.Point(mtri.PointID(1));
+                    const MeshPoint& sep3 = mesh.Point(mtri.PointID(2));
 
-                    double trigarea = Cross(Vec3d(sep1, sep2),
-                                            Vec3d(sep1, sep3)).Length() / 2;
+                    double trigarea = Cross(Vec2d(Point2d(sep1), Point2d(sep2)),
+                                            Vec2d(Point2d(sep1), Point2d(sep3))) / 2;
 
                     meshed_area += trigarea;
 

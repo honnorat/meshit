@@ -6,7 +6,7 @@
 
 namespace meshit
 {
-    FrontPoint2::FrontPoint2(const Point3d& ap, PointIndex agi)
+    FrontPoint2::FrontPoint2(const Point2d& ap, PointIndex agi)
         : globalindex(agi)
     {
         p = ap;
@@ -14,7 +14,7 @@ namespace meshit
         frontnr = INT_MAX - 10;
     }
 
-    AdFront2::AdFront2(const Box3d& aboundingbox)
+    AdFront2::AdFront2(const Box2d& aboundingbox)
         : boundingbox(aboundingbox),
           linesearchtree(boundingbox.PMin(), boundingbox.PMax()),
           pointsearchtree(boundingbox.PMin(), boundingbox.PMax()),
@@ -39,7 +39,7 @@ namespace meshit
         }
     }
 
-    int AdFront2::AddPoint(const Point3d& p, PointIndex globind)
+    int AdFront2::AddPoint(const Point2d& p, PointIndex globind)
     {
         // inserts at empty position or resizes array
         int pi;
@@ -83,7 +83,7 @@ namespace meshit
             li = lines.size() - 1;
         }
 
-        Box3d lbox;
+        Box2d lbox;
         lbox.SetPoint(p1.P());
         lbox.AddPoint(p2.P());
 
@@ -136,7 +136,7 @@ namespace meshit
         }
     }
 
-    int AdFront2::SelectBaseLine(Point3d& p1, Point3d& p2, int& qualclass)
+    int AdFront2::SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass)
     {
         int baselineindex = -1;
 
@@ -178,20 +178,20 @@ namespace meshit
     }
 
     int AdFront2::GetLocals(int baselineindex,
-                            std::vector<Point3d>& locpoints,
+                            std::vector<Point2d>& locpoints,
                             std::vector<INDEX_2>& loclines,  // local index
                             std::vector<INDEX>& pindex,
                             std::vector<INDEX>& lindex,
                             double xh)
     {
         int pstind = lines[baselineindex].L().I1();
-        Point3d p0 = points[pstind].P();
+        Point2d p0 = points[pstind].P();
 
         loclines.push_back(lines[baselineindex].L());
         lindex.push_back(baselineindex);
 
-        const Point3d pmin(p0.X() - xh, p0.Y() - xh);
-        const Point3d pmax(p0.X() + xh, p0.Y() + xh);
+        const Point2d pmin(p0.X() - xh, p0.Y() - xh);
+        const Point2d pmax(p0.X() + xh, p0.Y() + xh);
         // dominating costs !!
         linesearchtree.GetIntersecting(pmin, pmax, nearlines);
         pointsearchtree.GetIntersecting(pmin, pmax, nearpoints);

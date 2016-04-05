@@ -28,10 +28,10 @@ namespace meshit
         void operator delete(void*);
 
      protected:
-        double xmid[3];
+        double xmid[2];
         double h2;  // half edgelength
 
-        GradingBox* childs[8];
+        GradingBox* childs[4];
 
         double hopt;
     };
@@ -50,15 +50,15 @@ namespace meshit
 
         ~LocalH();
 
-        void Init(const Point3d& pmin, const Point3d& pmax, double grading);
+        void Init(const Point2d& pmin, const Point2d& pmax, double grading);
         void CleanRoot();
 
-        void SetH(const Point3d& x, double h);
-        double GetH(const Point3d& x) const;
-        double GetMinH(const Point3d& pmin, const Point3d& pmax) const;
+        void SetH(const Point2d& x, double h);
+        double GetH(const Point2d& x) const;
+        double GetMinH(const Point2d& pmin, const Point2d& pmax) const;
 
      private:
-        double GetMinHRec(const Point3d& pmin, const Point3d& pmax, const GradingBox* box) const;
+        double GetMinHRec(const Point2d& pmin, const Point2d& pmax, const GradingBox* box) const;
     };
 }  // namespace meshit
 
