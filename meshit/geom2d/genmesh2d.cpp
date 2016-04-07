@@ -9,7 +9,7 @@ namespace meshit
 {
     void Optimize2d(Mesh& mesh, MeshingParameters& mp)
     {
-        mesh.CalcSurfacesOfNode();
+        mesh.IndexBoundaryEdges();
 
         const char* optstr = mp.optimize2d;
         int optsteps = mp.optsteps2d;

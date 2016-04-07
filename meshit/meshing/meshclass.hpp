@@ -31,7 +31,6 @@ namespace meshit
         std::vector<Segment> segments;      // line-segments at edges
         std::vector<Element2d> elements;    // 2d-inner elements
 
-        TABLE<int> surfaces_on_node;        // surface indices at boundary nodes
         INDEX_2_map<int> segment_ht;        // boundary edges  (1..normal bedge, 2..segment)
 
         /**
@@ -116,7 +115,7 @@ namespace meshit
         void GetSurfaceElementsOfFace(size_t facenr, std::vector<SurfaceElementIndex>& sei) const;
 
         /// sets internal tables
-        void CalcSurfacesOfNode();
+        void IndexBoundaryEdges();
 
         /**
            Checks overlap of boundary
@@ -143,10 +142,9 @@ namespace meshit
         /// Refines mesh and projects points to true surface
         // void Refine (int levels, const CSGeometry * geom);
 
-        bool IsSegment(PointIndex pi1, PointIndex pi2) const
+        bool IsSegment(const INDEX_2& e) const
         {
-            INDEX_2 i2(pi1, pi2);
-            return segment_ht.count(i2.Sort()) == 1;
+            return segment_ht.count(e) == 1;
         }
 
         /**

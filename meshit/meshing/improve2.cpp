@@ -56,7 +56,7 @@ namespace meshit
             }
 
             faceindex = 0;
-            mesh.CalcSurfacesOfNode();
+            mesh.IndexBoundaryEdges();
             return;
         }
 
@@ -129,7 +129,7 @@ namespace meshit
                 INDEX_2 edge(pi1, pi2);
                 edge.Sort();
 
-                if (mesh.IsSegment(pi1, pi2))
+                if (mesh.IsSegment(edge))
                     continue;
 
                 INDEX_2 ii2(pi1, pi2);
@@ -293,7 +293,7 @@ namespace meshit
             for (size_t j = 0; j < 3; j++) {
                 PointIndex pi1 = sel.PointID((j + 1) % 3);
                 PointIndex pi2 = sel.PointID((j + 2) % 3);
-                if (mesh.IsSegment(pi1, pi2)) {
+                if (mesh.IsSegment(INDEX_2(pi1, pi2).Sort())) {
                     fixed[pi1] = true;
                     fixed[pi2] = true;
                 }
