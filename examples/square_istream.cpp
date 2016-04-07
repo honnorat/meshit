@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
     cc = uclock();
     mp.optsteps2d = 5;
-    geom.SetGrading(0.1);
+    geom.SetGrading(0.3);
     mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO(" . mesh created     in " << uclock() - cc << " s.");
 
