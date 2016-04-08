@@ -15,29 +15,9 @@
 
 namespace meshit
 {
-    /* Geometric Algorithms */
-
-    class Point2d;
-
     class Vec2d;
 
-    Vec2d operator-(const Point2d& p1, const Point2d& p2);
-    Point2d operator-(const Point2d& p1, const Vec2d& v);
-    Point2d operator+(const Point2d& p1, const Vec2d& v);
-
-    Vec2d operator-(const Point2d& p1, const Point2d& p2);
-    Point2d operator-(const Point2d& p1, const Vec2d& v);
-    Point2d operator+(const Point2d& p1, const Vec2d& v);
-    Vec2d operator-(const Vec2d& p1, const Vec2d& v);
-    Vec2d operator+(const Vec2d& p1, const Vec2d& v);
-    Vec2d operator*(double scal, const Vec2d& v);
-
-    std::ostream& operator<<(std::ostream& s, const Point2d& p);
-    std::ostream& operator<<(std::ostream& s, const Vec2d& v);
-
-    double Dist2(const Point2d& p1, const Point2d& p2);
-
-    class Point3d;
+    class Vec3d;
 
     class Point2d
     {
@@ -56,8 +36,6 @@ namespace meshit
 
         Point2d(const Point2d& p2)
             : px(p2.px), py(p2.py) { }
-
-        explicit Point2d(const Point3d& p3);
 
         Point2d& operator=(const Point2d& p2)
         {
@@ -93,7 +71,7 @@ namespace meshit
 
         double operator[](size_t i) const
         {
-            return (i == 0) ? px : ( i == 1 ) ? py : 0.0;
+            return (i == 0) ? px : (i == 1) ? py : 0.0;
         }
 
         const Point2d& SetToMin(const Point2d& p2)
@@ -129,13 +107,14 @@ namespace meshit
 
     inline double Dist(const Point2d& p1, const Point2d& p2)
     {
-        return sqrt(Dist2(p1, p2));
+        return sqrt((p1.px - p2.px) * (p1.px - p2.px) +
+                    (p1.py - p2.py) * (p1.py - p2.py));
     }
 
     inline double Dist2(const Point2d& p1, const Point2d& p2)
     {
-        return ((p1.px - p2.px) * (p1.px - p2.px) +
-                (p1.py - p2.py) * (p1.py - p2.py));
+        return (p1.px - p2.px) * (p1.px - p2.px) +
+               (p1.py - p2.py) * (p1.py - p2.py);
     }
 
     inline Point2d Center(const Point2d& p1, const Point2d& p2)
@@ -172,6 +151,7 @@ namespace meshit
         return ax * by - ay * bx > eps * eps * std::max(ax * ax + ay * ay, bx * bx + by * by);
     }
 
+
     class Vec2d
     {
      protected:
@@ -192,16 +172,16 @@ namespace meshit
         explicit Vec2d(const Point2d& p2)
             : vx{p2.X()}, vy{p2.Y()} { }
 
-        Vec2d& operator=(double val)
-        {
-            vx = vy = val;
-            return *this;
-        }
-
         Vec2d(const Point2d& p1, const Point2d& p2)
         {
             vx = p2.px - p1.px;
             vy = p2.py - p1.py;
+        }
+
+        Vec2d& operator=(double val)
+        {
+            vx = vy = val;
+            return *this;
         }
 
         Vec2d& operator=(const Vec2d& p2)

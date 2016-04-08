@@ -6,7 +6,6 @@ namespace meshit
     {
         newp.X() = p1.X() + secpoint * (p2.X() - p1.X());
         newp.Y() = p1.Y() + secpoint * (p2.Y() - p1.Y());
-//        newp[2] = p1[2] + secpoint * (p2[2] - p1[2]);
     }
 
     void Refinement::Refine(Mesh& mesh)

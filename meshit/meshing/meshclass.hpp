@@ -190,11 +190,6 @@ namespace meshit
         /// remove edge points
         void SetNP(size_t np);
 
-        bool PointContainedIn2DElement(
-            const Point2d& p,
-            double lami[3],
-            const int element) const;
-
         class CSurfaceArea
         {
             const Mesh& mesh;

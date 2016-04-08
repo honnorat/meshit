@@ -5,10 +5,6 @@
 
 namespace meshit
 {
-    Point2d::Point2d(const Point3d& p3)
-        : px{p3.X()}, py{p3.Y()} { }
-
-
     inline const Box2d& Box2d::operator+=(const Box2d& b)
     {
         pmin.X() = std::min(pmin.X(), b.pmin.X());
@@ -17,7 +13,6 @@ namespace meshit
         pmax.Y() = std::max(pmax.Y(), b.pmax.Y());
         return *this;
     }
-
 
     std::ostream& operator<<(std::ostream& s, const Point2d& p)
     {

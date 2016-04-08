@@ -402,12 +402,6 @@ namespace meshit
         tree = new ADTree6(apmin, apmax);
     }
 
-    Box3dTree::Box3dTree(const Point3d& apmin, const Point3d& apmax)
-        : boxpmin{apmin}, boxpmax{apmax}
-    {
-        tree = new ADTree6(Point2d(apmin), Point2d(apmax));
-    }
-
     Box3dTree::~Box3dTree()
     {
         delete tree;

@@ -4,32 +4,32 @@
 
 namespace meshit
 {
-    int IntersectTriangleLine(const Point2d** tri, const Point2d** line)
+    bool IntersectTriangleLine(const Point2d** tri, const Point2d** line)
     {
-        Vec3d vl(*line[0], *line[1]);
-        Vec3d vt1(*tri[0], *tri[1]);
-        Vec3d vt2(*tri[0], *tri[2]);
-        Vec3d vrs(*tri[0], *line[0]);
+        Vec2d vl(*line[0], *line[1]);
+        Vec2d vt1(*tri[0], *tri[1]);
+        Vec2d vt2(*tri[0], *tri[2]);
+        Vec2d vrs(*tri[0], *line[0]);
 
         // static DenseMatrix a(3), ainv(3);
         // static Vector rs(3), lami(3);
         Mat3x3 a, ainv;
-        Vec3d rs, lami;
-        int i;
+        Vec3d rs = Vec3d(vrs);
+        Vec3d lami;
 
-        for (i = 0; i < 3; i++) {
-            a(i, 0) = -vl.X(i + 1);
-            a(i, 1) = vt1.X(i + 1);
-            a(i, 2) = vt2.X(i + 1);
-            rs.X(i + 1) = vrs.X(i + 1);
-        }
+        a = 0;
+        a(0, 0) = -vl.X();
+        a(0, 1) = vt1.X();
+        a(0, 2) = vt2.X();
+        a(1, 0) = -vl.Y();
+        a(1, 1) = vt1.Y();
+        a(1, 2) = vt2.Y();
 
         double det = a.Det();
         double arel = vl.Length() * vt1.Length() * vt2.Length();
 
-        // new !!!!
         if (fabs(det) <= 1e-10 * arel) {
-            return 0;
+            return false;
         }
 
         a.CalcInverse(ainv);
@@ -37,183 +37,56 @@ namespace meshit
 
         if (lami.X() >= 0 && lami.X() <= 1 &&
             lami.Y() >= 0 && lami.Z() >= 0 && lami.Y() + lami.Z() <= 1) {
-            return 1;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
-    int IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2)
+    bool IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2)
     {
-        int i, j;
-        double diam = Dist(*tri1[0], *tri1[1]);
-        double epsrel = 1e-8;
-        double eps = diam * epsrel;
-        double eps2 = eps * eps;
+        constexpr double epsrel = 1e-8;
+        const double diam = Dist(*tri1[0], *tri1[1]);
+        const double eps = diam * epsrel;
+        const double eps2 = eps * eps;
 
-
-        int cnt = 0;
-        for (i = 0; i <= 2; i++) {
-            for (j = 0; j <= 2; j++) {
+        uint32_t cnt = 0;
+        for (uint32_t i = 0; i <= 2; i++) {
+            for (uint32_t j = 0; j <= 2; j++) {
                 if (Dist2(*tri1[j], *tri2[i]) < eps2) {
                     cnt++;
                     break;
                 }
             }
         }
-
         switch (cnt) {
             case 0: {
                 const Point2d* line[2];
-
-                for (i = 0; i <= 2; i++) {
+                for (size_t i = 0; i <= 2; i++) {
                     line[0] = tri2[i];
                     line[1] = tri2[(i + 1) % 3];
 
                     if (IntersectTriangleLine(tri1, &line[0])) {
                         std::cerr << "int1, line = " << *line[0] << " - " << *line[1] << std::endl;
-                        return 1;
+                        return true;
                     }
                 }
-
-                for (i = 0; i <= 2; i++) {
+                for (size_t i = 0; i <= 2; i++) {
                     line[0] = tri1[i];
                     line[1] = tri1[(i + 1) % 3];
 
                     if (IntersectTriangleLine(tri2, &line[0])) {
                         std::cerr << "int2, line = " << *line[0] << " - " << *line[1] << std::endl;
-                        return 1;
+                        return true;
                     }
                 }
                 break;
             }
             default:
-                return 0;
+                return false;
         }
 
-        return 0;
-    }
-
-    void LocalCoordinates(const Vec3d& e1, const Vec3d& e2,
-                          const Vec3d& v, double& lam1, double& lam2)
-    {
-        double m11 = e1 * e1;
-        double m12 = e1 * e2;
-        double m22 = e2 * e2;
-        double rs1 = v * e1;
-        double rs2 = v * e2;
-
-        double det = m11 * m22 - m12 * m12;
-        lam1 = (rs1 * m22 - rs2 * m12) / det;
-        lam2 = (m11 * rs2 - m12 * rs1) / det;
-    }
-
-    int CalcSphereCenter(const Point3d** pts, Point3d& c)
-    {
-        Vec3d row1(*pts[0], *pts[1]);
-        Vec3d row2(*pts[0], *pts[2]);
-        Vec3d row3(*pts[0], *pts[3]);
-
-        Vec3d rhs(0.5 * (row1 * row1),
-                  0.5 * (row2 * row2),
-                  0.5 * (row3 * row3));
-        Transpose(row1, row2, row3);
-
-        Vec3d sol;
-        if (SolveLinearSystem(row1, row2, row3, rhs, sol)) {
-            std::cerr << "CalcSphereCenter: degenerated" << std::endl;
-            return 1;
-        }
-
-        c = *pts[0] + sol;
-        return 0;
-    }
-
-    double MinDistLP2(const Point2d& lp1, const Point2d& lp2, const Point2d& p)
-    {
-        Vec2d v(lp1, lp2);
-        Vec2d vlp(lp1, p);
-
-        // dist(lam) = \| vlp \|^2 - 2 lam (v1p, v) + lam^2 \| v \|^2
-
-        // lam = (v * vlp) / (v * v);
-        // if (lam < 0) lam = 0;
-        // if (lam > 1) lam = 1;
-
-        double num = v * vlp;
-        double den = v * v;
-
-        if (num <= 0)
-            return Dist2(lp1, p);
-
-        if (num >= den)
-            return Dist2(lp2, p);
-
-        if (den > 0) {
-            return vlp.Length2() - num * num / den;
-        }
-        else
-            return vlp.Length2();
-    }
-
-    double MinDistLP2(const Point3d& lp1, const Point3d& lp2, const Point3d& p)
-    {
-        Vec3d v(lp1, lp2);
-        Vec3d vlp(lp1, p);
-
-        // dist(lam) = \| vlp \|^2 - 2 lam (v1p, v) + lam^2 \| v \|^2
-
-        // lam = (v * vlp) / (v * v);
-        // if (lam < 0) lam = 0;
-        // if (lam > 1) lam = 1;
-
-        double num = v * vlp;
-        double den = v * v;
-
-        if (num <= 0)
-            return Dist2(lp1, p);
-
-        if (num >= den)
-            return Dist2(lp2, p);
-
-        if (den > 0) {
-            return vlp.Length2() - num * num / den;
-        }
-        else
-            return vlp.Length2();
-    }
-
-    double MinDistTP2(const Point3d& tp1, const Point3d& tp2,
-                      const Point3d& tp3, const Point3d& p)
-    {
-        double lam1, lam2;
-        double res;
-
-        LocalCoordinates(Vec3d(tp1, tp2), Vec3d(tp1, tp3),
-                         Vec3d(tp1, p), lam1, lam2);
-        int in1 = lam1 >= 0;
-        int in2 = lam2 >= 0;
-        int in3 = lam1 + lam2 <= 1;
-
-        if (in1 && in2 && in3) {
-            Point3d pp = tp1 + lam1 * Vec3d(tp1, tp2) + lam2 * Vec3d(tp1, tp3);
-            res = Dist2(p, pp);
-        } else {
-            res = Dist2(tp1, p);
-            if (!in1) {
-                double hv = MinDistLP2(tp1, tp3, p);
-                if (hv < res) res = hv;
-            }
-            if (!in2) {
-                double hv = MinDistLP2(tp1, tp2, p);
-                if (hv < res) res = hv;
-            }
-            if (!in3) {
-                double hv = MinDistLP2(tp2, tp3, p);
-                if (hv < res) res = hv;
-            }
-        }
-        return res;
+        return false;
     }
 
 }  // namespace meshit

@@ -664,34 +664,6 @@ namespace meshit
         return overlap;
     }
 
-    bool Mesh::PointContainedIn2DElement(const Point2d& p,
-                                         double lami[3],
-                                         const int element) const
-    {
-        const double eps = 1e-6;
-
-        const Element2d& el = Element(element);
-        const MeshPoint& p1 = points[el.PointID(0)];
-        const MeshPoint& p2 = points[el.PointID(1)];
-        const MeshPoint& p3 = points[el.PointID(2)];
-
-        Vec3d col1(p1, p2);
-        Vec3d col2(p1, p3);
-        Vec3d col3 = Cross(col1, col2);
-        Vec3d rhs(p1, p);
-        Vec3d sol;
-
-        SolveLinearSystem(col1, col2, col3, rhs, sol);
-
-        if (sol.X() >= -eps && sol.Y() >= -eps && sol.X() + sol.Y() <= 1 + eps) {
-            lami[0] = sol.X();
-            lami[1] = sol.Y();
-            lami[2] = sol.Z();
-            return true;
-        }
-        return false;
-    }
-
     void Mesh::RebuildSurfaceElementLists()
     {
         for (size_t i = 0; i < facedecoding.size(); i++) {
@@ -751,13 +723,11 @@ namespace meshit
     {
         ost << "Mesh Mem:" << std::endl;
 
-        ost << points.size() << " Points, of size "
-        << sizeof(Point3d) << " + " << sizeof(PointType) << " = "
-        << points.size() * (sizeof(Point3d) + sizeof(PointType)) << std::endl;
+        ost << points.size() << " mesh points, of size " << sizeof(MeshPoint)
+        << " = " << points.size() * sizeof(MeshPoint) << std::endl;
 
-        ost << elements.size() << " Surface elements, of size "
-        << sizeof(Element2d) << " = "
-        << elements.size() * sizeof(Element2d) << std::endl;
+        ost << elements.size() << " elements, of size " << sizeof(Element2d)
+        << " = " << elements.size() * sizeof(Element2d) << std::endl;
     }
 
 }  // namespace meshit

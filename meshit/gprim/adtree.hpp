@@ -122,7 +122,6 @@ namespace meshit
 
      public:
         Box3dTree(const Point2d& apmin, const Point2d& apmax);
-        Box3dTree(const Point3d& apmin, const Point3d& apmax);
         ~Box3dTree();
 
         void Insert(const Point2d& bmin, const Point2d& bmax, int pi);
