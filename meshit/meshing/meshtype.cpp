@@ -16,8 +16,8 @@ namespace meshit
 
         si = -1;
 
-        domin = -1;
-        domout = -1;
+        domin = static_cast<size_t>(-1);
+        domout = static_cast<size_t>(-1);
     }
 
     Segment::Segment(const Segment& other)
@@ -136,7 +136,6 @@ namespace meshit
 
     DebugParameters::DebugParameters()
     {
-        haltsuccess = 0;
         haltnosuccess = 0;
         haltlargequalclass = 0;
     };

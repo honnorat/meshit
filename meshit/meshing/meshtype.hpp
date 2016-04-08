@@ -176,9 +176,9 @@ namespace meshit
         /// surface decoding index
         int si;
         /// domain number inner side
-        size_t domin;
+        size_t domin;       // FIXME: useless ?
         /// domain number outer side
-        size_t domout;
+        size_t domout;      // FIXME: useless ?
 
         EdgePointGeomInfo epgeominfo[2];
 
@@ -254,9 +254,9 @@ namespace meshit
         int optsteps2d;
         /// grading for local h
         double grading;
-        /// maximal mesh size
+        /// maximal mesh_ size
         double maxh;
-        /// minimal mesh size
+        /// minimal mesh_ size
         double minh;
         /// check overlapping surfaces (debug)
         bool check_overlap;
@@ -276,7 +276,6 @@ namespace meshit
     class DebugParameters
     {
      public:
-        int haltsuccess;
         int haltnosuccess;
         int haltlargequalclass;
         int haltface;

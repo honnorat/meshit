@@ -27,7 +27,7 @@ namespace meshit
 
         double mem1[100], mem2[100], mem3[100];
 
-        int vs = oldutofreearea.Height();
+        size_t vs = oldutofreearea.Height();
         FlatVector devfree(vs, mem1);
 
         size_t fzs = freezone.size();

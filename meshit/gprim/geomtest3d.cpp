@@ -35,12 +35,10 @@ namespace meshit
         a.CalcInverse(ainv);
         lami = ainv * rs;
 
-        if (lami.X() >= 0 && lami.X() <= 1 &&
-            lami.Y() >= 0 && lami.Z() >= 0 && lami.Y() + lami.Z() <= 1) {
-            return true;
-        }
+        return lami.X() >= 0 && lami.X() <= 1 &&
+               lami.Y() >= 0 && lami.Z() >= 0 &&
+               lami.Y() + lami.Z() <= 1;
 
-        return false;
     }
 
     bool IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2)

@@ -75,7 +75,7 @@ namespace meshit
     char SplineGeometry::TestComment(std::istream& infile)
     {
         bool comment = true;
-        char ch;
+        char ch = '\0';
         while (comment && !infile.eof()) {
             infile >> ch;
             if (ch == '#') {

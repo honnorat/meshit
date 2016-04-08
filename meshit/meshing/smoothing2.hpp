@@ -35,12 +35,12 @@ namespace meshit
     class MinFunction_2d
     {
      protected:
-        const Mesh& mesh;
+        const Mesh& mesh_;
         Opti2dLocalData& ld;
 
      public:
         MinFunction_2d(const Mesh& amesh, Opti2dLocalData& ald)
-            : mesh{amesh}, ld(ald) { }
+            : mesh_{amesh}, ld(ald) { }
 
         double Func(const double* x);
 

@@ -196,10 +196,10 @@ namespace meshit
                     }
 
                     if (ok) {
-                        int locli = lmap[nlok];
-                        INDEX_2 loclin = llines[locli - 1];
+                        size_t locli = lmap[nlok] - 1;
+                        INDEX_2 loclin = llines[locli];
 
-                        lused[locli - 1] = true;
+                        lused[locli] = true;
                         for (int j = 0; j < 2; j++) {
                             pmap[rule->GetLine(nlok)[j] - 1] = loclin[j];
                             pused[loclin[j] - 1]++;
