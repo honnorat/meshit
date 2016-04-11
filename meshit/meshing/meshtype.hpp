@@ -250,22 +250,14 @@ namespace meshit
            // p .. print for debug
          **/
         const char* optimize2d;
-        /// number of 2d optimization steps
-        int optsteps2d;
-        /// grading for local h
-        double grading;
-        /// maximal mesh_ size
-        double maxh;
-        /// minimal mesh_ size
-        double minh;
-        /// check overlapping surfaces (debug)
-        bool check_overlap;
-        /// safty factor for curvatures (elemetns per radius)
-        double curvature_safety;
-        /// minimal number of segments per edge
-        double segments_per_edge;
-        /// give up quality class, 2d meshing
-        int giveup_tol2d;
+        int optsteps2d;             // number of 2d optimization steps
+        double grading;             // grading for local h
+        double maxh;                // maximal mesh size
+        double minh;                // minimal mesh size
+        double curvature_safety;    // safty factor for curvatures (elemetns per radius)
+        double segments_per_edge;   // minimal number of segments per edge
+        bool restrict_segment;      // restrict local mesh size based on geometry segment
+        int giveup_tol2d;           // give up quality class
 
         int n_steps;
 

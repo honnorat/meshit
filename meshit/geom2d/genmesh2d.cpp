@@ -216,8 +216,10 @@ namespace meshit
             mesh2d.RestrictLocalH(p1, h1);
             mesh2d.RestrictLocalH(p2, h2);
 
-            double len = spline.Length();
-            mesh2d.RestrictLocalHLine(p1, p2, len / mp.segments_per_edge);
+            if (mp.restrict_segment) {
+                double len = spline.Length();
+                mesh2d.RestrictLocalHLine(p1, p2, len / mp.segments_per_edge);
+            }
 
             double hcurve = std::min(spline.hmax, h / spline.reffak);
             double hl = GetDomainMaxh(spline.leftdom);

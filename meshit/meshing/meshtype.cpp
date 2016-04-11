@@ -112,7 +112,7 @@ namespace meshit
         grading = -1.0;
         maxh = 1e10;
         minh = 0;
-        check_overlap = false;
+        restrict_segment = false;
         curvature_safety = 2;
         segments_per_edge = 1;
 
@@ -124,10 +124,10 @@ namespace meshit
     {
         optimize2d = other.optimize2d;
         optsteps2d = other.optsteps2d;
+        restrict_segment = other.restrict_segment;
         grading = other.grading;
         minh = other.minh;
         maxh = other.maxh;
-        check_overlap = other.check_overlap;
         curvature_safety = other.curvature_safety;
         segments_per_edge = other.segments_per_edge;
         giveup_tol2d = other.giveup_tol2d;

@@ -3,18 +3,17 @@
 
 namespace meshit
 {
-    GradingBox::GradingBox(const double* ax1, const double* ax2)
+    GradingBox::GradingBox(const Point2d& px1, const Point2d& px2)
     {
-        SetBox(ax1, ax2);
+        SetBox(px1, px2);
     }
 
-    void GradingBox::SetBox(const double* ax1, const double* ax2)
+    void GradingBox::SetBox(const Point2d& px1, const Point2d& px2)
     {
-        hopt = ax2[0] - ax1[0];
+        hopt = Dist(px2, px1);
         h2 = 0.5 * hopt;
 
-        xmid[0] = 0.5 * (ax1[0] + ax2[0]);
-        xmid[1] = 0.5 * (ax1[1] + ax2[1]);
+        xmid = Center(px1, px2);
 
         for (int i = 0; i < 4; i++) {
             childs[i] = nullptr;
@@ -56,15 +55,16 @@ namespace meshit
         constexpr double alpha = 0.13;
         constexpr double al_p1 = 1.0 + alpha;
 
-        double x1[2], x2[2];
         double hmax = std::max(pmax.X() - pmin.X(),
                                pmax.Y() - pmin.Y());
 
-        x1[0] = al_p1 * pmin.X() - alpha * pmax.X();
-        x1[1] = al_p1 * pmin.Y() - alpha * pmax.Y();
+        Point2d x1, x2;
 
-        x2[0] = x1[0] + hmax;
-        x2[1] = x1[1] + hmax;
+        x1.X() = al_p1 * pmin.X() - alpha * pmax.X();
+        x1.Y() = al_p1 * pmin.Y() - alpha * pmax.Y();
+
+        x2.X() = x1.X() + hmax;
+        x2.Y() = x1.Y() + hmax;
 
         CleanRoot();
         root = new GradingBox(x1, x2);
@@ -83,8 +83,8 @@ namespace meshit
         double p_x = p.X();
         double p_y = p.Y();
 
-        if (fabs(p_x - root->xmid[0]) > root->h2 ||
-            fabs(p_y - root->xmid[1]) > root->h2) {
+        if (fabs(p_x - root->xmid.X()) > root->h2 ||
+            fabs(p_y - root->xmid.Y()) > root->h2) {
             return;
         }
 
@@ -92,13 +92,13 @@ namespace meshit
 
         GradingBox* box = root;
         GradingBox* nbox = root;
-        double x1[2], x2[2];
+        Point2d x1, x2;
 
         while (nbox) {
             box = nbox;
             int childnr = 0;
-            childnr += 1 * static_cast<int>((p_x > box->xmid[0]));
-            childnr += 2 * static_cast<int>((p_y > box->xmid[1]));
+            childnr += 1 * static_cast<int>((p_x > box->xmid.X()));
+            childnr += 2 * static_cast<int>((p_y > box->xmid.Y()));
             nbox = box->childs[childnr];
         }
 
@@ -106,23 +106,23 @@ namespace meshit
 
         while (box->h2 > h_half) {
             int childnr = 0;
-            childnr += 1 * static_cast<int>((p_x > box->xmid[0]));
-            childnr += 2 * static_cast<int>((p_y > box->xmid[1]));
+            childnr += 1 * static_cast<int>((p_x > box->xmid.X()));
+            childnr += 2 * static_cast<int>((p_y > box->xmid.Y()));
 
             double h2 = box->h2;
             if (childnr & 1) {
-                x1[0] = box->xmid[0];
-                x2[0] = x1[0] + h2;
+                x1.X() = box->xmid.X();
+                x2.X() = x1.X() + h2;
             } else {
-                x2[0] = box->xmid[0];
-                x1[0] = x2[0] - h2;
+                x2.X() = box->xmid.X();
+                x1.X() = x2.X() - h2;
             }
             if (childnr & 2) {
-                x1[1] = box->xmid[1];
-                x2[1] = x1[1] + h2;
+                x1.Y() = box->xmid.Y();
+                x2.Y() = x1.Y() + h2;
             } else {
-                x2[1] = box->xmid[1];
-                x1[1] = x2[1] - h2;
+                x2.Y() = box->xmid.Y();
+                x1.Y() = x2.Y() - h2;
             }
 
             box = box->childs[childnr] = new GradingBox(x1, x2);
@@ -146,8 +146,8 @@ namespace meshit
 
         while (true) {
             int childnr = 0;
-            if (x.X() > box->xmid[0]) childnr += 1;
-            if (x.Y() > box->xmid[1]) childnr += 2;
+            if (x.X() > box->xmid.X()) childnr += 1;
+            if (x.Y() > box->xmid.Y()) childnr += 2;
 
             if (box->childs[childnr])
                 box = box->childs[childnr];
@@ -172,8 +172,8 @@ namespace meshit
     double LocalH::GetMinHRec(const Point2d& pmin, const Point2d& pmax, const GradingBox* box) const
     {
         double h2 = box->h2;
-        if (pmax.X() < box->xmid[0] - h2 || pmin.X() > box->xmid[0] + h2 ||
-            pmax.Y() < box->xmid[1] - h2 || pmin.Y() > box->xmid[1] + h2) {
+        if (pmax.X() < box->xmid.X() - h2 || pmin.X() > box->xmid.X() + h2 ||
+            pmax.Y() < box->xmid.Y() - h2 || pmin.Y() > box->xmid.Y() + h2) {
             return 1e8;
         }
 

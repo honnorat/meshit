@@ -16,10 +16,10 @@ namespace meshit
     class GradingBox
     {
      public:
-        GradingBox(const double* ax1, const double* ax2);
+        GradingBox(const Point2d& px1, const Point2d& px2);
         void DeleteChilds();
 
-        void SetBox(const double* ax1, const double* ax2);
+        void SetBox(const Point2d& px1, const Point2d& px2);
 
         friend class LocalH;
 
@@ -28,7 +28,7 @@ namespace meshit
         void operator delete(void*);
 
      protected:
-        double xmid[2];
+        Point2d xmid;
         double h2;  // half edgelength
 
         GradingBox* childs[4];

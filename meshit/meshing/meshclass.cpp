@@ -47,7 +47,7 @@ namespace meshit
             grading = geometry.GetGrading();
         }
         if (grading < 0.01) {
-            MESHIT_LOG_WARNING("grading is too small: " << grading << ". We reset it to 0.05");
+            MESHIT_LOG_WARNING("grading is too small: " << grading << ". We reset it to 0.01");
             grading = 0.01;
         }
         geometry.SetGrading(grading);
