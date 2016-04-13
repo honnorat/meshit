@@ -212,8 +212,8 @@ namespace meshit
 
         for (size_t sei = 0; sei < elements.size(); sei++) {
             if (elements[sei].GetIndex()) {
-                outfile << std::setw(8) << GetFaceDescriptor(elements[sei].GetIndex()).SurfNr() + 1;
-                outfile << std::setw(8) << GetFaceDescriptor(elements[sei].GetIndex()).BCProperty();
+                outfile << std::setw(8) << facedecoding[elements[sei].GetIndex() - 1].SurfNr() + 1;
+                outfile << std::setw(8) << facedecoding[elements[sei].GetIndex() - 1].BCProperty();
             } else {
                 outfile << "       0       0";
             }
@@ -304,15 +304,14 @@ namespace meshit
                     surfnr--;
 
                     for (size_t j = 0; j < facedecoding.size(); j++) {
-                        if (GetFaceDescriptor(j + 1).SurfNr() == static_cast<size_t>(surfnr) &&
-                            GetFaceDescriptor(j + 1).BCProperty() == static_cast<size_t>(bcp)) {
+                        if (facedecoding[j].SurfNr() == static_cast<size_t>(surfnr) &&
+                            facedecoding[j].BCProperty() == static_cast<size_t>(bcp)) {
                             faceind = j + 1;
                         }
                     }
                     if (!faceind) {
                         facedecoding.push_back(FaceDescriptor(surfnr));
-                        faceind = facedecoding.size();
-                        GetFaceDescriptor(faceind).SetBCProperty(bcp);
+                        facedecoding.back().SetBCProperty(bcp);
                     }
 
                     infile >> nep;
@@ -656,8 +655,8 @@ namespace meshit
                         MESHIT_LOG_DEBUG_CONT(*trip2[k] << "   ");
                     MESHIT_LOG_DEBUG("");
 
-                    MESHIT_LOG_DEBUG("Face1 = " << GetFaceDescriptor(tri1.GetIndex()));
-                    MESHIT_LOG_DEBUG("Face2 = " << GetFaceDescriptor(tri2.GetIndex()));
+                    MESHIT_LOG_DEBUG("Face1 = " << facedecoding[tri1.GetIndex() - 1]);
+                    MESHIT_LOG_DEBUG("Face2 = " << facedecoding[tri2.GetIndex() - 1]);
                 }
             }
         }

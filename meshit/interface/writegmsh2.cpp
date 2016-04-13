@@ -78,9 +78,9 @@ namespace meshit
         }
         for (size_t k = 0; k < nse; k++) {
             const Element2d& el = mesh.Element(k);
+            int domain = mesh.GetDomainNumber(el);
             os << ++cnt << " 2 2 ";   // GMSH Type for a 3 node triangle
-            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";
-            os << mesh.GetFaceDescriptor(el.GetIndex()).BCProperty() + 100 << " ";
+            os << domain << " " << domain << " ";
             os << el.PointID(0) + 1 << " ";
             os << el.PointID(1) + 1 << " ";
             os << el.PointID(2) + 1 << "\n";

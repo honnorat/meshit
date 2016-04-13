@@ -163,20 +163,10 @@ namespace meshit
 
         void SetMaterial(size_t domnr, const char* mat);
 
-        size_t GetNFD() const
-        {
-            return facedecoding.size();
-        }
+        size_t GetNFD() const { return facedecoding.size(); }
 
-        const FaceDescriptor& GetFaceDescriptor(int i) const
-        {
-            return facedecoding[i - 1];
-        }
-
-        FaceDescriptor& GetFaceDescriptor(int i)
-        {
-            return facedecoding[i - 1];
-        }
+        int GetDomainNumber(const Element2d& el) const { return GetDomainNumber(el.GetIndex()); }
+        int GetDomainNumber(int face_id) const { return facedecoding[face_id - 1].BCProperty() + 100; }
 
         /// find number of vertices
         void ComputeNVertices();
