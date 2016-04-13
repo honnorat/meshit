@@ -159,7 +159,7 @@ namespace meshit
         return ifail;
     }
 
-    double BFGS_2d(double* x, MinFunction_2d& fun, const OptiParameters& par, double eps)
+    double BFGS_2d(double* x, MinFunction_2d& fun, const OptiParameters& par)
     {
         bool a1crit;
         bool a3acrit;
@@ -256,7 +256,7 @@ namespace meshit
             }
 
             // Calculate stop conditions
-            hd = eps * std::max(typf, fabs(f));
+            hd = par.eps * std::max(typf, fabs(f));
             a1crit = true;
             a1crit &= (fabs(g[0]) * std::max(typx[0], fabs(x[0])) <= hd);
             a1crit &= (fabs(g[1]) * std::max(typx[1], fabs(x[1])) <= hd);

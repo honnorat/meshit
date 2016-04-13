@@ -16,70 +16,42 @@ namespace meshit
     class FlatVector
     {
      protected:
-        size_t s;
+        size_t size_;
         double* data;
 
      public:
         FlatVector() { }
 
         explicit FlatVector(size_t as, double* adata = nullptr)
-            : s{as}, data{adata} { }
+            : size_{as}, data{adata} { }
 
-        size_t Size() const
-        {
-            return s;
-        }
+        size_t Size() const { return size_; }
 
         FlatVector& operator=(const FlatVector& v)
         {
-            memcpy(data, v.data, s * sizeof(double));
+            memcpy(data, v.data, size_ * sizeof(double));
             return *this;
         }
 
         FlatVector& operator=(double scal)
         {
-            for (size_t i = 0; i < s; i++) data[i] = scal;
+            for (size_t i = 0; i < size_; i++) data[i] = scal;
             return *this;
         }
 
-        double& operator[](size_t i)
-        {
-            return data[i];
-        }
-
-        const double& operator[](size_t i) const
-        {
-            return data[i];
-        }
-
-        double& operator()(size_t i)
-        {
-            return data[i];
-        }
-
-        const double& operator()(size_t i) const
-        {
-            return data[i];
-        }
+        double& operator[](size_t i) { return data[i]; }
+        const double& operator[](size_t i) const { return data[i]; }
 
         FlatVector& operator*=(double scal)
         {
-            for (size_t i = 0; i < s; i++) data[i] *= scal;
+            for (size_t i = 0; i < size_; i++) data[i] *= scal;
             return *this;
         }
 
         FlatVector& Add(double scal, const FlatVector& v2)
         {
-            for (size_t i = 0; i < s; i++) {
+            for (size_t i = 0; i < size_; i++) {
                 data[i] += scal * v2[i];
-            }
-            return *this;
-        }
-
-        FlatVector& Set(double scal, const FlatVector& v2)
-        {
-            for (size_t i = 0; i < s; i++) {
-                data[i] = scal * v2[i];
             }
             return *this;
         }
@@ -87,19 +59,10 @@ namespace meshit
         FlatVector& Set2(double scal1, const FlatVector& v1,
                          double scal2, const FlatVector& v2)
         {
-            for (size_t i = 0; i < s; i++) {
+            for (size_t i = 0; i < size_; i++) {
                 data[i] = scal1 * v1[i] + scal2 * v2[i];
             }
             return *this;
-        }
-
-        double L2Norm() const
-        {
-            double sum = 0;
-            for (size_t i = 0; i < s; i++) {
-                sum += data[i] * data[i];
-            }
-            return sqrt(sum);
         }
 
         friend double operator*(const FlatVector& v1, const FlatVector& v2);
@@ -116,7 +79,7 @@ namespace meshit
         explicit Vector(size_t as)
             : FlatVector{as}
         {
-            data = new double[s];
+            data = new double[size_];
             ownmem = true;
         }
 
@@ -130,52 +93,31 @@ namespace meshit
 
         Vector& operator=(const FlatVector& v)
         {
-            memcpy(data, &v(0), s * sizeof(double));
+            memcpy(data, &v[0], size_ * sizeof(double));
             return *this;
         }
 
         Vector& operator=(double scal)
         {
-            for (size_t i = 0; i < s; i++) data[i] = scal;
+            for (size_t i = 0; i < size_; i++) data[i] = scal;
             return *this;
         }
 
         void SetSize(size_t as)
         {
-            if (s != as) {
-                s = as;
+            if (size_ != as) {
+                size_ = as;
                 if (ownmem) delete[] data;
-                data = new double[s];
+                data = new double[size_];
                 ownmem = true;
             }
-        }
-    };
-
-    template<size_t S>
-    class VectorMem : public Vector
-    {
-        double mem[S];
-
-     public:
-        VectorMem() : Vector(S, &mem[0]) { }
-
-        VectorMem& operator=(const FlatVector& v)
-        {
-            memcpy(data, &v(0), S * sizeof(double));
-            return *this;
-        }
-
-        VectorMem& operator=(double scal)
-        {
-            for (size_t i = 0; i < S; i++) data[i] = scal;
-            return *this;
         }
     };
 
     inline double operator*(const FlatVector& v1, const FlatVector& v2)
     {
         double sum = 0;
-        for (size_t i = 0; i < v1.s; i++) {
+        for (size_t i = 0; i < v1.Size(); i++) {
             sum += v1.data[i] * v2.data[i];
         }
         return sum;

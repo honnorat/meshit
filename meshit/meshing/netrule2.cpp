@@ -25,7 +25,7 @@ namespace meshit
         double lam1 = 1.0 / tolclass;
         double lam2 = 1. - lam1;
 
-        double mem1[100], mem2[100], mem3[100];
+        double mem1[20], mem2[20], mem3[20];
 
         size_t vs = oldutofreearea.Height();
         FlatVector devfree(vs, mem1);

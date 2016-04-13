@@ -50,7 +50,7 @@ namespace meshit
 
         ~LocalH();
 
-        void Init(const Point2d& pmin, const Point2d& pmax, double grading);
+        void Init(const Box2d& bbox, double grading);
         void CleanRoot();
 
         void SetH(const Point2d& x, double h);

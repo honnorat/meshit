@@ -18,8 +18,6 @@
 
 namespace meshit
 {
-    void Optimize2d(Mesh& mesh, MeshingParameters& mp);
-
     class SplineGeometry
     {
      protected:
@@ -41,8 +39,8 @@ namespace meshit
         void LoadData(std::istream& infile);
 
         void AddLine(const std::vector<Point2d>& points,
-                     double hmax, int bc,
-                     int face_left = 1, int face_right = 0);
+                     double hmax, int spline_id,
+                     int domain_left = 1, int domain_right = 0);
         void AddHole(const std::vector<Point2d>& points,
                      double hmax, int bc, int face = 1);
         void AddStructureLine(const std::vector<Point2d>& points,
@@ -51,26 +49,24 @@ namespace meshit
                               int face = 1);
 
         void AddSpline(const std::vector<Point2d>& points,
-                       double hmax, int bc = 1,
-                       int face_left = 1,
-                       int face_right = 0);
+                       double hmax, int spline_id = 1,
+                       int domain_left = 1,
+                       int domain_right = 0);
 
         void AddCircle(const Point2d& center, double radius,
-                       double hmax, int bc = 1,
+                       double hmax, int spline_id = 1,
                        int face_left = 1,
                        int face_right = 0);
 
         int AddFace(const std::string& name, double maxh_f = 1e99);
 
-        void FakeData();
-
         char TestComment(std::istream& infile);
 
-        void PartitionBoundary(MeshingParameters& mp, double h, Mesh& mesh2d);
+        void PartitionBoundary(Mesh& mesh2d, MeshingParameters& mp);
 
         void GetMaterial(size_t domnr, char*& material);
 
-        double GetDomainMaxh(size_t domnr);
+        double GetDomainMaxh(size_t domain_id);
 
         void SetGrading(const double grading)
         {
@@ -81,6 +77,31 @@ namespace meshit
         {
             return elto0;
         }
+    };
+
+
+    class SplineSegmenter
+    {
+     public:
+        SplineSegmenter(Mesh& mesh, MeshingParameters& mp, double elto0, const Box2d& bbox)
+            : mesh_{mesh}, mp_{mp}, elto0_{elto0}, searchtree_{bbox.PMin(), bbox.PMax()} { }
+
+        void Partition(const std::vector<SplineSeg*>& splines)
+        {
+            for (size_t i = 0; i < splines.size(); i++) {
+                Partition(*splines[i]);
+            }
+        }
+
+     protected:
+        void Partition(const SplineSeg& spline);
+        void CalcPartition(const SplineSeg& spline, std::vector<double>& points);
+
+     protected:
+        Mesh& mesh_;
+        MeshingParameters& mp_;
+        double elto0_;
+        Point3dTree searchtree_;
     };
 
 }  // namespace meshit

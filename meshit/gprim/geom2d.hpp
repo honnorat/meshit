@@ -351,24 +351,10 @@ namespace meshit
 
         void SetPoint(const Point2d& p)
         {
-            pmin.X() = pmax.X() = p.X();
-            pmin.Y() = pmax.Y() = p.Y();
-        }
-
-        void AddPoint(const Point2d& p)
-        {
-            if (p.X() < pmin.X()) pmin.X() = p.X();
-            if (p.X() > pmax.X()) pmax.X() = p.X();
-            if (p.Y() < pmin.Y()) pmin.Y() = p.Y();
-            if (p.Y() > pmax.Y()) pmax.Y() = p.Y();
-        }
-
-        void Set(const Point2d& p)
-        {
             pmin = pmax = p;
         }
 
-        void Add(const Point2d& p)
+        void AddPoint(const Point2d& p)
         {
             pmin.X() = std::min(pmin.X(), p.X());
             pmin.Y() = std::min(pmin.Y(), p.Y());
@@ -383,6 +369,11 @@ namespace meshit
             return sqrt(dx * dx + dy * dy);
         }
 
+        inline double LargestSide() const
+        {
+            return std::max(pmax.X() - pmin.X(),
+                            pmax.Y() - pmin.Y());
+        }
     };
 
     inline std::ostream& operator<<(std::ostream& ost, const Box2d& b)

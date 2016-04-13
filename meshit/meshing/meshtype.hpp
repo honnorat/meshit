@@ -9,7 +9,6 @@
 
 #include <iostream>
 
-#include "../meshit.hpp"
 #include "msghandler.hpp"
 #include "../linalg/densemat.hpp"
 #include "../gprim/geom3d.hpp"
@@ -20,29 +19,7 @@ namespace meshit
     {
         EDGE_POINT = 2, INNER_POINT = 3
     };
-
-    class EdgePointGeomInfo
-    {
-     public:
-        EdgePointGeomInfo()
-            : edgenr(0), body(0), dist(0.0), u(0.0), v(0.0) { }
-
-        EdgePointGeomInfo& operator=(const EdgePointGeomInfo& gi2)
-        {
-            edgenr = gi2.edgenr;
-            body = gi2.body;
-            dist = gi2.dist;
-            u = gi2.u;
-            v = gi2.v;
-            return *this;
-        }
-
-     public:
-        int edgenr;
-        int body;     // for ACIS
-        double dist;  // for 2d meshing
-        double u, v;  // for OCC Meshing
-    };
+    typedef PointType point_type_t;
 
     typedef int PointIndex;
     typedef int SurfaceElementIndex;
@@ -55,24 +32,17 @@ namespace meshit
      public:
         MeshPoint() { }
 
-        explicit MeshPoint(const Point2d& ap, PointType apt = INNER_POINT)
-            : Point2d{ap}, type{apt} { }
+        explicit MeshPoint(const Point2d& p, point_type_t type = INNER_POINT)
+            : Point2d{p}, type_{type} { }
 
-        explicit MeshPoint(double px, double py, PointType apt = INNER_POINT)
-            : Point2d{px, py}, type{apt} { }
+        explicit MeshPoint(double px, double py, point_type_t type = INNER_POINT)
+            : Point2d{px, py}, type_{type} { }
 
-        PointType Type() const
-        {
-            return type;
-        }
-
-        void SetType(PointType at)
-        {
-            type = at;
-        }
+        point_type_t Type() const { return type_; }
+        void SetType(point_type_t at) { type_ = at; }
 
      protected:
-        PointType type;
+        point_type_t type_;
     };
 
     /**
@@ -166,77 +136,41 @@ namespace meshit
 
         ~Segment() { }
 
-        PointIndex pnums[3];  // p1, p2, pmid
+        PointIndex pnums[2];    // p1, p2
 
-        int edgenr;
-
-        /// 0.. not first segment of segs, 1..first of class, 2..first of class, inverse
-        unsigned int seginfo : 2;
-
-        /// surface decoding index
-        int si;
-        /// domain number inner side
-        size_t domin;       // FIXME: useless ?
-        /// domain number outer side
-        size_t domout;      // FIXME: useless ?
-
-        EdgePointGeomInfo epgeominfo[2];
+        int edge_id;
+        size_t dom_left;        // domain number left side
+        size_t dom_right;       // domain number right side
 
      public:
         Segment& operator=(const Segment& other);
 
-        int hp_elnr;
-
-        PointIndex& operator[](int i)
-        {
-            return pnums[i];
-        }
-
-        const PointIndex& operator[](int i) const
-        {
-            return pnums[i];
-        }
+        PointIndex& operator[](int i) { return pnums[i]; }
+        const PointIndex& operator[](int i) const { return pnums[i]; }
     };
 
     std::ostream& operator<<(std::ostream& s, const Segment& seg);
 
+
     class FaceDescriptor
     {
-        /// which surface, 0 if not available
-        size_t surfnr;
-
-        /// boundary condition property
-        size_t bcprop;
-
-        /// root of linked list
-        SurfaceElementIndex firstelement;
-
      public:
-        FaceDescriptor();
-        FaceDescriptor(const FaceDescriptor& other);
-        explicit FaceDescriptor(size_t surfnri);
+        FaceDescriptor()
+            : index_{0}, first_element{-1} { }
 
-        ~FaceDescriptor() { }
+        explicit FaceDescriptor(size_t face_index)
+            : index_{face_index}, first_element{-1} { }
 
-        size_t SurfNr() const
-        {
-            return surfnr;
-        }
+        size_t face_id() const { return index_; }
 
-        size_t BCProperty() const
-        {
-            return bcprop;
-        }
-
-        void SetBCProperty(int bc)
-        {
-            bcprop = bc;
-        }
+     protected:
+        size_t index_;
+        SurfaceElementIndex first_element;   // root of linked list
 
         friend class Mesh;
     };
 
-    std::ostream& operator<<(std::ostream& s, const FaceDescriptor& fd);
+    std::ostream& operator<<(std::ostream& os, const FaceDescriptor& fd);
 
     class MeshingParameters
     {
@@ -263,16 +197,6 @@ namespace meshit
 
         MeshingParameters();
         MeshingParameters(const MeshingParameters& other);
-    };
-
-    class DebugParameters
-    {
-     public:
-        int haltnosuccess;
-        int haltlargequalclass;
-        int haltface;
-        int haltfacenr;
-        DebugParameters();
     };
 
     inline void Element2d::Invert()

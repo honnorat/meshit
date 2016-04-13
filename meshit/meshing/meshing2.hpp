@@ -23,26 +23,14 @@ namespace meshit
 
     class Meshing2
     {
-        /// the current advancing front
-        AdFront2* adfront;
-        /// rules for mesh generation
-        std::vector<netrule*> rules;
-        /// statistics
-        std::vector<int> ruleused, canuse, foundmap;
-
-        double max_area;
-
-        Vec2d ex, ey;
-        Point2d globp1;
-
      public:
-        explicit Meshing2(const Box2d& aboundingbox);
+        explicit Meshing2(Mesh& amesh, const Box2d& aboundingbox);
         ~Meshing2();
 
         /// Load rules, either from file, or compiled rules
         void LoadRules(const char* filename);
-
-        bool GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr);
+        void Reset();
+        bool GenerateMesh(const MeshingParameters& mp, double gh, int facenr);
 
         void AddPoint(const Point2d& p, PointIndex globind);
         void AddBoundaryElement(INDEX i1, INDEX i2);
@@ -68,6 +56,22 @@ namespace meshit
                        std::vector<uint32_t>& dellines,
                        int tolerance,
                        const MeshingParameters& mp);
+
+     protected:
+        Mesh& mesh_;
+        const Box2d& boundingbox_;
+        AdFront2* adfront;  // the current advancing front
+
+        double max_area;
+
+        std::vector<netrule*> rules;    // rules for mesh generation
+
+        // statistics
+        std::vector<int> ruleused, canuse, foundmap;
+
+        Vec2d ex, ey;
+        Point2d glob_p1;
+
     };
 }  // namespace meshit
 

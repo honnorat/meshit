@@ -74,13 +74,15 @@ namespace meshit
         cnt = 0;
         for (size_t i = 0; i < ns; i++) {
             const Segment& seg = mesh.LineSegment(i);
-            os << ++cnt << " 1 2 " << seg.si << " " << seg.si << " " << seg[0] + 1 << " " << seg[1] + 1 << std::endl;
+            os << ++cnt << " 1";   // GMSH type for a segment
+            os << " 2 " << seg.edge_id << " " << seg.edge_id << " ";
+            os << seg[0] + 1 << " " << seg[1] + 1 << std::endl;
         }
         for (size_t k = 0; k < nse; k++) {
             const Element2d& el = mesh.Element(k);
             int domain = mesh.GetDomainNumber(el);
-            os << ++cnt << " 2 2 ";   // GMSH Type for a 3 node triangle
-            os << domain << " " << domain << " ";
+            os << ++cnt << " 2";   // GMSH type for a 3 node triangle
+            os << " 2 " << domain << " " << domain << " ";
             os << el.PointID(0) + 1 << " ";
             os << el.PointID(1) + 1 << " ";
             os << el.PointID(2) + 1 << "\n";

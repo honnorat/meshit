@@ -72,10 +72,10 @@ namespace meshit
         void Mult(const FlatVector& v, FlatVector& prod) const
         {
             const double* mp = data;
-            double* dp = &prod(0);
+            double* dp = &prod[0];
             for (size_t i = 0; i < height; i++) {
                 double sum = 0;
-                const double* sp = &v(0);
+                const double* sp = &v[0];
 
                 for (size_t j = 0; j < width; j++) {
                     sum += *mp * *sp;

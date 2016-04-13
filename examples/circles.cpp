@@ -67,8 +67,7 @@ int main(int argc, char** argv)
     mesh.Save("circles.meshit");
     MESHIT_LOG_INFO("~ save     : " << uclock() - cc << " s.");
 
-    meshit::Refinement ref;
-    ref.Refine(mesh);
+    mesh.Refine();
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);
     mesh.CheckOverlappingBoundary();

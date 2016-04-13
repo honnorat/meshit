@@ -26,7 +26,6 @@ SET(src_LINALG
 
 SET(src_MESHING
     meshing/adfront2.cpp
-    meshing/global.cpp
     meshing/improve2.cpp
     meshing/localh.cpp
     meshing/meshclass.cpp

@@ -59,7 +59,7 @@ namespace meshit
         second.Y() = 0.0;
     }
 
-    double LineSeg::Length() const
+    inline double LineSeg::Length() const
     {
         return Dist(p1, p2);
     }

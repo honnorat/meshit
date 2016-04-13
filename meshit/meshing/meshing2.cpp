@@ -1,17 +1,14 @@
 #include "meshing2.hpp"
 
-#include "global.hpp"
 #include "../gprim/geomtest3d.hpp"
 
 namespace meshit
 {
-    Meshing2::Meshing2(const Box2d& boundingbox)
+    Meshing2::Meshing2(Mesh& amesh, const Box2d& boundingbox)
+        : mesh_{amesh}, boundingbox_{boundingbox}, adfront{new AdFront2(boundingbox)}, max_area{-1.0}
     {
         LoadRules(NULL);
         // LoadRules ("rules/triangle.rls");
-
-        adfront = new AdFront2(boundingbox);
-        max_area = -1;
     }
 
     Meshing2::~Meshing2()
@@ -20,6 +17,13 @@ namespace meshit
         for (size_t i = 0; i < rules.size(); i++) {
             delete rules[i];
         }
+    }
+
+    void Meshing2::Reset()
+    {
+        if (adfront) delete adfront;
+        adfront = new AdFront2(boundingbox_);
+        max_area = -1.0;
     }
 
     void Meshing2::AddPoint(const Point2d& p, PointIndex globind)
@@ -46,7 +50,7 @@ namespace meshit
 
     void Meshing2::DefineTransformation(const Point2d& p1, const Point2d& p2)
     {
-        globp1 = p1;
+        glob_p1 = p1;
         ex.X() = p2.X() - p1.X();
         ex.Y() = p2.Y() - p1.Y();
         ex /= ex.Length();
@@ -56,7 +60,7 @@ namespace meshit
 
     void Meshing2::TransformToPlain(const Point2d& locpoint, Point2d& plainpoint, double h)
     {
-        Vec2d p1p(globp1, locpoint);
+        Vec2d p1p(glob_p1, locpoint);
 
         plainpoint.X() = (p1p * ex) / h;
         plainpoint.Y() = (p1p * ey) / h;
@@ -64,21 +68,16 @@ namespace meshit
 
     void Meshing2::TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, double h)
     {
-        locpoint.X() = globp1.X() + h * (plainpoint.X() * ex.X() + plainpoint.Y() * ey.X());
-        locpoint.Y() = globp1.Y() + h * (plainpoint.X() * ex.Y() + plainpoint.Y() * ey.Y());
+        locpoint.X() = glob_p1.X() + h * (plainpoint.X() * ex.X() + plainpoint.Y() * ey.X());
+        locpoint.Y() = glob_p1.Y() + h * (plainpoint.X() * ex.Y() + plainpoint.Y() * ey.Y());
     }
 
-    bool Meshing2::GenerateMesh(Mesh& mesh, const MeshingParameters& mp, double gh, int facenr)
+    bool Meshing2::GenerateMesh(const MeshingParameters& mp, double gh, int facenr)
     {
         std::vector<int> pindex, lindex;
         std::vector<int> delpoints;
         std::vector<uint32_t> dellines;
         std::vector<Element2d> locelements;
-
-        bool found;
-        int rulenr{-1};
-        Point2d p1, p2;
-
         std::vector<Point2d> locpoints;
         std::vector<int> legalpoints;
         std::vector<Point2d> plainpoints;
@@ -86,12 +85,12 @@ namespace meshit
         int trials = 0, nfaces = 0;
         int qualclass;
 
-        std::vector<int> elements_on_node(mesh.GetNP(), 0);
-        std::vector<bool> illegal_point(mesh.GetNP(), false);
+        std::vector<int> elements_on_node(mesh_.GetNP(), 0);
+        std::vector<bool> illegal_point(mesh_.GetNP(), false);
         double meshed_area = 0.0;
 
         if (max_area > 0)
-            meshed_area = mesh.SurfaceArea();
+            meshed_area = mesh_.SurfaceArea();
 
         foundmap.resize(rules.size(), 0);
         canuse.resize(rules.size(), 0);
@@ -114,7 +113,7 @@ namespace meshit
 
             // plot statistics
             if (trials > plotnexttrial) {
-                MESHIT_LOG_DEBUG(nfaces << " faces, " << trials << " trials, " << mesh.GetNSE() << " elements.");
+                MESHIT_LOG_DEBUG(nfaces << " faces, " << trials << " trials, " << mesh_.GetNSE() << " elements.");
                 plotnexttrial += 1000;
             }
 
@@ -131,14 +130,15 @@ namespace meshit
                 }
             }
 
+            Point2d p1, p2;
             int baselineindex = adfront->SelectBaseLine(p1, p2, qualclass);
 
             Point2d pmid = Center(p1, p2);
             double pdist = Dist(p1, p2);
-            double hshould = std::min(gh, mesh.GetH(pmid));
+            double hshould = std::min(gh, mesh_.GetH(pmid));
             double hinner = (3 + qualclass) * std::max(pdist, hshould);
 
-            mesh.RestrictLocalH(pmid, hshould);
+            mesh_.RestrictLocalH(pmid, hshould);
 
             adfront->GetLocals(baselineindex, locpoints, loclines, pindex, lindex, 2 * hinner);
 
@@ -151,32 +151,19 @@ namespace meshit
             PointIndex gpi1 = adfront->GetGlobalIndex(pindex[loclines[0].I1() - 1]);
             PointIndex gpi2 = adfront->GetGlobalIndex(pindex[loclines[0].I2() - 1]);
 
-            bool debugflag = false;
-
-            if (debugparam.haltface && debugparam.haltfacenr == facenr) {
-                debugflag = true;
-                MESHIT_LOG_DEBUG("set debugflag");
-            }
-
-            if (debugparam.haltlargequalclass && qualclass > 50)
-                debugflag = true;
-
             // problem recognition !
-            found = gpi1 >= static_cast<PointIndex>(illegal_point.size()) ||
-                    gpi2 >= static_cast<PointIndex>(illegal_point.size()) ||
-                    (!illegal_point[gpi1] && !illegal_point[gpi2]);
+            bool found = gpi1 >= static_cast<PointIndex>(illegal_point.size()) ||
+                         gpi2 >= static_cast<PointIndex>(illegal_point.size()) ||
+                         (!illegal_point[gpi1] && !illegal_point[gpi2]);
 
             size_t oldnl = 0;
             size_t oldnp = 0;
+            int rulenr = -1;
 
             if (found) {
                 DefineTransformation(p1, p2);
 
                 plainpoints.resize(locpoints.size());
-
-                if (debugflag) {
-                    MESHIT_LOG_DEBUG("3d->2d transformation");
-                }
 
                 for (size_t i = 0; i < locpoints.size(); i++) {
                     TransformToPlain(locpoints[i], plainpoints[i], hshould);
@@ -211,8 +198,6 @@ namespace meshit
                                     dellines, qualclass, mp);
                 if (!rulenr) {
                     found = false;
-                    if (debugflag || debugparam.haltnosuccess)
-                        MESHIT_LOG_WARNING("no rule found");
                 }
             }
 
@@ -252,7 +237,7 @@ namespace meshit
                         pmin.SetToMin(hp);
                         pmax.SetToMax(hp);
                     }
-                    minh = std::min(minh, mesh.GetMinH(pmin, pmax));
+                    minh = std::min(minh, mesh_.GetMinH(pmin, pmax));
                 }
 
                 for (size_t i = 0; i < locelements.size(); i++) {
@@ -267,12 +252,9 @@ namespace meshit
                 }
 
                 if (newedgemaxh > violateminh * minh) {
-                    found = 0;
+                    found = false;
                     loclines.resize(oldnl);
                     locpoints.resize(oldnp);
-
-                    if (debugflag || debugparam.haltnosuccess)
-                        MESHIT_LOG_ERROR("meshing2, maxh too large");
                 }
             }
 
@@ -303,7 +285,7 @@ namespace meshit
                 pindex.resize(locpoints.size());
 
                 for (size_t i = oldnp; i < locpoints.size(); i++) {
-                    PointIndex globind = mesh.AddPoint(locpoints[i]);
+                    PointIndex globind = mesh_.AddPoint(locpoints[i]);
                     pindex[i] = adfront->AddPoint(locpoints[i], globind);
                 }
 
@@ -325,11 +307,11 @@ namespace meshit
                             adfront->GetGlobalIndex(pindex[locelements[i].PointID(j) - 1]);
                     }
 
-                    mesh.AddSurfaceElement(mtri);
+                    mesh_.AddSurfaceElement(mtri);
 
-                    const MeshPoint& sep1 = mesh.Point(mtri.PointID(0));
-                    const MeshPoint& sep2 = mesh.Point(mtri.PointID(1));
-                    const MeshPoint& sep3 = mesh.Point(mtri.PointID(2));
+                    const MeshPoint& sep1 = mesh_.Point(mtri.PointID(0));
+                    const MeshPoint& sep2 = mesh_.Point(mtri.PointID(1));
+                    const MeshPoint& sep3 = mesh_.Point(mtri.PointID(2));
 
                     double trigarea = Cross(Vec2d(Point2d(sep1), Point2d(sep2)),
                                             Vec2d(Point2d(sep1), Point2d(sep3))) / 2;

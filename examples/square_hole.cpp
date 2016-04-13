@@ -37,8 +37,6 @@ int main(int argc, char** argv)
     line_inner.push_back(meshit::Point2d(-0.5, 0.5));
     geom.AddHole(line_inner, 0.05, 3, face1);
 
-    geom.FakeData();
-
     MESHIT_LOG_INFO("== start meshing");
     mp.optsteps2d = 5;
     geom.SetGrading(0.1);
@@ -58,8 +56,7 @@ int main(int argc, char** argv)
     mesh.Save("square_hole.meshit");
 
     MESHIT_LOG_INFO("== refine mesh");
-    meshit::Refinement ref;
-    ref.Refine(mesh);
+    mesh.Refine();
     meshit::MeshQuality2d(mesh);
     meshit::CheckSurfaceMesh(mesh);
     mesh.CheckOverlappingBoundary();

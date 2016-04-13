@@ -15,7 +15,6 @@ namespace meshit
         loc_h_func = nullptr;
         hglob_ = 1e10;
         hmin_ = 0;
-        numvertices = 0;
     }
 
     Mesh::~Mesh()
@@ -52,25 +51,20 @@ namespace meshit
         }
         geometry.SetGrading(grading);
 
-        double h = mp.maxh;
+        // Define local meshing sizes
         Box2d bbox = geometry.GetBoundingBox();
-        if (bbox.Diam() < h) {
-            h = bbox.Diam();
-            mp.maxh = h;
-        }
-        Point2d pmin = {bbox.PMin().X(), bbox.PMin().Y()};
-        Point2d pmax = {bbox.PMax().X(), bbox.PMax().Y()};
+        mp.maxh = std::min(mp.maxh, bbox.Diam());
 
-        SetLocalH(pmin, pmax, grading);
+        SetLocalH(bbox, grading);
         hmin_ = mp.minh;
-        hglob_ = h;
+        hglob_ = mp.maxh;
 
-        geometry.PartitionBoundary(mp, h, *this);
+        geometry.PartitionBoundary(*this, mp);
 
         size_t maxdomnr = 0;
         for (size_t si = 0; si < segments.size(); si++) {
-            if (segments[si].domin > maxdomnr) maxdomnr = segments[si].domin;
-            if (segments[si].domout > maxdomnr) maxdomnr = segments[si].domout;
+            if (segments[si].dom_left > maxdomnr) maxdomnr = segments[si].dom_left;
+            if (segments[si].dom_right > maxdomnr) maxdomnr = segments[si].dom_right;
         }
 
         facedecoding.resize(0);
@@ -81,16 +75,21 @@ namespace meshit
         CalcLocalH();
 
         size_t bnp = points.size();  // boundary points
+        double h = mp.maxh;
 
-        for (size_t domnr = 1; domnr <= maxdomnr; domnr++) {
-            if (geometry.GetDomainMaxh(domnr) > 0) {
-                h = geometry.GetDomainMaxh(domnr);
+        Meshing2 meshing(*this, bbox);
+
+        for (size_t dom_nr = 1; dom_nr <= maxdomnr; dom_nr++) {
+            if (geometry.GetDomainMaxh(dom_nr) > 0) {
+                h = geometry.GetDomainMaxh(dom_nr);
             }
-            MESHIT_LOG_DEBUG("Meshing domain " << domnr << " / " << maxdomnr);
+            MESHIT_LOG_DEBUG("Meshing domain " << dom_nr << " / " << maxdomnr);
 
             size_t oldnf = elements.size();
 
-            Meshing2 meshing(Box2d(pmin, pmax));
+            if (dom_nr > 1) {
+                meshing.Reset();
+            }
 
             std::vector<int> compress(bnp, -1);
             int cnt = 0;
@@ -100,27 +99,27 @@ namespace meshit
                 compress[pi] = cnt;
             }
             for (size_t si = 0; si < segments.size(); si++) {
-                if (segments[si].domin == domnr) {
+                if (segments[si].dom_left == dom_nr) {
                     meshing.AddBoundaryElement(compress[segments[si][0]],
                                                compress[segments[si][1]]);
                 }
-                if (segments[si].domout == domnr) {
+                if (segments[si].dom_right == dom_nr) {
                     meshing.AddBoundaryElement(compress[segments[si][1]],
                                                compress[segments[si][0]]);
                 }
             }
 
-            meshing.GenerateMesh(*this, mp, h, domnr);
+            meshing.GenerateMesh(mp, h, dom_nr);
 
             for (size_t sei = oldnf; sei < elements.size(); sei++) {
-                elements[sei].SetIndex(domnr);
+                elements[sei].SetIndex(dom_nr);
             }
 
             // astrid
             char* material;
-            geometry.GetMaterial(domnr, material);
+            geometry.GetMaterial(dom_nr, material);
             if (material) {
-                SetMaterial(domnr, material);
+                SetMaterial(dom_nr, material);
             }
         }
 
@@ -128,18 +127,18 @@ namespace meshit
 
         mp.optimize2d = "smm";
         mp.optsteps2d = hsteps / 2;
-        Optimize2d(*this, mp);
+        Optimize2d(mp);
 
         mp.optimize2d = "Smm";
         mp.optsteps2d = (hsteps + 1) / 2;
-        Optimize2d(*this, mp);
+        Optimize2d(mp);
 
         mp.optsteps2d = hsteps;
 
         Compress();
     }
 
-    size_t Mesh::AddPoint(const Point2d& p, PointType type)
+    size_t Mesh::AddPoint(const Point2d& p, point_type_t type)
     {
         points.push_back(MeshPoint(p, type));
         return points.size() - 1;
@@ -166,8 +165,9 @@ namespace meshit
         }
 
         Element2d& bref = elements.back();
-        bref.next = facedecoding[bref.index - 1].firstelement;
-        facedecoding[bref.index - 1].firstelement = si;
+        FaceDescriptor& faceref = facedecoding[bref.index - 1];
+        bref.next = faceref.first_element;
+        faceref.first_element = si;
 
         if (surfarea.Valid()) {
             surfarea.Add(el);
@@ -207,13 +207,13 @@ namespace meshit
         outfile.precision(15);
 
         outfile << "mesh2d" << std::endl;
-        outfile << "# surfnr    bcnr      np      p1      p2      p3" << std::endl;
+        outfile << "# surfnr    np      p1      p2      p3" << std::endl;
         outfile << "surface_elements" << std::endl << GetNSE() << std::endl;
 
         for (size_t sei = 0; sei < elements.size(); sei++) {
-            if (elements[sei].GetIndex()) {
-                outfile << std::setw(8) << facedecoding[elements[sei].GetIndex() - 1].SurfNr() + 1;
-                outfile << std::setw(8) << facedecoding[elements[sei].GetIndex() - 1].BCProperty();
+            size_t el_index = elements[sei].GetIndex();
+            if (el_index > 0) {
+                outfile << std::setw(8) << facedecoding[el_index - 1].face_id();
             } else {
                 outfile << "       0       0";
             }
@@ -226,31 +226,25 @@ namespace meshit
         }
 
         outfile << "\n\n";
-        outfile << "# surfid      p1      p2  dom_in dom_out";
-        outfile << "   ednr1   ednr2                 dist1                 dist2\n";
+        outfile << "# surfid      p1      p2   dom_l   dom_r\n";
         outfile << "edge_segments" << std::endl << segments.size() << std::endl;
 
         for (size_t i = 0; i < segments.size(); i++) {
             const Segment& seg = LineSegment(i);
-            outfile << std::setw(8) << seg.si;
+            outfile << std::setw(8) << seg.edge_id;
             outfile << std::setw(8) << seg[0];
             outfile << std::setw(8) << seg[1];
-            outfile << std::setw(8) << seg.domin;
-            outfile << std::setw(8) << seg.domout;
-            outfile << std::setw(8) << seg.edgenr;
-            outfile << std::setw(8) << seg.epgeominfo[1].edgenr;  // geometry dependent
-            outfile << std::setw(22) << seg.epgeominfo[0].dist;  // splineparameter (2D)
-            outfile << std::setw(22) << seg.epgeominfo[1].dist;
+            outfile << std::setw(8) << seg.dom_left;
+            outfile << std::setw(8) << seg.dom_right;
             outfile << std::endl;
         }
 
         outfile << "\n\n";
-        outfile << "#                    X                     Y                     Z\n";
+        outfile << "#                    X                     Y\n";
         outfile << "points" << std::endl << points.size() << std::endl;
         for (size_t pi = 0; pi < points.size(); pi++) {
             outfile << std::setw(22) << points[pi].X();
-            outfile << std::setw(22) << points[pi].Y();
-            outfile << std::setw(22) << 0.0 << std::endl;
+            outfile << std::setw(22) << points[pi].Y() << std::endl;
         }
 
         int cntmat = 0;
@@ -293,29 +287,20 @@ namespace meshit
                 MESHIT_LOG_DEBUG(n << " surface elements");
 
                 for (int i = 1; i <= n; i++) {
-                    int surfnr, bcp, nep, faceind = 0;
+                    int surf_id, nep, faceind = 0;
 
-                    infile >> surfnr >> bcp;
-
-                    if (surfnr < 1) {
-                        MESHIT_LOG_ERROR("Invalid surface index number: " << surfnr);
-                        throw std::runtime_error("Aborting.");
-                    }
-                    surfnr--;
+                    infile >> surf_id;
 
                     for (size_t j = 0; j < facedecoding.size(); j++) {
-                        if (facedecoding[j].SurfNr() == static_cast<size_t>(surfnr) &&
-                            facedecoding[j].BCProperty() == static_cast<size_t>(bcp)) {
+                        if (facedecoding[j].face_id() == static_cast<size_t>(surf_id)) {
                             faceind = j + 1;
                         }
                     }
                     if (!faceind) {
-                        facedecoding.push_back(FaceDescriptor(surfnr));
-                        facedecoding.back().SetBCProperty(bcp);
+                        facedecoding.push_back(FaceDescriptor(surf_id));
                     }
 
                     infile >> nep;
-                    if (!nep) nep = 3;
 
                     if (nep != 3) {
                         MESHIT_LOG_FATAL("Mesh::Load: undefined element type. nep = " << nep << ". Aborting");
@@ -335,13 +320,8 @@ namespace meshit
                 infile >> n;
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
-                    infile >> seg.si >> seg[0] >> seg[1];
-                    infile >> seg.domin >> seg.domout;
-                    infile >> seg.edgenr >> seg.epgeominfo[1].edgenr;
-                    infile >> seg.epgeominfo[0].dist >> seg.epgeominfo[1].dist;
-
-                    seg.epgeominfo[0].edgenr = seg.epgeominfo[1].edgenr;
-
+                    infile >> seg.edge_id >> seg[0] >> seg[1];
+                    infile >> seg.dom_left >> seg.dom_right;
                     AddSegment(seg);
                 }
             }
@@ -350,8 +330,7 @@ namespace meshit
                 MESHIT_LOG_DEBUG(n << " points");
                 for (int i = 1; i <= n; i++) {
                     Point2d p;
-                    double dummy;
-                    infile >> p.X() >> p.Y() >> dummy;
+                    infile >> p.X() >> p.Y();
                     AddPoint(p);
                 }
             }
@@ -393,18 +372,11 @@ namespace meshit
         }
     }
 
-    void Mesh::SetLocalH(const Point2d& pmin, const Point2d& pmax, double grading)
+    void Mesh::SetLocalH(const Box2d& bbox, double grading)
     {
-        double d = 0.5 * std::max(pmax.X() - pmin.X(),
-                                  pmax.Y() - pmin.Y());
-
-        Point2d c = Center(pmin, pmax);
-        Point2d pmin2 = {c.X() - d, c.Y() - d};
-        Point2d pmax2 = {c.X() + d, c.Y() + d};
-
         delete loc_h_func;
         loc_h_func = new LocalH();
-        loc_h_func->Init(pmin2, pmax2, grading);
+        loc_h_func->Init(bbox, grading);
     }
 
     void Mesh::RestrictLocalH(const Point2d& p, double hloc)
@@ -439,14 +411,14 @@ namespace meshit
         return std::min(hglob_, loc_h_func->GetMinH(pmin, pmax));
     }
 
-    double Mesh::AverageH(size_t surfnr) const
+    double Mesh::AverageH(size_t surf_id) const
     {
         double maxh = 0, minh = 1e10;
         double hsum = 0;
         size_t n = 0;
         for (size_t i = 0; i < elements.size(); i++) {
             const Element2d& el = Element(i);
-            if (surfnr == 0 || el.GetIndex() == surfnr) {
+            if (surf_id == 0 || el.GetIndex() == surf_id) {
                 for (size_t j = 0; j < 3; j++) {
                     double hi = Dist(points[el.PointID(j)], points[el.PointID((j + 1) % 3)]);
                     hsum += hi;
@@ -574,13 +546,13 @@ namespace meshit
         }
 
         for (size_t i = 0; i < facedecoding.size(); i++) {
-            facedecoding[i].firstelement = -1;
+            facedecoding[i].first_element = -1;
         }
 
         for (int i = elements.size() - 1; i >= 0; i--) {
             int ind = elements[i].GetIndex();
-            elements[i].next = facedecoding[ind - 1].firstelement;
-            facedecoding[ind - 1].firstelement = i;
+            elements[i].next = facedecoding[ind - 1].first_element;
+            facedecoding[ind - 1].first_element = i;
         }
 
         IndexBoundaryEdges();
@@ -666,12 +638,12 @@ namespace meshit
     void Mesh::RebuildSurfaceElementLists()
     {
         for (size_t i = 0; i < facedecoding.size(); i++) {
-            facedecoding[i].firstelement = -1;
+            facedecoding[i].first_element = -1;
         }
         for (int i = elements.size() - 1; i >= 0; i--) {
             int ind = elements[i].GetIndex();
-            elements[i].next = facedecoding[ind - 1].firstelement;
-            facedecoding[ind - 1].firstelement = i;
+            elements[i].next = facedecoding[ind - 1].first_element;
+            facedecoding[ind - 1].first_element = i;
         }
     }
 
@@ -679,7 +651,7 @@ namespace meshit
     {
         sei.clear();
 
-        SurfaceElementIndex si = facedecoding[facenr - 1].firstelement;
+        SurfaceElementIndex si = facedecoding[facenr - 1].first_element;
         while (si != -1) {
             const Element2d& se = Element(si);
             if (se.GetIndex() == facenr && se.PointID(0) >= 0 && !se.IsDeleted()) {
@@ -689,24 +661,17 @@ namespace meshit
         }
     }
 
-    void Mesh::ComputeNVertices()
+    size_t Mesh::ComputeNVertices()
     {
-        numvertices = 0;
+        PointIndex nb_vertices = 0;
         for (size_t i = 0; i < elements.size(); i++) {
             const Element2d& el = Element(i);
-            for (size_t j = 0; j < 3; j++) {
-                if (el.PointID(j) > static_cast<PointIndex>(numvertices)) {
-                    numvertices = static_cast<size_t>(el.PointID(j));
-                }
-            }
+            nb_vertices = std::max(nb_vertices, el.PointID(0));
+            nb_vertices = std::max(nb_vertices, el.PointID(1));
+            nb_vertices = std::max(nb_vertices, el.PointID(2));
         }
-        numvertices += 1;
-        MESHIT_LOG_INFO("Mesh::ComputeNVertices: numvertices = " << numvertices << " numpoints = " << points.size());
-    }
-
-    void Mesh::SetNP(size_t np)
-    {
-        points.resize(np);
+        nb_vertices += 1;
+        return static_cast<size_t>(nb_vertices);
     }
 
     void Mesh::SetMaterial(size_t domnr, const char* mat)

@@ -14,7 +14,6 @@ namespace meshit
 
         void Refine(Mesh& mesh);
 
-        void PointBetween(const MeshPoint& p1, const MeshPoint& p2, double secpoint, Point2d& newp) const;
     };
 
 }  // namespace meshit

@@ -49,9 +49,6 @@ namespace meshit
         /// sub-domain materials
         std::vector<char*> materials;
 
-        /// number of vertices
-        size_t numvertices;
-
      public:
         Mesh();
         ~Mesh();
@@ -60,7 +57,7 @@ namespace meshit
 
         void BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp);
 
-        size_t AddPoint(const Point2d& p, PointType type = INNER_POINT);
+        size_t AddPoint(const Point2d& p, point_type_t type = INNER_POINT);
 
         size_t GetNP() const
         {
@@ -127,10 +124,10 @@ namespace meshit
            finds average h of surface surfnr if surfnr > 0,
            else of all surfaces.
          */
-        double AverageH(size_t surfnr = 0) const;
-        /// Calculates localh
+        double AverageH(size_t surf_id = 0) const;
+
         void CalcLocalH();
-        void SetLocalH(const Point2d& pmin, const Point2d& pmax, double grading);
+        void SetLocalH(const Box2d& bbox, double grading);
         void RestrictLocalH(const Point2d& p, double hloc);
         void RestrictLocalHLine(const Point2d& p1, const Point2d& p2, double hloc);
         double GetH(const Point2d& p) const;
@@ -138,9 +135,6 @@ namespace meshit
 
         /// Find bounding box
         void GetBox(Point2d& pmin, Point2d& pmax) const;
-
-        /// Refines mesh and projects points to true surface
-        // void Refine (int levels, const CSGeometry * geom);
 
         bool IsSegment(const INDEX_2& e) const
         {
@@ -161,24 +155,18 @@ namespace meshit
         void Save(const std::string& filename) const;
         void Load(const std::string& filename);
 
+        void Refine();
+        void Optimize2d(MeshingParameters& mp);
+
         void SetMaterial(size_t domnr, const char* mat);
 
         size_t GetNFD() const { return facedecoding.size(); }
 
         int GetDomainNumber(const Element2d& el) const { return GetDomainNumber(el.GetIndex()); }
-        int GetDomainNumber(int face_id) const { return facedecoding[face_id - 1].BCProperty() + 100; }
+        int GetDomainNumber(int face_id) const { return facedecoding[face_id - 1].face_id() + 100; }
 
         /// find number of vertices
-        void ComputeNVertices();
-
-        /// number of vertices (no edge-midpoints)
-        size_t GetNV() const
-        {
-            return numvertices;
-        }
-
-        /// remove edge points
-        void SetNP(size_t np);
+        size_t ComputeNVertices();
 
         class CSurfaceArea
         {
@@ -221,8 +209,6 @@ namespace meshit
         }
 
         void PrintMemInfo(std::ostream& ost) const;
-
-        friend class Meshing3;
     };
 
     inline std::ostream& operator<<(std::ostream& ost, const Mesh& mesh)

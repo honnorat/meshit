@@ -9,56 +9,36 @@ namespace meshit
     {
         pnums[0] = -1;
         pnums[1] = -1;
-        pnums[2] = -1;
-
-        edgenr = -1;
-        seginfo = 0;
-
-        si = -1;
-
-        domin = static_cast<size_t>(-1);
-        domout = static_cast<size_t>(-1);
+        edge_id = -1;
+        dom_left = static_cast<size_t>(-1);
+        dom_right = static_cast<size_t>(-1);
     }
 
     Segment::Segment(const Segment& other)
-        : edgenr(other.edgenr),
-          seginfo(other.seginfo),
-          si(other.si),
-          domin(other.domin),
-          domout(other.domout),
-          epgeominfo(),
-          hp_elnr(other.hp_elnr)
+        : edge_id(other.edge_id),
+          dom_left(other.dom_left),
+          dom_right(other.dom_right)
     {
-        for (int j = 0; j < 3; j++) {
-            pnums[j] = other.pnums[j];
-        }
-        epgeominfo[0] = other.epgeominfo[0];
-        epgeominfo[1] = other.epgeominfo[1];
+        pnums[0] = other.pnums[0];
+        pnums[1] = other.pnums[1];
     }
 
     Segment& Segment::operator=(const Segment& other)
     {
         if (&other != this) {
-            pnums[0] = other[0];
-            pnums[1] = other[1];
-            edgenr = other.edgenr;
-            seginfo = other.seginfo;
-            si = other.si;
-            domin = other.domin;
-            domout = other.domout;
-            epgeominfo[0] = other.epgeominfo[0];
-            epgeominfo[1] = other.epgeominfo[1];
-            pnums[2] = other.pnums[2];
-            hp_elnr = other.hp_elnr;
+            pnums[0] = other.pnums[0];
+            pnums[1] = other.pnums[1];
+            edge_id = other.edge_id;
+            dom_left = other.dom_left;
+            dom_right = other.dom_right;
         }
-
         return *this;
     }
 
     std::ostream& operator<<(std::ostream& s, const Segment& seg)
     {
-        s << seg[0] << " - " << seg[1] << " domin = " << seg.domin << ", domout = " << seg.domout
-        << " si = " << seg.si << ", edgenr = " << seg.edgenr;
+        s << seg[0] << " - " << seg[1] << " domin = " << seg.dom_left << ", domout = " << seg.dom_right
+        << " si = " << seg.edge_id;
         return s;
     }
 
@@ -80,29 +60,10 @@ namespace meshit
         return s;
     }
 
-    FaceDescriptor::FaceDescriptor()
+    std::ostream& operator<<(std::ostream& os, const FaceDescriptor& fd)
     {
-        surfnr = bcprop = 0;
-        firstelement = -1;
-    }
-
-    FaceDescriptor::FaceDescriptor(const FaceDescriptor& other)
-        : surfnr(other.surfnr), bcprop(other.bcprop)
-    {
-        firstelement = -1;
-    }
-
-    FaceDescriptor::FaceDescriptor(size_t surfnri)
-    {
-        surfnr = surfnri;
-        bcprop = surfnri;
-        firstelement = -1;
-    }
-
-    std::ostream& operator<<(std::ostream& s, const FaceDescriptor& fd)
-    {
-        s << "surfnr = " << fd.SurfNr() << ", bcprop = " << fd.BCProperty();
-        return s;
+        os << "surf_id = " << fd.face_id();
+        return os;
     }
 
     MeshingParameters::MeshingParameters()
@@ -134,10 +95,5 @@ namespace meshit
         n_steps = other.n_steps;
     }
 
-    DebugParameters::DebugParameters()
-    {
-        haltnosuccess = 0;
-        haltlargequalclass = 0;
-    };
 }  // namespace meshit
 

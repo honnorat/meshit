@@ -23,8 +23,8 @@ namespace meshit
         double loc_metric_weight;
 
      public:
-        Opti2dLocalData()
-            : loc_metric_weight{0.0} { }
+        explicit Opti2dLocalData(double metric_weight)
+            : loc_metric_weight{metric_weight} { }
     };
 
     class Mesh;
@@ -56,12 +56,14 @@ namespace meshit
      public:
         size_t maxit_bfgs;
         size_t maxit_linsearch;
+        double eps;
         double typf;
         double typx;
 
         OptiParameters()
             : maxit_bfgs{100},
               maxit_linsearch{100},
+              eps{1e-2},
               typf{1.0}, typx{1.0} { }
     };
 
@@ -71,7 +73,7 @@ namespace meshit
         @param x initial value and solution 
         @param fun function to be minimized
      */
-    double BFGS_2d(double* x, MinFunction_2d& fun, const OptiParameters& par, double eps = 1e-8);
+    double BFGS_2d(double* x, MinFunction_2d& fun, const OptiParameters& par);
 
     int lines(
         double* x,      // i: Ausgangspunkt der Liniensuche

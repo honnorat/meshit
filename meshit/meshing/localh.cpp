@@ -47,21 +47,22 @@ namespace meshit
         CleanRoot();
     }
 
-    void LocalH::Init(const Point2d& pmin, const Point2d& pmax, double agrading)
+    void LocalH::Init(const Box2d& bbox, double agrading)
     {
         grading = agrading;
 
         // a small enlargement, non-regular points
-        constexpr double alpha = 0.13;
-        constexpr double al_p1 = 1.0 + alpha;
+        constexpr double alpha = -0.13;
+        constexpr double al_p1 = 1.0 - alpha;
 
-        double hmax = std::max(pmax.X() - pmin.X(),
-                               pmax.Y() - pmin.Y());
+        double hmax = bbox.LargestSide();
 
+        const Point2d& pmin = bbox.PMin();
+        const Point2d& pmax = bbox.PMax();
         Point2d x1, x2;
 
-        x1.X() = al_p1 * pmin.X() - alpha * pmax.X();
-        x1.Y() = al_p1 * pmin.Y() - alpha * pmax.Y();
+        x1.X() = al_p1 * pmin.X() + alpha * pmax.X();
+        x1.Y() = al_p1 * pmin.Y() + alpha * pmax.Y();
 
         x2.X() = x1.X() + hmax;
         x2.Y() = x1.Y() + hmax;
@@ -158,15 +159,7 @@ namespace meshit
 
     double LocalH::GetMinH(const Point2d& pmin, const Point2d& pmax) const
     {
-        // minimal h in box (pmin, pmax)
-        Point2d pmin2, pmax2;
-
-        pmin2.X() = std::min(pmin.X(), pmax.X());
-        pmax2.X() = std::max(pmin.X(), pmax.X());
-        pmin2.Y() = std::min(pmin.Y(), pmax.Y());
-        pmax2.Y() = std::max(pmin.Y(), pmax.Y());
-
-        return GetMinHRec(pmin2, pmax2, root);
+        return GetMinHRec(pmin, pmax, root);
     }
 
     double LocalH::GetMinHRec(const Point2d& pmin, const Point2d& pmax, const GradingBox* box) const
@@ -177,13 +170,22 @@ namespace meshit
             return 1e8;
         }
 
-        double hmin = 2.0 * h2;  // box->x2[0] - box->x1[0];
+        double hmin = 2.0 * h2;
+        double hmin_0 = 1e100;
+        double hmin_1 = 1e100;
+        double hmin_2 = 1e100;
+        double hmin_3 = 1e100;
 
-        for (int i = 0; i < 4; i++) {
-            if (box->childs[i]) {
-                hmin = std::min(hmin, GetMinHRec(pmin, pmax, box->childs[i]));
-            }
-        }
+        if ( box->childs[0])     hmin_0 = GetMinHRec(pmin, pmax, box->childs[0]);
+        if ( box->childs[1])     hmin_1 = GetMinHRec(pmin, pmax, box->childs[1]);
+        if ( box->childs[2])     hmin_2 = GetMinHRec(pmin, pmax, box->childs[2]);
+        if ( box->childs[3])     hmin_3 = GetMinHRec(pmin, pmax, box->childs[3]);
+
+        hmin = std::min(hmin, hmin_0);
+        hmin = std::min(hmin, hmin_1);
+        hmin = std::min(hmin, hmin_2);
+        hmin = std::min(hmin, hmin_3);
+
         return hmin;
     }
 

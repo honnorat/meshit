@@ -1,63 +1,49 @@
-#include "refine.hpp"
+#include "meshclass.hpp"
 
 namespace meshit
 {
-    void Refinement::PointBetween(const MeshPoint& p1, const MeshPoint& p2, double secpoint, Point2d& newp) const
-    {
-        newp.X() = p1.X() + secpoint * (p2.X() - p1.X());
-        newp.Y() = p1.Y() + secpoint * (p2.Y() - p1.Y());
-    }
-
-    void Refinement::Refine(Mesh& mesh)
+    void Mesh::Refine()
     {
         // reduce 2nd order
-        mesh.ComputeNVertices();
-        mesh.SetNP(mesh.GetNV());
-        INDEX_2_map<PointIndex> between(mesh.GetNP() + 5);
+        size_t nb_vertices = ComputeNVertices();
 
-        // refine edges
-        std::vector<EdgePointGeomInfo> epgi;
+        points.resize(nb_vertices);
+        INDEX_2_map<PointIndex> between(nb_vertices + 5);
 
-        size_t oldns = mesh.GetNSeg();
+        size_t oldns = segments.size();
         for (size_t si = 0; si < oldns; si++) {
-            const Segment& el = mesh.LineSegment(si);
+            const Segment& seg = segments[si];
+            const MeshPoint& p1 = points[seg[0]];
+            const MeshPoint& p2 = points[seg[1]];
 
-            INDEX_2 i2(el[0], el[1]);
+            INDEX_2 i2(seg[0], seg[1]);
             i2.Sort();
-            PointIndex pinew;
-            EdgePointGeomInfo ngi;
+            PointIndex pi_new;
 
             if (between.count(i2) == 1) {
-                pinew = between[i2];
-                ngi = epgi[pinew];
+                pi_new = between[i2];
             } else {
                 Point2d pnew;
-                PointBetween(mesh.Point(el[0]), mesh.Point(el[1]), 0.5, pnew);
-                pinew = mesh.AddPoint(pnew);
-                between[i2] = pinew;
-
-                if (pinew >= static_cast<PointIndex>(epgi.size())) {
-                    epgi.resize(pinew + 1);
-                }
-                epgi[pinew] = ngi;
+                pnew.X() = 0.5 * (p1.X() + p2.X());
+                pnew.Y() = 0.5 * (p1.Y() + p2.Y());
+                pi_new = AddPoint(pnew);
+                between[i2] = pi_new;
             }
 
-            Segment ns1 = el;
-            Segment ns2 = el;
-            ns1[1] = pinew;
-            ns1.epgeominfo[1] = ngi;
-            ns2[0] = pinew;
-            ns2.epgeominfo[0] = ngi;
+            Segment ns1 = seg;
+            Segment ns2 = seg;
+            ns1[1] = pi_new;
+            ns2[0] = pi_new;
 
-            mesh.LineSegment(si) = ns1;
-            mesh.AddSegment(ns2);
+            segments[si] = ns1;
+            AddSegment(ns2);
         }
 
         // refine surface elements
-        size_t oldnf = mesh.GetNSE();
+        size_t oldnf = elements.size();
         for (size_t sei = 0; sei < oldnf; sei++) {
             int j, k;
-            const Element2d& el = mesh.Element(sei);
+            const Element2d& el = elements[sei];
 
             PointIndex pnums[6];
 
@@ -79,9 +65,12 @@ namespace meshit
                 i2.Sort();
 
                 if (between.count(i2) == 0) {
-                    Point2d pb;
-                    PointBetween(mesh.Point(pi1), mesh.Point(pi2), 0.5, pb);
-                    between[i2] = mesh.AddPoint(pb);
+                    const MeshPoint& p1 = points[pi1];
+                    const MeshPoint& p2 = points[pi2];
+                    Point2d pnew;
+                    pnew.X() = 0.5 * (p1.X() + p2.X());
+                    pnew.Y() = 0.5 * (p1.Y() + p2.Y());
+                    between[i2] = AddPoint(pnew);
                 }
                 pnums[3 + j] = between[i2];
             }
@@ -101,15 +90,16 @@ namespace meshit
                 }
                 nel.SetIndex(ind);
 
-                if (j == 0)
-                    mesh.Element(sei) = nel;
-                else
-                    mesh.AddSurfaceElement(nel);
+                if (j == 0) {
+                    elements[sei] = nel;
+                } else {
+                    AddSurfaceElement(nel);
+                }
             }
         }
 
-        mesh.ComputeNVertices();
-        mesh.RebuildSurfaceElementLists();
-        return;
+        ComputeNVertices();
+        RebuildSurfaceElementLists();
     }
+
 }  // namespace meshit

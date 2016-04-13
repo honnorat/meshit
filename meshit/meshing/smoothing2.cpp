@@ -1,6 +1,5 @@
 #include "smoothing2.hpp"
 #include "improve2.hpp"
-#include "global.hpp"
 
 namespace meshit
 {
@@ -10,7 +9,7 @@ namespace meshit
     double CalcTriangleBadness(const Point2d& p1,
                                const Point2d& p2,
                                const Point2d& p3,
-                               double metricweight,
+                               double metric_weight,
                                double h)
     {
         // badness = B = sqrt(3.0)/12 * (\sum l_i^2) / area - 1
@@ -35,13 +34,13 @@ namespace meshit
         // B = sqrt(3.0)/12 * ( c^2 / A ) - 1
         double badness = c_trig0 * c_2 / area - 1.0;
 
-        if (metricweight > 0) {
-            // add:  metricweight * (A / h^2 + h^2 / A - 2)
+        if (metric_weight > 0) {
+            // add:  metric_weight * (A / h^2 + h^2 / A - 2)
             // optimum for (2A) is h^2
             double areahh = 2.0 * area / (h * h);
 
-            // B += metricweight * (2A / h^2 + h^2 / 2A - 2)
-            badness += metricweight * (areahh + 1.0 / areahh - 2.0);
+            // B += metric_weight * (2A / h^2 + h^2 / 2A - 2)
+            badness += metric_weight * (areahh + 1.0 / areahh - 2.0);
         }
 
         return badness;
@@ -51,7 +50,7 @@ namespace meshit
                                    const Point2d& p2,
                                    const Point2d& p3,
                                    Vec2d& d_bad,
-                                   double metricweight,
+                                   double metric_weight,
                                    double h)
     {
         // badness = B = sqrt(3.0)/12 * (\sum l_i^2) / area - 1
@@ -85,17 +84,17 @@ namespace meshit
         d_bad.X() = -2.0 * (c_trig0 / area) * (dx12 + dx13 - beta * dy23);
         d_bad.Y() = -2.0 * (c_trig0 / area) * (dy12 + dy13 + beta * dx23);
 
-        if (metricweight > 0) {
-            // add:  metricweight * (A / h^2 + h^2 / A - 2)
+        if (metric_weight > 0) {
+            // add:  metric_weight * (A / h^2 + h^2 / A - 2)
             // optimum for (2A) is h^2
             double h_2 = h * h;
             double areahh = 2.0 * area / h_2;
 
-            // B += metricweight * (2A / h^2 + h^2 / 2A - 2)
-            badness += metricweight * (areahh + 1.0 / areahh - 2.0);
+            // B += metric_weight * (2A / h^2 + h^2 / 2A - 2)
+            badness += metric_weight * (areahh + 1.0 / areahh - 2.0);
 
-            // ∇B += metricweight * ( 2∇A/h^2 - 2 h^2/((2A)^2)∇A )
-            double gamma = 0.5 * metricweight * (1.0 / h_2 - 0.25 * h_2 / (area * area)) / area;
+            // ∇B += metric_weight * ( 2∇A/h^2 - 2 h^2/((2A)^2)∇A )
+            double gamma = 0.5 * metric_weight * (1.0 / h_2 - 0.25 * h_2 / (area * area)) / area;
             d_bad.X() -= gamma * (cross_z * dy23);
             d_bad.Y() += gamma * (cross_z * dx23);
         }
@@ -220,35 +219,32 @@ namespace meshit
         return badness;
     }
 
-    void MeshOptimize2d::ImproveMesh(Mesh& mesh, const MeshingParameters& mp)
+    void MeshOptimize2d::ImproveMesh(double metric_weight)
     {
-        if (!faceindex) {
-            MESHIT_LOG_DEBUG("Smoothing");
+        MESHIT_LOG_DEBUG("Smoothing");
 
-            for (faceindex = 1; faceindex <= mesh.GetNFD(); faceindex++) {
-                ImproveMesh(mesh, mp);
-            }
-            faceindex = 0;
-            return;
+        for (size_t face_index = 1; face_index <= mesh_.GetNFD(); face_index++) {
+            ImproveMesh(face_index, metric_weight);
         }
+    }
 
-        Opti2dLocalData ld;
-
+    void MeshOptimize2d::ImproveMesh(size_t faceindex, double metric_weight)
+    {
         std::vector<SurfaceElementIndex> seia;
-        mesh.GetSurfaceElementsOfFace(faceindex, seia);
+        mesh_.GetSurfaceElementsOfFace(faceindex, seia);
 
 
-        std::vector<MeshPoint> savepoints(mesh.GetNP());
-        std::vector<int> compress(mesh.GetNP());
+        std::vector<MeshPoint> savepoints(mesh_.GetNP());
+        std::vector<int> compress(mesh_.GetNP());
         std::vector<PointIndex> icompress;
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.Element(seia[i]);
+            const Element2d& el = mesh_.Element(seia[i]);
             compress[el.PointID(0)] = -1;
             compress[el.PointID(1)] = -1;
             compress[el.PointID(2)] = -1;
         }
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.Element(seia[i]);
+            const Element2d& el = mesh_.Element(seia[i]);
             for (size_t j = 0; j < 3; j++) {
                 if (compress[el.PointID(j)] == -1) {
                     compress[el.PointID(j)] = icompress.size();
@@ -258,28 +254,29 @@ namespace meshit
         }
         std::vector<int> cnta(icompress.size(), 0);
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.Element(seia[i]);
+            const Element2d& el = mesh_.Element(seia[i]);
             cnta[compress[el.PointID(0)]]++;
             cnta[compress[el.PointID(1)]]++;
             cnta[compress[el.PointID(2)]]++;
         }
         TABLE<SurfaceElementIndex> elements_on_point(cnta);
         for (size_t i = 0; i < seia.size(); i++) {
-            const Element2d& el = mesh.Element(seia[i]);
+            const Element2d& el = mesh_.Element(seia[i]);
             elements_on_point.Add(compress[el.PointID(0)], seia[i]);
             elements_on_point.Add(compress[el.PointID(1)], seia[i]);
             elements_on_point.Add(compress[el.PointID(2)], seia[i]);
         }
-        ld.loc_metric_weight = metricweight;
 
-        MinFunction_2d surfminf(mesh, ld);
+        Opti2dLocalData ld(metric_weight);
+        MinFunction_2d surfminf(mesh_, ld);
         OptiParameters par;
         par.maxit_linsearch = 8;
         par.maxit_bfgs = 5;
+        par.eps = 1e-2;
 
         for (size_t hi = 0; hi < icompress.size(); hi++) {
             PointIndex pi = icompress[hi];
-            MeshPoint& pp = mesh.Point(pi);
+            MeshPoint& pp = mesh_.Point(pi);
 
             if (pp.Type() == INNER_POINT) {
                 std::vector<SurfaceElementIndex> elem_idx = elements_on_point[hi];
@@ -297,36 +294,38 @@ namespace meshit
                     SurfaceElementIndex sei = elem_idx[j];
                     ld.loc_elements[j] = sei;
 
-                    const Element2d& bel = mesh.Element(sei);
+                    const Element2d& bel = mesh_.Element(sei);
                     for (size_t k = 0; k < 3; k++) {
                         if (bel[k] == pi) {
-                            ld.loc_pnts2.push_back(mesh.Point(bel[(k + 1) % 3]));
-                            ld.loc_pnts3.push_back(mesh.Point(bel[(k + 2) % 3]));
+                            ld.loc_pnts2.push_back(mesh_.Point(bel[(k + 1) % 3]));
+                            ld.loc_pnts3.push_back(mesh_.Point(bel[(k + 2) % 3]));
                             break;
                         }
                     }
-                    Point2d pmid = Center(Point2d(mesh.Point(bel[0])), Point2d(mesh.Point(bel[1])), Point2d(mesh.Point(bel[2])));
-                    ld.lochs[j] = mesh.GetH(pmid);
+                    Point2d pmid = Center(Point2d(mesh_.Point(bel[0])),
+                                          Point2d(mesh_.Point(bel[1])),
+                                          Point2d(mesh_.Point(bel[2])));
+                    ld.lochs[j] = mesh_.GetH(pmid);
                 }
 
                 // save points, and project to tangential plane
                 for (size_t j = 0; j < n_elems; j++) {
-                    const Element2d& el = mesh.Element(ld.loc_elements[j]);
+                    const Element2d& el = mesh_.Element(ld.loc_elements[j]);
                     for (size_t k = 0; k < 3; k++) {
-                        savepoints[el[k]] = mesh.Point(el[k]);
+                        savepoints[el[k]] = mesh_.Point(el[k]);
                     }
                 }
 
                 double x[2] = {0.0, 0.0};
                 par.typx = 0.3 * ld.lochs[0];
-                BFGS_2d(x, surfminf, par, 1e-2);
+                BFGS_2d(x, surfminf, par);
 
                 // restore other points
                 for (size_t j = 0; j < n_elems; j++) {
-                    const Element2d& el = mesh.Element(ld.loc_elements[j]);
+                    const Element2d& el = mesh_.Element(ld.loc_elements[j]);
                     for (size_t k = 0; k < 3; k++) {
                         PointIndex hhpi = el[k];
-                        if (hhpi != pi) mesh.Point(hhpi) = savepoints[hhpi];
+                        if (hhpi != pi) mesh_.Point(hhpi) = savepoints[hhpi];
                     }
                 }
 

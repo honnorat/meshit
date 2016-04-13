@@ -63,7 +63,7 @@ namespace meshit
         pnearness[llines1[0][0] - 1] = 0;
         pnearness[llines1[0][1] - 1] = 0;
 
-        const size_t MAX_NEARNESS = 3;
+        constexpr size_t MAX_NEARNESS = 3;
 
         for (size_t cnt = 0; cnt < MAX_NEARNESS; cnt++) {
             bool ok = true;
@@ -292,8 +292,8 @@ namespace meshit
 
                             for (size_t i = 0; i < rule->GetNOldP(); i++) {
                                 Vec2d ui(rule->GetPoint(i), lpoints[pmap[i] - 1]);
-                                oldu(2 * i + 0) = ui.X();
-                                oldu(2 * i + 1) = ui.Y();
+                                oldu[2 * i + 0] = ui.X();
+                                oldu[2 * i + 1] = ui.Y();
                             }
 
                             rule->SetFreeZoneTransformation(oldu, tolerance);
@@ -346,8 +346,8 @@ namespace meshit
                                 size_t oldnp = rule->GetNOldP();
                                 for (size_t i = oldnp; i < rule->GetNP(); i++) {
                                     Point2d np = rule->GetPoint(i);
-                                    np.X() += newu(2 * (i - oldnp));
-                                    np.Y() += newu(2 * (i - oldnp) + 1);
+                                    np.X() += newu[2 * (i - oldnp)];
+                                    np.Y() += newu[2 * (i - oldnp) + 1];
 
                                     lpoints.push_back(np);
                                     pmap[i] = lpoints.size();

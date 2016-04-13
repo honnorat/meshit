@@ -24,7 +24,7 @@ namespace meshit
     {
         if (!splines.size()) {
             Point2d auxp{0.0, 0.0};
-            box.Set(auxp);
+            box.SetPoint(auxp);
             return;
         }
 
@@ -32,9 +32,9 @@ namespace meshit
         for (size_t i = 0; i < splines.size(); i++) {
             splines[i]->GetPoints(20, points);
 
-            if (i == 0) box.Set(points[0]);
+            if (i == 0) box.SetPoint(points[0]);
             for (size_t j = 0; j < points.size(); j++) {
-                box.Add(points[j]);
+                box.AddPoint(points[j]);
             }
         }
     }
@@ -81,7 +81,7 @@ namespace meshit
             if (ch == '#') {
                 // skip comments
                 while (ch != '\n' && !infile.eof()) {
-                    infile >> ch;
+                    infile.get(ch);
                 }
             } else if (ch == '\n') {
                 // skip empty lines
@@ -102,7 +102,7 @@ namespace meshit
     void SplineGeometry::LoadData(std::istream& infile)
     {
         MESHIT_LOG_INFO("Load 2D Geometry");
-        int nump, leftdom, rightdom;
+        int nump, dom_left, dom_right;
         Point2d x;
         int hi1, hi2, hi3;
         char buf[50], ch;
@@ -155,9 +155,9 @@ namespace meshit
             else if (keyword == "segments") {
                 int i = 1;
                 while (!isalpha(static_cast<int>(ch))) {
-                    infile >> leftdom >> rightdom;
-                    if (leftdom > numdomains) numdomains = leftdom;
-                    if (rightdom > numdomains) numdomains = rightdom;
+                    infile >> dom_left >> dom_right;
+                    if (dom_left > numdomains) numdomains = dom_left;
+                    if (dom_right > numdomains) numdomains = dom_right;
 
                     SplineSeg* spline = nullptr;
                     infile >> buf;
@@ -176,8 +176,8 @@ namespace meshit
                         throw std::runtime_error("SplineGeometry::LoadData : unknown segment type");
                     }
 
-                    spline->leftdom = leftdom;
-                    spline->rightdom = rightdom;
+                    spline->dom_left = dom_left;
+                    spline->dom_right = dom_right;
                     splines.push_back(spline);
 
                     Flags flags;
@@ -190,7 +190,7 @@ namespace meshit
                     }
                     infile.unget();
 
-                    spline->bc = static_cast<int>(flags.GetNumFlag("bc", ++i));
+                    spline->id_ = static_cast<int>(flags.GetNumFlag("id", ++i));
                     spline->reffak = flags.GetNumFlag("ref", 1);
                     spline->hmax = flags.GetNumFlag("maxh", 1e99);
                     ch = TestComment(infile);
@@ -231,7 +231,7 @@ namespace meshit
     }
 
     void SplineGeometry::AddLine(
-        const std::vector<Point2d>& points, double hmax, int bc, int face_left, int face_right)
+        const std::vector<Point2d>& points, double hmax, int spline_id, int domain_left, int domain_right)
     {
         size_t nold_points = geompoints.size();
         size_t nnew_points = points.size();
@@ -248,9 +248,9 @@ namespace meshit
         for (size_t i0 = 0; i0 < nnew_points; i0++) {
             size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
             SplineSeg* spline = new LineSeg(gpts[i0], gpts[i1]);
-            spline->leftdom = face_left;
-            spline->rightdom = face_right;
-            spline->bc = bc;
+            spline->dom_left = domain_left;
+            spline->dom_right = domain_right;
+            spline->id_ = spline_id;
             spline->reffak = 1;  // Refinement factor
             spline->hmax = hmax;
             splines.push_back(spline);
@@ -268,9 +268,9 @@ namespace meshit
     }
 
     void SplineGeometry::AddSpline(const std::vector<Point2d>& points,
-                                   double hmax, int bc,
-                                   int face_left,
-                                   int face_right)
+                                   double hmax, int spline_id,
+                                   int domain_left,
+                                   int domain_right)
     {
         size_t nb_points = points.size();
         size_t ip_0 = geompoints.size();
@@ -291,9 +291,9 @@ namespace meshit
             size_t id2 = ip + 2;
             if (i == nb_splines - 1) id2 = ip_0;
             SplineSeg* spline = new SplineSeg3(geompoints[id0], geompoints[id1], geompoints[id2]);
-            spline->leftdom = face_left;
-            spline->rightdom = face_right;
-            spline->bc = bc;
+            spline->dom_left = domain_left;
+            spline->dom_right = domain_right;
+            spline->id_ = spline_id;
             spline->reffak = 1;
             spline->hmax = hmax;
             splines.push_back(spline);
@@ -302,7 +302,7 @@ namespace meshit
     }
 
     void SplineGeometry::AddCircle(const Point2d& center, double radius,
-                                   double hmax, int bc,
+                                   double hmax, int spline_id,
                                    int face_left, int face_right)
     {
         std::vector<Point2d> spline_points;
@@ -319,19 +319,7 @@ namespace meshit
         spline_points.push_back(Point2d(c_x, c_y - radius));
         spline_points.push_back(Point2d(c_x + radius, c_y - radius));
 
-        AddSpline(spline_points, hmax, bc, face_left, face_right);
-    }
-
-    void SplineGeometry::FakeData()
-    {
-        int numdomains = 1;
-        materials.resize(numdomains);
-        maxh.assign(numdomains, 1000);
-
-        for (int i = 0; i < numdomains; i++) {
-            materials[i] = new char[1];
-            materials[i][0] = '\0';
-        }
+        AddSpline(spline_points, hmax, spline_id, face_left, face_right);
     }
 
     int SplineGeometry::AddFace(const std::string& name, double maxh_f)
@@ -351,13 +339,128 @@ namespace meshit
             material = nullptr;
     }
 
-    double SplineGeometry::GetDomainMaxh(size_t domnr)
+    double SplineGeometry::GetDomainMaxh(size_t domain_id)
     {
-        if (domnr > 0 && domnr <= maxh.size()) {
-            return maxh[domnr - 1];
+        if (domain_id > 0 && domain_id <= maxh.size()) {
+            return maxh[domain_id - 1];
         } else {
             return -1.0;
         }
     }
+
+    void SplineSegmenter::Partition(const SplineSeg& spline)
+    {
+        constexpr size_t n = 10000;
+        constexpr double dt = 1.0 / n;
+
+        std::vector<double> curve_points;
+        CalcPartition(spline, curve_points);
+
+        std::vector<size_t> loc_search;
+        Point2d p_old = spline.GetPoint(0);
+        Point2d mark_old = p_old;
+        double l_old = 0.0;
+        size_t j = 1;
+
+        for (size_t i = 1; i <= n; i++) {
+            double t = static_cast<double>(i) * dt;
+            Point2d p = spline.GetPoint(t);
+            double l = l_old + Dist(p, p_old);
+            while (j < curve_points.size() && (l >= curve_points[j] || i == n)) {
+                PointIndex pi1, pi2;
+                double frac = (curve_points[j] - l) / (l - l_old);
+                Point2d mark = spline.GetPoint(t + frac * dt);
+
+                double h = mesh_.GetH(mark_old);
+                Vec2d v(1e-4 * h, 1e-4 * h);
+                searchtree_.GetIntersecting(mark_old - v, mark_old + v, loc_search);
+                if (loc_search.size() > 0) {
+                    pi1 = loc_search.back();
+                } else {
+                    pi1 = mesh_.AddPoint(mark_old);
+                    searchtree_.Insert(mark_old, pi1);
+                }
+                searchtree_.GetIntersecting(mark - v, mark + v, loc_search);
+                if (loc_search.size() > 0) {
+                    pi2 = loc_search.back();
+                } else {
+                    pi2 = mesh_.AddPoint(mark);
+                    searchtree_.Insert(mark, pi2);
+                }
+
+                Segment seg;
+                seg.edge_id = spline.get_id();
+                seg[0] = pi1;
+                seg[1] = pi2;
+                seg.dom_left = spline.dom_left;
+                seg.dom_right = spline.dom_right;
+                mesh_.AddSegment(seg);
+
+                mark_old = mark;
+                j++;
+            }
+
+            p_old = p;
+            l_old = l;
+        }
+    }
+
+    void SplineSegmenter::CalcPartition(const SplineSeg& spline, std::vector<double>& points)
+    {
+        double fperel, oldf, f;
+
+        size_t n = 10000;
+
+        std::vector<Point2d> xi(n);
+        std::vector<double> hi(n);
+
+        for (size_t i = 0; i < n; i++) {
+            xi[i] = spline.GetPoint((i + 0.5) / n);
+            hi[i] = mesh_.GetH(xi[i]);
+        }
+
+        // limit slope
+        double gradh = 1 / elto0_;
+        for (size_t i = 0; i < n - 1; i++) {
+            double hnext = hi[i] + gradh * (xi[i + 1] - xi[i]).Length();
+            hi[i + 1] = std::min(hi[i + 1], hnext);
+        }
+        for (size_t i = n - 1; i > 1; i--) {
+            double hnext = hi[i] + gradh * (xi[i - 1] - xi[i]).Length();
+            hi[i - 1] = std::min(hi[i - 1], hnext);
+        }
+
+        points.clear();
+
+        double len = spline.Length();
+        double dt = len / n;
+
+        double sum = 0;
+        for (size_t i = 0; i < n; i++) {
+            sum += dt / hi[i];
+        }
+
+        size_t nel = static_cast<size_t>(sum + 1);
+        fperel = sum / nel;
+
+        points.push_back(0);
+
+        size_t i = 1;
+        oldf = 0;
+
+        for (size_t j = 0; j < n && i < nel; j++) {
+            double fun = hi[j];
+
+            f = oldf + dt / fun;
+
+            while (i * fperel < f && i < nel) {
+                points.push_back(dt * j + (i * fperel - oldf) * fun);
+                i++;
+            }
+            oldf = f;
+        }
+        points.push_back(len);
+    }
+
 
 }  // namespace meshit
