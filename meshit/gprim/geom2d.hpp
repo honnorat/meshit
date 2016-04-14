@@ -337,14 +337,13 @@ namespace meshit
             pmax.Y() = std::max(p1.Y(), p2.Y());
         }
 
-        const Point2d& PMin() const
-        {
-            return pmin;
-        }
+        const Point2d& PMin() const { return pmin; }
+        const Point2d& PMax() const { return pmax; }
 
-        const Point2d& PMax() const
+        Point2d Center() const
         {
-            return pmax;
+            return Point2d(0.5 * (pmin.X() + pmax.X()),
+                           0.5 * (pmin.Y() + pmax.Y()));
         }
 
         const Box2d& operator+=(const Box2d& b);
