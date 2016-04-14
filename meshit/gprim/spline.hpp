@@ -71,13 +71,26 @@ namespace meshit
             return fabs(first.X() * second.Y() - first.Y() * second.X()) / (fl * fl * fl);
         }
 
-        int get_id() const { return id_; }
+        int GetID() const { return id_; }
+        void SetID(int id) { id_ = id; }
+
+        void SetDomains(size_t left, size_t right)
+        {
+            dom_left = left;
+            dom_right = right;
+        }
+
+        void SetHRef(double max_h, double ref_fac=1.0)
+        {
+            hmax_ = max_h;
+            ref_fac_ = ref_fac;
+        }
 
      public:
         size_t dom_left;    // left domain
         size_t dom_right;   // right domain
-        double reffak;      // refinement at line
-        double hmax;        // maximal h
+        double ref_fac_;    // refinement at line
+        double hmax_;       // maximal h
         int id_;            // spline index number
     };
 

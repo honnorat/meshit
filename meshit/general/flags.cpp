@@ -26,6 +26,15 @@ namespace meshit
         }
     }
 
+    int Flags::GetIntFlag(const std::string& name, int default_value)
+    {
+        if (num_flags.count(name)) {
+            return static_cast<int>(num_flags[name]);
+        } else {
+            return default_value;
+        }
+    }
+
     void Flags::SetCommandLineFlag(const std::string& st)
     {
         size_t eq_pos = st.find('=');

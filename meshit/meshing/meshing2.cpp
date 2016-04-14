@@ -85,8 +85,8 @@ namespace meshit
         int trials = 0, nfaces = 0;
         int qualclass;
 
-        std::vector<int> elements_on_node(mesh_.GetNP(), 0);
-        std::vector<bool> illegal_point(mesh_.GetNP(), false);
+        std::vector<int> elements_on_node(mesh_.GetNbPoints(), 0);
+        std::vector<bool> illegal_point(mesh_.GetNbPoints(), false);
         double meshed_area = 0.0;
 
         if (max_area > 0)
@@ -113,7 +113,7 @@ namespace meshit
 
             // plot statistics
             if (trials > plotnexttrial) {
-                MESHIT_LOG_DEBUG(nfaces << " faces, " << trials << " trials, " << mesh_.GetNSE() << " elements.");
+                MESHIT_LOG_DEBUG(nfaces << " faces, " << trials << " trials, " << mesh_.GetNbElements() << " elements.");
                 plotnexttrial += 1000;
             }
 
@@ -300,7 +300,7 @@ namespace meshit
                 for (size_t i = 0; i < locelements.size(); i++) {
                     Element2d mtri;
                     mtri = locelements[i];
-                    mtri.SetIndex(facenr);
+                    mtri.SetFaceID(facenr);
 
                     for (size_t j = 0; j < 3; j++) {
                         mtri.PointID(j) = locelements[i].PointID(j) =

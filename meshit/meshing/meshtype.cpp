@@ -10,14 +10,14 @@ namespace meshit
         pnums[0] = -1;
         pnums[1] = -1;
         edge_id = -1;
-        dom_left = static_cast<size_t>(-1);
-        dom_right = static_cast<size_t>(-1);
+        face_left = static_cast<size_t>(-1);
+        face_right = static_cast<size_t>(-1);
     }
 
     Segment::Segment(const Segment& other)
         : edge_id(other.edge_id),
-          dom_left(other.dom_left),
-          dom_right(other.dom_right)
+          face_left(other.face_left),
+          face_right(other.face_right)
     {
         pnums[0] = other.pnums[0];
         pnums[1] = other.pnums[1];
@@ -29,15 +29,15 @@ namespace meshit
             pnums[0] = other.pnums[0];
             pnums[1] = other.pnums[1];
             edge_id = other.edge_id;
-            dom_left = other.dom_left;
-            dom_right = other.dom_right;
+            face_left = other.face_left;
+            face_right = other.face_right;
         }
         return *this;
     }
 
     std::ostream& operator<<(std::ostream& s, const Segment& seg)
     {
-        s << seg[0] << " - " << seg[1] << " domin = " << seg.dom_left << ", domout = " << seg.dom_right
+        s << seg[0] << " - " << seg[1] << " domin = " << seg.face_left << ", domout = " << seg.face_right
         << " si = " << seg.edge_id;
         return s;
     }
@@ -73,10 +73,8 @@ namespace meshit
         grading = -1.0;
         maxh = 1e10;
         minh = 0;
-        restrict_segment = false;
         curvature_safety = 2;
         segments_per_edge = 1;
-
         giveup_tol2d = 200;
         n_steps = 0;
     }
@@ -85,7 +83,6 @@ namespace meshit
     {
         optimize2d = other.optimize2d;
         optsteps2d = other.optsteps2d;
-        restrict_segment = other.restrict_segment;
         grading = other.grading;
         minh = other.minh;
         maxh = other.maxh;

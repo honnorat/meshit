@@ -8,7 +8,7 @@ namespace meshit
     {
         MESHIT_LOG_DEBUG("Check Surface mesh");
 
-        size_t nf = mesh.GetNSE();
+        size_t nf = mesh.GetNbElements();
         INDEX_2_map<int> edges(nf + 2);
         INDEX_2 i2;
         int cnt1 = 0, cnt2 = 0;
@@ -68,7 +68,7 @@ namespace meshit
         std::vector<INDEX> incl(ncl, 0);
         double qual;
 
-        for (size_t sei = 0; sei < mesh.GetNSE(); sei++) {
+        for (size_t sei = 0; sei < mesh.GetNbElements(); sei++) {
             qual = TriangleQualityInst(
                 mesh.Point(mesh.Element(sei)[0]),
                 mesh.Point(mesh.Element(sei)[1]),
@@ -79,8 +79,8 @@ namespace meshit
         }
 
         MESHIT_LOG_INFO("\n\n");
-        MESHIT_LOG_INFO("Points:           " << mesh.GetNP());
-        MESHIT_LOG_INFO("Surface Elements: " << mesh.GetNSE());
+        MESHIT_LOG_INFO("Points:           " << mesh.GetNbPoints());
+        MESHIT_LOG_INFO("Surface Elements: " << mesh.GetNbElements());
         MESHIT_LOG_INFO("\nElements in qualityclasses:");
         for (size_t i = 0; i < ncl; i++) {
             MESHIT_LOG_INFO(std::fixed << std::setprecision(2) <<

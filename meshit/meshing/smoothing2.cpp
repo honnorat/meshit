@@ -223,7 +223,7 @@ namespace meshit
     {
         MESHIT_LOG_DEBUG("Smoothing");
 
-        for (size_t face_index = 1; face_index <= mesh_.GetNFD(); face_index++) {
+        for (size_t face_index = 1; face_index <= mesh_.GetNbFaces(); face_index++) {
             ImproveMesh(face_index, metric_weight);
         }
     }
@@ -234,8 +234,8 @@ namespace meshit
         mesh_.GetSurfaceElementsOfFace(faceindex, seia);
 
 
-        std::vector<MeshPoint> savepoints(mesh_.GetNP());
-        std::vector<int> compress(mesh_.GetNP());
+        std::vector<MeshPoint> savepoints(mesh_.GetNbPoints());
+        std::vector<int> compress(mesh_.GetNbPoints());
         std::vector<PointIndex> icompress;
         for (size_t i = 0; i < seia.size(); i++) {
             const Element2d& el = mesh_.Element(seia[i]);

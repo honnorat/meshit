@@ -50,7 +50,7 @@ namespace meshit
             MESHIT_LOG_DEBUG("Edgeswapping, topological");
         }
 
-        for (size_t face_index = 1; face_index <= mesh_.GetNFD(); face_index++) {
+        for (size_t face_index = 1; face_index <= mesh_.GetNbFaces(); face_index++) {
             EdgeSwapping(face_index, use_metric, metric_weight);
         }
 
@@ -63,12 +63,12 @@ namespace meshit
         std::vector<SurfaceElementIndex> seia;
         mesh_.GetSurfaceElementsOfFace(face_index, seia);
 
-        std::vector<Neighbour> neighbors(mesh_.GetNSE());
+        std::vector<Neighbour> neighbors(mesh_.GetNbElements());
         INDEX_2_map<trionedge> other(seia.size() + 2);
 
-        std::vector<char> swapped(mesh_.GetNSE());
-        std::vector<int> pdef(mesh_.GetNP());
-        std::vector<double> pangle(mesh_.GetNP());
+        std::vector<char> swapped(mesh_.GetNbElements());
+        std::vector<int> pdef(mesh_.GetNbPoints());
+        std::vector<double> pangle(mesh_.GetNbPoints());
 
         static const double minangle[] = {0, 1.481, 2.565, 3.627, 4.683, 5.736, 7, 9};
 
@@ -157,7 +157,7 @@ namespace meshit
                 if (mesh_.Element(t1).IsDeleted())
                     continue;
 
-                if (mesh_.Element(t1).GetIndex() != face_index)
+                if (mesh_.Element(t1).FaceID() != face_index)
                     continue;
 
                 for (size_t o1 = 0; o1 < 3; o1++) {
@@ -261,7 +261,7 @@ namespace meshit
     void MeshOptimize2d::CombineImprove(double metric_weight)
     {
         MESHIT_LOG_DEBUG("Combine improve");
-        for (size_t face_index = 1; face_index <= mesh_.GetNFD(); face_index++) {
+        for (size_t face_index = 1; face_index <= mesh_.GetNbFaces(); face_index++) {
             CombineImprove(face_index, metric_weight);
         }
     }
@@ -271,7 +271,7 @@ namespace meshit
         std::vector<SurfaceElementIndex> seia;
         mesh_.GetSurfaceElementsOfFace(face_index, seia);
 
-        size_t np = mesh_.GetNP();
+        size_t np = mesh_.GetNbPoints();
 
         TABLE<SurfaceElementIndex> elements_on_node(np);
         std::vector<SurfaceElementIndex> has_one_pi, has_both_pi;

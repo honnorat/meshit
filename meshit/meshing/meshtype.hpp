@@ -50,23 +50,9 @@ namespace meshit
      */
     class Element2d
     {
-        /// surface nr
-        size_t index;
-
-        /// point numbers
-        PointIndex pnum[3];
-
-        // marked for refinement
-        bool deleted;  // element is deleted
-
-        // element visible
-
-        /// a linked list for all segments in the same face
-        SurfaceElementIndex next;
-
      public:
         Element2d()
-            : index{0}, pnum{0, 0, 0}, deleted{false} { }
+            : pnum{0, 0, 0}, face_id{0}, deleted{false} { }
 
         PointIndex& operator[](size_t i)
         {
@@ -88,27 +74,24 @@ namespace meshit
             return pnum[i];
         }
 
-        void SetIndex(int si)
+        void SetFaceID(int fid)
         {
-            index = si;
+            face_id = fid;
         }
 
-        size_t GetIndex() const
+        size_t FaceID() const
         {
-            return index;
+            return face_id;
         };
 
-        /// invert orientation
-        inline void Invert();
-        /// first point number is smallest
-        inline void NormalizeNumbering();
+        void Invert();   // invert orientation
+        void NormalizeNumbering();
 
-        // friend ostream & operator<<(ostream  & s, const Element2d & el);
         friend class Mesh;
 
         void Delete()
         {
-            deleted = 1;
+            deleted = true;
             pnum[0] = pnum[1] = pnum[2] = -1;
         }
 
@@ -117,10 +100,13 @@ namespace meshit
             return deleted;
         }
 
-        // Philippose - 08 August 2010
-        // Access functions for the new property: visible
-
         bool operator==(const Element2d& el2) const;
+
+     protected:
+        PointIndex pnum[3];
+        size_t face_id;
+        SurfaceElementIndex next;   // a linked list for all segments in the same face
+        bool deleted;  // element is deleted
     };
 
     std::ostream& operator<<(std::ostream& s, const Element2d& el);
@@ -139,8 +125,8 @@ namespace meshit
         PointIndex pnums[2];    // p1, p2
 
         int edge_id;
-        size_t dom_left;        // domain number left side
-        size_t dom_right;       // domain number right side
+        size_t face_left;        // domain number left side
+        size_t face_right;       // domain number right side
 
      public:
         Segment& operator=(const Segment& other);
@@ -189,8 +175,7 @@ namespace meshit
         double maxh;                // maximal mesh size
         double minh;                // minimal mesh size
         double curvature_safety;    // safty factor for curvatures (elemetns per radius)
-        double segments_per_edge;   // minimal number of segments per edge
-        bool restrict_segment;      // restrict local mesh size based on geometry segment
+        int segments_per_edge;      // minimal number of segments per edge
         int giveup_tol2d;           // give up quality class
 
         int n_steps;

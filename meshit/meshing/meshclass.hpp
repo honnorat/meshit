@@ -44,7 +44,7 @@ namespace meshit
            the face-index of the surface element maps into
            this table.
          */
-        std::vector<FaceDescriptor> facedecoding;
+        std::vector<FaceDescriptor> faces;
 
         /// sub-domain materials
         std::vector<char*> materials;
@@ -58,55 +58,20 @@ namespace meshit
         void BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp);
 
         size_t AddPoint(const Point2d& p, point_type_t type = INNER_POINT);
-
-        size_t GetNP() const
-        {
-            return points.size();
-        }
-
-        MeshPoint& Point(size_t pi)
-        {
-            return points[pi];
-        }
-
-        const MeshPoint& Point(size_t pi) const
-        {
-            return points[pi];
-        }
-
         void AddSegment(const Segment& s);
-
-        size_t GetNSeg() const
-        {
-            return segments.size();
-        }
-
-        Segment& LineSegment(size_t i)
-        {
-            return segments[i];
-        }
-
-        const Segment& LineSegment(size_t i) const
-        {
-            return segments[i];
-        }
-
         void AddSurfaceElement(const Element2d& el);
 
-        size_t GetNSE() const
-        {
-            return elements.size();
-        }
+        MeshPoint& Point(size_t pi) { return points[pi]; }
+        Element2d& Element(size_t i) { return elements[i]; }
 
-        Element2d& Element(size_t i)
-        {
-            return elements[i];
-        }
+        const MeshPoint& Point(size_t pi) const { return points[pi]; }
+        const Segment& LineSegment(size_t i) const { return segments[i]; }
+        const Element2d& Element(size_t i) const { return elements[i]; }
 
-        const Element2d& Element(size_t i) const
-        {
-            return elements[i];
-        }
+        size_t GetNbPoints() const { return points.size(); }
+        size_t GetNbSegments() const { return segments.size(); }
+        size_t GetNbElements() const { return elements.size(); }
+        size_t GetNbFaces() const { return faces.size(); }
 
         void RebuildSurfaceElementLists();
         void GetSurfaceElementsOfFace(size_t facenr, std::vector<SurfaceElementIndex>& sei) const;
@@ -114,11 +79,7 @@ namespace meshit
         /// sets internal tables
         void IndexBoundaryEdges();
 
-        /**
-           Checks overlap of boundary
-           return == 1, iff overlap
-         */
-        int CheckOverlappingBoundary();
+        int CheckOverlappingBoundary();     // Checks overlap of boundary, return == 1, iff overlap
 
         /**
            finds average h of surface surfnr if surfnr > 0,
@@ -141,10 +102,8 @@ namespace meshit
             return segment_ht.count(e) == 1;
         }
 
-        /**
-           Remove unused points. etc.
-         */
-        void Compress();
+        void Compress();    // Remove unused points. etc.
+        size_t ComputeNVertices();
 
         void Export(const std::string& filetype, const std::string& filename) const;
         void Export(const std::string& filetype, std::ostream& os) const;
@@ -160,13 +119,8 @@ namespace meshit
 
         void SetMaterial(size_t domnr, const char* mat);
 
-        size_t GetNFD() const { return facedecoding.size(); }
-
-        int GetDomainNumber(const Element2d& el) const { return GetDomainNumber(el.GetIndex()); }
-        int GetDomainNumber(int face_id) const { return facedecoding[face_id - 1].face_id() + 100; }
-
-        /// find number of vertices
-        size_t ComputeNVertices();
+        int GetDomainNumber(const Element2d& el) const { return GetDomainNumber(el.FaceID()); }
+        int GetDomainNumber(int face_id) const { return faces[face_id - 1].face_id() + 100; }
 
         class CSurfaceArea
         {

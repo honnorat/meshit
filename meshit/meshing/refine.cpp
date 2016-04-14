@@ -82,13 +82,13 @@ namespace meshit
                 {5, 3, 4}
             };
 
-            int ind = el.GetIndex();
+            int ind = el.FaceID();
             for (j = 0; j < 4; j++) {
                 Element2d nel;
                 for (k = 0; k < 3; k++) {
                     nel.PointID(k) = pnums[reftab[j][k]];
                 }
-                nel.SetIndex(ind);
+                nel.SetFaceID(ind);
 
                 if (j == 0) {
                     elements[sei] = nel;

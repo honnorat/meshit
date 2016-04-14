@@ -102,19 +102,14 @@ namespace meshit
     void SplineGeometry::LoadData(std::istream& infile)
     {
         MESHIT_LOG_INFO("Load 2D Geometry");
-        int nump, dom_left, dom_right;
+
         Point2d x;
-        int hi1, hi2, hi3;
         char buf[50], ch;
-        int pointnr;
 
         std::string keyword;
         std::string flag;
 
-        std::vector<GeomPoint> infilepoints;
-        std::vector<int> pointnrs;
-        nump = 0;
-        int numdomains = 0;
+        int nb_domains = 0;
 
         TestComment(infile);
         // refinement factor
@@ -126,13 +121,16 @@ namespace meshit
             ch = TestComment(infile);
 
             if (keyword == "points") {
+                std::vector<GeomPoint> points;
+                std::vector<PointIndex> point_ids;
+                size_t point_id;
+                size_t nb_points = 0;
                 while (!isalpha(static_cast<int>(ch))) {
-                    infile >> pointnr;  // pointnrs is 1-based
-                    if (pointnr > nump) nump = pointnr;
-                    pointnrs.push_back(pointnr);
+                    infile >> point_id;  // point ids are 1-based
+                    if (point_id > nb_points) nb_points = point_id;
+                    point_ids.push_back(point_id);
 
-                    infile >> x.X() >> x.Y();
-                    infile >> ch;
+                    infile >> x.X() >> x.Y() >> ch;
 
                     Flags flags;
                     while (ch == '-') {
@@ -141,33 +139,36 @@ namespace meshit
                         ch = TestComment(infile);
                     }
                     infile.unget();
-
-                    infilepoints.push_back(GeomPoint(x,
-                                                     flags.GetNumFlag("ref", 1.0),
-                                                     flags.GetNumFlag("maxh", 1e99)));
                     ch = TestComment(infile);
+
+                    points.push_back(GeomPoint(x, flags.GetNumFlag("ref", 1.0), flags.GetNumFlag("maxh", 1e99)));
                 }
-                geompoints.resize(nump);
-                for (int i = 0; i < nump; i++) {
-                    geompoints[pointnrs[i] - 1] = infilepoints[i];
+                geompoints.resize(nb_points);
+                for (size_t i = 0; i < nb_points; i++) {
+                    geompoints[point_ids[i] - 1] = points[i];
                 }
             }
             else if (keyword == "segments") {
+
                 int i = 1;
                 while (!isalpha(static_cast<int>(ch))) {
+                    int dom_left, dom_right;
                     infile >> dom_left >> dom_right;
-                    if (dom_left > numdomains) numdomains = dom_left;
-                    if (dom_right > numdomains) numdomains = dom_right;
+                    if (dom_left > nb_domains) nb_domains = dom_left;
+                    if (dom_right > nb_domains) nb_domains = dom_right;
 
                     SplineSeg* spline = nullptr;
                     infile >> buf;
                     // type of spline segement
+
                     if (strcmp(buf, "2") == 0) {  // a line
-                        infile >> hi1 >> hi2;
+                        int hi1, hi2;
+                        infile >> hi1 >> hi2 >> ch;
                         spline = new LineSeg(geompoints[hi1 - 1],
                                              geompoints[hi2 - 1]);
                     } else if (strcmp(buf, "3") == 0) {  // a rational spline
-                        infile >> hi1 >> hi2 >> hi3;
+                        int hi1, hi2, hi3;
+                        infile >> hi1 >> hi2 >> hi3 >> ch;
                         spline = new SplineSeg3(geompoints[hi1 - 1],
                                                 geompoints[hi2 - 1],
                                                 geompoints[hi3 - 1]);
@@ -176,43 +177,39 @@ namespace meshit
                         throw std::runtime_error("SplineGeometry::LoadData : unknown segment type");
                     }
 
-                    spline->dom_left = dom_left;
-                    spline->dom_right = dom_right;
-                    splines.push_back(spline);
-
                     Flags flags;
-
-                    infile >> ch;
                     while (ch == '-') {
                         infile >> flag;
                         flags.SetCommandLineFlag(flag);
                         ch = TestComment(infile);
                     }
                     infile.unget();
-
-                    spline->id_ = static_cast<int>(flags.GetNumFlag("id", ++i));
-                    spline->reffak = flags.GetNumFlag("ref", 1);
-                    spline->hmax = flags.GetNumFlag("maxh", 1e99);
                     ch = TestComment(infile);
+
+                    spline->SetDomains(dom_left, dom_right);
+                    spline->SetID(flags.GetIntFlag("id", ++i));
+                    spline->SetHRef(flags.GetNumFlag("maxh", 1e99),
+                                    flags.GetNumFlag("ref", 1));
+                    splines.push_back(spline);
                 }
             }
             else if (keyword == "materials") {
-                int domainnr;
-                char material[100];
+                char material_name[100];
 
-                materials.resize(numdomains);
-                maxh.resize(numdomains);
-                for (int i = 0; i < numdomains; i++) {
+                materials.resize(nb_domains);
+                maxh.resize(nb_domains);
+                for (int i = 0; i < nb_domains; i++) {
                     maxh[i] = 1000;
                 }
 
-                for (int i = 0; i < numdomains; i++) {
+                for (int i = 0; i < nb_domains; i++) {
                     materials[i] = new char[100];
                 }
-                for (int i = 0; i < numdomains && infile.good(); i++) {
-                    infile >> domainnr;
-                    infile >> material;
-                    strncpy(materials[domainnr - 1], material, 100);
+                for (int i = 0; i < nb_domains && infile.good(); i++) {
+                    int material_id;
+                    infile >> material_id;
+                    infile >> material_name;
+                    strncpy(materials[material_id - 1], material_name, 100);
 
                     Flags flags;
                     infile >> ch;
@@ -222,8 +219,9 @@ namespace meshit
                         ch = TestComment(infile);
                     }
                     infile.unget();
-                    maxh[domainnr - 1] = flags.GetNumFlag("maxh", 1000);
                     ch = TestComment(infile);
+
+                    maxh[material_id - 1] = flags.GetNumFlag("maxh", 1000);
                 }
             }
         }
@@ -251,8 +249,8 @@ namespace meshit
             spline->dom_left = domain_left;
             spline->dom_right = domain_right;
             spline->id_ = spline_id;
-            spline->reffak = 1;  // Refinement factor
-            spline->hmax = hmax;
+            spline->ref_fac_ = 1;  // Refinement factor
+            spline->hmax_ = hmax;
             splines.push_back(spline);
         }
     }
@@ -294,8 +292,8 @@ namespace meshit
             spline->dom_left = domain_left;
             spline->dom_right = domain_right;
             spline->id_ = spline_id;
-            spline->reffak = 1;
-            spline->hmax = hmax;
+            spline->ref_fac_ = 1;
+            spline->hmax_ = hmax;
             splines.push_back(spline);
             ip += 2;
         }
@@ -389,11 +387,11 @@ namespace meshit
                 }
 
                 Segment seg;
-                seg.edge_id = spline.get_id();
+                seg.edge_id = spline.GetID();
                 seg[0] = pi1;
                 seg[1] = pi2;
-                seg.dom_left = spline.dom_left;
-                seg.dom_right = spline.dom_right;
+                seg.face_left = spline.dom_left;
+                seg.face_right = spline.dom_right;
                 mesh_.AddSegment(seg);
 
                 mark_old = mark;

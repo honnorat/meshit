@@ -31,7 +31,7 @@ namespace meshit
         points = mesh2.points;
         segments = mesh2.segments;
         elements = mesh2.elements;
-        facedecoding = mesh2.facedecoding;
+        faces = mesh2.faces;
 
         return *this;
     }
@@ -46,8 +46,12 @@ namespace meshit
             grading = geometry.GetGrading();
         }
         if (grading < 0.01) {
-            MESHIT_LOG_WARNING("grading is too small: " << grading << ". We reset it to 0.01");
+            MESHIT_LOG_WARNING("grading is too small: " << grading << ". We reset it to 0.01.");
             grading = 0.01;
+        }
+        if (grading > 0.9) {
+            MESHIT_LOG_WARNING("grading is too large: " << grading << ". We reset it to 0.9.");
+            grading = 0.9;
         }
         geometry.SetGrading(grading);
 
@@ -61,15 +65,16 @@ namespace meshit
 
         geometry.PartitionBoundary(*this, mp);
 
-        size_t maxdomnr = 0;
+        // Build mesh faces
+        size_t nb_faces = 0;
         for (size_t si = 0; si < segments.size(); si++) {
-            if (segments[si].dom_left > maxdomnr) maxdomnr = segments[si].dom_left;
-            if (segments[si].dom_right > maxdomnr) maxdomnr = segments[si].dom_right;
+            nb_faces = std::max(nb_faces, segments[si].face_left);
+            nb_faces = std::max(nb_faces, segments[si].face_right);
         }
 
-        facedecoding.resize(0);
-        for (size_t i = 1; i <= maxdomnr; i++) {
-            facedecoding.push_back(FaceDescriptor(i));
+        faces.resize(nb_faces);
+        for (size_t face_index = 0; face_index < nb_faces; face_index++) {
+            faces[face_index] = FaceDescriptor(face_index + 1);
         }
 
         CalcLocalH();
@@ -79,11 +84,11 @@ namespace meshit
 
         Meshing2 meshing(*this, bbox);
 
-        for (size_t dom_nr = 1; dom_nr <= maxdomnr; dom_nr++) {
+        for (size_t dom_nr = 1; dom_nr <= nb_faces; dom_nr++) {
             if (geometry.GetDomainMaxh(dom_nr) > 0) {
                 h = geometry.GetDomainMaxh(dom_nr);
             }
-            MESHIT_LOG_DEBUG("Meshing domain " << dom_nr << " / " << maxdomnr);
+            MESHIT_LOG_DEBUG("Meshing domain " << dom_nr << " / " << nb_faces);
 
             size_t oldnf = elements.size();
 
@@ -99,11 +104,11 @@ namespace meshit
                 compress[pi] = cnt;
             }
             for (size_t si = 0; si < segments.size(); si++) {
-                if (segments[si].dom_left == dom_nr) {
+                if (segments[si].face_left == dom_nr) {
                     meshing.AddBoundaryElement(compress[segments[si][0]],
                                                compress[segments[si][1]]);
                 }
-                if (segments[si].dom_right == dom_nr) {
+                if (segments[si].face_right == dom_nr) {
                     meshing.AddBoundaryElement(compress[segments[si][1]],
                                                compress[segments[si][0]]);
                 }
@@ -112,7 +117,7 @@ namespace meshit
             meshing.GenerateMesh(mp, h, dom_nr);
 
             for (size_t sei = oldnf; sei < elements.size(); sei++) {
-                elements[sei].SetIndex(dom_nr);
+                elements[sei].SetFaceID(dom_nr);
             }
 
             // astrid
@@ -160,12 +165,12 @@ namespace meshit
         size_t si = elements.size();
         elements.push_back(el);
 
-        if (el.index > facedecoding.size()) {
-            MESHIT_LOG_ERROR("has no facedecoding: fd.size = " << facedecoding.size() << ", ind = " << el.index);
+        if (el.face_id > faces.size()) {
+            MESHIT_LOG_ERROR("has no faces: fd.size = " << faces.size() << ", ind = " << el.face_id);
         }
 
         Element2d& bref = elements.back();
-        FaceDescriptor& faceref = facedecoding[bref.index - 1];
+        FaceDescriptor& faceref = faces[bref.face_id - 1];
         bref.next = faceref.first_element;
         faceref.first_element = si;
 
@@ -207,13 +212,14 @@ namespace meshit
         outfile.precision(15);
 
         outfile << "mesh2d" << std::endl;
-        outfile << "# surfnr    np      p1      p2      p3" << std::endl;
-        outfile << "surface_elements" << std::endl << GetNSE() << std::endl;
+        outfile << "# face_id      np      p1      p2      p3" << std::endl;
+        outfile << "surface_elements" << std::endl;
+        outfile << elements.size() << std::endl;
 
         for (size_t sei = 0; sei < elements.size(); sei++) {
-            size_t el_index = elements[sei].GetIndex();
+            size_t el_index = elements[sei].FaceID();
             if (el_index > 0) {
-                outfile << std::setw(8) << facedecoding[el_index - 1].face_id();
+                outfile << std::setw(9) << faces[el_index - 1].face_id();
             } else {
                 outfile << "       0       0";
             }
@@ -230,12 +236,12 @@ namespace meshit
         outfile << "edge_segments" << std::endl << segments.size() << std::endl;
 
         for (size_t i = 0; i < segments.size(); i++) {
-            const Segment& seg = LineSegment(i);
+            const Segment& seg = segments[i];
             outfile << std::setw(8) << seg.edge_id;
             outfile << std::setw(8) << seg[0];
             outfile << std::setw(8) << seg[1];
-            outfile << std::setw(8) << seg.dom_left;
-            outfile << std::setw(8) << seg.dom_right;
+            outfile << std::setw(8) << seg.face_left;
+            outfile << std::setw(8) << seg.face_right;
             outfile << std::endl;
         }
 
@@ -276,7 +282,7 @@ namespace meshit
         char str[100];
         int n;
 
-        facedecoding.resize(0);
+        faces.resize(0);
 
         bool endmesh = false;
 
@@ -291,13 +297,13 @@ namespace meshit
 
                     infile >> surf_id;
 
-                    for (size_t j = 0; j < facedecoding.size(); j++) {
-                        if (facedecoding[j].face_id() == static_cast<size_t>(surf_id)) {
+                    for (size_t j = 0; j < faces.size(); j++) {
+                        if (faces[j].face_id() == static_cast<size_t>(surf_id)) {
                             faceind = j + 1;
                         }
                     }
                     if (!faceind) {
-                        facedecoding.push_back(FaceDescriptor(surf_id));
+                        faces.push_back(FaceDescriptor(surf_id));
                     }
 
                     infile >> nep;
@@ -308,7 +314,7 @@ namespace meshit
                     }
 
                     Element2d tri;
-                    tri.SetIndex(faceind);
+                    tri.SetFaceID(faceind);
 
                     for (int j = 0; j < nep; j++) {
                         infile >> tri.PointID(j);
@@ -321,7 +327,7 @@ namespace meshit
                 for (int i = 1; i <= n; i++) {
                     Segment seg;
                     infile >> seg.edge_id >> seg[0] >> seg[1];
-                    infile >> seg.dom_left >> seg.dom_right;
+                    infile >> seg.face_left >> seg.face_right;
                     AddSegment(seg);
                 }
             }
@@ -418,7 +424,7 @@ namespace meshit
         size_t n = 0;
         for (size_t i = 0; i < elements.size(); i++) {
             const Element2d& el = Element(i);
-            if (surf_id == 0 || el.GetIndex() == surf_id) {
+            if (surf_id == 0 || el.FaceID() == surf_id) {
                 for (size_t j = 0; j < 3; j++) {
                     double hi = Dist(points[el.PointID(j)], points[el.PointID((j + 1) % 3)]);
                     hsum += hi;
@@ -442,18 +448,18 @@ namespace meshit
 
         for (size_t i = 0; i < elements.size(); i++) {
             const Element2d& el = elements[i];
-            double hel = -1;
+            double h_el = 0.0;
             for (size_t j = 0; j < 3; j++) {
                 const MeshPoint& p1 = points[el.PointID(j)];
                 const MeshPoint& p2 = points[el.PointID((j + 1) % 3)];
-                double hedge = Dist(p1, p2);
-                if (hedge > hel) hel = hedge;
+                double h_edge = Dist(p1, p2);
+                if (h_edge > h_el) h_el = h_edge;
             }
-            if (hel > 0) {
+            if (h_el > 0.0) {
                 const MeshPoint& p1 = points[el.PointID(0)];
                 const MeshPoint& p2 = points[el.PointID(1)];
                 const MeshPoint& p3 = points[el.PointID(2)];
-                loc_h_func->SetH(Center(p1, p2, p3), hel);
+                loc_h_func->SetH(Center(p1, p2, p3), h_el);
             }
         }
 
@@ -545,14 +551,14 @@ namespace meshit
             seg[1] = op2np[seg[1]];
         }
 
-        for (size_t i = 0; i < facedecoding.size(); i++) {
-            facedecoding[i].first_element = -1;
+        for (size_t i = 0; i < faces.size(); i++) {
+            faces[i].first_element = -1;
         }
 
         for (int i = elements.size() - 1; i >= 0; i--) {
-            int ind = elements[i].GetIndex();
-            elements[i].next = facedecoding[ind - 1].first_element;
-            facedecoding[ind - 1].first_element = i;
+            int ind = elements[i].FaceID();
+            elements[i].next = faces[ind - 1].first_element;
+            faces[ind - 1].first_element = i;
         }
 
         IndexBoundaryEdges();
@@ -627,8 +633,8 @@ namespace meshit
                         MESHIT_LOG_DEBUG_CONT(*trip2[k] << "   ");
                     MESHIT_LOG_DEBUG("");
 
-                    MESHIT_LOG_DEBUG("Face1 = " << facedecoding[tri1.GetIndex() - 1]);
-                    MESHIT_LOG_DEBUG("Face2 = " << facedecoding[tri2.GetIndex() - 1]);
+                    MESHIT_LOG_DEBUG("Face1 = " << faces[tri1.FaceID() - 1]);
+                    MESHIT_LOG_DEBUG("Face2 = " << faces[tri2.FaceID() - 1]);
                 }
             }
         }
@@ -637,13 +643,13 @@ namespace meshit
 
     void Mesh::RebuildSurfaceElementLists()
     {
-        for (size_t i = 0; i < facedecoding.size(); i++) {
-            facedecoding[i].first_element = -1;
+        for (size_t i = 0; i < faces.size(); i++) {
+            faces[i].first_element = -1;
         }
         for (int i = elements.size() - 1; i >= 0; i--) {
-            int ind = elements[i].GetIndex();
-            elements[i].next = facedecoding[ind - 1].first_element;
-            facedecoding[ind - 1].first_element = i;
+            int ind = elements[i].FaceID();
+            elements[i].next = faces[ind - 1].first_element;
+            faces[ind - 1].first_element = i;
         }
     }
 
@@ -651,10 +657,10 @@ namespace meshit
     {
         sei.clear();
 
-        SurfaceElementIndex si = facedecoding[facenr - 1].first_element;
+        SurfaceElementIndex si = faces[facenr - 1].first_element;
         while (si != -1) {
             const Element2d& se = Element(si);
-            if (se.GetIndex() == facenr && se.PointID(0) >= 0 && !se.IsDeleted()) {
+            if (se.FaceID() == facenr && se.PointID(0) >= 0 && !se.IsDeleted()) {
                 sei.push_back(si);
             }
             si = se.next;

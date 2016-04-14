@@ -34,6 +34,7 @@ namespace meshit
 
         /// Returns numerical flag, default value if not exists
         double GetNumFlag(const std::string& name, double default_value);
+        int GetIntFlag(const std::string& name, int default_value);
     };
 
 }  // namespace meshit
