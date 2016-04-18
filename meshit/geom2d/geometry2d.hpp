@@ -42,11 +42,11 @@ namespace meshit
                      double hmax, int spline_id,
                      int domain_left = 1, int domain_right = 0);
         void AddHole(const std::vector<Point2d>& points,
-                     double hmax, int bc, int face = 1);
+                     double hmax, int bc, int domain = 1);
         void AddStructureLine(const std::vector<Point2d>& points,
                               double hmax = 1e99,
                               int bc = 1,
-                              int face = 1);
+                              int domain = 1);
 
         void AddSpline(const std::vector<Point2d>& points,
                        double hmax, int spline_id = 1,

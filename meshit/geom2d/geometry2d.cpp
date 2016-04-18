@@ -255,14 +255,14 @@ namespace meshit
         }
     }
 
-    void SplineGeometry::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, int face)
+    void SplineGeometry::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, int domain)
     {
-        AddLine(point_list, hmax, bc, 0, face);
+        AddLine(point_list, hmax, bc, 0, domain);
     }
 
-    void SplineGeometry::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, int face)
+    void SplineGeometry::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, int domain)
     {
-        AddLine(points, hmax, bc, face, face);
+        AddLine(points, hmax, bc, domain, domain);
     }
 
     void SplineGeometry::AddSpline(const std::vector<Point2d>& points,
