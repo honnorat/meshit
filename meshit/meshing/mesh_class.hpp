@@ -68,7 +68,7 @@ class Mesh
     size_t GetNbFaces() const { return faces.size(); }
 
     void RebuildSurfaceElementLists();
-    void GetSurfaceElementsOfFace(size_t facenr, std::vector<SurfaceElementIndex>& sei) const;
+    void GetSurfaceElementsOfFace(size_t facenr, std::vector<ElementIndex>& sei) const;
 
     /// sets internal tables
     void IndexBoundaryEdges();

@@ -48,13 +48,13 @@ void MeshOptimize::EdgeSwapping(bool use_metric, double metric_weight)
 
 void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metric_weight)
 {
-    std::vector<SurfaceElementIndex> seia;
+    std::vector<ElementIndex> seia;
     mesh_.GetSurfaceElementsOfFace(face_index, seia);
 
     std::vector<Neighbour> neighbors(mesh_.GetNbElements());
     INDEX_2_map<trionedge> other(seia.size() + 2);
 
-    std::vector<char> swapped(mesh_.GetNbElements());
+    std::vector<bool> swapped(mesh_.GetNbElements());
     std::vector<int> pdef(mesh_.GetNbPoints());
     std::vector<double> pangle(mesh_.GetNbPoints());
 
@@ -134,13 +134,13 @@ void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metri
         }
     }
     for (size_t i = 0; i < seia.size(); i++) {
-        swapped[seia[i]] = 0;
+        swapped[seia[i]] = false;
     }
     int t = 4;
     bool done = false;
     while (!done && t >= 2) {
         for (size_t i = 0; i < seia.size(); i++) {
-            SurfaceElementIndex t1 = seia[i];
+            ElementIndex t1 = seia[i];
 
             if (mesh_.Element(t1).IsDeleted()) continue;
 
@@ -149,10 +149,10 @@ void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metri
             for (size_t o1 = 0; o1 < 3; o1++) {
                 bool should;
 
-                SurfaceElementIndex t2 = neighbors[t1].GetNeighborIndex(o1);
+                ElementIndex t2 = neighbors[t1].GetNeighborIndex(o1);
                 size_t o2 = neighbors[t1].GetOrientation(o1);
 
-                if (t2 == -1) continue;
+                if (t2 == Element2d::undefined) continue;
                 if (swapped[t1] || swapped[t2]) continue;
 
                 PointIndex pi1 = mesh_.Element(t1).PointID((o1 + 1) % 3);
@@ -232,8 +232,8 @@ void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metri
                     pdef[pi3]++;
                     pdef[pi4]++;
 
-                    swapped[t1] = 1;
-                    swapped[t2] = 1;
+                    swapped[t1] = true;
+                    swapped[t2] = true;
                 }
             }
         }
@@ -251,13 +251,13 @@ void MeshOptimize::CombineImprove()
 
 void MeshOptimize::CombineImprove(size_t face_index)
 {
-    std::vector<SurfaceElementIndex> seia;
+    std::vector<ElementIndex> seia;
     mesh_.GetSurfaceElementsOfFace(face_index, seia);
 
     size_t np = mesh_.GetNbPoints();
 
-    TABLE<SurfaceElementIndex> elements_on_node(np);
-    std::vector<SurfaceElementIndex> has_one_pi, has_both_pi;
+    TABLE<ElementIndex> elements_on_node(np);
+    std::vector<ElementIndex> has_one_pi, has_both_pi;
 
     for (size_t i = 0; i < seia.size(); i++) {
         const Element2d& el = mesh_.Element(seia[i]);
@@ -281,7 +281,7 @@ void MeshOptimize::CombineImprove(size_t face_index)
     }
 
     for (size_t i = 0; i < seia.size(); i++) {
-        SurfaceElementIndex sei = seia[i];
+        ElementIndex sei = seia[i];
         Element2d& elem = mesh_.Element(sei);
         if (elem.IsDeleted()) continue;
 
@@ -306,8 +306,8 @@ void MeshOptimize::CombineImprove(size_t face_index)
             has_one_pi.resize(0);
             has_both_pi.resize(0);
 
-            std::vector<SurfaceElementIndex> elem_idx_1 = elements_on_node[pi1];
-            std::vector<SurfaceElementIndex> elem_idx_2 = elements_on_node[pi2];
+            std::vector<ElementIndex> elem_idx_1 = elements_on_node[pi1];
+            std::vector<ElementIndex> elem_idx_2 = elements_on_node[pi2];
 
             for (size_t k = 0; k < elem_idx_1.size(); k++) {
                 const Element2d& el2 = mesh_.Element(elem_idx_1[k]);

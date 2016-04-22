@@ -521,7 +521,7 @@ void Mesh::Compress()
             op2np[pi] = npi++;
             hpoints.push_back(points[pi]);
         } else {
-            op2np[pi] = -1;
+            op2np[pi] = MeshPoint::undefined;
         }
     }
 
@@ -543,13 +543,15 @@ void Mesh::Compress()
         seg[1] = op2np[seg[1]];
     }
     for (size_t i = 0; i < faces.size(); i++) {
-        faces[i].first_element = -1;
+        faces[i].first_element = Element2d::undefined;
     }
 
-    for (int i = elements.size() - 1; i >= 0; i--) {
-        int ind = elements[i].FaceID();
-        elements[i].next = faces[ind - 1].first_element;
-        faces[ind - 1].first_element = i;
+//    for (int i = elements.size() - 1; i >= 0; i--) {
+    for (size_t i = 0; i < elements.size(); i++) {
+        int idx = elements.size() - i - 1;
+        int ind = elements[idx].FaceID();
+        elements[idx].next = faces[ind - 1].first_element;
+        faces[ind - 1].first_element = idx;
     }
 
     IndexBoundaryEdges();
@@ -631,21 +633,23 @@ int Mesh::CheckOverlappingBoundary()
 void Mesh::RebuildSurfaceElementLists()
 {
     for (size_t i = 0; i < faces.size(); i++) {
-        faces[i].first_element = -1;
+        faces[i].first_element = Element2d::undefined;
     }
-    for (int i = elements.size() - 1; i >= 0; i--) {
-        int ind = elements[i].FaceID();
-        elements[i].next = faces[ind - 1].first_element;
-        faces[ind - 1].first_element = i;
+//    for (int i = elements.size() - 1; i >= 0; i--) {
+    for (size_t i = 0; i < elements.size(); i++) {
+        int idx = elements.size() - i - 1;
+        int ind = elements[idx].FaceID();
+        elements[idx].next = faces[ind - 1].first_element;
+        faces[ind - 1].first_element = idx;
     }
 }
 
-void Mesh::GetSurfaceElementsOfFace(size_t facenr, std::vector<SurfaceElementIndex>& sei) const
+void Mesh::GetSurfaceElementsOfFace(size_t facenr, std::vector<ElementIndex>& sei) const
 {
     sei.clear();
 
-    SurfaceElementIndex si = faces[facenr - 1].first_element;
-    while (si != -1) {
+    ElementIndex si = faces[facenr - 1].first_element;
+    while (si != Element2d::undefined) {
         const Element2d& se = Element(si);
         if (se.FaceID() == facenr && se.PointID(0) >= 0 && !se.IsDeleted()) {
             sei.push_back(si);

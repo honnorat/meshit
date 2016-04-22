@@ -20,7 +20,7 @@ class Opti2dLocalData
 
  public:
     MeshPoint sp1;
-    std::vector<SurfaceElementIndex> loc_elements;
+    std::vector<ElementIndex> loc_elements;
     std::vector<double> lochs;
     std::vector<MeshPoint> loc_pnts2;
     std::vector<MeshPoint> loc_pnts3;

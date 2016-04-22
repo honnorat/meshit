@@ -22,7 +22,7 @@ enum PointType
 typedef PointType point_type_t;
 
 typedef uint32_t PointIndex;
-typedef int SurfaceElementIndex;
+typedef uint32_t ElementIndex;
 
 /**
    Point in the mesh.
@@ -54,6 +54,9 @@ class MeshPoint : public Point2d
 class Element2d
 {
  public:
+    static constexpr ElementIndex undefined = static_cast<ElementIndex>(-1);
+
+ public:
     Element2d()
         : pnum{0, 0, 0}, face_id{0}, deleted{false} { }
 
@@ -74,7 +77,7 @@ class Element2d
     void Delete()
     {
         deleted = true;
-        pnum[0] = pnum[1] = pnum[2] = -1;
+        pnum[0] = pnum[1] = pnum[2] = Element2d::undefined;
     }
 
     bool IsDeleted() const { return deleted; }
@@ -84,7 +87,7 @@ class Element2d
  protected:
     PointIndex pnum[3];
     size_t face_id;
-    SurfaceElementIndex next;  // a linked list for all segments in the same face
+    ElementIndex next;  // a linked list for all segments in the same face
     bool deleted;              // element is deleted
 };
 
@@ -120,16 +123,16 @@ class FaceDescriptor
 {
  public:
     FaceDescriptor()
-        : index_{0}, first_element{-1} { }
+        : index_{0}, first_element{Element2d::undefined} { }
 
     explicit FaceDescriptor(size_t face_index)
-        : index_{face_index}, first_element{-1} { }
+        : index_{face_index}, first_element{Element2d::undefined} { }
 
     size_t face_id() const { return index_; }
 
  protected:
     size_t index_;
-    SurfaceElementIndex first_element;  // root of linked list
+    ElementIndex first_element;  // root of linked list
 
     friend class Mesh;
 };

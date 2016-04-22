@@ -213,7 +213,7 @@ void MeshOptimize::ImproveMesh(double metric_weight)
 
 void MeshOptimize::ImproveMesh(size_t faceindex, double metric_weight)
 {
-    std::vector<SurfaceElementIndex> seia;
+    std::vector<ElementIndex> seia;
     mesh_.GetSurfaceElementsOfFace(faceindex, seia);
 
     std::vector<MeshPoint> savepoints(mesh_.GetNbPoints());
@@ -241,7 +241,7 @@ void MeshOptimize::ImproveMesh(size_t faceindex, double metric_weight)
         cnta[compress[el.PointID(1)]]++;
         cnta[compress[el.PointID(2)]]++;
     }
-    TABLE<SurfaceElementIndex> elements_on_point(cnta);
+    TABLE<ElementIndex> elements_on_point(cnta);
     for (size_t i = 0; i < seia.size(); i++) {
         const Element2d& el = mesh_.Element(seia[i]);
         elements_on_point.Add(compress[el.PointID(0)], seia[i]);
@@ -261,7 +261,7 @@ void MeshOptimize::ImproveMesh(size_t faceindex, double metric_weight)
         MeshPoint& pp = mesh_.Point(pi);
 
         if (pp.Type() == INNER_POINT) {
-            std::vector<SurfaceElementIndex> elem_idx = elements_on_point[hi];
+            std::vector<ElementIndex> elem_idx = elements_on_point[hi];
             size_t n_elems = elem_idx.size();
 
             if (n_elems == 0) continue;
@@ -273,7 +273,7 @@ void MeshOptimize::ImproveMesh(size_t faceindex, double metric_weight)
             ld.loc_pnts3.resize(0);
 
             for (size_t j = 0; j < n_elems; j++) {
-                SurfaceElementIndex sei = elem_idx[j];
+                ElementIndex sei = elem_idx[j];
                 ld.loc_elements[j] = sei;
 
                 const Element2d& bel = mesh_.Element(sei);
