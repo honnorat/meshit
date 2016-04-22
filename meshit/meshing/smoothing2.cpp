@@ -211,10 +211,10 @@ void MeshOptimize::ImproveMesh(double metric_weight)
     }
 }
 
-void MeshOptimize::ImproveMesh(size_t faceindex, double metric_weight)
+void MeshOptimize::ImproveMesh(DomainIndex faceindex, double metric_weight)
 {
     std::vector<ElementIndex> seia;
-    mesh_.GetSurfaceElementsOfFace(faceindex, seia);
+    mesh_.GetElementsOfFace(faceindex, seia);
 
     std::vector<MeshPoint> savepoints(mesh_.GetNbPoints());
     std::vector<PointIndex> compress(mesh_.GetNbPoints());

@@ -23,6 +23,7 @@ typedef PointType point_type_t;
 
 typedef uint32_t PointIndex;
 typedef uint32_t ElementIndex;
+typedef uint32_t DomainIndex;
 
 /**
    Point in the mesh.
@@ -58,7 +59,7 @@ class Element2d
 
  public:
     Element2d()
-        : pnum{0, 0, 0}, face_id{0}, deleted{false} { }
+        : pnum{undefined, undefined, undefined}, face_id{0}, deleted{false} { }
 
     PointIndex& operator[](size_t i) { return pnum[i]; }
     const PointIndex& operator[](size_t i) const { return pnum[i]; }
@@ -66,8 +67,8 @@ class Element2d
     PointIndex& PointID(size_t i) { return pnum[i]; }
     const PointIndex& PointID(size_t i) const { return pnum[i]; }
 
-    void SetFaceID(int fid) { face_id = fid; }
-    size_t FaceID() const { return face_id; }
+    void SetFaceID(DomainIndex fid) { face_id = fid; }
+    DomainIndex FaceID() const { return face_id; }
 
     void Invert() { std::swap(pnum[1], pnum[2]); }  // invert orientation
     void NormalizeNumbering();
@@ -86,7 +87,7 @@ class Element2d
 
  protected:
     PointIndex pnum[3];
-    size_t face_id;
+    DomainIndex face_id;
     ElementIndex next;  // a linked list for all segments in the same face
     bool deleted;              // element is deleted
 };
@@ -107,8 +108,8 @@ class Segment
     PointIndex pnums[2];  // p1, p2
 
     int edge_id;
-    size_t face_left;   // domain number left side
-    size_t face_right;  // domain number right side
+    DomainIndex face_left;   // domain number left side
+    DomainIndex face_right;  // domain number right side
 
  public:
     Segment& operator=(const Segment& other);
@@ -122,16 +123,19 @@ std::ostream& operator<<(std::ostream& s, const Segment& seg);
 class FaceDescriptor
 {
  public:
-    FaceDescriptor()
-        : index_{0}, first_element{Element2d::undefined} { }
+    static constexpr DomainIndex undefined = static_cast<DomainIndex>(-1);
 
-    explicit FaceDescriptor(size_t face_index)
+ public:
+    FaceDescriptor()
+        : index_{undefined}, first_element{Element2d::undefined} { }
+
+    explicit FaceDescriptor(DomainIndex face_index)
         : index_{face_index}, first_element{Element2d::undefined} { }
 
-    size_t face_id() const { return index_; }
+    DomainIndex face_id() const { return index_; }
 
  protected:
-    size_t index_;
+    DomainIndex index_;
     ElementIndex first_element;  // root of linked list
 
     friend class Mesh;

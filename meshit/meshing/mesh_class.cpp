@@ -67,8 +67,12 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
     // Build mesh faces
     size_t nb_faces = 0;
     for (size_t si = 0; si < segments.size(); si++) {
-        nb_faces = std::max(nb_faces, segments[si].face_left);
-        nb_faces = std::max(nb_faces, segments[si].face_right);
+        if ((segments[si].face_left == MeshPoint::undefined) ||
+            (segments[si].face_right == MeshPoint::undefined)) {
+            throw std::runtime_error("Segment " + std::to_string(si) + " is adjacent to an undefined domain !");
+        }
+        nb_faces = std::max(nb_faces, static_cast<size_t>(segments[si].face_left));
+        nb_faces = std::max(nb_faces, static_cast<size_t>(segments[si].face_right));
     }
 
     faces.resize(nb_faces);
@@ -83,7 +87,7 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
 
     MeshGenerator mesher(*this, bbox);
 
-    for (size_t dom_nr = 1; dom_nr <= nb_faces; dom_nr++) {
+    for (DomainIndex dom_nr = 1; dom_nr <= nb_faces; dom_nr++) {
         if (geometry.GetDomainMaxh(dom_nr) > 0) {
             h = geometry.GetDomainMaxh(dom_nr);
         }
@@ -157,7 +161,7 @@ void Mesh::AddSegment(const Segment& s)
     segments.push_back(s);
 }
 
-void Mesh::AddSurfaceElement(const Element2d& el)
+void Mesh::AddElement(const Element2d& el)
 {
     size_t si = elements.size();
     elements.push_back(el);
@@ -214,12 +218,8 @@ void Mesh::Save(std::ostream& outfile) const
     outfile << elements.size() << std::endl;
 
     for (size_t sei = 0; sei < elements.size(); sei++) {
-        size_t el_index = elements[sei].FaceID();
-        if (el_index > 0) {
-            outfile << std::setw(9) << faces[el_index - 1].face_id();
-        } else {
-            outfile << "       0       0";
-        }
+        DomainIndex el_index = elements[sei].FaceID();
+        outfile << std::setw(9) << faces[el_index - 1].face_id();
 
         const Element2d& sel = elements[sei];
         outfile << std::setw(8) << 3;
@@ -288,7 +288,8 @@ void Mesh::Load(std::istream& infile)
             MESHIT_LOG_DEBUG(n << " surface elements");
 
             for (int i = 1; i <= n; i++) {
-                int surf_id, nep, faceind = 0;
+                DomainIndex surf_id;
+                int nep, faceind = 0;
 
                 infile >> surf_id;
 
@@ -309,12 +310,12 @@ void Mesh::Load(std::istream& infile)
                 }
 
                 Element2d tri;
-                tri.SetFaceID(faceind);
+                tri.SetFaceID(surf_id);
 
-                for (int j = 0; j < nep; j++) {
+                for (size_t j = 0; j < 3; j++) {
                     infile >> tri.PointID(j);
                 }
-                AddSurfaceElement(tri);
+                AddElement(tri);
             }
         }
         if (strcmp(str, "edge_segments") == 0) {
@@ -412,7 +413,7 @@ double Mesh::GetMinH(const Point2d& pmin, const Point2d& pmax)
     return std::min(hglob_, loc_h_func->GetMinH(pmin, pmax));
 }
 
-double Mesh::AverageH(size_t surf_id) const
+double Mesh::AverageH(DomainIndex surf_id) const
 {
     double maxh = 0, minh = 1e10;
     double hsum = 0;
@@ -514,7 +515,7 @@ void Mesh::Compress()
         pused[seg[1]] = true;
     }
 
-    int npi = 0;
+    PointIndex npi = 0;
 
     for (size_t pi = 0; pi < points.size(); pi++) {
         if (pused[pi]) {
@@ -546,12 +547,11 @@ void Mesh::Compress()
         faces[i].first_element = Element2d::undefined;
     }
 
-//    for (int i = elements.size() - 1; i >= 0; i--) {
     for (size_t i = 0; i < elements.size(); i++) {
-        int idx = elements.size() - i - 1;
-        int ind = elements[idx].FaceID();
-        elements[idx].next = faces[ind - 1].first_element;
-        faces[ind - 1].first_element = idx;
+        size_t idx = elements.size() - i - 1;
+        DomainIndex ind = elements[idx].FaceID() - 1;
+        elements[idx].next = faces[ind].first_element;
+        faces[ind].first_element = idx;
     }
 
     IndexBoundaryEdges();
@@ -635,23 +635,22 @@ void Mesh::RebuildSurfaceElementLists()
     for (size_t i = 0; i < faces.size(); i++) {
         faces[i].first_element = Element2d::undefined;
     }
-//    for (int i = elements.size() - 1; i >= 0; i--) {
     for (size_t i = 0; i < elements.size(); i++) {
-        int idx = elements.size() - i - 1;
-        int ind = elements[idx].FaceID();
-        elements[idx].next = faces[ind - 1].first_element;
-        faces[ind - 1].first_element = idx;
+        size_t idx = elements.size() - i - 1;
+        DomainIndex ind = elements[idx].FaceID() - 1;
+        elements[idx].next = faces[ind].first_element;
+        faces[ind].first_element = idx;
     }
 }
 
-void Mesh::GetSurfaceElementsOfFace(size_t facenr, std::vector<ElementIndex>& sei) const
+void Mesh::GetElementsOfFace(DomainIndex facenr, std::vector<ElementIndex>& sei) const
 {
     sei.clear();
 
     ElementIndex si = faces[facenr - 1].first_element;
     while (si != Element2d::undefined) {
         const Element2d& se = Element(si);
-        if (se.FaceID() == facenr && se.PointID(0) >= 0 && !se.IsDeleted()) {
+        if (se.FaceID() == facenr && se.PointID(0) != MeshPoint::undefined && !se.IsDeleted()) {
             sei.push_back(si);
         }
         si = se.next;

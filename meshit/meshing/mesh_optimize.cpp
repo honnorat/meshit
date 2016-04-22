@@ -7,14 +7,14 @@ class Neighbour
  public:
     Neighbour() { }
 
-    void SetNeighborIndex(size_t side, PointIndex anr) { nr[side] = anr; }
-    PointIndex GetNeighborIndex(size_t side) { return nr[side]; }
+    void SetNeighborIndex(size_t side, ElementIndex anr) { nr[side] = anr; }
+    ElementIndex GetNeighborIndex(size_t side) { return nr[side]; }
 
     void SetOrientation(size_t side, size_t aorient) { orient[side] = aorient; }
     size_t GetOrientation(size_t side) { return orient[side]; }
 
  protected:
-    PointIndex nr[3];
+    ElementIndex nr[3];
     size_t orient[3];
 };
 
@@ -39,17 +39,17 @@ void MeshOptimize::EdgeSwapping(bool use_metric, double metric_weight)
         MESHIT_LOG_DEBUG("Edgeswapping, topological");
     }
 
-    for (size_t face_index = 1; face_index <= mesh_.GetNbFaces(); face_index++) {
+    for (DomainIndex face_index = 1; face_index <= mesh_.GetNbFaces(); face_index++) {
         EdgeSwapping(face_index, use_metric, metric_weight);
     }
 
     mesh_.IndexBoundaryEdges();
 }
 
-void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metric_weight)
+void MeshOptimize::EdgeSwapping(DomainIndex face_index, bool use_metric, double metric_weight)
 {
     std::vector<ElementIndex> seia;
-    mesh_.GetSurfaceElementsOfFace(face_index, seia);
+    mesh_.GetElementsOfFace(face_index, seia);
 
     std::vector<Neighbour> neighbors(mesh_.GetNbElements());
     INDEX_2_map<trionedge> other(seia.size() + 2);
@@ -102,9 +102,11 @@ void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metri
     }
 
     for (size_t i = 0; i < seia.size(); i++) {
+        ElementIndex el_idx = seia[i];
+        Neighbour& neighb = neighbors[el_idx];
         for (size_t j = 0; j < 3; j++) {
-            neighbors[seia[i]].SetNeighborIndex(j, -1);
-            neighbors[seia[i]].SetOrientation(j, 0);
+            neighb.SetNeighborIndex(j, Element2d::undefined);
+            neighb.SetOrientation(j, 0);
         }
     }
 
@@ -244,15 +246,15 @@ void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metri
 void MeshOptimize::CombineImprove()
 {
     MESHIT_LOG_DEBUG("Combine improve");
-    for (size_t face_index = 1; face_index <= mesh_.GetNbFaces(); face_index++) {
+    for (DomainIndex face_index = 1; face_index <= mesh_.GetNbFaces(); face_index++) {
         CombineImprove(face_index);
     }
 }
 
-void MeshOptimize::CombineImprove(size_t face_index)
+void MeshOptimize::CombineImprove(DomainIndex face_index)
 {
     std::vector<ElementIndex> seia;
-    mesh_.GetSurfaceElementsOfFace(face_index, seia);
+    mesh_.GetElementsOfFace(face_index, seia);
 
     size_t np = mesh_.GetNbPoints();
 

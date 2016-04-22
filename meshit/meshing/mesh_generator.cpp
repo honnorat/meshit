@@ -65,7 +65,7 @@ void MeshGenerator::TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, d
     locpoint.Y() = glob_p1.Y() + h * (plainpoint.X() * ex.Y() + plainpoint.Y() * ey.Y());
 }
 
-bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, int facenr)
+bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainIndex facenr)
 {
     std::vector<int> pindex, lindex;
     std::vector<int> delpoints;
@@ -290,7 +290,7 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, int fac
                         adfront->GetGlobalIndex(pindex[locelements[i].PointID(j) - 1]);
                 }
 
-                mesh_.AddSurfaceElement(mtri);
+                mesh_.AddElement(mtri);
 
                 const MeshPoint& sep1 = mesh_.Point(mtri.PointID(0));
                 const MeshPoint& sep2 = mesh_.Point(mtri.PointID(1));

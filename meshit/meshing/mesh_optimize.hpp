@@ -20,9 +20,9 @@ class MeshOptimize
     friend class Opti2SurfaceMinFunction;
 
  protected:
-    void EdgeSwapping(size_t face_index, bool use_metric, double metric_weight);
-    void ImproveMesh(size_t face_index, double metric_weight);
-    void CombineImprove(size_t face_index);
+    void EdgeSwapping(DomainIndex face_index, bool use_metric, double metric_weight);
+    void ImproveMesh(DomainIndex face_index, double metric_weight);
+    void CombineImprove(DomainIndex face_index);
 
  protected:
     Mesh& mesh_;

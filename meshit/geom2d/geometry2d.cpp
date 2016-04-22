@@ -222,7 +222,7 @@ void SplineGeometry::LoadData(std::istream& infile)
 }
 
 void SplineGeometry::AddLine(const std::vector<Point2d>& points, double hmax, int spline_id,
-                             int domain_left, int domain_right)
+                             DomainIndex domain_left, DomainIndex domain_right)
 {
     size_t nold_points = geompoints.size();
     size_t nnew_points = points.size();
@@ -248,18 +248,18 @@ void SplineGeometry::AddLine(const std::vector<Point2d>& points, double hmax, in
     }
 }
 
-void SplineGeometry::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, int domain)
+void SplineGeometry::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, DomainIndex domain)
 {
     AddLine(point_list, hmax, bc, 0, domain);
 }
 
-void SplineGeometry::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, int domain)
+void SplineGeometry::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, DomainIndex domain)
 {
     AddLine(points, hmax, bc, domain, domain);
 }
 
 void SplineGeometry::AddSpline(const std::vector<Point2d>& points, double hmax, int spline_id,
-                               int domain_left, int domain_right)
+                               uint32_t domain_left, uint32_t domain_right)
 {
     size_t nb_points = points.size();
     size_t ip_0 = geompoints.size();
@@ -291,7 +291,7 @@ void SplineGeometry::AddSpline(const std::vector<Point2d>& points, double hmax, 
 }
 
 void SplineGeometry::AddCircle(const Point2d& center, double radius, double hmax, int spline_id,
-                               int face_left, int face_right)
+                               uint32_t face_left, uint32_t face_right)
 {
     std::vector<Point2d> spline_points;
     double c_x = center.X();
@@ -310,7 +310,7 @@ void SplineGeometry::AddCircle(const Point2d& center, double radius, double hmax
     AddSpline(spline_points, hmax, spline_id, face_left, face_right);
 }
 
-int SplineGeometry::AddFace(const std::string& name, double maxh_f)
+DomainIndex SplineGeometry::AddFace(const std::string& name, double maxh_f)
 {
     maxh.push_back(maxh_f);
     materials.push_back(new char[100]);
@@ -319,7 +319,7 @@ int SplineGeometry::AddFace(const std::string& name, double maxh_f)
     return materials.size();
 }
 
-void SplineGeometry::GetMaterial(size_t domnr, char*& material)
+void SplineGeometry::GetMaterial(DomainIndex domnr, char*& material)
 {
     if (domnr <= materials.size())
         material = materials[domnr - 1];
@@ -327,7 +327,7 @@ void SplineGeometry::GetMaterial(size_t domnr, char*& material)
         material = nullptr;
 }
 
-double SplineGeometry::GetDomainMaxh(size_t domain_id)
+double SplineGeometry::GetDomainMaxh(DomainIndex domain_id)
 {
     if (domain_id > 0 && domain_id <= maxh.size()) {
         return maxh[domain_id - 1];

@@ -17,14 +17,14 @@ int main(int argc, char** argv)
     int bc_num = 1;
 
     // outer boundary
-    int face1 = geom.AddFace("face1");
+    uint32_t face1 = geom.AddFace("face1");
     geom.AddCircle({0.0, 1.5}, 3.0, 1e99, ++bc_num, face1);
 
     // add hole
     geom.AddCircle({0.0, 0.0}, 1.0, 0.1, ++bc_num, 0, face1);
 
     // Add inclusion
-    int face2 = geom.AddFace("face2");
+    uint32_t face2 = geom.AddFace("face2");
     std::vector<meshit::Point2d> ellipse = {{0.0,  2.25},
                                             {-1.5, 2.25},
                                             {-1.5, 1.75},

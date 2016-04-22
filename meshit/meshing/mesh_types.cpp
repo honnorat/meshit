@@ -10,8 +10,8 @@ Segment::Segment()
     pnums[0] = MeshPoint::undefined;
     pnums[1] = MeshPoint::undefined;
     edge_id = -1;
-    face_left = static_cast<size_t>(-1);
-    face_right = static_cast<size_t>(-1);
+    face_left = FaceDescriptor::undefined;
+    face_right = FaceDescriptor::undefined;
 }
 
 Segment::Segment(const Segment& other)

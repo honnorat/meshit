@@ -71,7 +71,7 @@ class SplineSeg
     int GetID() const { return id_; }
     void SetID(int id) { id_ = id; }
 
-    void SetDomains(size_t left, size_t right)
+    void SetDomains(DomainIndex left, DomainIndex right)
     {
         dom_left = left;
         dom_right = right;
@@ -84,11 +84,11 @@ class SplineSeg
     }
 
  public:
-    size_t dom_left;   // left domain
-    size_t dom_right;  // right domain
-    double ref_fac_;   // refinement at line
-    double hmax_;      // maximal h
-    int id_;           // spline index number
+    DomainIndex dom_left;   // left domain
+    DomainIndex dom_right;  // right domain
+    double ref_fac_;        // refinement at line
+    double hmax_;           // maximal h
+    int id_;                // spline index number
 };
 
 // Straight line form p1 to p2

@@ -78,18 +78,18 @@ void Mesh::Refine()
                                    {2, 4, 3},
                                    {5, 3, 4}};
 
-        int ind = el.FaceID();
+        DomainIndex ind = el.FaceID();
         for (j = 0; j < 4; j++) {
-            Element2d nel;
+            Element2d new_element;
             for (k = 0; k < 3; k++) {
-                nel.PointID(k) = pnums[reftab[j][k]];
+                new_element.PointID(k) = pnums[reftab[j][k]];
             }
-            nel.SetFaceID(ind);
+            new_element.SetFaceID(ind);
 
             if (j == 0) {
-                elements[sei] = nel;
+                elements[sei] = new_element;
             } else {
-                AddSurfaceElement(nel);
+                AddElement(new_element);
             }
         }
     }

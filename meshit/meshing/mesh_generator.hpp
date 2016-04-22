@@ -27,7 +27,7 @@ class MeshGenerator
     // Load rules, either from file, or compiled rules
     void LoadRules(const char* filename);
     void Reset();
-    bool GenerateMesh(const MeshingParameters& mp, double gh, int facenr);
+    bool GenerateMesh(const MeshingParameters& mp, double gh, DomainIndex facenr);
 
     void AddPoint(const Point2d& p, PointIndex globind);
     void AddBoundaryElement(INDEX i1, INDEX i2);
