@@ -1,6 +1,6 @@
+#include <meshit/geom2d/geometry2d.hpp>
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
-#include <meshit/geom2d/geometry2d.hpp>
 
 #include <sstream>
 #include <string>
@@ -12,8 +12,7 @@ inline double uclock(void)
 
 inline bool ends_with(const std::string& str, const std::string& end)
 {
-    if (end.size() > str.size())
-        return false;
+    if (end.size() > str.size()) return false;
 
     return std::equal(end.rbegin(), end.rend(), str.rbegin());
 }
@@ -65,20 +64,21 @@ int main(int argc, char** argv)
         filename_export = "square_argv_copy.msh";
         filename_save = "square_argv_copy.meshit";
     } else {
-        MESHIT_LOG_INFO("File format not recognized for'" << filename <<
-                        "'. I will handle only MESHIT (.meshit) and 2d geometry (.in2d) formats.");
+        MESHIT_LOG_INFO("File format not recognized for'"
+                        << filename
+                        << "'. I will handle only MESHIT (.meshit) and 2d geometry (.in2d) formats.");
         return 1;
     }
 
     cc = uclock();
     mesh.Save(filename_save);
     MESHIT_LOG_INFO(" . save to MESHIT done in " << uclock() - cc << " s."
-                    << " -> '" << filename_save << "'");
+                                                 << " -> '" << filename_save << "'");
 
     cc = uclock();
     mesh.Export(filename_export);
     MESHIT_LOG_INFO(" . export to GMSH done in " << uclock() - cc << " s."
-                    << " -> '" << filename_export << "'");
+                                                 << " -> '" << filename_export << "'");
 
     return 0;
 }

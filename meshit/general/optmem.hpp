@@ -10,31 +10,31 @@
 #include <cstdlib>
 #include <vector>
 
-namespace meshit
-{
+namespace meshit {
+
 /**
     Optimized Memory allocation classes
 */
-    class BlockAllocator
+class BlockAllocator
+{
+ public:
+    explicit BlockAllocator(size_t asize, size_t ablocks = 512);
+    ~BlockAllocator();
+
+    void* Alloc();
+
+    void Free(void* p)
     {
-     private:
-        size_t blocks;
-        size_t size;
-        void* freelist;
-        std::vector<char*> bablocks;
+        *reinterpret_cast<void**>(p) = freelist;
+        freelist = p;
+    }
 
-     public:
-        explicit BlockAllocator(size_t asize, size_t ablocks = 512);
-        ~BlockAllocator();
-
-        void* Alloc();
-
-        void Free(void* p)
-        {
-            *reinterpret_cast<void**>(p) = freelist;
-            freelist = p;
-        }
-    };
+ private:
+    size_t blocks;
+    size_t size;
+    void* freelist;
+    std::vector<char*> bablocks;
+};
 
 }  // namespace meshit
 

@@ -3,11 +3,10 @@
 
 #include "meshclass.hpp"
 
-namespace meshit
-{
-    void MeshQuality2d(const Mesh& mesh);
+namespace meshit {
 
-    int CheckSurfaceMesh(const Mesh& mesh);
+void MeshQuality2d(const Mesh& mesh);
+int CheckSurfaceMesh(const Mesh& mesh);
 
 }
 #endif

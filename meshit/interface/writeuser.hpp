@@ -7,21 +7,19 @@
 /* Date:    10. Dec. 97                                                   */
 /**************************************************************************/
 
-#include <string>
 #include <iostream>
+#include <string>
 
-namespace meshit
-{
-    class Mesh;
+namespace meshit {
 
-    class SplineGeometry;
+class Mesh;
+class SplineGeometry;
 
-    void WriteGmsh2Format(const Mesh& mesh, const std::string& filename);
-    void WriteGmsh2Format(const Mesh& mesh, std::ostream& os);
+void WriteGmsh2Format(const Mesh& mesh, const std::string& filename);
+void WriteGmsh2Format(const Mesh& mesh, std::ostream& os);
 
-    bool WriteUserFormat(const std::string& format, const Mesh& mesh, const std::string& filename);
-    bool WriteUserFormat(const std::string& format, const Mesh& mesh, std::ostream& ostream);
+bool WriteUserFormat(const std::string& format, const Mesh& mesh, const std::string& filename);
+bool WriteUserFormat(const std::string& format, const Mesh& mesh, std::ostream& ostream);
 
 }  // namespace meshit
 #endif
-

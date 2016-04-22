@@ -10,7 +10,7 @@ inline double uclock(void)
 
 int main(int argc, char** argv)
 {
-    meshit::SetLogLevel(MESHIT_INFO_LOG_LEVEL);
+    meshit::SetLogLevel(MESHIT_DEBUG_LOG_LEVEL);
 
     // creates geometry structure
     meshit::SplineGeometry geom;
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
                                             {+1.5, 1.25},
                                             {+1.5, 1.75},
                                             {+1.5, 2.25}};
-    geom.AddSpline(ellipse, 0.2, ++bc_num, face2, face1);
+    geom.AddSpline(ellipse, 0.05, ++bc_num, face2, face1);
 
     meshit::Mesh mesh;
     meshit::MeshingParameters mp;
@@ -41,7 +41,6 @@ int main(int argc, char** argv)
     mp.maxh = 0.2;
 
     double cc;
-
     cc = uclock();
     mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO("~ meshing  : " << uclock() - cc << " s.");

@@ -8,58 +8,61 @@
 /**************************************************************************/
 
 #include <iostream>
+
 #include "../general/optmem.hpp"
 #include "../gprim/geom3d.hpp"
 
-namespace meshit
+namespace meshit {
+
+class GradingBox
 {
-    class GradingBox
-    {
-     public:
-        GradingBox(const Point2d& px1, const Point2d& px2);
-        void DeleteChilds();
+ public:
+    GradingBox(const Point2d& px1, const Point2d& px2);
 
-        void SetBox(const Point2d& px1, const Point2d& px2);
+    void SetBox(const Point2d& px1, const Point2d& px2);
 
-        friend class LocalH;
+    void DeleteChilds();
 
-        static BlockAllocator ball;
-        void* operator new(size_t);
-        void operator delete(void*);
+    // Allocation :
+    static BlockAllocator ball;
+    void* operator new(size_t);
+    void operator delete(void* p);
 
-     protected:
-        Point2d xmid;
-        double h2;  // half edgelength
+    friend class LocalH;
 
-        GradingBox* childs[4];
+ protected:
+    Point2d xmid;
+    double h2;  // half edgelength
+    GradingBox* childs[4];
+    double hopt;
+};
 
-        double hopt;
-    };
+/**
+   Control of 3D mesh grading
+ */
+class LocalH
+{
+ public:
+    LocalH()
+        : root{nullptr} { }
 
-    /**
-       Control of 3D mesh grading
-     */
-    class LocalH
-    {
-        GradingBox* root;
-        double grading;
+    ~LocalH();
 
-     public:
-        LocalH()
-            : root{nullptr} { }
+    void Init(const Box2d& bbox, double grading);
+    void CleanRoot();
 
-        ~LocalH();
+    void SetH(const Point2d& x, double h);
+    double GetH(const Point2d& x) const;
+    double GetMinH(const Point2d& pmin, const Point2d& pmax) const;
 
-        void Init(const Box2d& bbox, double grading);
-        void CleanRoot();
+ private:
+    double GetMinHRec(const Point2d& pmin, const Point2d& pmax, const GradingBox* box) const;
 
-        void SetH(const Point2d& x, double h);
-        double GetH(const Point2d& x) const;
-        double GetMinH(const Point2d& pmin, const Point2d& pmax) const;
+ protected:
+    GradingBox* root;
+    double grading;
+};
 
-     private:
-        double GetMinHRec(const Point2d& pmin, const Point2d& pmax, const GradingBox* box) const;
-    };
 }  // namespace meshit
 
 #endif

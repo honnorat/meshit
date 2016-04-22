@@ -26,8 +26,9 @@ SET(src_LINALG
 
 SET(src_MESHING
     meshing/adfront2.cpp
-    meshing/improve2.cpp
     meshing/localh.cpp
+    meshing/mesh_optimize.cpp
+    meshing/mesh_refine.cpp
     meshing/meshclass.cpp
     meshing/meshing2.cpp
     meshing/meshtool.cpp
@@ -35,7 +36,6 @@ SET(src_MESHING
     meshing/msghandler.cpp
     meshing/netrule2.cpp
     meshing/parser2.cpp
-    meshing/refine.cpp
     meshing/ruler2.cpp
     meshing/smoothing2.cpp
     meshing/triarls.cpp)

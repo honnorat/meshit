@@ -1,10 +1,9 @@
+#include <meshit/geom2d/geometry2d.hpp>
 #include <meshit/meshing/meshclass.hpp>
 #include <meshit/meshing/meshtool.hpp>
-#include <meshit/geom2d/geometry2d.hpp>
 
 #include <iostream>
 #include <sstream>
-
 
 inline double uclock(void)
 {
@@ -66,14 +65,13 @@ int main(int argc, char** argv)
     cc = uclock();
     mesh.Export(filename_export);
     MESHIT_LOG_INFO(" . export to GMSH   in " << uclock() - cc << " s."
-                    << " -> '" << filename_export << "'");
+                                              << " -> '" << filename_export << "'");
     mesh.Save("square_istream.meshit");
 
     cc = uclock();
     mesh.Save(filename_save);
     MESHIT_LOG_INFO(" . save to MESHIT   in " << uclock() - cc << " s."
-                    << " -> '" << filename_save << "'");
-
+                                              << " -> '" << filename_save << "'");
 
     return 0;
 }
