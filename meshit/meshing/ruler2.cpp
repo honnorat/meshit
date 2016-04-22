@@ -1,4 +1,4 @@
-#include "meshing2.hpp"
+#include "mesh_generator.hpp"
 
 namespace meshit {
 
@@ -29,7 +29,7 @@ static double CalcElementBadness(const std::vector<Point2d>& points, const Eleme
            + 1 / l12 + l12 + 1 / l13 + l13 + 1 / l23 + l23 - 6;
 }
 
-int Meshing2::ApplyRules(std::vector<Point2d>& lpoints,
+int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
                          std::vector<int>& legalpoints, size_t maxlegalpoint,
                          std::vector<INDEX_2>& llines1, size_t maxlegalline,
                          std::vector<Element2d>& elements,

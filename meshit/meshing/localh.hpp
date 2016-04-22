@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "../general/optmem.hpp"
+#include "../general/block_allocator.hpp"
 #include "../gprim/geom3d.hpp"
 
 namespace meshit {

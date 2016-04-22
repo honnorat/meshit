@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include "meshing2.hpp"
+#include "mesh_generator.hpp"
 
 #ifdef WIN32
 #define COMMASIGN ':'
@@ -318,7 +318,7 @@ void netrule::LoadRule(std::istream& ist)
 
 extern const char* triarules[];
 
-void Meshing2::LoadRules(const char* filename)
+void MeshGenerator::LoadRules(const char* filename)
 {
     char buf[256];
     std::istream* ist;

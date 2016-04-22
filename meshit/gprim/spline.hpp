@@ -14,7 +14,7 @@
 #include <string>
 
 #include "../linalg/vector.hpp"
-#include "../meshing/meshclass.hpp"
+#include "../meshing/mesh_class.hpp"
 #include "geom2d.hpp"
 #include "geomobjects.hpp"
 

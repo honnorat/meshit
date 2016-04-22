@@ -1,6 +1,5 @@
 #include <meshit/geom2d/geometry2d.hpp>
-#include <meshit/meshing/meshclass.hpp>
-#include <meshit/meshing/meshtool.hpp>
+#include <meshit/meshing/mesh_class.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -56,7 +55,7 @@ int main(int argc, char** argv)
     MESHIT_LOG_INFO(" . mesh created     in " << uclock() - cc << " s.");
 
     cc = uclock();
-    meshit::MeshQuality2d(mesh);
+    mesh.PrintQuality();
     MESHIT_LOG_INFO(" . mesh diagnostics in " << uclock() - cc << " s.");
 
     std::string filename_export = "square_istream.msh";

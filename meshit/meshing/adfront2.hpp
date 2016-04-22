@@ -14,7 +14,7 @@
 
 #include "../gprim/adtree.hpp"
 #include "../gprim/geomobjects.hpp"
-#include "meshtype.hpp"
+#include "mesh_types.hpp"
 
 /**
     Advancing front class for surfaces

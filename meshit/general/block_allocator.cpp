@@ -8,7 +8,7 @@
    Abstract data type Array
 */
 
-#include "optmem.hpp"
+#include "block_allocator.hpp"
 
 namespace meshit {
 

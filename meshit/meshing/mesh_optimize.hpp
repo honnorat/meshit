@@ -1,7 +1,7 @@
 #ifndef MESH_OPTIMIZE_HPP
 #define MESH_OPTIMIZE_HPP
 
-#include "meshclass.hpp"
+#include "mesh_class.hpp"
 
 namespace meshit {
 

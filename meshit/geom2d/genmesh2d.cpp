@@ -2,7 +2,7 @@
 
 #include "../gprim/geom3d.hpp"
 #include "../meshing/mesh_optimize.hpp"
-#include "../meshing/meshing2.hpp"
+#include "../meshing/mesh_generator.hpp"
 #include "geometry2d.hpp"
 
 namespace meshit {

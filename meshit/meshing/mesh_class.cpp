@@ -4,8 +4,7 @@
 #include "../geom2d/geometry2d.hpp"
 #include "../gprim/geomtest3d.hpp"
 #include "../interface/writeuser.hpp"
-#include "meshing2.hpp"
-#include "meshtool.hpp"
+#include "mesh_generator.hpp"
 
 namespace meshit {
 
@@ -82,7 +81,7 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
     size_t bnp = points.size();  // boundary points
     double h = mp.maxh;
 
-    Meshing2 meshing(*this, bbox);
+    MeshGenerator mesher(*this, bbox);
 
     for (size_t dom_nr = 1; dom_nr <= nb_faces; dom_nr++) {
         if (geometry.GetDomainMaxh(dom_nr) > 0) {
@@ -93,26 +92,26 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
         size_t oldnf = elements.size();
 
         if (dom_nr > 1) {
-            meshing.Reset();
+            mesher.Reset();
         }
 
         std::vector<int> compress(bnp, -1);
         int cnt = 0;
         for (size_t pi = 0; pi < bnp; pi++) {
-            meshing.AddPoint(Point2d(points[pi]), pi);
+            mesher.AddPoint(Point2d(points[pi]), pi);
             cnt++;
             compress[pi] = cnt;
         }
         for (size_t si = 0; si < segments.size(); si++) {
             if (segments[si].face_left == dom_nr) {
-                meshing.AddBoundaryElement(compress[segments[si][0]], compress[segments[si][1]]);
+                mesher.AddBoundaryElement(compress[segments[si][0]], compress[segments[si][1]]);
             }
             if (segments[si].face_right == dom_nr) {
-                meshing.AddBoundaryElement(compress[segments[si][1]], compress[segments[si][0]]);
+                mesher.AddBoundaryElement(compress[segments[si][1]], compress[segments[si][0]]);
             }
         }
 
-        meshing.GenerateMesh(mp, h, dom_nr);
+        mesher.GenerateMesh(mp, h, dom_nr);
 
         for (size_t sei = oldnf; sei < elements.size(); sei++) {
             elements[sei].SetFaceID(dom_nr);
@@ -430,7 +429,6 @@ double Mesh::AverageH(size_t surf_id) const
             }
         }
     }
-
     MESHIT_LOG_DEBUG("minh = " << minh << " avh = " << (hsum / n) << " maxh = " << maxh);
     return (hsum / n);
 }

@@ -14,7 +14,7 @@
 #include "../gprim/adtree.hpp"
 #include "../gprim/geomobjects.hpp"
 #include "localh.hpp"
-#include "meshtype.hpp"
+#include "mesh_types.hpp"
 
 namespace meshit {
 
@@ -73,7 +73,9 @@ class Mesh
     /// sets internal tables
     void IndexBoundaryEdges();
 
+    int CheckSurface();
     int CheckOverlappingBoundary();  // Checks overlap of boundary, return == 1, iff overlap
+    void PrintQuality();
 
     // finds average h of surface surfnr if surfnr > 0, else of all surfaces.
     double AverageH(size_t surf_id = 0) const;

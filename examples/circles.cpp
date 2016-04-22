@@ -1,5 +1,5 @@
 #include <meshit/geom2d/geometry2d.hpp>
-#include <meshit/meshing/meshtool.hpp>
+#include <meshit/meshing/mesh_class.hpp>
 
 #include <ctime>
 
@@ -10,7 +10,7 @@ inline double uclock(void)
 
 int main(int argc, char** argv)
 {
-    meshit::SetLogLevel(MESHIT_DEBUG_LOG_LEVEL);
+    meshit::SetLogLevel(MESHIT_INFO_LOG_LEVEL);
 
     // creates geometry structure
     meshit::SplineGeometry geom;
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     MESHIT_LOG_INFO("~ meshing  : " << uclock() - cc << " s.");
 
     cc = uclock();
-    meshit::MeshQuality2d(mesh);
+    mesh.PrintQuality();
     MESHIT_LOG_INFO("~ quality  : " << uclock() - cc << " s.");
 
     cc = uclock();
@@ -67,8 +67,8 @@ int main(int argc, char** argv)
     MESHIT_LOG_INFO("~ save     : " << uclock() - cc << " s.");
 
     mesh.Refine();
-    meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh(mesh);
+    mesh.PrintQuality();
+    mesh.CheckSurface();
     mesh.CheckOverlappingBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO("AverageH(0) = " << mesh.AverageH(0));

@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-#include "../meshing/msghandler.hpp"
+#include "../general/logging.hpp"
 #include "../meshing/smoothing2.hpp"
 
 namespace meshit {

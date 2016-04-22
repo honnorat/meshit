@@ -1,6 +1,5 @@
 #include <meshit/geom2d/geometry2d.hpp>
-#include <meshit/meshing/meshclass.hpp>
-#include <meshit/meshing/meshtool.hpp>
+#include <meshit/meshing/mesh_class.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -42,8 +41,8 @@ int main(int argc, char** argv)
     geom.SetGrading(0.1);
     mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO("== meshing done");
-    meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh(mesh);
+    mesh.PrintQuality();
+    mesh.CheckSurface();
     mesh.CheckOverlappingBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO(" - averageH(0) = " << mesh.AverageH(0));
@@ -57,8 +56,8 @@ int main(int argc, char** argv)
 
     MESHIT_LOG_INFO("== refine mesh");
     mesh.Refine();
-    meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh(mesh);
+    mesh.PrintQuality();
+    mesh.CheckSurface();
     mesh.CheckOverlappingBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO(" - averageH(0) = " << mesh.AverageH(0));

@@ -6,7 +6,7 @@
 
 #include "../gprim/geom2d.hpp"
 #include "../linalg/densemat.hpp"
-#include "meshtype.hpp"
+#include "mesh_types.hpp"
 
 namespace meshit {
 

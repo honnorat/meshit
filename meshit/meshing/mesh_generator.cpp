@@ -1,17 +1,17 @@
-#include "meshing2.hpp"
+#include "mesh_generator.hpp"
 
 #include "../gprim/geomtest3d.hpp"
 
 namespace meshit {
 
-Meshing2::Meshing2(Mesh& amesh, const Box2d& boundingbox)
+MeshGenerator::MeshGenerator(Mesh& amesh, const Box2d& boundingbox)
     : mesh_{amesh}, boundingbox_{boundingbox}, adfront{new AdFront2(boundingbox)}, max_area{-1.0}
 {
     LoadRules(NULL);
     // LoadRules ("rules/triangle.rls");
 }
 
-Meshing2::~Meshing2()
+MeshGenerator::~MeshGenerator()
 {
     delete adfront;
     for (size_t i = 0; i < rules.size(); i++) {
@@ -19,36 +19,29 @@ Meshing2::~Meshing2()
     }
 }
 
-void Meshing2::Reset()
+void MeshGenerator::Reset()
 {
     if (adfront) delete adfront;
     adfront = new AdFront2(boundingbox_);
     max_area = -1.0;
 }
 
-void Meshing2::AddPoint(const Point2d& p, PointIndex globind)
+void MeshGenerator::AddPoint(const Point2d& p, PointIndex globind)
 {
     adfront->AddPoint(p, globind);
 }
 
-void Meshing2::AddBoundaryElement(int i1, int i2)
+void MeshGenerator::AddBoundaryElement(int i1, int i2)
 {
     adfront->AddLine(i1 - 1, i2 - 1);
 }
 
-void Meshing2::EndMesh()
-{
-    for (size_t i = 0; i < ruleused.size(); i++) {
-        MESHIT_LOG_DEBUG(std::setw(5) << ruleused[i] << " times used rule " << rules[i]->Name());
-    }
-}
-
-void Meshing2::SetMaxArea(double amaxarea)
+void MeshGenerator::SetMaxArea(double amaxarea)
 {
     max_area = amaxarea;
 }
 
-void Meshing2::DefineTransformation(const Point2d& p1, const Point2d& p2)
+void MeshGenerator::DefineTransformation(const Point2d& p1, const Point2d& p2)
 {
     glob_p1 = p1;
     ex.X() = p2.X() - p1.X();
@@ -58,7 +51,7 @@ void Meshing2::DefineTransformation(const Point2d& p1, const Point2d& p2)
     ey.Y() = ex.X();
 }
 
-void Meshing2::TransformToPlain(const Point2d& locpoint, Point2d& plainpoint, double h)
+void MeshGenerator::TransformToPlain(const Point2d& locpoint, Point2d& plainpoint, double h)
 {
     Vec2d p1p(glob_p1, locpoint);
 
@@ -66,13 +59,13 @@ void Meshing2::TransformToPlain(const Point2d& locpoint, Point2d& plainpoint, do
     plainpoint.Y() = (p1p * ey) / h;
 }
 
-void Meshing2::TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, double h)
+void MeshGenerator::TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, double h)
 {
     locpoint.X() = glob_p1.X() + h * (plainpoint.X() * ex.X() + plainpoint.Y() * ey.X());
     locpoint.Y() = glob_p1.Y() + h * (plainpoint.X() * ex.Y() + plainpoint.Y() * ey.Y());
 }
 
-bool Meshing2::GenerateMesh(const MeshingParameters& mp, double gh, int facenr)
+bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, int facenr)
 {
     std::vector<int> pindex, lindex;
     std::vector<int> delpoints;
@@ -343,10 +336,11 @@ bool Meshing2::GenerateMesh(const MeshingParameters& mp, double gh, int facenr)
     }
 
     MESHIT_LOG_DEBUG("Surface meshing done");
+    for (size_t i = 0; i < ruleused.size(); i++) {
+        MESHIT_LOG_DEBUG(std::setw(5) << ruleused[i] << " times used rule " << rules[i]->Name());
+    }
 
     adfront->PrintOpenSegments(std::cout);
-
-    EndMesh();
 
     return (!adfront->Empty());
 }

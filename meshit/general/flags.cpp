@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include "../meshing/msghandler.hpp"
+#include "logging.hpp"
 
 namespace meshit {
 

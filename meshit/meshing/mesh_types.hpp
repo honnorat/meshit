@@ -9,9 +9,9 @@
 
 #include <iostream>
 
+#include "../general/logging.hpp"
 #include "../gprim/geom3d.hpp"
 #include "../linalg/densemat.hpp"
-#include "msghandler.hpp"
 
 namespace meshit {
 

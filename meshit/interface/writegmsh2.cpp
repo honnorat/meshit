@@ -5,7 +5,7 @@
  */
 #include "writeuser.hpp"
 
-#include "../meshing/meshclass.hpp"
+#include "../meshing/mesh_class.hpp"
 
 namespace meshit {
 

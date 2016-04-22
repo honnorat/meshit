@@ -10,8 +10,7 @@
 
 #include <iostream>
 
-#include "../general/optmem.hpp"
-#include "../meshit.hpp"
+#include "../general/block_allocator.hpp"
 #include "geom3d.hpp"
 #include "geomobjects.hpp"
 

@@ -1,6 +1,5 @@
 #include <meshit/geom2d/geometry2d.hpp>
-#include <meshit/meshing/meshclass.hpp>
-#include <meshit/meshing/meshtool.hpp>
+#include <meshit/meshing/mesh_class.hpp>
 
 #include <sstream>
 #include <string>

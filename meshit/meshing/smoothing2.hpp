@@ -8,7 +8,7 @@
 /**************************************************************************/
 
 #include "../linalg/densemat.hpp"
-#include "meshtype.hpp"
+#include "mesh_types.hpp"
 
 namespace meshit {
 

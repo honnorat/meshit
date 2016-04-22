@@ -1,7 +1,7 @@
 #include <stdexcept>
 
-#include "meshclass.hpp"
-#include "meshtype.hpp"
+#include "mesh_class.hpp"
+#include "mesh_types.hpp"
 
 namespace meshit {
 
