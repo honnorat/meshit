@@ -21,7 +21,7 @@ enum PointType
 };
 typedef PointType point_type_t;
 
-typedef int PointIndex;
+typedef uint32_t PointIndex;
 typedef int SurfaceElementIndex;
 
 /**
@@ -29,6 +29,9 @@ typedef int SurfaceElementIndex;
  */
 class MeshPoint : public Point2d
 {
+ public:
+    static constexpr PointIndex undefined = static_cast<PointIndex>(-1);
+
  public:
     MeshPoint() { }
 

@@ -96,7 +96,9 @@ void MeshOptimize::EdgeSwapping(size_t face_index, bool use_metric, double metri
 
     for (size_t i = 0; i < seia.size(); i++) {
         const Element2d& sel = mesh_.Element(seia[i]);
-        for (size_t j = 0; j < 3; j++) pdef[sel[j]]++;
+        for (size_t j = 0; j < 3; j++) {
+            pdef[sel[j]]++;
+        }
     }
 
     for (size_t i = 0; i < seia.size(); i++) {

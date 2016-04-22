@@ -217,18 +217,18 @@ void MeshOptimize::ImproveMesh(size_t faceindex, double metric_weight)
     mesh_.GetSurfaceElementsOfFace(faceindex, seia);
 
     std::vector<MeshPoint> savepoints(mesh_.GetNbPoints());
-    std::vector<int> compress(mesh_.GetNbPoints());
+    std::vector<PointIndex> compress(mesh_.GetNbPoints());
     std::vector<PointIndex> icompress;
     for (size_t i = 0; i < seia.size(); i++) {
         const Element2d& el = mesh_.Element(seia[i]);
-        compress[el.PointID(0)] = -1;
-        compress[el.PointID(1)] = -1;
-        compress[el.PointID(2)] = -1;
+        compress[el.PointID(0)] = MeshPoint::undefined;
+        compress[el.PointID(1)] = MeshPoint::undefined;
+        compress[el.PointID(2)] = MeshPoint::undefined;
     }
     for (size_t i = 0; i < seia.size(); i++) {
         const Element2d& el = mesh_.Element(seia[i]);
         for (size_t j = 0; j < 3; j++) {
-            if (compress[el.PointID(j)] == -1) {
+            if (compress[el.PointID(j)] == MeshPoint::undefined) {
                 compress[el.PointID(j)] = icompress.size();
                 icompress.push_back(el.PointID(j));
             }

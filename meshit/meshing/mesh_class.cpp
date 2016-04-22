@@ -496,7 +496,7 @@ void Mesh::Compress()
         }
     }
     for (size_t i = 0; i < segments.size(); i++) {
-        if (segments[i][0] <= -1) {
+        if (segments[i][0] == MeshPoint::undefined) {
             segments.erase(segments.begin() + i);
             i--;
         }
