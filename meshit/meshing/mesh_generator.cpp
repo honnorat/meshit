@@ -67,15 +67,15 @@ void MeshGenerator::TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, d
 
 bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainIndex facenr)
 {
-    std::vector<int> pindex;
+    std::vector<PointIndex> pindex;
     std::vector<FrontLineIndex> lindex;
     std::vector<int> delpoints;
     std::vector<uint32_t> dellines;
     std::vector<Element2d> locelements;
     std::vector<Point2d> locpoints;
-    std::vector<int> legalpoints;
+    std::vector<bool> legalpoints;
     std::vector<Point2d> plainpoints;
-    std::vector<INDEX_2> loclines;
+    std::vector<IndexPair> loclines;
     uint32_t trials = 0;
     uint32_t plot_next_trial = 999;
     uint32_t qualclass;
@@ -156,7 +156,7 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
                 TransformToPlain(locpoints[i], plainpoints[i], hshould);
             }
 
-            legalpoints.assign(plainpoints.size(), 1);
+            legalpoints.assign(plainpoints.size(), true);
             double avy = 0;
             for (size_t i = 0; i < plainpoints.size(); i++) {
                 avy += plainpoints[i].Y();
@@ -164,12 +164,12 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
             avy *= 1. / plainpoints.size();
 
             for (size_t i = 0; i < plainpoints.size(); i++) {
-                if (pindex[i] == -1) {
-                    legalpoints[i] = 0;
+                if (pindex[i] == CONST<PointIndex>::undefined) {
+                    legalpoints[i] = false;
                 }
                 if (plainpoints[i].Y() < -1e-10 * avy)  // changed
                 {
-                    legalpoints[i] = 0;
+                    legalpoints[i] = false;
                 }
             }
 
@@ -179,8 +179,10 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
             oldnl = loclines.size();
             oldnp = plainpoints.size();
 
-            rulenr = ApplyRules(plainpoints, legalpoints, maxlegalpoint, loclines, maxlegalline, locelements,
-                                dellines, qualclass, mp);
+            rulenr = ApplyRules(plainpoints,
+                                legalpoints, maxlegalpoint,
+                                loclines, maxlegalline,
+                                locelements, dellines, qualclass, mp);
             if (!rulenr) {
                 found = false;
             }
@@ -190,7 +192,8 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
             for (size_t i = 0; i < locelements.size() && found; i++) {
                 const Element2d& el = locelements[i];
                 for (size_t j = 0; j < 3; j++) {
-                    if (el.PointID(j) <= static_cast<PointIndex>(oldnp) && pindex[el.PointID(j) - 1] == -1) {
+                    if (el.PointID(j) <= static_cast<PointIndex>(oldnp) &&
+                        pindex[el.PointID(j) - 1] == CONST<PointIndex>::undefined) {
                         found = false;
                         MESHIT_LOG_ERROR("meshing2, index missing");
                     }
@@ -245,10 +248,10 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
         if (found) {
             // check, whether new front line already exists
             for (size_t i = oldnl; i < loclines.size(); i++) {
-                int nlgpi1 = loclines[i].I1();
-                int nlgpi2 = loclines[i].I2();
-                if (nlgpi1 <= static_cast<INDEX>(pindex.size()) &&
-                    nlgpi2 <= static_cast<INDEX>(pindex.size())) {
+                PointIndex nlgpi1 = loclines[i].I1();
+                PointIndex nlgpi2 = loclines[i].I2();
+                if (nlgpi1 <= static_cast<PointIndex>(pindex.size()) &&
+                    nlgpi2 <= static_cast<PointIndex>(pindex.size())) {
                     nlgpi1 = adfront->GetGlobalIndex(pindex[nlgpi1 - 1]);
                     nlgpi2 = adfront->GetGlobalIndex(pindex[nlgpi2 - 1]);
 
@@ -274,9 +277,6 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
             }
 
             for (size_t i = oldnl; i < loclines.size(); i++) {
-                if (pindex[loclines[i].I1() - 1] == -1 || pindex[loclines[i].I2() - 1] == -1) {
-                    std::cerr << "pindex is 0" << std::endl;
-                }
                 PointIndex pi1 = pindex[loclines[i].I1() - 1];
                 PointIndex pi2 = pindex[loclines[i].I2() - 1];
                 adfront->AddLine(pi1, pi2);

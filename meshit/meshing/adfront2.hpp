@@ -21,7 +21,7 @@
  */
 namespace meshit {
 
-typedef uint32_t FrontLineIndex;
+typedef GenericIndex FrontLineIndex;
 
 class FrontPoint2
 {
@@ -60,26 +60,27 @@ class FrontLine
         : line_class_{1} { }
 
     FrontLine(PointIndex pi1, PointIndex pi2)
-        : indices_{static_cast<INDEX>(pi1), static_cast<INDEX>(pi2)}, line_class_{1} { }
+        : indices_{static_cast<GenericIndex>(pi1), static_cast<GenericIndex>(pi2)},
+          line_class_{1} { }
 
-    const INDEX_2& L() const { return indices_; }
+    const IndexPair& L() const { return indices_; }
     uint32_t LineClass() const { return line_class_; }
 
     void IncrementClass() { line_class_++; }
 
-    bool Valid() const { return indices_.I1() != CONST<INDEX>::undefined; }
+    bool Valid() const { return indices_.I1() != CONST<PointIndex>::undefined; }
 
     void Invalidate()
     {
-        indices_.I1() = CONST<INDEX>::undefined;
-        indices_.I2() = CONST<INDEX>::undefined;
+        indices_.I1() = CONST<PointIndex>::undefined;
+        indices_.I2() = CONST<PointIndex>::undefined;
         line_class_ = 1000;
     }
 
     friend class AdFront2;
 
  private:
-    INDEX_2 indices_;      // Point Indizes
+    IndexPair indices_;    // Point Indizes
     uint32_t line_class_;  // quality class
 };
 
@@ -95,13 +96,15 @@ class AdFront2
 
     FrontLineIndex SelectBaseLine(Point2d& p1, Point2d& p2, uint32_t& qualclass);
 
-    void GetLocals(FrontLineIndex baseline, std::vector<Point2d>& locpoints,
-                   std::vector<INDEX_2>& loclines,  // local index
-                   std::vector<int>& pindex, std::vector<FrontLineIndex>& lindex, double xh);
+    void GetLocals(FrontLineIndex baseline,
+                   std::vector<Point2d>& locpoints,
+                   std::vector<IndexPair>& loclines,  // local index
+                   std::vector<PointIndex>& pindex,
+                   std::vector<FrontLineIndex>& lindex, double xh);
 
     void DeleteLine(FrontLineIndex li);
 
-    int AddPoint(const Point2d& p, PointIndex globind);
+    PointIndex AddPoint(const Point2d& p, PointIndex globind);
     int AddLine(PointIndex pi1, PointIndex pi2);
 
     bool LineExists(PointIndex gpi1, PointIndex gpi2);
@@ -128,10 +131,10 @@ class AdFront2
     std::vector<PointIndex> nearpoints;
     std::vector<FrontLineIndex> nearlines;
 
-    size_t nfl;                        // number of front lines;
-    INDEX_2_map<uint8_t> all_flines_;  // all front lines ever have been
+    size_t nfl;                          // number of front lines;
+    IndexPair_map<uint8_t> all_flines_;  // all front lines ever have been
 
-    std::vector<int> invpindex;
+    std::vector<PointIndex> inv_pindex;
 
     uint32_t minval;
     FrontLineIndex starti;

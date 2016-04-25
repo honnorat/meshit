@@ -21,13 +21,13 @@ class Neighbour
 class trionedge
 {
  public:
-    INDEX tnr;
+    GenericIndex tnr;
     size_t sidenr;
 
     trionedge()
         : tnr{0}, sidenr{0} { }
 
-    trionedge(INDEX atnr, size_t asidenr)
+    trionedge(GenericIndex atnr, size_t asidenr)
         : tnr{atnr}, sidenr{asidenr} { }
 };
 
@@ -52,7 +52,7 @@ void MeshOptimize::EdgeSwapping(DomainIndex face_index, bool use_metric, double 
     mesh_.GetElementsOfFace(face_index, seia);
 
     std::vector<Neighbour> neighbors(mesh_.GetNbElements());
-    INDEX_2_map<trionedge> other(seia.size() + 2);
+    IndexPair_map<trionedge> other(seia.size() + 2);
 
     std::vector<bool> swapped(mesh_.GetNbElements());
     std::vector<int> pdef(mesh_.GetNbPoints());
@@ -117,21 +117,21 @@ void MeshOptimize::EdgeSwapping(DomainIndex face_index, bool use_metric, double 
             PointIndex pi1 = sel.PointID((j + 1) % 3);
             PointIndex pi2 = sel.PointID((j + 2) % 3);
 
-            INDEX_2 edge(pi1, pi2);
+            IndexPair edge(pi1, pi2);
             edge.Sort();
 
             if (mesh_.IsSegment(edge)) continue;
 
-            INDEX_2 ii2(pi1, pi2);
+            IndexPair ii2(pi1, pi2);
             if (other.count(ii2)) {
-                INDEX i2 = other[ii2].tnr;
+                GenericIndex i2 = other[ii2].tnr;
                 size_t j2 = other[ii2].sidenr;
                 neighbors[seia[i]].SetNeighborIndex(j, i2);
                 neighbors[seia[i]].SetOrientation(j, j2);
                 neighbors[i2].SetNeighborIndex(j2, seia[i]);
                 neighbors[i2].SetOrientation(j2, j);
             } else {
-                other[INDEX_2(pi2, pi1)] = trionedge(seia[i], j);
+                other[IndexPair(pi2, pi1)] = trionedge(seia[i], j);
             }
         }
     }
@@ -275,7 +275,7 @@ void MeshOptimize::CombineImprove(DomainIndex face_index)
         for (size_t j = 0; j < 3; j++) {
             PointIndex pi1 = sel.PointID((j + 1) % 3);
             PointIndex pi2 = sel.PointID((j + 2) % 3);
-            if (mesh_.IsSegment(INDEX_2(pi1, pi2).Sort())) {
+            if (mesh_.IsSegment(IndexPair(pi1, pi2).Sort())) {
                 fixed[pi1] = true;
                 fixed[pi2] = true;
             }
@@ -301,7 +301,7 @@ void MeshOptimize::CombineImprove(DomainIndex face_index)
                 continue;
             }
 
-            INDEX_2 si2(pi1, pi2);
+            IndexPair si2(pi1, pi2);
             si2.Sort();
 
             double nv_z = 0.0;

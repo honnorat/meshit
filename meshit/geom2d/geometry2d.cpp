@@ -259,7 +259,7 @@ void SplineGeometry::AddStructureLine(const std::vector<Point2d>& points, double
 }
 
 void SplineGeometry::AddSpline(const std::vector<Point2d>& points, double hmax, int spline_id,
-                               uint32_t domain_left, uint32_t domain_right)
+                               DomainIndex domain_left, DomainIndex domain_right)
 {
     size_t nb_points = points.size();
     size_t ip_0 = geompoints.size();
@@ -291,7 +291,7 @@ void SplineGeometry::AddSpline(const std::vector<Point2d>& points, double hmax, 
 }
 
 void SplineGeometry::AddCircle(const Point2d& center, double radius, double hmax, int spline_id,
-                               uint32_t face_left, uint32_t face_right)
+                               DomainIndex face_left, DomainIndex face_right)
 {
     std::vector<Point2d> spline_points;
     double c_x = center.X();

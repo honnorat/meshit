@@ -9,19 +9,17 @@
 
 #include <iostream>
 
+#include "../general/index.hpp"
 #include "../general/logging.hpp"
 #include "../gprim/geom3d.hpp"
 #include "../linalg/densemat.hpp"
 
 namespace meshit {
 
-enum PointType
-{
-    EDGE_POINT = 2, INNER_POINT = 3
-};
+enum PointType { EDGE_POINT = 2, INNER_POINT = 3 };
+
 typedef PointType point_type_t;
 
-typedef uint32_t GenericIndex;
 typedef GenericIndex PointIndex;
 typedef GenericIndex EdgeIndex;
 typedef GenericIndex ElementIndex;
@@ -93,7 +91,7 @@ class Element2d
     PointIndex point_ids_[3];
     DomainIndex face_id_;
     ElementIndex next_;  // a linked list for all segments in the same face
-    bool deleted_;              // element is deleted
+    bool deleted_;       // element is deleted
 };
 
 std::ostream& operator<<(std::ostream& s, const Element2d& el);

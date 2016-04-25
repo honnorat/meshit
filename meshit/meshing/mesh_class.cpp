@@ -370,7 +370,7 @@ void Mesh::IndexBoundaryEdges()
 
     for (size_t i = 0; i < segments.size(); i++) {
         const Segment& seg = segments[i];
-        INDEX_2 i2(seg[0], seg[1]);
+        IndexPair i2(seg[0], seg[1]);
         segment_ht[i2.Sort()] = i;
     }
 }

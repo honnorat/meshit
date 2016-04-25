@@ -9,8 +9,8 @@ int Mesh::CheckSurface()
     MESHIT_LOG_DEBUG("Check Surface mesh");
 
     size_t nf = elements.size();
-    INDEX_2_map<int> edges(nf + 2);
-    INDEX_2 i2;
+    IndexPair_map<int> edges(nf + 2);
+    IndexPair i2;
     int cnt1 = 0, cnt2 = 0;
 
     for (size_t i = 0; i < nf; i++) {
@@ -65,7 +65,7 @@ static double TriangleQualityInst(const MeshPoint& p1, const MeshPoint& p2, cons
 void Mesh::PrintQuality()
 {
     size_t ncl = 20, cl;
-    std::vector<INDEX> incl(ncl, 0);
+    std::vector<size_t> incl(ncl, 0);
     double qual;
 
     for (size_t sei = 0; sei < elements.size(); sei++) {

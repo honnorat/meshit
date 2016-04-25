@@ -8,7 +8,7 @@ void Mesh::Refine()
     size_t nb_vertices = ComputeNVertices();
 
     points.resize(nb_vertices);
-    INDEX_2_map<PointIndex> between(nb_vertices + 5);
+    IndexPair_map<PointIndex> between(nb_vertices + 5);
 
     size_t oldns = segments.size();
     for (size_t si = 0; si < oldns; si++) {
@@ -16,7 +16,7 @@ void Mesh::Refine()
         const MeshPoint& p1 = points[seg[0]];
         const MeshPoint& p2 = points[seg[1]];
 
-        INDEX_2 i2(seg[0], seg[1]);
+        IndexPair i2(seg[0], seg[1]);
         i2.Sort();
         PointIndex pi_new;
 
@@ -59,7 +59,7 @@ void Mesh::Refine()
             PointIndex pi1 = pnums[betw[j][0]];
             PointIndex pi2 = pnums[betw[j][1]];
 
-            INDEX_2 i2(pi1, pi2);
+            IndexPair i2(pi1, pi2);
             i2.Sort();
 
             if (between.count(i2) == 0) {

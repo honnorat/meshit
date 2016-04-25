@@ -89,12 +89,12 @@ void netrule::LoadRule(std::istream& ist)
         } else if (strcmp(buf, "maplines") == 0) {
             ist >> ch;
             while (ch == '(') {
-                INDEX li1, li2;
+                GenericIndex li1, li2;
                 ist >> li1 >> ch;  // ','
                 ist >> li2 >> ch;  // ')'
                 li1--;  // indices are stored 0-based
                 li2--;
-                lines.push_back(INDEX_2(li1, li2));
+                lines.push_back(IndexPair(li1, li2));
                 linevecs.push_back(points[li2] - points[li1]);
                 linetolerances.push_back({0.0, 0.0, 0.0});
                 noldl++;
@@ -136,12 +136,12 @@ void netrule::LoadRule(std::istream& ist)
         } else if (strcmp(buf, "newlines") == 0) {
             ist >> ch;
             while (ch == '(') {
-                INDEX li1, li2;
+                GenericIndex li1, li2;
                 ist >> li1 >> ch;  // ','
                 ist >> li2 >> ch;  // ')'
                 li1--;  // indices are stored 0-based
                 li2--;
-                lines.push_back(INDEX_2(li1, li2));
+                lines.push_back(IndexPair(li1, li2));
                 linevecs.push_back(points[li2] - points[li1]);
                 ist >> ch;
                 while (ch != ';') {
@@ -272,8 +272,8 @@ void netrule::LoadRule(std::istream& ist)
     do {
         ok = true;
         for (size_t i = 0; i < noldl; i++) {
-            INDEX idx1 = lines[i].I1();
-            INDEX idx2 = lines[i].I2();
+            GenericIndex idx1 = lines[i].I1();
+            GenericIndex idx2 = lines[i].I2();
             uint32_t minn = 1000;
             minn = std::min(minn, pnearness[idx1]);
             minn = std::min(minn, pnearness[idx2]);

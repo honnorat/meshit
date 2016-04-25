@@ -27,7 +27,7 @@ class Mesh
     std::vector<Segment> segments;    // line-segments at edges
     std::vector<Element2d> elements;  // 2d-inner elements
 
-    INDEX_2_map<int> segment_ht;  // boundary edges  (1..normal bedge, 2..segment)
+    IndexPair_map<int> segment_ht;  // boundary edges  (1..normal bedge, 2..segment)
 
     // Representation of local mesh-size h
     LocalH* loc_h_func;
@@ -90,7 +90,7 @@ class Mesh
     /// Find bounding box
     void GetBox(Point2d& pmin, Point2d& pmax) const;
 
-    bool IsSegment(const INDEX_2& e) const { return segment_ht.count(e) == 1; }
+    bool IsSegment(const IndexPair& e) const { return segment_ht.count(e) == 1; }
 
     void Compress();  // Remove unused points. etc.
     size_t ComputeNVertices();

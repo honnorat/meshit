@@ -30,8 +30,8 @@ static double CalcElementBadness(const std::vector<Point2d>& points, const Eleme
 }
 
 int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
-                              std::vector<int>& legalpoints, size_t maxlegalpoint,
-                              std::vector<INDEX_2>& llines1, size_t maxlegalline,
+                              std::vector<bool>& legalpoints, size_t maxlegalpoint,
+                              std::vector<IndexPair>& llines1, size_t maxlegalline,
                               std::vector<Element2d>& elements,
                               std::vector<uint32_t>& dellines, int tolerance, const MeshingParameters& mp)
 {
@@ -42,7 +42,7 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
     size_t noldll = llines1.size();
 
     std::vector<Point2d> tempnewpoints;
-    std::vector<INDEX_2> tempnewlines;
+    std::vector<IndexPair> tempnewlines;
     std::vector<uint32_t> tempdellines;
     std::vector<Element2d> tempelements;
 
@@ -64,7 +64,7 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
     for (size_t cnt = 0; cnt < MAX_NEARNESS; cnt++) {
         bool ok = true;
         for (size_t i = 0; i < maxlegalline; i++) {
-            const INDEX_2& hline = llines1[i];
+            const IndexPair& hline = llines1[i];
 
             size_t minn = std::min(pnearness[hline[0] - 1], pnearness[hline[1] - 1]);
 
@@ -83,7 +83,7 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
     }
 
     // resort lines after lnearness
-    std::vector<INDEX_2> llines(llines1.size());
+    std::vector<IndexPair> llines(llines1.size());
     std::vector<size_t> sortlines(llines1.size());
     uint32_t lnearness_class[MAX_NEARNESS];
 
@@ -123,7 +123,7 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
 
     std::vector<int> pused(maxlegalpoint, 0);
     std::vector<bool> lused(maxlegalline, false);
-    std::vector<int> pmap;
+    std::vector<PointIndex> pmap;
     std::vector<bool> pfixed;
     std::vector<size_t> lmap;
 
@@ -162,7 +162,7 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
 
                     ok = 1;
 
-                    INDEX_2 loclin = llines[locli - 1];
+                    IndexPair loclin = llines[locli - 1];
                     Vec2d linevec = lpoints[loclin.I2() - 1] - lpoints[loclin.I1() - 1];
 
                     if (rule->CalcLineError(nlok, linevec) > maxerr) {
@@ -190,7 +190,7 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
 
                 if (ok) {
                     size_t locli = lmap[nlok] - 1;
-                    INDEX_2 loclin = llines[locli];
+                    IndexPair loclin = llines[locli];
 
                     lused[locli] = true;
                     for (int j = 0; j < 2; j++) {
@@ -232,10 +232,10 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
                         } else {
                             ok = 0;
 
-                            if (pmap[npok]) {
+                            if (pmap[npok] > 0) {
                                 pused[pmap[npok] - 1]--;
                             }
-                            while (!ok && pmap[npok] < static_cast<int>(maxlegalpoint)) {
+                            while (!ok && pmap[npok] < maxlegalpoint) {
                                 ok = 1;
 
                                 pmap[npok]++;
@@ -348,7 +348,7 @@ int MeshGenerator::ApplyRules(std::vector<Point2d>& lpoints,
 
                         // Setze neue Linien:
                         for (size_t i = rule->GetNOldL(); i < rule->GetNL(); i++) {
-                            llines.push_back(INDEX_2(pmap[rule->GetLine(i)[0]], pmap[rule->GetLine(i)[1]]));
+                            llines.push_back(IndexPair(pmap[rule->GetLine(i)[0]], pmap[rule->GetLine(i)[1]]));
                         }
 
                         // delete old lines:

@@ -39,7 +39,7 @@ class netrule
 
     uint32_t GetLNearness(size_t li) const { return lnearness[li]; }
     const Point2d& GetPoint(size_t i) const { return points[i]; }
-    const INDEX_2& GetLine(size_t i) const { return lines[i]; }
+    const IndexPair& GetLine(size_t i) const { return lines[i]; }
     const Element2d& GetElement(size_t i) const { return elements[i]; }
     const threeint& GetOrientation(size_t i) const { return orientations[i]; }
 
@@ -63,8 +63,8 @@ class netrule
 
     int ConvexFreeZone() const;
 
-    INDEX GetPointNr1(size_t ln) const { return lines[ln].I1(); }
-    INDEX GetPointNr2(size_t ln) const { return lines[ln].I2(); }
+    GenericIndex GetPointNr1(size_t ln) const { return lines[ln].I1(); }
+    GenericIndex GetPointNr2(size_t ln) const { return lines[ln].I2(); }
 
     void LoadRule(std::istream& ist);
 
@@ -72,7 +72,7 @@ class netrule
     int quality;
     char* name;
     std::vector<Point2d> points;
-    std::vector<INDEX_2> lines;
+    std::vector<IndexPair> lines;
     std::vector<Point2d> freezone, freezonelimit;
     std::vector<std::vector<Point2d>*> freezone_i;
     std::vector<Point2d> transfreezone;

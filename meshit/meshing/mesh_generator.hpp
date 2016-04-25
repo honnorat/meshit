@@ -41,8 +41,8 @@ class MeshGenerator
     /** Applies 2D rules.
      Tests all 2D rules */
     int ApplyRules(std::vector<Point2d>& lpoints,
-                   std::vector<int>& legalpoints, size_t maxlegalpoint,
-                   std::vector<INDEX_2>& llines, size_t maxlegelline,
+                   std::vector<bool>& legalpoints, size_t maxlegalpoint,
+                   std::vector<IndexPair>& llines, size_t maxlegelline,
                    std::vector<Element2d>& elements,
                    std::vector<uint32_t>& dellines,
                    int tolerance, const MeshingParameters& mp);
