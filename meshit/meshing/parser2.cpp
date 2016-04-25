@@ -69,19 +69,15 @@ void netrule::LoadRule(std::istream& ist)
                 ist >> p.Y() >> ch;  // ')'
 
                 points.push_back(p);
+                tolerances.push_back({1.0, 0.0, 1.0});
                 noldp++;
-
-                tolerances.resize(noldp);
-                tolerances[noldp - 1].f1 = 1.0;
-                tolerances[noldp - 1].f2 = 0;
-                tolerances[noldp - 1].f3 = 1.0;
 
                 ist >> ch;
                 while (ch != ';') {
                     if (ch == '{') {
-                        ist >> tolerances[noldp - 1].f1 >> ch;  // ','
-                        ist >> tolerances[noldp - 1].f2 >> ch;  // ','
-                        ist >> tolerances[noldp - 1].f3 >> ch;  // '}'
+                        ist >> tolerances.back().f1 >> ch;  // ','
+                        ist >> tolerances.back().f2 >> ch;  // ','
+                        ist >> tolerances.back().f3 >> ch;  // '}'
                     } else if (ch == 'd') {
                         ist >> ch;  // 'e'
                         ist >> ch;  // 'l'
@@ -99,18 +95,15 @@ void netrule::LoadRule(std::istream& ist)
 
                 lines.push_back(lin);
                 linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
+                linetolerances.push_back({0.0, 0.0, 0.0});
                 noldl++;
-                linetolerances.resize(noldl);
-                linetolerances[noldl - 1].f1 = 0;
-                linetolerances[noldl - 1].f2 = 0;
-                linetolerances[noldl - 1].f3 = 0;
 
                 ist >> ch;
                 while (ch != ';') {
                     if (ch == '{') {
-                        ist >> linetolerances[noldl - 1].f1 >> ch;  // ','
-                        ist >> linetolerances[noldl - 1].f2 >> ch;  // ','
-                        ist >> linetolerances[noldl - 1].f3 >> ch;  // '}'
+                        ist >> linetolerances.back().f1 >> ch;  // ','
+                        ist >> linetolerances.back().f2 >> ch;  // ','
+                        ist >> linetolerances.back().f3 >> ch;  // '}'
                     } else if (ch == 'd') {
                         dellines.push_back(noldl);
                         ist >> ch;  // 'e'

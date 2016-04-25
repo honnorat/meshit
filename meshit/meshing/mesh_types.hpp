@@ -114,8 +114,8 @@ class Segment
  public:
     Segment& operator=(const Segment& other);
 
-    PointIndex& operator[](int i) { return pnums[i]; }
-    const PointIndex& operator[](int i) const { return pnums[i]; }
+    PointIndex& operator[](size_t i) { return pnums[i]; }
+    const PointIndex& operator[](size_t i) const { return pnums[i]; }
 };
 
 std::ostream& operator<<(std::ostream& s, const Segment& seg);

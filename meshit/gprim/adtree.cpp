@@ -60,7 +60,7 @@ ADTree3::~ADTree3()
     delete root;
 }
 
-void ADTree3::Insert(const Point2d& p, int pi)
+void ADTree3::Insert(const Point2d& p, PointIndex pi)
 {
     ADTreeNode3* node = nullptr;
     ADTreeNode3* next = root;
@@ -81,7 +81,7 @@ void ADTree3::Insert(const Point2d& p, int pi)
             node->data[1] = p[1];
             node->pi = pi;
 
-            if (ela.size() < static_cast<size_t>(pi + 1)) {
+            if (ela.size() < pi + 1) {
                 ela.resize(pi + 1);
             }
             ela[pi] = node;
@@ -127,11 +127,11 @@ void ADTree3::Insert(const Point2d& p, int pi)
     }
 }
 
-void ADTree3::DeleteElement(int pi)
+void ADTree3::DeleteElement(PointIndex pi)
 {
     ADTreeNode3* node = ela[pi];
 
-    node->pi = -1;
+    node->pi = MeshPoint::undefined;
 
     node = node->father;
     while (node) {
@@ -197,7 +197,7 @@ void ADTree3::PrintRec(std::ostream& ost, const ADTreeNode3* node) const
 
 ADTreeNode6::ADTreeNode6()
 {
-    pi_ = -1;
+    pi_ = MeshPoint::undefined;
 
     left = nullptr;
     right = nullptr;
@@ -219,7 +219,7 @@ void ADTreeNode6::DeleteChilds()
     }
 }
 
-inline void ADTreeNode6::SetData(const Point2d& pmin, const Point2d& pmax, int pi)
+inline void ADTreeNode6::SetData(const Point2d& pmin, const Point2d& pmax, PointIndex pi)
 {
     pmin_ = pmin;
     pmax_ = pmax;
@@ -251,7 +251,7 @@ ADTree6::~ADTree6()
     delete root;
 }
 
-void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, int pi)
+void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, PointIndex pi)
 {
     ADTreeNode6* node = nullptr;
     ADTreeNode6* next = root;
@@ -265,10 +265,10 @@ void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, int pi)
     while (next) {
         node = next;
 
-        if (node->pi_ == -1) {
+        if (node->pi_ == MeshPoint::undefined) {
             node->SetData(bmin_, bmax_, pi);
 
-            if (static_cast<size_t>(pi) >= ela.size()) {
+            if (pi >= ela.size()) {
                 ela.push_back(node);
             } else {
                 ela[pi] = node;
@@ -293,7 +293,7 @@ void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, int pi)
     next->SetData(bmin_, bmax_, pi);
     next->sep_ = (bmin[dir] + bmax[dir]) / 2;
 
-    if (static_cast<size_t>(pi) >= ela.size()) {
+    if (pi >= ela.size()) {
         ela.push_back(next);
     } else {
         ela[pi] = next;
@@ -311,11 +311,11 @@ void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, int pi)
     }
 }
 
-void ADTree6::DeleteElement(int pi)
+void ADTree6::DeleteElement(PointIndex pi)
 {
     ADTreeNode6* node = ela[pi];
 
-    node->pi_ = -1;
+    node->pi_ = MeshPoint::undefined;
 
     node = node->father;
     while (node) {
@@ -346,9 +346,9 @@ void ADTree6::GetIntersecting(const Point2d& bmin, const Point2d& bmax,
     while (stacks) {
         stacks--;
         ADTreeNode6* node = stack[stacks].node;
-        if (node->pi_ != -1 &&
-            !(node->pmin_.X() > pmax.X() || node->pmax_.X() < pmin.X() || node->pmin_.Y() > pmax.Y() ||
-              node->pmax_.Y() < pmin.Y())) {
+        if (node->pi_ != MeshPoint::undefined &&
+            !(node->pmin_.X() > pmax.X() || node->pmax_.X() < pmin.X() ||
+              node->pmin_.Y() > pmax.Y() || node->pmax_.Y() < pmin.Y())) {
             pis.push_back(node->pi_);
         }
 
@@ -379,7 +379,7 @@ Point3dTree::~Point3dTree()
     delete tree;
 }
 
-void Point3dTree::Insert(const Point2d& p, int pi)
+void Point3dTree::Insert(const Point2d& p, PointIndex pi)
 {
     tree->Insert(p, pi);
 }
@@ -400,7 +400,7 @@ Box3dTree::~Box3dTree()
     delete tree;
 }
 
-void Box3dTree::Insert(const Point2d& bmin, const Point2d& bmax, int pi)
+void Box3dTree::Insert(const Point2d& bmin, const Point2d& bmax, PointIndex pi)
 {
     tree->Insert(bmin, bmax, pi);
 }

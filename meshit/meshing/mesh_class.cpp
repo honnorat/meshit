@@ -1,6 +1,7 @@
 #include <cassert>
 #include <stdexcept>
 
+#include "mesh_class.hpp"
 #include "../geom2d/geometry2d.hpp"
 #include "../gprim/geomtest3d.hpp"
 #include "../interface/writeuser.hpp"
@@ -82,7 +83,7 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
 
     CalcLocalH();
 
-    size_t bnp = points.size();  // boundary points
+    size_t np_bdy = points.size();  // boundary points
     double h = mp.maxh;
 
     MeshGenerator mesher(*this, bbox);
@@ -99,12 +100,11 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
             mesher.Reset();
         }
 
-        std::vector<int> compress(bnp, -1);
-        int cnt = 0;
-        for (size_t pi = 0; pi < bnp; pi++) {
+        std::vector<PointIndex> compress(np_bdy, MeshPoint::undefined);
+        PointIndex cnt = 0;
+        for (size_t pi = 0; pi < np_bdy; pi++) {
             mesher.AddPoint(Point2d(points[pi]), pi);
-            cnt++;
-            compress[pi] = cnt;
+            compress[pi] = cnt++;
         }
         for (size_t si = 0; si < segments.size(); si++) {
             if (segments[si].face_left == dom_nr) {

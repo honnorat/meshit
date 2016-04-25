@@ -31,9 +31,9 @@ void MeshGenerator::AddPoint(const Point2d& p, PointIndex globind)
     adfront->AddPoint(p, globind);
 }
 
-void MeshGenerator::AddBoundaryElement(int i1, int i2)
+void MeshGenerator::AddBoundaryElement(PointIndex i1, PointIndex i2)
 {
-    adfront->AddLine(i1 - 1, i2 - 1);
+    adfront->AddLine(i1, i2);
 }
 
 void MeshGenerator::SetMaxArea(double amaxarea)
@@ -253,9 +253,9 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
                     nlgpi1 = adfront->GetGlobalIndex(pindex[nlgpi1 - 1]);
                     nlgpi2 = adfront->GetGlobalIndex(pindex[nlgpi2 - 1]);
 
-                    int exval = adfront->ExistsLine(nlgpi1, nlgpi2);
+                    bool exval = adfront->LineExists(nlgpi1, nlgpi2);
                     if (exval) {
-                        MESHIT_LOG_ERROR("ERROR: new line exits, val = " << exval);
+                        MESHIT_LOG_ERROR("ERROR: new line (" << nlgpi1 << "," << nlgpi2 << ") exits !");
                         found = false;
                     }
                 }
@@ -278,7 +278,9 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
                 if (pindex[loclines[i].I1() - 1] == -1 || pindex[loclines[i].I2() - 1] == -1) {
                     std::cerr << "pindex is 0" << std::endl;
                 }
-                adfront->AddLine(pindex[loclines[i].I1() - 1], pindex[loclines[i].I2() - 1]);
+                PointIndex pi1 = pindex[loclines[i].I1() - 1];
+                PointIndex pi2 = pindex[loclines[i].I2() - 1];
+                adfront->AddLine(pi1, pi2);
             }
             for (size_t i = 0; i < locelements.size(); i++) {
                 Element2d mtri;

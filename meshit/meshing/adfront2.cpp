@@ -1,14 +1,14 @@
 /*
   Advancing front class for surfaces
  */
+#include <cassert>
 #include "adfront2.hpp"
 
 namespace meshit {
 
-FrontPoint2::FrontPoint2(const Point2d& ap, PointIndex agi)
-    : globalindex(agi)
+FrontPoint2::FrontPoint2(const Point2d& point, PointIndex gi)
+    : point_{point}, global_index_{gi}
 {
-    p = ap;
     nlinetopoint = 0;
     frontnr = INT_MAX - 10;
 }
@@ -38,10 +38,10 @@ void AdFront2::PrintOpenSegments(std::ostream& ost) const
 int AdFront2::AddPoint(const Point2d& p, PointIndex globind)
 {
     // inserts at empty position or resizes array
-    int pi;
+    PointIndex pi;
 
-    if (delpointl.size() != 0) {
-        pi = delpointl[delpointl.size() - 1];
+    if (delpointl.size() > 0) {
+        pi = delpointl.back();
         delpointl.pop_back();
         points[pi] = FrontPoint2(p, globind);
     } else {
@@ -53,7 +53,7 @@ int AdFront2::AddPoint(const Point2d& p, PointIndex globind)
     return pi;
 }
 
-int AdFront2::AddLine(int pi1, int pi2)
+int AdFront2::AddLine(PointIndex pi1, PointIndex pi2)
 {
     int minfn;
     int li;
@@ -86,34 +86,35 @@ int AdFront2::AddLine(int pi1, int pi2)
     linesearchtree.Insert(lbox.PMin(), lbox.PMax(), li);
 
     INDEX_2 globline(GetGlobalIndex(pi1), GetGlobalIndex(pi2));
-    if (allflines.count(globline)) {
+    if (all_flines_.count(globline)) {
         MESHIT_LOG_ERROR("Adfront2::AddLine: line exists");
     }
-    allflines[globline] = 1;
+    all_flines_[globline] = 1;
 
     return li;
 }
 
 void AdFront2::DeleteLine(int li)
 {
+    assert(nfl > 0);
     nfl--;
 
     const INDEX_2& lidx = lines[li].L();
 
-    INDEX pi1 = lidx.I1();
+    PointIndex pi1 = lidx.I1();
     points[pi1].RemoveLine();
     if (!points[pi1].Valid()) {
         delpointl.push_back(pi1);
         pointsearchtree.DeleteElement(pi1);
     }
-    INDEX pi2 = lidx.I2();
+    PointIndex pi2 = lidx.I2();
     points[pi2].RemoveLine();
     if (!points[pi2].Valid()) {
         delpointl.push_back(pi2);
         pointsearchtree.DeleteElement(pi2);
     }
 
-    allflines[INDEX_2(GetGlobalIndex(pi1), GetGlobalIndex(pi2))] = 2;
+    all_flines_[INDEX_2(GetGlobalIndex(pi1), GetGlobalIndex(pi2))] = 2;
 
     lines[li].Invalidate();
     linesearchtree.DeleteElement(li);
@@ -121,13 +122,13 @@ void AdFront2::DeleteLine(int li)
     dellinel.push_back(li);
 }
 
-int AdFront2::ExistsLine(int pi1, int pi2)
+bool AdFront2::LineExists(PointIndex pi1, PointIndex pi2)
 {
     INDEX_2 line(pi1, pi2);
-    if (allflines.count(line) == 1) {
-        return allflines[line];
+    if (all_flines_.count(line) == 1) {
+        return all_flines_[line] > 0;
     } else {
-        return 0;
+        return false;
     }
 }
 
@@ -137,7 +138,8 @@ int AdFront2::SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass)
 
     for (size_t i = starti; i < lines.size(); i++) {
         if (lines[i].Valid()) {
-            int hi = lines[i].LineClass() + points[lines[i].L().I1()].FrontNr() +
+            int hi = lines[i].LineClass() +
+                     points[lines[i].L().I1()].FrontNr() +
                      points[lines[i].L().I2()].FrontNr();
 
             if (hi <= minval) {
@@ -170,11 +172,11 @@ int AdFront2::SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass)
     return baselineindex;
 }
 
-int AdFront2::GetLocals(int baselineindex,
-                        std::vector<Point2d>& locpoints,
-                        std::vector<INDEX_2>& loclines,  // local index
-                        std::vector<INDEX>& pindex,
-                        std::vector<INDEX>& lindex, double xh)
+void AdFront2::GetLocals(int baselineindex,
+                         std::vector<Point2d>& locpoints,
+                         std::vector<INDEX_2>& loclines,  // local index
+                         std::vector<INDEX>& pindex,
+                         std::vector<INDEX>& lindex, double xh)
 {
     int pstind = lines[baselineindex].L().I1();
     Point2d p0 = points[pstind].P();
@@ -189,8 +191,8 @@ int AdFront2::GetLocals(int baselineindex,
     pointsearchtree.GetIntersecting(pmin, pmax, nearpoints);
 
     for (size_t ii = 0; ii < nearlines.size(); ii++) {
-        int i = nearlines[ii];
-        if (lines[i].Valid() && i != baselineindex) {
+        size_t i = nearlines[ii];
+        if (lines[i].Valid() && i != static_cast<size_t>(baselineindex)) {
             loclines.push_back(lines[i].L());
             lindex.push_back(i);
         }
@@ -228,7 +230,6 @@ int AdFront2::GetLocals(int baselineindex,
             pindex.push_back(i);
         }
     }
-    return lines[baselineindex].LineClass();
 }
 
 void AdFront2::SetStartFront()

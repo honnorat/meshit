@@ -30,7 +30,7 @@ class MeshGenerator
     bool GenerateMesh(const MeshingParameters& mp, double gh, DomainIndex facenr);
 
     void AddPoint(const Point2d& p, PointIndex globind);
-    void AddBoundaryElement(INDEX i1, INDEX i2);
+    void AddBoundaryElement(PointIndex i1, PointIndex i2);
     void SetMaxArea(double amaxarea);
 
  protected:

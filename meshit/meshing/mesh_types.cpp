@@ -1,9 +1,13 @@
 #include <stdexcept>
 
-#include "mesh_class.hpp"
 #include "mesh_types.hpp"
+#include "mesh_class.hpp"
 
 namespace meshit {
+
+constexpr PointIndex MeshPoint::undefined;
+constexpr ElementIndex Element2d::undefined;
+constexpr DomainIndex FaceDescriptor::undefined;
 
 Segment::Segment()
 {

@@ -13,6 +13,7 @@
 #include "../general/block_allocator.hpp"
 #include "geom3d.hpp"
 #include "geomobjects.hpp"
+#include "../meshing/mesh_types.hpp"
 
 namespace meshit {
 /**
@@ -42,9 +43,9 @@ class ADTree3
     ADTree3(const Point2d& acmin, const Point2d& acmax);
     ~ADTree3();
 
-    void Insert(const Point2d& p, int pi);
+    void Insert(const Point2d& p, PointIndex pi);
     void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const;
-    void DeleteElement(int pi);
+    void DeleteElement(PointIndex pi);
     void PrintRec(std::ostream& ost, const ADTreeNode3* node) const;
 
  protected:
@@ -59,12 +60,12 @@ class ADTreeNode6
     ADTreeNode6* left, * right, * father;
     double sep_;
     Point2d pmin_, pmax_;
-    int pi_;
+    PointIndex pi_;
     int nchilds;
 
     ADTreeNode6();
     void DeleteChilds();
-    void SetData(const Point2d& pmin, const Point2d& pmax, int pi);
+    void SetData(const Point2d& pmin, const Point2d& pmax, PointIndex pi);
 
     friend class ADTree6;
 
@@ -79,11 +80,11 @@ class ADTree6
     ADTree6(const Point2d& pmin, const Point2d& pmax);
     ~ADTree6();
 
-    void Insert(const Point2d& bmin, const Point2d& bmax, int pi);
+    void Insert(const Point2d& bmin, const Point2d& bmax, PointIndex pi);
     void GetIntersecting(const Point2d& bmin, const Point2d& bmax,
                          const Point2d& pmin, const Point2d& pmax,
                          std::vector<size_t>& pis) const;
-    void DeleteElement(int pi);
+    void DeleteElement(PointIndex pi);
 
  protected:
     ADTreeNode6* root;
@@ -98,8 +99,8 @@ class Point3dTree
     Point3dTree(const Point2d& pmin, const Point2d& pmax);
     ~Point3dTree();
 
-    void Insert(const Point2d& p, int pi);
-    void DeleteElement(int pi) { tree->DeleteElement(pi); }
+    void Insert(const Point2d& p, PointIndex pi);
+    void DeleteElement(PointIndex pi) { tree->DeleteElement(pi); }
     void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const;
 
  protected:
@@ -112,8 +113,8 @@ class Box3dTree
     Box3dTree(const Point2d& apmin, const Point2d& apmax);
     ~Box3dTree();
 
-    void Insert(const Point2d& bmin, const Point2d& bmax, int pi);
-    void DeleteElement(int pi) { tree->DeleteElement(pi); }
+    void Insert(const Point2d& bmin, const Point2d& bmax, PointIndex pi);
+    void DeleteElement(PointIndex pi) { tree->DeleteElement(pi); }
     void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const;
 
  protected:
