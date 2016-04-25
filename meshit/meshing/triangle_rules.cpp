@@ -316,7 +316,7 @@ const char* triarules[] = {
     "   (1, 2, 5);                                                  \n",
     "   (3, 4, 5);                                                  \n",
     "endrule                                                        \n",
-    "\0"
+    0
 };
 
 }  // namespace meshit
