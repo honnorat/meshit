@@ -19,59 +19,69 @@ namespace meshit {
 /**
   Alternating Digital Tree
  */
-struct ADTreeNode3
+class ADTreeNode3
 {
-    ADTreeNode3* left, * right, * father;
-    double sep;
-    double data[2];
-    int pi;
-    int nchilds;
+ public:
+    ADTreeNode3()
+        : left_{nullptr}, right_{nullptr}, pi_{CONST<GenericIndex>::undefined} { }
 
-    ADTreeNode3();
     void DeleteChilds();
+    void SetData(const Point2d& point, GenericIndex pi);
+
+    void* operator new(size_t);
+    void operator delete(void* p);
 
     friend class ADTree3;
 
-    static BlockAllocator ball;
-    void* operator new(size_t);
-    void operator delete(void* p);
+ protected:
+    ADTreeNode3* left_;
+    ADTreeNode3* right_;
+    double sep_;
+    double data_[2];
+    GenericIndex pi_;
+
+    static BlockAllocator ball_;
 };
 
 class ADTree3
 {
  public:
-    ADTree3(const Point2d& acmin, const Point2d& acmax);
+    ADTree3(const Point2d& cmin, const Point2d& cmax);
     ~ADTree3();
 
-    void Insert(const Point2d& p, PointIndex pi);
-    void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const;
-    void DeleteElement(PointIndex pi);
-    void PrintRec(std::ostream& ost, const ADTreeNode3* node) const;
+    void Insert(const Point2d& p, GenericIndex pi);
+    void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<GenericIndex>& pis) const;
+    void DeleteElement(GenericIndex pi);
 
  protected:
-    ADTreeNode3* root;
-    double cmin[2], cmax[2];
-    std::vector<ADTreeNode3*> ela;
+    ADTreeNode3* root_;
+    Point2d cmin_;
+    Point2d cmax_;
+    std::vector<ADTreeNode3*> nodes_;
 };
 
 class ADTreeNode6
 {
  public:
-    ADTreeNode6* left, * right, * father;
-    double sep_;
-    Point2d pmin_, pmax_;
-    PointIndex pi_;
-    int nchilds;
+    ADTreeNode6()
+        : left_{nullptr}, right_{nullptr}, pi_{CONST<GenericIndex>::undefined} { }
 
-    ADTreeNode6();
     void DeleteChilds();
-    void SetData(const Point2d& pmin, const Point2d& pmax, PointIndex pi);
+    void SetData(const Point2d& pmin, const Point2d& pmax, GenericIndex pi);
 
     friend class ADTree6;
 
-    static BlockAllocator ball;
     void* operator new(size_t);
     void operator delete(void* p);
+
+ protected:
+    ADTreeNode6* left_;
+    ADTreeNode6* right_;
+    double sep_;
+    Point2d pmin_, pmax_;
+    GenericIndex pi_;
+
+    static BlockAllocator ball_;
 };
 
 class ADTree6
@@ -80,17 +90,17 @@ class ADTree6
     ADTree6(const Point2d& pmin, const Point2d& pmax);
     ~ADTree6();
 
-    void Insert(const Point2d& bmin, const Point2d& bmax, PointIndex pi);
+    void Insert(const Point2d& bmin, const Point2d& bmax, GenericIndex pi);
     void GetIntersecting(const Point2d& bmin, const Point2d& bmax,
                          const Point2d& pmin, const Point2d& pmax,
-                         std::vector<size_t>& pis) const;
-    void DeleteElement(PointIndex pi);
+                         std::vector<GenericIndex>& pis) const;
+    void DeleteElement(GenericIndex pi);
 
  protected:
-    ADTreeNode6* root;
+    ADTreeNode6* root_;
     Point2d pmin_;
     Point2d pmax_;
-    std::vector<ADTreeNode6*> ela;
+    std::vector<ADTreeNode6*> nodes_;
 };
 
 class Point3dTree
@@ -100,11 +110,11 @@ class Point3dTree
     ~Point3dTree();
 
     void Insert(const Point2d& p, PointIndex pi);
-    void DeleteElement(PointIndex pi) { tree->DeleteElement(pi); }
-    void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const;
+    void DeleteElement(PointIndex pi) { tree_->DeleteElement(pi); }
+    void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<PointIndex>& pis) const;
 
  protected:
-    ADTree3* tree;
+    ADTree3* tree_;
 };
 
 class Box3dTree
@@ -113,13 +123,13 @@ class Box3dTree
     Box3dTree(const Point2d& apmin, const Point2d& apmax);
     ~Box3dTree();
 
-    void Insert(const Point2d& bmin, const Point2d& bmax, PointIndex pi);
-    void DeleteElement(PointIndex pi) { tree->DeleteElement(pi); }
-    void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const;
+    void Insert(const Point2d& bmin, const Point2d& bmax, GenericIndex pi);
+    void DeleteElement(GenericIndex pi) { tree_->DeleteElement(pi); }
+    void GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<GenericIndex>& pis) const;
 
  protected:
-    ADTree6* tree;
-    Point2d boxpmin, boxpmax;
+    ADTree6* tree_;
+    Point2d box_pmin_, box_pmax_;
 };
 
 }  // namespace meshit

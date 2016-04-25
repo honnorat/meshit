@@ -563,7 +563,7 @@ int Mesh::CheckOverlappingBoundary()
     Point2d pmin, pmax;
     GetBox(pmin, pmax);
     Box3dTree setree(pmin, pmax);
-    std::vector<size_t> inters;
+    std::vector<GenericIndex> inters;
 
     bool overlap = false;
 

@@ -63,8 +63,8 @@ class netrule
 
     int ConvexFreeZone() const;
 
-    int GetPointNr1(size_t ln) const { return lines[ln].I1() - 1; }
-    int GetPointNr2(size_t ln) const { return lines[ln].I2() - 1; }
+    INDEX GetPointNr1(size_t ln) const { return lines[ln].I1(); }
+    INDEX GetPointNr2(size_t ln) const { return lines[ln].I2(); }
 
     void LoadRule(std::istream& ist);
 

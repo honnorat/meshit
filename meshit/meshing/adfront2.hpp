@@ -21,6 +21,8 @@
  */
 namespace meshit {
 
+typedef uint32_t FrontLineIndex;
+
 class FrontPoint2
 {
  public:
@@ -30,7 +32,7 @@ class FrontPoint2
 
     const Point2d& P() const { return point_; }
     operator const Point2d&() const { return point_; }
-    int FrontNr() const { return frontnr; }
+    uint32_t FrontNr() const { return frontnr; }
     PointIndex GlobalIndex() const { return global_index_; }
 
     void AddLine() { nlinetopoint++; }
@@ -42,43 +44,43 @@ class FrontPoint2
     }
 
     bool Valid() const { return nlinetopoint >= 0; }
-    void DecFrontNr(int afrontnr) { frontnr = std::min(frontnr, afrontnr); }
+    void DecFrontNr(uint32_t afrontnr) { frontnr = std::min(frontnr, afrontnr); }
 
  protected:
     Point2d point_;            // coordinates
     PointIndex global_index_;  // global node index
     int nlinetopoint;          // number of front lines connected to point
-    int frontnr;               // distance to original boundary
+    uint32_t frontnr;               // distance to original boundary
 };
 
 class FrontLine
 {
  public:
     FrontLine()
-        : lineclass{1} { }
+        : line_class_{1} { }
 
-    explicit FrontLine(const INDEX_2& al)
-        : l{al}, lineclass{1} { }
+    FrontLine(PointIndex pi1, PointIndex pi2)
+        : indices_{static_cast<INDEX>(pi1), static_cast<INDEX>(pi2)}, line_class_{1} { }
 
-    const INDEX_2& L() const { return l; }
-    int LineClass() const { return lineclass; }
+    const INDEX_2& L() const { return indices_; }
+    uint32_t LineClass() const { return line_class_; }
 
-    void IncrementClass() { lineclass++; }
+    void IncrementClass() { line_class_++; }
 
-    bool Valid() const { return l.I1() != -1; }
+    bool Valid() const { return indices_.I1() != CONST<INDEX>::undefined; }
 
     void Invalidate()
     {
-        l.I1() = -1;
-        l.I2() = -1;
-        lineclass = 1000;
+        indices_.I1() = CONST<INDEX>::undefined;
+        indices_.I2() = CONST<INDEX>::undefined;
+        line_class_ = 1000;
     }
 
     friend class AdFront2;
 
  private:
-    INDEX_2 l;      // Point Indizes
-    int lineclass;  // quality class
+    INDEX_2 indices_;      // Point Indizes
+    uint32_t line_class_;  // quality class
 };
 
 class AdFront2
@@ -91,20 +93,20 @@ class AdFront2
     bool Empty() const { return nfl == 0; }
     size_t GetNFL() const { return nfl; }
 
-    int SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass);
+    FrontLineIndex SelectBaseLine(Point2d& p1, Point2d& p2, uint32_t& qualclass);
 
-    void GetLocals(int baseline, std::vector<Point2d>& locpoints,
+    void GetLocals(FrontLineIndex baseline, std::vector<Point2d>& locpoints,
                    std::vector<INDEX_2>& loclines,  // local index
-                   std::vector<int>& pindex, std::vector<int>& lindex, double xh);
+                   std::vector<int>& pindex, std::vector<FrontLineIndex>& lindex, double xh);
 
-    void DeleteLine(int li);
+    void DeleteLine(FrontLineIndex li);
 
     int AddPoint(const Point2d& p, PointIndex globind);
     int AddLine(PointIndex pi1, PointIndex pi2);
 
     bool LineExists(PointIndex gpi1, PointIndex gpi2);
 
-    void IncrementClass(int li) { lines[li].IncrementClass(); }
+    void IncrementClass(FrontLineIndex li) { lines[li].IncrementClass(); }
 
     PointIndex GetGlobalIndex(PointIndex pi) const { return points[pi].GlobalIndex(); }
 
@@ -120,19 +122,19 @@ class AdFront2
     Point3dTree pointsearchtree;   // search tree for points
     Point3dTree cpointsearchtree;  // search tree for cone points (not used ???)
 
-    std::vector<PointIndex> delpointl;  // list of deleted front points
-    std::vector<int> dellinel;          // list of deleted front lines
+    std::vector<PointIndex> delpointl;     // list of deleted front points
+    std::vector<FrontLineIndex> dellinel;  // list of deleted front lines
 
-    std::vector<size_t> nearlines;
-    std::vector<size_t> nearpoints;
+    std::vector<PointIndex> nearpoints;
+    std::vector<FrontLineIndex> nearlines;
 
     size_t nfl;                        // number of front lines;
     INDEX_2_map<uint8_t> all_flines_;  // all front lines ever have been
 
     std::vector<int> invpindex;
 
-    int minval;
-    size_t starti;
+    uint32_t minval;
+    FrontLineIndex starti;
 };
 
 }  // namespace meshit

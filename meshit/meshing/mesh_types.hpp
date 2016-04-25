@@ -21,10 +21,11 @@ enum PointType
 };
 typedef PointType point_type_t;
 
-typedef uint32_t PointIndex;
-typedef uint32_t EdgeIndex;
-typedef uint32_t ElementIndex;
-typedef uint32_t DomainIndex;
+typedef uint32_t GenericIndex;
+typedef GenericIndex PointIndex;
+typedef GenericIndex EdgeIndex;
+typedef GenericIndex ElementIndex;
+typedef GenericIndex DomainIndex;
 
 template<typename T>
 struct CONST
@@ -168,7 +169,7 @@ class MeshingParameters
     double minh;              // minimal mesh size
     double curvature_safety;  // safty factor for curvatures (elemetns per radius)
     int segments_per_edge;    // minimal number of segments per edge
-    int giveup_tol2d;         // give up quality class
+    uint32_t giveup_tol2d;    // give up quality class
 
     int n_steps;
 };

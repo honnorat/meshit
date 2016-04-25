@@ -36,7 +36,6 @@ void netrule::LoadRule(std::istream& ist)
     char buf[256];
     char ch;
     Point2d p;
-    INDEX_2 lin;
     DenseMatrix tempoldutonewu(20, 20);
     DenseMatrix tempoldutofreearea(20, 20);
     DenseMatrix tempoldutofreearealimit(20, 20);
@@ -90,11 +89,13 @@ void netrule::LoadRule(std::istream& ist)
         } else if (strcmp(buf, "maplines") == 0) {
             ist >> ch;
             while (ch == '(') {
-                ist >> lin.I1() >> ch;  // ','
-                ist >> lin.I2() >> ch;  // ')'
-
-                lines.push_back(lin);
-                linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
+                INDEX li1, li2;
+                ist >> li1 >> ch;  // ','
+                ist >> li2 >> ch;  // ')'
+                li1--;  // indices are stored 0-based
+                li2--;
+                lines.push_back(INDEX_2(li1, li2));
+                linevecs.push_back(points[li2] - points[li1]);
                 linetolerances.push_back({0.0, 0.0, 0.0});
                 noldl++;
 
@@ -135,10 +136,13 @@ void netrule::LoadRule(std::istream& ist)
         } else if (strcmp(buf, "newlines") == 0) {
             ist >> ch;
             while (ch == '(') {
-                ist >> lin.I1() >> ch;  // ','
-                ist >> lin.I2() >> ch;  // ')'
-                lines.push_back(lin);
-                linevecs.push_back(points[lin.I2() - 1] - points[lin.I1() - 1]);
+                INDEX li1, li2;
+                ist >> li1 >> ch;  // ','
+                ist >> li2 >> ch;  // ')'
+                li1--;  // indices are stored 0-based
+                li2--;
+                lines.push_back(INDEX_2(li1, li2));
+                linevecs.push_back(points[li2] - points[li1]);
                 ist >> ch;
                 while (ch != ';') {
                     ist >> ch;
@@ -261,15 +265,15 @@ void netrule::LoadRule(std::istream& ist)
 
     std::vector<uint32_t> pnearness(noldp, 1000);
 
-    pnearness[lines[0].I1() - 1] = 0;
-    pnearness[lines[0].I2() - 1] = 0;
+    pnearness[lines[0].I1()] = 0;
+    pnearness[lines[0].I2()] = 0;
 
     bool ok;
     do {
         ok = true;
         for (size_t i = 0; i < noldl; i++) {
-            INDEX idx1 = lines[i].I1() - 1;
-            INDEX idx2 = lines[i].I2() - 1;
+            INDEX idx1 = lines[i].I1();
+            INDEX idx2 = lines[i].I2();
             uint32_t minn = 1000;
             minn = std::min(minn, pnearness[idx1]);
             minn = std::min(minn, pnearness[idx2]);
@@ -286,7 +290,7 @@ void netrule::LoadRule(std::istream& ist)
 
     lnearness.resize(noldl);
     for (size_t i = 0; i < noldl; i++) {
-        lnearness[i] = pnearness[lines[i].I1() - 1] + pnearness[lines[i].I2() - 1];
+        lnearness[i] = pnearness[lines[i].I1()] + pnearness[lines[i].I2()];
     }
 
     freezone_i.resize(10);

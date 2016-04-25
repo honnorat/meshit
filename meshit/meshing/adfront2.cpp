@@ -55,7 +55,7 @@ int AdFront2::AddPoint(const Point2d& p, PointIndex globind)
 
 int AdFront2::AddLine(PointIndex pi1, PointIndex pi2)
 {
-    int minfn;
+    uint32_t minfn;
     int li;
 
     FrontPoint2& p1 = points[pi1];
@@ -71,12 +71,12 @@ int AdFront2::AddLine(PointIndex pi1, PointIndex pi2)
     p2.DecFrontNr(minfn + 1);
 
     if (dellinel.size() != 0) {
-        li = dellinel[dellinel.size() - 1];
+        li = dellinel.back();
         dellinel.pop_back();
-        lines[li] = FrontLine(INDEX_2(pi1, pi2));
+        lines[li] = FrontLine(pi1, pi2);
     } else {
-        lines.push_back(FrontLine(INDEX_2(pi1, pi2)));
-        li = lines.size() - 1;
+        li = lines.size();
+        lines.push_back(FrontLine(pi1, pi2));
     }
 
     Box2d lbox;
@@ -94,7 +94,7 @@ int AdFront2::AddLine(PointIndex pi1, PointIndex pi2)
     return li;
 }
 
-void AdFront2::DeleteLine(int li)
+void AdFront2::DeleteLine(FrontLineIndex li)
 {
     assert(nfl > 0);
     nfl--;
@@ -118,7 +118,6 @@ void AdFront2::DeleteLine(int li)
 
     lines[li].Invalidate();
     linesearchtree.DeleteElement(li);
-
     dellinel.push_back(li);
 }
 
@@ -132,38 +131,39 @@ bool AdFront2::LineExists(PointIndex pi1, PointIndex pi2)
     }
 }
 
-int AdFront2::SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass)
+FrontLineIndex AdFront2::SelectBaseLine(Point2d& p1, Point2d& p2, uint32_t& qualclass)
 {
-    int baselineindex = -1;
+    FrontLineIndex baselineindex = CONST<FrontLineIndex>::undefined;
 
-    for (size_t i = starti; i < lines.size(); i++) {
+    for (size_t i = static_cast<size_t>(starti); i < lines.size(); i++) {
         if (lines[i].Valid()) {
-            int hi = lines[i].LineClass() +
-                     points[lines[i].L().I1()].FrontNr() +
-                     points[lines[i].L().I2()].FrontNr();
+            uint32_t hi = lines[i].LineClass() +
+                          points[lines[i].L().I1()].FrontNr() +
+                          points[lines[i].L().I2()].FrontNr();
 
             if (hi <= minval) {
                 minval = hi;
-                baselineindex = i;
+                baselineindex = static_cast<FrontLineIndex>(i);
                 break;
             }
         }
     }
-    if (baselineindex == -1) {
+    if (baselineindex == CONST<FrontLineIndex>::undefined) {
         minval = INT_MAX;
         for (size_t i = 0; i < lines.size(); i++) {
             if (lines[i].Valid()) {
-                int hi = lines[i].LineClass() + points[lines[i].L().I1()].FrontNr() +
-                         points[lines[i].L().I2()].FrontNr();
+                uint32_t hi = lines[i].LineClass() +
+                              points[lines[i].L().I1()].FrontNr() +
+                              points[lines[i].L().I2()].FrontNr();
 
                 if (hi < minval) {
                     minval = hi;
-                    baselineindex = i;
+                    baselineindex = static_cast<FrontLineIndex>(i);
                 }
             }
         }
     }
-    starti = static_cast<size_t>(baselineindex + 1);
+    starti = baselineindex + 1;
 
     p1 = points[lines[baselineindex].L().I1()].P();
     p2 = points[lines[baselineindex].L().I2()].P();
@@ -172,13 +172,13 @@ int AdFront2::SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass)
     return baselineindex;
 }
 
-void AdFront2::GetLocals(int baselineindex,
+void AdFront2::GetLocals(FrontLineIndex baselineindex,
                          std::vector<Point2d>& locpoints,
                          std::vector<INDEX_2>& loclines,  // local index
                          std::vector<INDEX>& pindex,
-                         std::vector<INDEX>& lindex, double xh)
+                         std::vector<FrontLineIndex>& lindex, double xh)
 {
-    int pstind = lines[baselineindex].L().I1();
+    PointIndex pstind = lines[baselineindex].L().I1();
     Point2d p0 = points[pstind].P();
 
     loclines.push_back(lines[baselineindex].L());
@@ -191,10 +191,10 @@ void AdFront2::GetLocals(int baselineindex,
     pointsearchtree.GetIntersecting(pmin, pmax, nearpoints);
 
     for (size_t ii = 0; ii < nearlines.size(); ii++) {
-        size_t i = nearlines[ii];
-        if (lines[i].Valid() && i != static_cast<size_t>(baselineindex)) {
-            loclines.push_back(lines[i].L());
-            lindex.push_back(i);
+        FrontLineIndex fli = nearlines[ii];
+        if (lines[fli].Valid() && fli != baselineindex) {
+            loclines.push_back(lines[fli].L());
+            lindex.push_back(fli);
         }
     }
 

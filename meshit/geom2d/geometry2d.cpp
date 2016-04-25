@@ -344,7 +344,7 @@ void SplineSegmenter::Partition(const SplineSeg& spline)
     std::vector<double> curve_points;
     CalcPartition(spline, curve_points);
 
-    std::vector<size_t> loc_search;
+    std::vector<PointIndex> loc_search;
     Point2d p_old = spline.GetPoint(0);
     Point2d mark_old = p_old;
     double l_old = 0.0;

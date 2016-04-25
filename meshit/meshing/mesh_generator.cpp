@@ -67,7 +67,8 @@ void MeshGenerator::TransformFromPlain(Point2d& plainpoint, Point2d& locpoint, d
 
 bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainIndex facenr)
 {
-    std::vector<int> pindex, lindex;
+    std::vector<int> pindex;
+    std::vector<FrontLineIndex> lindex;
     std::vector<int> delpoints;
     std::vector<uint32_t> dellines;
     std::vector<Element2d> locelements;
@@ -75,8 +76,9 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
     std::vector<int> legalpoints;
     std::vector<Point2d> plainpoints;
     std::vector<INDEX_2> loclines;
-    int trials = 0, nfaces = 0;
-    int qualclass;
+    uint32_t trials = 0;
+    uint32_t plot_next_trial = 999;
+    uint32_t qualclass;
 
     std::vector<int> elements_on_node(mesh_.GetNbPoints(), 0);
     std::vector<bool> illegal_point(mesh_.GetNbPoints(), false);
@@ -90,7 +92,6 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
 
     adfront->SetStartFront();
 
-    int plotnexttrial = 999;
 
     double meshedarea_before = meshed_area;
 
@@ -104,20 +105,17 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
         locelements.clear();
 
         // plot statistics
-        if (trials > plotnexttrial) {
+        if (++trials > plot_next_trial) {
             MESHIT_LOG_DEBUG_CONT("Trial #" << trials << " : ");
-            MESHIT_LOG_DEBUG(nfaces << " faces, " << mesh_.GetNbElements() << " elements.");
+            MESHIT_LOG_DEBUG(adfront->GetNFL() << " faces, " << mesh_.GetNbElements() << " elements.");
             for (size_t i = 0; i < canuse.size(); i++) {
                 MESHIT_LOG_DEBUG("  map:" << std::setw(4) << foundmap[i] <<
                                  " / can:" << std::setw(4) << canuse[i] <<
                                  " / use:" << std::setw(4) << ruleused[i] <<
                                  " rule " << rules[i]->Name());
             }
-            plotnexttrial += 1000;
+            plot_next_trial += 1000;
         }
-
-        nfaces = adfront->GetNFL();
-        trials++;
 
         Point2d p1, p2;
         int baselineindex = adfront->SelectBaseLine(p1, p2, qualclass);
@@ -210,7 +208,8 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
             double minh = 1e8;
             double newedgemaxh = 0;
             for (size_t i = oldnl; i < loclines.size(); i++) {
-                double eh = Dist(locpoints[loclines[i].I1() - 1], locpoints[loclines[i].I2() - 1]);
+                double eh = Dist(locpoints[loclines[i].I1() - 1],
+                                 locpoints[loclines[i].I2() - 1]);
                 if (eh > newedgemaxh) newedgemaxh = eh;
             }
 
