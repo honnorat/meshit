@@ -148,7 +148,7 @@ void SplineGeometry::LoadData(std::istream& infile)
                 geompoints[point_ids[i] - 1] = points[i];
             }
         } else if (keyword == "segments") {
-            int i = 1;
+            EdgeIndex edge_idx = 1;
             while (!isalpha(static_cast<int>(ch))) {
                 int dom_left, dom_right;
                 infile >> dom_left >> dom_right;
@@ -182,7 +182,7 @@ void SplineGeometry::LoadData(std::istream& infile)
                 ch = TestComment(infile);
 
                 spline->SetDomains(dom_left, dom_right);
-                spline->SetID(flags.GetIntFlag("id", ++i));
+                spline->SetID(flags.GetIntFlag("id", ++edge_idx));
                 spline->SetHRef(flags.GetNumFlag("maxh", 1e99), flags.GetNumFlag("ref", 1));
                 splines.push_back(spline);
             }

@@ -5,17 +5,15 @@
 
 namespace meshit {
 
-constexpr PointIndex MeshPoint::undefined;
-constexpr ElementIndex Element2d::undefined;
-constexpr DomainIndex FaceDescriptor::undefined;
+template<typename T> constexpr T CONST<T>::undefined;
 
 Segment::Segment()
 {
-    pnums[0] = MeshPoint::undefined;
-    pnums[1] = MeshPoint::undefined;
-    edge_id = -1;
-    face_left = FaceDescriptor::undefined;
-    face_right = FaceDescriptor::undefined;
+    pnums[0] = CONST<PointIndex>::undefined;
+    pnums[1] = CONST<PointIndex>::undefined;
+    edge_id = CONST<EdgeIndex>::undefined;
+    face_left = CONST<DomainIndex>::undefined;
+    face_right = CONST<DomainIndex>::undefined;
 }
 
 Segment::Segment(const Segment& other)
@@ -41,8 +39,10 @@ Segment& Segment::operator=(const Segment& other)
 
 std::ostream& operator<<(std::ostream& s, const Segment& seg)
 {
-    s << seg[0] << " - " << seg[1] << " domin = " << seg.face_left << ", domout = " << seg.face_right
-    << " si = " << seg.edge_id;
+    s << seg[0] << " - " << seg[1];
+    s << " domin = " << seg.face_left << ",";
+    s << " domout = " << seg.face_right;
+    s << " si = " << seg.edge_id;
     return s;
 }
 

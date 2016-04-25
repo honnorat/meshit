@@ -105,7 +105,7 @@ void MeshOptimize::EdgeSwapping(DomainIndex face_index, bool use_metric, double 
         ElementIndex el_idx = seia[i];
         Neighbour& neighb = neighbors[el_idx];
         for (size_t j = 0; j < 3; j++) {
-            neighb.SetNeighborIndex(j, Element2d::undefined);
+            neighb.SetNeighborIndex(j, CONST<ElementIndex>::undefined);
             neighb.SetOrientation(j, 0);
         }
     }
@@ -154,7 +154,7 @@ void MeshOptimize::EdgeSwapping(DomainIndex face_index, bool use_metric, double 
                 ElementIndex t2 = neighbors[t1].GetNeighborIndex(o1);
                 size_t o2 = neighbors[t1].GetOrientation(o1);
 
-                if (t2 == Element2d::undefined) continue;
+                if (t2 == CONST<ElementIndex>::undefined) continue;
                 if (swapped[t1] || swapped[t2]) continue;
 
                 PointIndex pi1 = mesh_.Element(t1).PointID((o1 + 1) % 3);

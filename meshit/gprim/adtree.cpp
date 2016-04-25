@@ -131,7 +131,7 @@ void ADTree3::DeleteElement(PointIndex pi)
 {
     ADTreeNode3* node = ela[pi];
 
-    node->pi = MeshPoint::undefined;
+    node->pi = CONST<PointIndex>::undefined;
 
     node = node->father;
     while (node) {
@@ -197,7 +197,7 @@ void ADTree3::PrintRec(std::ostream& ost, const ADTreeNode3* node) const
 
 ADTreeNode6::ADTreeNode6()
 {
-    pi_ = MeshPoint::undefined;
+    pi_ = CONST<PointIndex>::undefined;
 
     left = nullptr;
     right = nullptr;
@@ -265,7 +265,7 @@ void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, PointIndex pi)
     while (next) {
         node = next;
 
-        if (node->pi_ == MeshPoint::undefined) {
+        if (node->pi_ == CONST<PointIndex>::undefined) {
             node->SetData(bmin_, bmax_, pi);
 
             if (pi >= ela.size()) {
@@ -315,7 +315,7 @@ void ADTree6::DeleteElement(PointIndex pi)
 {
     ADTreeNode6* node = ela[pi];
 
-    node->pi_ = MeshPoint::undefined;
+    node->pi_ = CONST<PointIndex>::undefined;
 
     node = node->father;
     while (node) {
@@ -346,7 +346,7 @@ void ADTree6::GetIntersecting(const Point2d& bmin, const Point2d& bmax,
     while (stacks) {
         stacks--;
         ADTreeNode6* node = stack[stacks].node;
-        if (node->pi_ != MeshPoint::undefined &&
+        if (node->pi_ != CONST<PointIndex>::undefined &&
             !(node->pmin_.X() > pmax.X() || node->pmax_.X() < pmin.X() ||
               node->pmin_.Y() > pmax.Y() || node->pmax_.Y() < pmin.Y())) {
             pis.push_back(node->pi_);

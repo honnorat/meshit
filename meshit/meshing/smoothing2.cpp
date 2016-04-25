@@ -221,14 +221,14 @@ void MeshOptimize::ImproveMesh(DomainIndex faceindex, double metric_weight)
     std::vector<PointIndex> icompress;
     for (size_t i = 0; i < seia.size(); i++) {
         const Element2d& el = mesh_.Element(seia[i]);
-        compress[el.PointID(0)] = MeshPoint::undefined;
-        compress[el.PointID(1)] = MeshPoint::undefined;
-        compress[el.PointID(2)] = MeshPoint::undefined;
+        compress[el.PointID(0)] = CONST<PointIndex>::undefined;
+        compress[el.PointID(1)] = CONST<PointIndex>::undefined;
+        compress[el.PointID(2)] = CONST<PointIndex>::undefined;
     }
     for (size_t i = 0; i < seia.size(); i++) {
         const Element2d& el = mesh_.Element(seia[i]);
         for (size_t j = 0; j < 3; j++) {
-            if (compress[el.PointID(j)] == MeshPoint::undefined) {
+            if (compress[el.PointID(j)] == CONST<PointIndex>::undefined) {
                 compress[el.PointID(j)] = icompress.size();
                 icompress.push_back(el.PointID(j));
             }

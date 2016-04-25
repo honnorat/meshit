@@ -68,8 +68,8 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
     // Build mesh faces
     size_t nb_faces = 0;
     for (size_t si = 0; si < segments.size(); si++) {
-        if ((segments[si].face_left == MeshPoint::undefined) ||
-            (segments[si].face_right == MeshPoint::undefined)) {
+        if ((segments[si].face_left == CONST<PointIndex>::undefined) ||
+            (segments[si].face_right == CONST<PointIndex>::undefined)) {
             throw std::runtime_error("Segment " + std::to_string(si) + " is adjacent to an undefined domain !");
         }
         nb_faces = std::max(nb_faces, static_cast<size_t>(segments[si].face_left));
@@ -100,7 +100,8 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
             mesher.Reset();
         }
 
-        std::vector<PointIndex> compress(np_bdy, MeshPoint::undefined);
+        constexpr PointIndex undef_pid = CONST<PointIndex>::undefined;
+        std::vector<PointIndex> compress(np_bdy, undef_pid);
         PointIndex cnt = 0;
         for (size_t pi = 0; pi < np_bdy; pi++) {
             mesher.AddPoint(Point2d(points[pi]), pi);
@@ -166,13 +167,13 @@ void Mesh::AddElement(const Element2d& el)
     size_t si = elements.size();
     elements.push_back(el);
 
-    if (el.face_id > faces.size()) {
-        MESHIT_LOG_ERROR("has no faces: fd.size = " << faces.size() << ", ind = " << el.face_id);
+    if (el.face_id_ > faces.size()) {
+        MESHIT_LOG_ERROR("has no faces: fd.size = " << faces.size() << ", ind = " << el.face_id_);
     }
 
     Element2d& bref = elements.back();
-    FaceDescriptor& faceref = faces[bref.face_id - 1];
-    bref.next = faceref.first_element;
+    FaceDescriptor& faceref = faces[bref.face_id_ - 1];
+    bref.next_ = faceref.first_element;
     faceref.first_element = si;
 
     if (surfarea.Valid()) {
@@ -497,7 +498,7 @@ void Mesh::Compress()
         }
     }
     for (size_t i = 0; i < segments.size(); i++) {
-        if (segments[i][0] == MeshPoint::undefined) {
+        if (segments[i][0] == CONST<PointIndex>::undefined) {
             segments.erase(segments.begin() + i);
             i--;
         }
@@ -522,7 +523,7 @@ void Mesh::Compress()
             op2np[pi] = npi++;
             hpoints.push_back(points[pi]);
         } else {
-            op2np[pi] = MeshPoint::undefined;
+            op2np[pi] = CONST<PointIndex>::undefined;
         }
     }
 
@@ -544,13 +545,13 @@ void Mesh::Compress()
         seg[1] = op2np[seg[1]];
     }
     for (size_t i = 0; i < faces.size(); i++) {
-        faces[i].first_element = Element2d::undefined;
+        faces[i].first_element = CONST<ElementIndex>::undefined;
     }
 
     for (size_t i = 0; i < elements.size(); i++) {
         size_t idx = elements.size() - i - 1;
         DomainIndex ind = elements[idx].FaceID() - 1;
-        elements[idx].next = faces[ind].first_element;
+        elements[idx].next_ = faces[ind].first_element;
         faces[ind].first_element = idx;
     }
 
@@ -633,12 +634,12 @@ int Mesh::CheckOverlappingBoundary()
 void Mesh::RebuildSurfaceElementLists()
 {
     for (size_t i = 0; i < faces.size(); i++) {
-        faces[i].first_element = Element2d::undefined;
+        faces[i].first_element = CONST<ElementIndex>::undefined;
     }
     for (size_t i = 0; i < elements.size(); i++) {
         size_t idx = elements.size() - i - 1;
         DomainIndex ind = elements[idx].FaceID() - 1;
-        elements[idx].next = faces[ind].first_element;
+        elements[idx].next_ = faces[ind].first_element;
         faces[ind].first_element = idx;
     }
 }
@@ -648,12 +649,12 @@ void Mesh::GetElementsOfFace(DomainIndex facenr, std::vector<ElementIndex>& sei)
     sei.clear();
 
     ElementIndex si = faces[facenr - 1].first_element;
-    while (si != Element2d::undefined) {
+    while (si != CONST<ElementIndex>::undefined) {
         const Element2d& se = Element(si);
-        if (se.FaceID() == facenr && se.PointID(0) != MeshPoint::undefined && !se.IsDeleted()) {
+        if (se.FaceID() == facenr && se.PointID(0) != CONST<PointIndex>::undefined && !se.IsDeleted()) {
             sei.push_back(si);
         }
-        si = se.next;
+        si = se.next_;
     }
 }
 

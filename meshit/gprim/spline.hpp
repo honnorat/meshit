@@ -68,8 +68,8 @@ class SplineSeg
         return fabs(first.X() * second.Y() - first.Y() * second.X()) / (fl * fl * fl);
     }
 
-    int GetID() const { return id_; }
-    void SetID(int id) { id_ = id; }
+    EdgeIndex GetID() const { return id_; }
+    void SetID(EdgeIndex id) { id_ = id; }
 
     void SetDomains(DomainIndex left, DomainIndex right)
     {
@@ -88,7 +88,7 @@ class SplineSeg
     DomainIndex dom_right;  // right domain
     double ref_fac_;        // refinement at line
     double hmax_;           // maximal h
-    int id_;                // spline index number
+    EdgeIndex id_;          // spline index number
 };
 
 // Straight line form p1 to p2

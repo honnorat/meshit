@@ -22,17 +22,21 @@ enum PointType
 typedef PointType point_type_t;
 
 typedef uint32_t PointIndex;
+typedef uint32_t EdgeIndex;
 typedef uint32_t ElementIndex;
 typedef uint32_t DomainIndex;
+
+template<typename T>
+struct CONST
+{
+    static constexpr T undefined = static_cast<T>(-1);
+};
 
 /**
    Point in the mesh.
  */
 class MeshPoint : public Point2d
 {
- public:
-    static constexpr PointIndex undefined = static_cast<PointIndex>(-1);
-
  public:
     MeshPoint() { }
 
@@ -55,41 +59,40 @@ class MeshPoint : public Point2d
 class Element2d
 {
  public:
-    static constexpr ElementIndex undefined = static_cast<ElementIndex>(-1);
-
- public:
     Element2d()
-        : pnum{undefined, undefined, undefined}, face_id{0}, deleted{false} { }
+        : point_ids_{undef_pid, undef_pid, undef_pid}, face_id_{0}, deleted_{false} { }
 
-    PointIndex& operator[](size_t i) { return pnum[i]; }
-    const PointIndex& operator[](size_t i) const { return pnum[i]; }
+    PointIndex& operator[](size_t i) { return point_ids_[i]; }
+    const PointIndex& operator[](size_t i) const { return point_ids_[i]; }
 
-    PointIndex& PointID(size_t i) { return pnum[i]; }
-    const PointIndex& PointID(size_t i) const { return pnum[i]; }
+    PointIndex& PointID(size_t i) { return point_ids_[i]; }
+    const PointIndex& PointID(size_t i) const { return point_ids_[i]; }
 
-    void SetFaceID(DomainIndex fid) { face_id = fid; }
-    DomainIndex FaceID() const { return face_id; }
+    void SetFaceID(DomainIndex fid) { face_id_ = fid; }
+    DomainIndex FaceID() const { return face_id_; }
 
-    void Invert() { std::swap(pnum[1], pnum[2]); }  // invert orientation
+    void Invert() { std::swap(point_ids_[1], point_ids_[2]); }  // invert orientation
     void NormalizeNumbering();
 
     friend class Mesh;
 
     void Delete()
     {
-        deleted = true;
-        pnum[0] = pnum[1] = pnum[2] = Element2d::undefined;
+        deleted_ = true;
+        point_ids_[0] = point_ids_[1] = point_ids_[2] = undef_pid;
     }
 
-    bool IsDeleted() const { return deleted; }
+    bool IsDeleted() const { return deleted_; }
 
     bool operator==(const Element2d& el2) const;
 
  protected:
-    PointIndex pnum[3];
-    DomainIndex face_id;
-    ElementIndex next;  // a linked list for all segments in the same face
-    bool deleted;              // element is deleted
+    static constexpr PointIndex undef_pid = CONST<PointIndex>::undefined;
+
+    PointIndex point_ids_[3];
+    DomainIndex face_id_;
+    ElementIndex next_;  // a linked list for all segments in the same face
+    bool deleted_;              // element is deleted
 };
 
 std::ostream& operator<<(std::ostream& s, const Element2d& el);
@@ -107,7 +110,7 @@ class Segment
 
     PointIndex pnums[2];  // p1, p2
 
-    int edge_id;
+    EdgeIndex edge_id;
     DomainIndex face_left;   // domain number left side
     DomainIndex face_right;  // domain number right side
 
@@ -123,14 +126,13 @@ std::ostream& operator<<(std::ostream& s, const Segment& seg);
 class FaceDescriptor
 {
  public:
-    static constexpr DomainIndex undefined = static_cast<DomainIndex>(-1);
-
- public:
     FaceDescriptor()
-        : index_{undefined}, first_element{Element2d::undefined} { }
+        : index_{CONST<DomainIndex>::undefined},
+          first_element{CONST<ElementIndex>::undefined} { }
 
     explicit FaceDescriptor(DomainIndex face_index)
-        : index_{face_index}, first_element{Element2d::undefined} { }
+        : index_{face_index},
+          first_element{CONST<ElementIndex>::undefined} { }
 
     DomainIndex face_id() const { return index_; }
 
@@ -173,19 +175,19 @@ class MeshingParameters
 
 inline void Element2d::NormalizeNumbering()
 {
-    if (pnum[0] < pnum[1] && pnum[0] < pnum[2]) {
+    if (point_ids_[0] < point_ids_[1] && point_ids_[0] < point_ids_[2]) {
         return;
     } else {
-        if (pnum[1] < pnum[2]) {
-            PointIndex pi1 = pnum[1];
-            pnum[1] = pnum[2];
-            pnum[2] = pnum[0];
-            pnum[0] = pi1;
+        if (point_ids_[1] < point_ids_[2]) {
+            PointIndex pi1 = point_ids_[1];
+            point_ids_[1] = point_ids_[2];
+            point_ids_[2] = point_ids_[0];
+            point_ids_[0] = pi1;
         } else {
-            PointIndex pi1 = pnum[2];
-            pnum[2] = pnum[1];
-            pnum[1] = pnum[0];
-            pnum[0] = pi1;
+            PointIndex pi1 = point_ids_[2];
+            point_ids_[2] = point_ids_[1];
+            point_ids_[1] = point_ids_[0];
+            point_ids_[0] = pi1;
         }
     }
 }
