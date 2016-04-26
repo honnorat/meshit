@@ -1,139 +1,149 @@
-#ifndef FILE_SPLINE_HPP
-#define FILE_SPLINE_HPP
-
-/**************************************************************************/
-/* File:   spline.hpp                                                     */
-/* Author: Joachim Schoeberl                                              */
-/* Date:   24. Jul. 96                                                    */
-/**************************************************************************/
+#ifndef MESHIT_SPLINE_HPP
+#define MESHIT_SPLINE_HPP
+/**
+ * meshit - a 2d mesh generator
+ *
+ * Copyright © 1995-2015 Joachim Schoeberl <joachim.schoeberl@tuwien.ac.at>
+ * Copyright © 2015-2016 Marc Honnorat <marc.honnorat@gmail.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library in the file LICENSE.LGPL; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
+ */
 
 #define _USE_MATH_DEFINES 1
 
+#include <cmath>
 #include <iostream>
 #include <string>
-#include <cmath>
 
 #include "../linalg/vector.hpp"
-#include "geomobjects.hpp"
+#include "../meshing/mesh_class.hpp"
 #include "geom2d.hpp"
+#include "geomobjects.hpp"
 
-namespace meshit
+namespace meshit {
+
+/*
+  Spline curves for 2D mesh generation
+ */
+
+// Geometry point
+class GeomPoint : public Point2d
 {
-    /*
-      Spline curves for 2D mesh generation
-     */
+ public:
+    GeomPoint() { }
 
-    /// Geometry point
-    class GeomPoint : public Point2d
+    explicit GeomPoint(const Point2d& ap, double aref = 1, double ahmax = 1e99)
+        : Point2d{ap}, refatpoint{aref}, hmax{ahmax} { }
+
+ public:
+    double refatpoint;  // refinement factor at point
+    double hmax;        // max mesh-size at point
+};
+
+// base class for 2d-segment
+class SplineSeg
+{
+ public:
+    SplineSeg() { }
+
+    virtual ~SplineSeg() { }
+
+    virtual double Length() const;
+
+    // returns point at curve, 0 <= t <= 1
+    virtual Point2d GetPoint(double t) const = 0;
+
+    // returns a (not necessarily unit-length) tangent vector for 0 <= t <= 1
+    virtual void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const = 0;
+
+    virtual const GeomPoint& StartPI() const = 0;  // returns initial point on curve
+    virtual const GeomPoint& EndPI() const = 0;    // returns terminal point on curve
+
+    void GetPoints(size_t n, std::vector<Point2d>& points) const;
+
+    double CalcCurvature(double t) const
     {
-     public:
-        /// refinement factor at point
-        double refatpoint;
-        /// max mesh-size at point
-        double hmax;
+        Point2d point;
+        Vec2d first, second;
+        GetDerivatives(t, point, first, second);
+        double fl = first.Length();
+        return fabs(first.X() * second.Y() - first.Y() * second.X()) / (fl * fl * fl);
+    }
 
-        GeomPoint() { }
+    EdgeIndex GetID() const { return id_; }
+    void SetID(EdgeIndex id) { id_ = id; }
 
-        explicit GeomPoint(const Point2d& ap, double aref = 1, double ahmax = 1e99)
-            : Point2d{ap}, refatpoint{aref}, hmax{ahmax} { }
-    };
-
-
-    /// base class for 2d - segment
-
-    class SplineSeg
+    void SetDomains(DomainIndex left, DomainIndex right)
     {
-     public:
-        SplineSeg() { }
+        dom_left = left;
+        dom_right = right;
+    }
 
-        virtual ~SplineSeg() { }
-
-        virtual double Length() const;
-
-        /// returns point at curve, 0 <= t <= 1
-        virtual Point2d GetPoint(double t) const = 0;
-
-        /// returns a (not necessarily unit-length) tangent vector for 0 <= t <= 1
-        virtual void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const = 0;
-
-        /// returns initial point on curve
-        virtual const GeomPoint& StartPI() const = 0;
-        /// returns terminal point on curve
-        virtual const GeomPoint& EndPI() const = 0;
-
-        virtual void GetPoints(size_t n, std::vector<Point2d>& points) const;
-
-        double CalcCurvature(double t) const
-        {
-            Point2d point;
-            Vec2d first, second;
-            GetDerivatives(t, point, first, second);
-            double fl = first.Length();
-            return fabs(first.X() * second.Y() - first.Y() * second.X()) / (fl * fl * fl);
-        }
-
-     public:
-        size_t leftdom;     // left domain
-        size_t rightdom;    // right domain
-        double reffak;      // refinement at line
-        double hmax;        // maximal h
-        int bc;             // boundary condition number
-    };
-
-    /// Straight line form p1 to p2
-    class LineSeg : public SplineSeg
+    void SetHRef(double max_h, double ref_fac = 1.0)
     {
-     public:
-        LineSeg(const GeomPoint& ap1, const GeomPoint& ap2)
-            : p1(ap1), p2(ap2) { }
+        hmax_ = max_h;
+        ref_fac_ = ref_fac;
+    }
 
-        virtual double Length() const;
+ public:
+    DomainIndex dom_left;   // left domain
+    DomainIndex dom_right;  // right domain
+    double ref_fac_;        // refinement at line
+    double hmax_;           // maximal h
+    EdgeIndex id_;          // spline index number
+};
 
-        inline virtual Point2d GetPoint(double t) const;
+// Straight line form p1 to p2
+class LineSeg : public SplineSeg
+{
+ public:
+    LineSeg(const GeomPoint& ap1, const GeomPoint& ap2)
+        : p1(ap1), p2(ap2) { }
 
-        virtual void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const;
+    virtual double Length() const;
 
-        virtual const GeomPoint& StartPI() const
-        {
-            return p1;
-        };
+    Point2d GetPoint(double t) const override;
 
-        virtual const GeomPoint& EndPI() const
-        {
-            return p2;
-        }
+    void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const override;
 
-     protected:
-        GeomPoint p1, p2;
-    };
+    const GeomPoint& StartPI() const override { return p1; }
+    const GeomPoint& EndPI() const override { return p2; }
 
-    /// curve given by a rational, quadratic spline (including ellipses)
+ protected:
+    GeomPoint p1, p2;
+};
 
-    class SplineSeg3 : public SplineSeg
-    {
-     public:
-        SplineSeg3(const GeomPoint& ap1,
-                   const GeomPoint& ap2,
-                   const GeomPoint& ap3);
+/// curve given by a rational, quadratic spline (including ellipses)
 
-        inline virtual Point2d GetPoint(double t) const;
+class SplineSeg3 : public SplineSeg
+{
+ public:
+    SplineSeg3(const GeomPoint& ap1, const GeomPoint& ap2, const GeomPoint& ap3);
 
-        virtual void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const;
+    Point2d GetPoint(double t) const override;
 
-        virtual const GeomPoint& StartPI() const
-        {
-            return p1;
-        };
+    void GetDerivatives(const double t, Point2d& point, Vec2d& first, Vec2d& second) const override;
 
-        virtual const GeomPoint& EndPI() const
-        {
-            return p3;
-        }
+    const GeomPoint& StartPI() const override { return p1; }
+    const GeomPoint& EndPI() const override { return p3; }
 
-     protected:
-        GeomPoint p1, p2, p3;
-        double weight;
-    };
+ protected:
+    GeomPoint p1, p2, p3;
+    double weight;
+};
 
 }  // namespace meshit
 

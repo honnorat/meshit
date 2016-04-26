@@ -1,5 +1,3 @@
-#ifndef MESHIT_GEOMTEST_HPP
-#define MESHIT_GEOMTEST_HPP
 /**
  * meshit - a 2d mesh generator
  *
@@ -22,14 +20,20 @@
  * 02111-1307 USA
  */
 
-#include "geom3d.hpp"
-#include "geomobjects.hpp"
+#include "logging.hpp"
 
 namespace meshit {
 
-bool IntersectTriangleLine(const Point2d** tri, const Point2d** line);
-bool IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2);
+static int _meshit_logLevel = MESHIT_INFO_LOG_LEVEL;
+
+int GetLogLevel()
+{
+    return _meshit_logLevel;
+}
+
+void SetLogLevel(int logLevel)
+{
+    _meshit_logLevel = logLevel;
+}
 
 }  // namespace meshit
-
-#endif

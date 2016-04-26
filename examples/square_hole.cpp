@@ -1,6 +1,5 @@
 #include <meshit/geom2d/geometry2d.hpp>
-#include <meshit/meshing/meshclass.hpp>
-#include <meshit/meshing/meshtool.hpp>
+#include <meshit/meshing/mesh_class.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -13,7 +12,7 @@ inline double uclock(void)
 
 int main(int argc, char** argv)
 {
-    MESHIT_LOG_INFO("== MeshGen Square_hole");
+    MESHIT_LOG_INFO("== Meshit Square_hole");
 
     meshit::MeshingParameters mp;
     meshit::Mesh mesh;
@@ -37,15 +36,13 @@ int main(int argc, char** argv)
     line_inner.push_back(meshit::Point2d(-0.5, 0.5));
     geom.AddHole(line_inner, 0.05, 3, face1);
 
-    geom.FakeData();
-
     MESHIT_LOG_INFO("== start meshing");
     mp.optsteps2d = 5;
     geom.SetGrading(0.1);
     mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO("== meshing done");
-    meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh(mesh);
+    mesh.PrintQuality();
+    mesh.CheckSurface();
     mesh.CheckOverlappingBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO(" - averageH(0) = " << mesh.AverageH(0));
@@ -58,10 +55,9 @@ int main(int argc, char** argv)
     mesh.Save("square_hole.meshit");
 
     MESHIT_LOG_INFO("== refine mesh");
-    meshit::Refinement ref;
-    ref.Refine(mesh);
-    meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh(mesh);
+    mesh.Refine();
+    mesh.PrintQuality();
+    mesh.CheckSurface();
     mesh.CheckOverlappingBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO(" - averageH(0) = " << mesh.AverageH(0));

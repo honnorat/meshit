@@ -1,5 +1,5 @@
 #include <meshit/geom2d/geometry2d.hpp>
-#include <meshit/meshing/meshtool.hpp>
+#include <meshit/meshing/mesh_class.hpp>
 
 #include <ctime>
 
@@ -17,14 +17,14 @@ int main(int argc, char** argv)
     int bc_num = 1;
 
     // outer boundary
-    int face1 = geom.AddFace("face1");
+    uint32_t face1 = geom.AddFace("face1");
     geom.AddCircle({0.0, 1.5}, 3.0, 1e99, ++bc_num, face1);
 
     // add hole
     geom.AddCircle({0.0, 0.0}, 1.0, 0.1, ++bc_num, 0, face1);
 
     // Add inclusion
-    int face2 = geom.AddFace("face2");
+    uint32_t face2 = geom.AddFace("face2");
     std::vector<meshit::Point2d> ellipse = {{0.0,  2.25},
                                             {-1.5, 2.25},
                                             {-1.5, 1.75},
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
                                             {+1.5, 1.25},
                                             {+1.5, 1.75},
                                             {+1.5, 2.25}};
-    geom.AddSpline(ellipse, 0.2, ++bc_num, face2, face1);
+    geom.AddSpline(ellipse, 0.05, ++bc_num, face2, face1);
 
     meshit::Mesh mesh;
     meshit::MeshingParameters mp;
@@ -41,13 +41,12 @@ int main(int argc, char** argv)
     mp.maxh = 0.2;
 
     double cc;
-
     cc = uclock();
     mesh.BuildFromSplineGeometry(geom, mp);
     MESHIT_LOG_INFO("~ meshing  : " << uclock() - cc << " s.");
 
     cc = uclock();
-    meshit::MeshQuality2d(mesh);
+    mesh.PrintQuality();
     MESHIT_LOG_INFO("~ quality  : " << uclock() - cc << " s.");
 
     cc = uclock();
@@ -67,10 +66,9 @@ int main(int argc, char** argv)
     mesh.Save("circles.meshit");
     MESHIT_LOG_INFO("~ save     : " << uclock() - cc << " s.");
 
-    meshit::Refinement ref;
-    ref.Refine(mesh);
-    meshit::MeshQuality2d(mesh);
-    meshit::CheckSurfaceMesh(mesh);
+    mesh.Refine();
+    mesh.PrintQuality();
+    mesh.CheckSurface();
     mesh.CheckOverlappingBoundary();
     mesh.PrintMemInfo(std::cout);
     MESHIT_LOG_INFO("AverageH(0) = " << mesh.AverageH(0));

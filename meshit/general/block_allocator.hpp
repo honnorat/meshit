@@ -1,5 +1,5 @@
-#ifndef MESHIT_GEOMTEST_HPP
-#define MESHIT_GEOMTEST_HPP
+#ifndef MESHIT_BLOCK_ALLOC_HPP
+#define MESHIT_BLOCK_ALLOC_HPP
 /**
  * meshit - a 2d mesh generator
  *
@@ -22,13 +22,34 @@
  * 02111-1307 USA
  */
 
-#include "geom3d.hpp"
-#include "geomobjects.hpp"
+#include <cstdlib>
+#include <vector>
 
 namespace meshit {
 
-bool IntersectTriangleLine(const Point2d** tri, const Point2d** line);
-bool IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2);
+/**
+    Optimized Memory allocation classes
+*/
+class BlockAllocator
+{
+ public:
+    explicit BlockAllocator(size_t asize, size_t ablocks = 512);
+    ~BlockAllocator();
+
+    void* Alloc();
+
+    void Free(void* p)
+    {
+        *reinterpret_cast<void**>(p) = freelist;
+        freelist = p;
+    }
+
+ private:
+    size_t blocks;
+    size_t size;
+    void* freelist;
+    std::vector<char*> bablocks;
+};
 
 }  // namespace meshit
 

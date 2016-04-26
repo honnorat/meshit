@@ -1,8 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(src_GENERAL
+    general/block_allocator.cpp
     general/flags.cpp
-    general/optmem.cpp)
+    general/logging.cpp)
 
 SET(src_GEOM2D
     geom2d/genmesh2d.cpp
@@ -26,20 +27,18 @@ SET(src_LINALG
 
 SET(src_MESHING
     meshing/adfront2.cpp
-    meshing/global.cpp
-    meshing/improve2.cpp
     meshing/localh.cpp
-    meshing/meshclass.cpp
-    meshing/meshing2.cpp
-    meshing/meshtool.cpp
-    meshing/meshtype.cpp
-    meshing/msghandler.cpp
+    meshing/mesh_class.cpp
+    meshing/mesh_generator.cpp
+    meshing/mesh_optimize.cpp
+    meshing/mesh_refine.cpp
+    meshing/mesh_tools.cpp
+    meshing/mesh_types.cpp
     meshing/netrule2.cpp
     meshing/parser2.cpp
-    meshing/refine.cpp
     meshing/ruler2.cpp
     meshing/smoothing2.cpp
-    meshing/triarls.cpp)
+    meshing/triangle_rules.cpp)
 
 #######################
 # Build library

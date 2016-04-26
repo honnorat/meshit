@@ -1,420 +1,369 @@
-#include <cstring>
-#include "adtree.hpp"
+/**
+ * meshit - a 2d mesh generator
+ *
+ * Copyright © 1995-2015 Joachim Schoeberl <joachim.schoeberl@tuwien.ac.at>
+ * Copyright © 2015-2016 Marc Honnorat <marc.honnorat@gmail.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library in the file LICENSE.LGPL; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
+ */
 
-namespace meshit
-{
+#include "adtree.hpp"
+#include <cstring>
+
+namespace meshit {
 
 #define ADTREE_MAX_STACK_SIZE 20
 
-    /* ******************************* ADTree3 ******************************* */
+/* ******************************* ADTree3 ******************************* */
 
-    ADTreeNode3::ADTreeNode3()
-    {
-        pi = -1;
-
-        left = nullptr;
-        right = nullptr;
-        father = nullptr;
-        nchilds = 0;
+void ADTreeNode3::DeleteChilds()
+{
+    if (left_) {
+        left_->DeleteChilds();
+        delete left_;
+        left_ = nullptr;
     }
-
-    void ADTreeNode3::DeleteChilds()
-    {
-        if (left) {
-            left->DeleteChilds();
-            delete left;
-            left = nullptr;
-        }
-        if (right) {
-            right->DeleteChilds();
-            delete right;
-            right = nullptr;
-        }
+    if (right_) {
+        right_->DeleteChilds();
+        delete right_;
+        right_ = nullptr;
     }
+}
 
-    BlockAllocator ADTreeNode3::ball(sizeof(ADTreeNode3));
+void ADTreeNode3::SetData(const Point2d& point, GenericIndex pi)
+{
+    data_[0] = point.X();
+    data_[1] = point.Y();
+    pi_ = pi;
+}
 
-    void* ADTreeNode3::operator new(size_t /*s*/)
-    {
-        return ball.Alloc();
-    }
+BlockAllocator ADTreeNode3::ball_(sizeof(ADTreeNode3));
 
-    void ADTreeNode3::operator delete(void* p)
-    {
-        ball.Free(p);
-    }
+void* ADTreeNode3::operator new(size_t /*s*/)
+{
+    return ball_.Alloc();
+}
 
-    ADTree3::ADTree3(const Point2d& acmin,
-                     const Point2d& acmax)
-    {
-        cmin[0] = acmin.X();
-        cmin[1] = acmin.Y();
-        cmax[0] = acmax.X();
-        cmax[1] = acmax.Y();
+void ADTreeNode3::operator delete(void* p)
+{
+    ball_.Free(p);
+}
 
-        root = new ADTreeNode3;
-        root->sep = (cmin[0] + cmax[0]) / 2;
-    }
+ADTree3::ADTree3(const Point2d& cmin, const Point2d& cmax)
+    : cmin_{cmin}, cmax_{cmax}
+{
+    root_ = new ADTreeNode3;
+    root_->sep_ = 0.5 * (cmin_.X() + cmax_.X());
+}
 
-    ADTree3::~ADTree3()
-    {
-        root->DeleteChilds();
-        delete root;
-    }
+ADTree3::~ADTree3()
+{
+    root_->DeleteChilds();
+    delete root_;
+}
 
-    void ADTree3::Insert(const Point2d& p, int pi)
-    {
-        ADTreeNode3* node = nullptr;
-        ADTreeNode3* next = root;
-        int dir = 0;
-        bool lr = false;
+void ADTree3::Insert(const Point2d& p, GenericIndex pi)
+{
+    ADTreeNode3* node = nullptr;
+    ADTreeNode3* next = root_;
+    int dir = 0;
+    bool lr = false;
 
-        double bmin[3];
-        double bmax[3];
+    double bmin[2] = {cmin_.X(), cmin_.Y()};
+    double bmax[2] = {cmax_.X(), cmax_.Y()};
 
-        memcpy(bmin, cmin, 3 * sizeof(double));
-        memcpy(bmax, cmax, 3 * sizeof(double));
+    while (next) {
+        node = next;
 
-        while (next) {
-            node = next;
+        if (node->pi_ == CONST<GenericIndex>::undefined) {
+            node->SetData(p, pi);
 
-            if (node->pi == -1) {
-                node->data[0] = p[0];
-                node->data[1] = p[1];
-                node->pi = pi;
-
-                if (ela.size() < static_cast<size_t>(pi + 1)) {
-                    ela.resize(pi + 1);
-                }
-                ela[pi] = node;
-
-                return;
-            }
-
-            if (node->sep > p[dir]) {
-                next = node->left;
-                bmax[dir] = node->sep;
-                lr = false;
+            if (pi >= nodes_.size()) {
+                nodes_.push_back(node);
             } else {
-                next = node->right;
-                bmin[dir] = node->sep;
-                lr = true;
+                nodes_[pi] = node;
             }
-
-            if (++dir == 2) {
-                dir = 0;
-            }
+            return;
         }
-
-        next = new ADTreeNode3;
-        next->data[0] = p[0];
-        next->data[1] = p[1];
-        next->pi = pi;
-        next->sep = (bmin[dir] + bmax[dir]) / 2;
-
-        if (ela.size() < static_cast<size_t>(pi + 1)) {
-            ela.resize(pi + 1);
+        if (node->sep_ > p[dir]) {
+            next = node->left_;
+            bmax[dir] = node->sep_;
+            lr = false;
+        } else {
+            next = node->right_;
+            bmin[dir] = node->sep_;
+            lr = true;
         }
-        ela[pi] = next;
-
-        if (lr)
-            node->right = next;
-        else
-            node->left = next;
-        next->father = node;
-
-        while (node) {
-            node->nchilds++;
-            node = node->father;
-        }
+        if (++dir == 2) dir = 0;
     }
 
-    void ADTree3::DeleteElement(int pi)
-    {
-        ADTreeNode3* node = ela[pi];
+    next = new ADTreeNode3;
+    next->SetData(p, pi);
+    next->sep_ = 0.5 * (bmin[dir] + bmax[dir]);
 
-        node->pi = -1;
-
-        node = node->father;
-        while (node) {
-            node->nchilds--;
-            node = node->father;
-        }
+    if (pi >= nodes_.size()) {
+        nodes_.push_back(next);
+    } else {
+        nodes_[pi] = next;
     }
 
-    struct inttn3
-    {
-        ADTreeNode3* node;
-        int dir;
-    };
+    if (lr) {
+        node->right_ = next;
+    } else {
+        node->left_ = next;
+    }
+}
 
-    void ADTree3::GetIntersecting(const Point2d& pmin,
-                                  const Point2d& pmax,
-                                  std::vector<size_t>& pis) const
-    {
-        pis.clear();
+void ADTree3::DeleteElement(GenericIndex pi)
+{
+    nodes_[pi]->pi_ = CONST<PointIndex>::undefined;
+}
 
-        static inttn3 stack[ADTREE_MAX_STACK_SIZE];
-        stack[0].node = root;
-        stack[0].dir = 0;
-        size_t stacks = 1;
+struct inttn3
+{
+    ADTreeNode3* node;
+    int dir;
+};
 
-        while (stacks) {
-            stacks--;
-            ADTreeNode3* node = stack[stacks].node;
+void ADTree3::GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<GenericIndex>& pis) const
+{
+    static inttn3 stack[ADTREE_MAX_STACK_SIZE];
+    stack[0].node = root_;
+    stack[0].dir = 0;
+    size_t stacks = 1;
 
-            if (node->pi != -1 && !(
-                node->data[0] < pmin.X() || node->data[0] > pmax.X() ||
-                node->data[1] < pmin.Y() || node->data[1] > pmax.Y())) {
-                pis.push_back(node->pi);
-            }
+    pis.clear();
+    while (stacks > 0) {
+        stacks--;
+        ADTreeNode3* node = stack[stacks].node;
 
-            int dir = stack[stacks].dir;
+        if (node->pi_ != CONST<GenericIndex>::undefined &&
+            !(node->data_[0] < pmin.X() || node->data_[0] > pmax.X() ||
+              node->data_[1] < pmin.Y() || node->data_[1] > pmax.Y())) {
+            pis.push_back(node->pi_);
+        }
 
-            if (node->left && pmin[dir] <= node->sep) {
-                stack[stacks].node = node->left;
-                stack[stacks].dir = (dir + 1) % 2;
-                stacks++;
-            }
-            if (node->right && pmax[dir] >= node->sep) {
-                stack[stacks].node = node->right;
-                stack[stacks].dir = (dir + 1) % 2;
-                stacks++;
-            }
+        int dir = stack[stacks].dir;
+
+        if (node->left_ && pmin[dir] <= node->sep_) {
+            stack[stacks].node = node->left_;
+            stack[stacks].dir = (dir + 1) % 2;
+            stacks++;
+        }
+        if (node->right_ && pmax[dir] >= node->sep_) {
+            stack[stacks].node = node->right_;
+            stack[stacks].dir = (dir + 1) % 2;
+            stacks++;
         }
     }
-
-    void ADTree3::PrintRec(std::ostream& ost, const ADTreeNode3* node) const
-    {
-        if (node->data) {
-            ost << node->pi << ": ";
-            ost << node->nchilds << " childs, ";
-            ost << node->data[0] << " ";
-            ost << node->data[1] << " ";
-            ost << std::endl;
-        }
-        if (node->left)
-            PrintRec(ost, node->left);
-        if (node->right)
-            PrintRec(ost, node->right);
-    }
+}
 
 /* ******************************* ADTree6 ******************************* */
 
-    ADTreeNode6::ADTreeNode6()
-    {
-        pi_ = -1;
-
-        left = nullptr;
-        right = nullptr;
-        father = nullptr;
-        nchilds = 0;
+void ADTreeNode6::DeleteChilds()
+{
+    if (left_) {
+        left_->DeleteChilds();
+        delete left_;
+        left_ = nullptr;
     }
-
-    void ADTreeNode6::DeleteChilds()
-    {
-        if (left) {
-            left->DeleteChilds();
-            delete left;
-            left = nullptr;
-        }
-        if (right) {
-            right->DeleteChilds();
-            delete right;
-            right = nullptr;
-        }
+    if (right_) {
+        right_->DeleteChilds();
+        delete right_;
+        right_ = nullptr;
     }
+}
 
-    inline void ADTreeNode6::SetData(const Point2d& pmin, const Point2d& pmax, int pi)
-    {
-        pmin_ = pmin;
-        pmax_ = pmax;
-        pi_ = pi;
-    }
+inline void ADTreeNode6::SetData(const Point2d& pmin, const Point2d& pmax, GenericIndex pi)
+{
+    pmin_ = pmin;
+    pmax_ = pmax;
+    pi_ = pi;
+}
 
-    BlockAllocator ADTreeNode6::ball(sizeof(ADTreeNode6));
+BlockAllocator ADTreeNode6::ball_(sizeof(ADTreeNode6));
 
-    void* ADTreeNode6::operator new(size_t /*s*/)
-    {
-        return ball.Alloc();
-    }
+void* ADTreeNode6::operator new(size_t /*s*/)
+{
+    return ball_.Alloc();
+}
 
-    void ADTreeNode6::operator delete(void* p)
-    {
-        ball.Free(p);
-    }
+void ADTreeNode6::operator delete(void* p)
+{
+    ball_.Free(p);
+}
 
-    ADTree6::ADTree6(const Point2d& pmin, const Point2d& pmax)
-        : pmin_{pmin}, pmax_{pmax}
-    {
-        root = new ADTreeNode6;
-        root->sep_ = 0.5 * (pmin_.X() + pmax_.X());
-    }
+ADTree6::ADTree6(const Point2d& pmin, const Point2d& pmax)
+    : pmin_{pmin}, pmax_{pmax}
+{
+    root_ = new ADTreeNode6;
+    root_->sep_ = 0.5 * (pmin_.X() + pmax_.X());
+}
 
-    ADTree6::~ADTree6()
-    {
-        root->DeleteChilds();
-        delete root;
-    }
+ADTree6::~ADTree6()
+{
+    root_->DeleteChilds();
+    delete root_;
+}
 
-    void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, int pi)
-    {
-        ADTreeNode6* node = nullptr;
-        ADTreeNode6* next = root;
-        int dir = 0;
-        bool lr = false;
+void ADTree6::Insert(const Point2d& bmin_, const Point2d& bmax_, GenericIndex pi)
+{
+    ADTreeNode6* node = nullptr;
+    ADTreeNode6* next = root_;
+    int dir = 0;
+    bool lr = false;
 
-        double bmin[4] = {pmin_.X(), pmin_.Y(), pmin_.X(), pmin_.Y()};
-        double bmax[4] = {pmax_.X(), pmax_.Y(), pmax_.X(), pmax_.Y()};
-        double p[4] = {bmin_.X(), bmin_.Y(), bmax_.X(), bmax_.Y()};
+    double bmin[4] = {pmin_.X(), pmin_.Y(), pmin_.X(), pmin_.Y()};
+    double bmax[4] = {pmax_.X(), pmax_.Y(), pmax_.X(), pmax_.Y()};
+    double p[4] = {bmin_.X(), bmin_.Y(), bmax_.X(), bmax_.Y()};
 
-        while (next) {
-            node = next;
+    while (next) {
+        node = next;
 
-            if (node->pi_ == -1) {
-                node->SetData(bmin_, bmax_, pi);
+        if (node->pi_ == CONST<GenericIndex>::undefined) {
+            node->SetData(bmin_, bmax_, pi);
 
-                if (static_cast<size_t>(pi) >= ela.size()) {
-                    ela.push_back(node);
-                } else {
-                    ela[pi] = node;
-                }
-                return;
-            }
-
-            if (node->sep_ > p[dir]) {
-                next = node->left;
-                bmax[dir] = node->sep_;
-                lr = false;
+            if (pi >= nodes_.size()) {
+                nodes_.push_back(node);
             } else {
-                next = node->right;
-                bmin[dir] = node->sep_;
-                lr = true;
+                nodes_[pi] = node;
             }
-
-            if (++dir == 4) dir = 0;
+            return;
         }
 
-        next = new ADTreeNode6;
-        next->SetData(bmin_, bmax_, pi);
-        next->sep_ = (bmin[dir] + bmax[dir]) / 2;
-
-        if (static_cast<size_t>(pi) >= ela.size()) {
-            ela.push_back(next);
+        if (node->sep_ > p[dir]) {
+            next = node->left_;
+            bmax[dir] = node->sep_;
+            lr = false;
         } else {
-            ela[pi] = next;
+            next = node->right_;
+            bmin[dir] = node->sep_;
+            lr = true;
         }
 
-        if (lr)
-            node->right = next;
-        else
-            node->left = next;
-        next->father = node;
+        if (++dir == 4) dir = 0;
+    }
 
-        while (node) {
-            node->nchilds++;
-            node = node->father;
+    next = new ADTreeNode6;
+    next->SetData(bmin_, bmax_, pi);
+    next->sep_ = 0.5 * (bmin[dir] + bmax[dir]);
+
+    if (pi >= nodes_.size()) {
+        nodes_.push_back(next);
+    } else {
+        nodes_[pi] = next;
+    }
+
+    if (lr) {
+        node->right_ = next;
+    } else {
+        node->left_ = next;
+    }
+}
+
+void ADTree6::DeleteElement(GenericIndex pi)
+{
+    nodes_[pi]->pi_ = CONST<GenericIndex>::undefined;
+}
+
+struct inttn6
+{
+    ADTreeNode6* node;
+    int dir;
+};
+
+void ADTree6::GetIntersecting(const Point2d& bmin, const Point2d& bmax,
+                              const Point2d& pmin, const Point2d& pmax, std::vector<GenericIndex>& pis) const
+{
+    const double abmin[4] = {bmin.X(), bmin.Y(), pmin.X(), pmin.Y()};
+    const double abmax[4] = {pmax.X(), pmax.Y(), bmax.X(), bmax.Y()};
+
+    static inttn6 stack[ADTREE_MAX_STACK_SIZE];
+    stack[0].node = root_;
+    stack[0].dir = 0;
+    size_t stacks = 1;
+
+    pis.clear();
+    while (stacks > 0) {
+        stacks--;
+        ADTreeNode6* node = stack[stacks].node;
+        if (node->pi_ != CONST<PointIndex>::undefined &&
+            !(node->pmin_.X() > pmax.X() || node->pmax_.X() < pmin.X() ||
+              node->pmin_.Y() > pmax.Y() || node->pmax_.Y() < pmin.Y())) {
+            pis.push_back(node->pi_);
+        }
+
+        int dir = stack[stacks].dir;
+
+        if (node->left_ && abmin[dir] <= node->sep_) {
+            stack[stacks].node = node->left_;
+            stack[stacks].dir = (dir + 1) % 4;
+            stacks++;
+        }
+        if (node->right_ && abmax[dir] >= node->sep_) {
+            stack[stacks].node = node->right_;
+            stack[stacks].dir = (dir + 1) % 4;
+            stacks++;
         }
     }
+}
 
-    void ADTree6::DeleteElement(int pi)
-    {
-        ADTreeNode6* node = ela[pi];
+/*************************************** Point3dTree ************************/
 
-        node->pi_ = -1;
+Point3dTree::Point3dTree(const Point2d& pmin, const Point2d& pmax)
+{
+    tree_ = new ADTree3(pmin, pmax);
+}
 
-        node = node->father;
-        while (node) {
-            node->nchilds--;
-            node = node->father;
-        }
-    }
+Point3dTree::~Point3dTree()
+{
+    delete tree_;
+}
 
-    struct inttn6
-    {
-        ADTreeNode6* node;
-        int dir;
-    };
+void Point3dTree::Insert(const Point2d& p, PointIndex pi)
+{
+    tree_->Insert(p, pi);
+}
 
-    void ADTree6::GetIntersecting(const Point2d& bmin, const Point2d& bmax,
-                                  const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const
-    {
-        pis.clear();
+void Point3dTree::GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<PointIndex>& pis) const
+{
+    tree_->GetIntersecting(pmin, pmax, pis);
+}
 
-        const double abmin[4] = {bmin.X(), bmin.Y(), pmin.X(), pmin.Y()};
-        const double abmax[4] = {pmax.X(), pmax.Y(), bmax.X(), bmax.Y()};
+/*************************************** Box3dTree **************************/
 
-        static inttn6 stack[ADTREE_MAX_STACK_SIZE];
-        stack[0].node = root;
-        stack[0].dir = 0;
-        size_t stacks = 1;
+Box3dTree::Box3dTree(const Point2d& apmin, const Point2d& apmax)
+    : box_pmin_{apmin}, box_pmax_{apmax}
+{
+    tree_ = new ADTree6(apmin, apmax);
+}
 
-        while (stacks) {
-            stacks--;
-            ADTreeNode6* node = stack[stacks].node;
-            if (node->pi_ != -1 && !(
-                node->pmin_.X() > pmax.X() || node->pmax_.X() < pmin.X() ||
-                node->pmin_.Y() > pmax.Y() || node->pmax_.Y() < pmin.Y())) {
-                pis.push_back(node->pi_);
-            }
+Box3dTree::~Box3dTree()
+{
+    delete tree_;
+}
 
-            int dir = stack[stacks].dir;
+void Box3dTree::Insert(const Point2d& bmin, const Point2d& bmax, GenericIndex pi)
+{
+    tree_->Insert(bmin, bmax, pi);
+}
 
-            if (node->left && abmin[dir] <= node->sep_) {
-                stack[stacks].node = node->left;
-                stack[stacks].dir = (dir + 1) % 4;
-                stacks++;
-            }
-            if (node->right && abmax[dir] >= node->sep_) {
-                stack[stacks].node = node->right;
-                stack[stacks].dir = (dir + 1) % 4;
-                stacks++;
-            }
-        }
-    }
-
-
-/* ************************************* Point3dTree ********************** */
-
-    Point3dTree::Point3dTree(const Point2d& pmin, const Point2d& pmax)
-    {
-        tree = new ADTree3(pmin, pmax);
-    }
-
-    Point3dTree::~Point3dTree()
-    {
-        delete tree;
-    }
-
-    void Point3dTree::Insert(const Point2d& p, int pi)
-    {
-        tree->Insert(p, pi);
-    }
-
-    void Point3dTree::GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const
-    {
-        tree->GetIntersecting(pmin, pmax, pis);
-    }
-
-    Box3dTree::Box3dTree(const Point2d& apmin, const Point2d& apmax)
-        : boxpmin{apmin}, boxpmax{apmax}
-    {
-        tree = new ADTree6(apmin, apmax);
-    }
-
-    Box3dTree::~Box3dTree()
-    {
-        delete tree;
-    }
-
-    void Box3dTree::Insert(const Point2d& bmin, const Point2d& bmax, int pi)
-    {
-        tree->Insert(bmin, bmax, pi);
-    }
-
-    void Box3dTree::GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<size_t>& pis) const
-    {
-        tree->GetIntersecting(boxpmin, boxpmax, pmin, pmax, pis);
-    }
+void Box3dTree::GetIntersecting(const Point2d& pmin, const Point2d& pmax, std::vector<GenericIndex>& pis) const
+{
+    tree_->GetIntersecting(box_pmin_, box_pmax_, pmin, pmax, pis);
+}
 
 }  // namespace meshit

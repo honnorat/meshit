@@ -1,5 +1,5 @@
-#ifndef MESHIT_GEOMTEST_HPP
-#define MESHIT_GEOMTEST_HPP
+#ifndef MESHIT_MESH_OPTIMIZE_HPP
+#define MESHIT_MESH_OPTIMIZE_HPP
 /**
  * meshit - a 2d mesh generator
  *
@@ -22,13 +22,37 @@
  * 02111-1307 USA
  */
 
-#include "geom3d.hpp"
-#include "geomobjects.hpp"
+#include "mesh_class.hpp"
 
 namespace meshit {
 
-bool IntersectTriangleLine(const Point2d** tri, const Point2d** line);
-bool IntersectTriangleTriangle(const Point2d** tri1, const Point2d** tri2);
+class MeshOptimize
+{
+ public:
+    explicit MeshOptimize(Mesh& mesh)
+        : mesh_{mesh} { }
+
+    ~MeshOptimize() { }
+
+    void EdgeSwapping(bool use_metric, double metric_weight = 0.0);
+    void ImproveMesh(double metric_weight);
+    void CombineImprove();
+
+    friend class Opti2SurfaceMinFunction;
+
+ protected:
+    void EdgeSwapping(DomainIndex face_index, bool use_metric, double metric_weight);
+    void ImproveMesh(DomainIndex face_index, double metric_weight);
+    void CombineImprove(DomainIndex face_index);
+
+ protected:
+    Mesh& mesh_;
+};
+
+double CalcTriangleBadness(const Point2d& p1, const Point2d& p2, const Point2d& p3,
+                           double metric_weight, double h);
+
+double CalcTriangleBadness_2(const Point2d& p1, const Point2d& p2, const Point2d& p3, double n_z);
 
 }  // namespace meshit
 

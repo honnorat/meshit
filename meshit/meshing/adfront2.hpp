@@ -1,205 +1,160 @@
-#ifndef FILE_ADFRONT2_HPP
-#define FILE_ADFRONT2_HPP
+#ifndef MESHIT_ADFRONT2_HPP
+#define MESHIT_ADFRONT2_HPP
+/**
+ * meshit - a 2d mesh generator
+ *
+ * Copyright © 1995-2015 Joachim Schoeberl <joachim.schoeberl@tuwien.ac.at>
+ * Copyright © 2015-2016 Marc Honnorat <marc.honnorat@gmail.com>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library in the file LICENSE.LGPL; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
+ */
 
-/**************************************************************************/
-/* File:   adfront2.hpp                                                   */
-/* Author: Joachim Schoeberl                                              */
-/* Date:   01. Okt. 95                                                    */
-/**************************************************************************/
-
+#include <algorithm>
 #include <climits>
 #include <iostream>
 #include <vector>
 
-#include "../gprim/geomobjects.hpp"
 #include "../gprim/adtree.hpp"
-#include "meshtype.hpp"
+#include "../gprim/geomobjects.hpp"
+#include "mesh_types.hpp"
 
 /**
     Advancing front class for surfaces
  */
-namespace meshit
+namespace meshit {
+
+typedef GenericIndex FrontLineIndex;
+
+class FrontPoint2
 {
-    class FrontPoint2
+ public:
+    FrontPoint2(const Point2d& point, PointIndex gi);
+
+    ~FrontPoint2() { }
+
+    const Point2d& P() const { return point_; }
+    operator const Point2d&() const { return point_; }
+    uint32_t FrontNr() const { return frontnr; }
+    PointIndex GlobalIndex() const { return global_index_; }
+
+    void AddLine() { nlinetopoint++; }
+
+    void RemoveLine()
     {
-        /// coordinates
-        Point2d p;
-        /// global node index
-        PointIndex globalindex;
-        /// number of front lines connected to point
-        int nlinetopoint;
-        /// distance to original boundary
-        int frontnr;
+        nlinetopoint--;
+        if (nlinetopoint == 0) nlinetopoint = -1;
+    }
 
-     public:
-        FrontPoint2(const Point2d& ap, PointIndex agi);
+    bool Valid() const { return nlinetopoint >= 0; }
+    void DecFrontNr(uint32_t afrontnr) { frontnr = std::min(frontnr, afrontnr); }
 
-        ~FrontPoint2() { }
+ protected:
+    Point2d point_;            // coordinates
+    PointIndex global_index_;  // global node index
+    int nlinetopoint;          // number of front lines connected to point
+    uint32_t frontnr;               // distance to original boundary
+};
 
-        const Point2d& P() const
-        {
-            return p;
-        }
+class FrontLine
+{
+ public:
+    FrontLine()
+        : line_class_{1} { }
 
-        operator const Point2d&() const
-        {
-            return p;
-        }
+    FrontLine(PointIndex pi1, PointIndex pi2)
+        : indices_{static_cast<GenericIndex>(pi1), static_cast<GenericIndex>(pi2)},
+          line_class_{1} { }
 
-        PointIndex GlobalIndex() const
-        {
-            return globalindex;
-        }
+    const IndexPair& L() const { return indices_; }
+    uint32_t LineClass() const { return line_class_; }
 
-        void AddLine()
-        {
-            nlinetopoint++;
-        }
+    void IncrementClass() { line_class_++; }
 
-        void RemoveLine()
-        {
-            nlinetopoint--;
-            if (nlinetopoint == 0)
-                nlinetopoint = -1;
-        }
+    bool Valid() const { return indices_.I1() != CONST<PointIndex>::undefined; }
 
-        bool Valid() const
-        {
-            return nlinetopoint >= 0;
-        }
-
-        void DecFrontNr(int afrontnr)
-        {
-            if (frontnr > afrontnr) frontnr = afrontnr;
-        }
-
-        int FrontNr() const
-        {
-            return frontnr;
-        }
-    };
-
-    class FrontLine
+    void Invalidate()
     {
-     private:
-        /// Point Indizes
-        INDEX_2 l;
-        /// quality class
-        int lineclass;
+        indices_.I1() = CONST<PointIndex>::undefined;
+        indices_.I2() = CONST<PointIndex>::undefined;
+        line_class_ = 1000;
+    }
 
-     public:
-        FrontLine()
-        {
-            lineclass = 1;
-        }
+    friend class AdFront2;
 
-        explicit FrontLine(const INDEX_2& al)
-        {
-            l = al;
-            lineclass = 1;
-        }
+ private:
+    IndexPair indices_;    // Point Indizes
+    uint32_t line_class_;  // quality class
+};
 
-        const INDEX_2& L() const
-        {
-            return l;
-        }
+class AdFront2
+{
+ public:
+    explicit AdFront2(const Box2d& aboundingbox);
 
-        int LineClass() const
-        {
-            return lineclass;
-        }
+    ~AdFront2() { }
 
-        void IncrementClass()
-        {
-            lineclass++;
-        }
+    bool Empty() const { return nfl == 0; }
+    size_t GetNFL() const { return nfl; }
 
-        bool Valid() const
-        {
-            return l.I1() != -1;
-        }
+    FrontLineIndex SelectBaseLine(Point2d& p1, Point2d& p2, uint32_t& qualclass);
 
-        void Invalidate()
-        {
-            l.I1() = -1;
-            l.I2() = -1;
-            lineclass = 1000;
-        }
+    void GetLocals(FrontLineIndex baseline,
+                   std::vector<Point2d>& locpoints,
+                   std::vector<IndexPair>& loclines,  // local index
+                   std::vector<PointIndex>& pindex,
+                   std::vector<FrontLineIndex>& lindex, double xh);
 
-        friend class AdFront2;
-    };
+    void DeleteLine(FrontLineIndex li);
 
-    class AdFront2
-    {
-        std::vector<FrontPoint2> points;  // front points
-        std::vector<FrontLine> lines;     // front lines
+    PointIndex AddPoint(const Point2d& p, PointIndex globind);
+    int AddLine(PointIndex pi1, PointIndex pi2);
 
-        Box2d boundingbox;
-        Box3dTree linesearchtree;      // search tree for lines
-        Point3dTree pointsearchtree;   // search tree for points
-        Point3dTree cpointsearchtree;  // search tree for cone points (not used ???)
+    bool LineExists(PointIndex gpi1, PointIndex gpi2);
 
-        std::vector<int> delpointl;  // list of deleted front points
-        std::vector<int> dellinel;   // list of deleted front lines
+    void IncrementClass(FrontLineIndex li) { lines[li].IncrementClass(); }
 
-        std::vector<size_t> nearlines;
-        std::vector<size_t> nearpoints;
+    PointIndex GetGlobalIndex(PointIndex pi) const { return points[pi].GlobalIndex(); }
 
+    void SetStartFront();
+    void PrintOpenSegments(std::ostream& ost) const;
 
-        int nfl;  // number of front lines;
-        INDEX_2_map<int> allflines;  // all front lines ever have been
+ protected:
+    std::vector<FrontPoint2> points;  // front points
+    std::vector<FrontLine> lines;     // front lines
 
-        std::vector<int> invpindex;
+    Box2d boundingbox;
+    Box3dTree linesearchtree;      // search tree for lines
+    Point3dTree pointsearchtree;   // search tree for points
+    Point3dTree cpointsearchtree;  // search tree for cone points (not used ???)
 
-        int minval;
-        size_t starti;
+    std::vector<PointIndex> delpointl;     // list of deleted front points
+    std::vector<FrontLineIndex> dellinel;  // list of deleted front lines
 
-     public:
-        explicit AdFront2(const Box2d& aboundingbox);
+    std::vector<PointIndex> nearpoints;
+    std::vector<FrontLineIndex> nearlines;
 
-        ~AdFront2() { }
+    size_t nfl;                          // number of front lines;
+    IndexPair_map<uint8_t> all_flines_;  // all front lines ever have been
 
-        bool Empty() const
-        {
-            return nfl == 0;
-        }
+    std::vector<PointIndex> inv_pindex;
 
-        int GetNFL() const
-        {
-            return nfl;
-        }
+    uint32_t minval;
+    FrontLineIndex starti;
+};
 
-        int SelectBaseLine(Point2d& p1, Point2d& p2, int& qualclass);
-
-        int GetLocals(int baseline,
-                      std::vector<Point2d>& locpoints,
-                      std::vector<INDEX_2>& loclines,  // local index
-                      std::vector<int>& pindex,
-                      std::vector<int>& lindex,
-                      double xh);
-
-        void DeleteLine(int li);
-
-        int AddPoint(const Point2d& p, PointIndex globind);
-
-        int AddLine(int pi1, int pi2);
-
-        int ExistsLine(int gpi1, int gpi2);
-
-        void IncrementClass(int li)
-        {
-            lines[li].IncrementClass();
-        }
-
-        PointIndex GetGlobalIndex(int pi) const
-        {
-            return points[pi].GlobalIndex();
-        }
-
-        void SetStartFront();
-        void PrintOpenSegments(std::ostream& ost) const;
-    };
 }  // namespace meshit
 
 #endif
-
