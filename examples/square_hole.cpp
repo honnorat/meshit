@@ -12,7 +12,7 @@ inline double uclock(void)
 
 int main(int argc, char** argv)
 {
-    MESHIT_LOG_INFO("== MeshGen Square_hole");
+    MESHIT_LOG_INFO("== Meshit Square_hole");
 
     meshit::MeshingParameters mp;
     meshit::Mesh mesh;
