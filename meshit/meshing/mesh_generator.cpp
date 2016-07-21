@@ -279,7 +279,7 @@ bool MeshGenerator::GenerateMesh(const MeshingParameters& mp, double gh, DomainI
 
                     bool exval = adfront->LineExists(nlgpi1, nlgpi2);
                     if (exval) {
-                        MESHIT_LOG_ERROR("ERROR: new line (" << nlgpi1 << "," << nlgpi2 << ") exits !");
+                        MESHIT_LOG_ERROR("new line (" << nlgpi1 << "," << nlgpi2 << ") exits !");
                         found = false;
                     }
                 }

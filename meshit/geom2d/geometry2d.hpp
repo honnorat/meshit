@@ -47,10 +47,19 @@ class SplineGeometry
     void LoadData(std::istream& infile);
 
     DomainIndex AddFace(const std::string& name, double maxh_f = 1e99);
-    void AddHole(const std::vector<Point2d>& points, double hmax, int bc, DomainIndex domain = 1);
 
-    void AddLine(const std::vector<Point2d>& points, double hmax, int spline_id,
-                 DomainIndex domain_left = 1, DomainIndex domain_right = 0);
+    size_t AddPoint(const Point2d& point);
+
+    void AddPoints(const std::vector<Point2d>& points);
+
+    void AddSegment(const GeomPoint& p0, const GeomPoint& p1, double hmax, int spline_id,
+                    DomainIndex domain_left = 1, DomainIndex domain_right = 0);
+
+    void AddClosedLine(const std::vector<Point2d>& points, double hmax, int spline_id,
+                       DomainIndex domain_left = 1, DomainIndex domain_right = 0);
+
+    void AddOpenLine(const std::vector<size_t>& points, double hmax, int spline_id,
+                     DomainIndex domain_left, DomainIndex domain_right);
 
     void AddStructureLine(const std::vector<Point2d>& points, double hmax = 1e99, int bc = 1, DomainIndex domain = 1);
 
@@ -59,6 +68,8 @@ class SplineGeometry
 
     void AddCircle(const Point2d& center, double radius, double hmax, int spline_id = 1,
                    DomainIndex face_left = 1, DomainIndex face_right = 0);
+
+    void AddHole(const std::vector<Point2d>& points, double hmax, int bc, DomainIndex domain = 1);
 
     void PartitionBoundary(Mesh& mesh2d, MeshingParameters& mp);
 
