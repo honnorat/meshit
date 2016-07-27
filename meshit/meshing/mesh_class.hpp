@@ -64,7 +64,7 @@ class Mesh
 
     Mesh& operator=(const Mesh& mesh2);
 
-    void BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp);
+    void BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp, bool geometry_only = false);
 
     size_t AddPoint(const Point2d& p, point_type_t type = INNER_POINT);
     void AddSegment(const Segment& s);

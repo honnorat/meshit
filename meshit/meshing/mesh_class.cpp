@@ -58,7 +58,7 @@ Mesh& Mesh::operator=(const Mesh& mesh2)
     return *this;
 }
 
-void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp)
+void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& mp, bool geometry_only)
 {
     MESHIT_LOG_DEBUG("Generate Mesh from spline geometry");
 
@@ -138,7 +138,8 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
             }
         }
 
-        mesher.GenerateMesh(mp, h, dom_nr);
+        if (!geometry_only)
+            mesher.GenerateMesh(mp, h, dom_nr);
 
         for (size_t sei = oldnf; sei < elements.size(); sei++) {
             elements[sei].SetFaceID(dom_nr);
@@ -151,6 +152,8 @@ void Mesh::BuildFromSplineGeometry(SplineGeometry& geometry, MeshingParameters& 
             SetMaterial(dom_nr, material);
         }
     }
+
+    if (geometry_only) return;
 
     int hsteps = mp.optsteps2d;
 
