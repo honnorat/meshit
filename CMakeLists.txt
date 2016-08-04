@@ -4,8 +4,6 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     MESSAGE(FATAL_ERROR "In-source build prohibited.")
 ENDIF()
 
-PROJECT(meshit)
-
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fpermissive -Wall")
 ENDIF()
