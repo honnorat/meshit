@@ -68,8 +68,3 @@ FOREACH(hdr_dir . general geom2d gprim interface linalg meshing)
 ENDFOREACH(hdr_dir)
 ADD_CUSTOM_COMMAND(TARGET meshit PRE_LINK ${cmd_export_headers})
 
-#######################
-# Export variables
-#######################
-
-SET(MESHIT_LINK_LIBRARIES meshit PARENT_SCOPE)
