@@ -237,41 +237,70 @@ void SplineGeometry::LoadData(std::istream& infile)
     return;
 }
 
-void SplineGeometry::AddLine(const std::vector<Point2d>& points, double hmax, int spline_id,
-                             DomainIndex domain_left, DomainIndex domain_right)
+size_t SplineGeometry::AddPoint(const Point2d& point)
 {
-    size_t nold_points = geompoints.size();
-    size_t nnew_points = points.size();
+    geompoints.push_back(GeomPoint(point));
+    return geompoints.size() - 1;
+}
 
-    std::vector<GeomPoint> gpts;
+void SplineGeometry::AddPoints(const std::vector<Point2d>& points)
+{
+    size_t old_nb_pts = geompoints.size();
+    size_t new_nb_pts = points.size();
 
-    gpts.reserve(nnew_points);
-    geompoints.reserve(nold_points + nnew_points);
+    geompoints.reserve(old_nb_pts + new_nb_pts);
 
-    for (size_t i = 0; i < nnew_points; i++) {
-        gpts.push_back(GeomPoint(points[i]));
-        geompoints.push_back(gpts[i]);
+    for (size_t i = 0; i < new_nb_pts; i++) {
+        AddPoint(points[i]);
     }
-    for (size_t i0 = 0; i0 < nnew_points; i0++) {
-        size_t i1 = (i0 == nnew_points - 1) ? 0 : i0 + 1;
-        SplineSeg* spline = new LineSeg(gpts[i0], gpts[i1]);
-        spline->dom_left = domain_left;
-        spline->dom_right = domain_right;
-        spline->id_ = spline_id;
-        spline->ref_fac_ = 1;  // Refinement factor
-        spline->hmax_ = hmax;
-        splines.push_back(spline);
+}
+
+void SplineGeometry::AddSegment(const GeomPoint& p0, const GeomPoint& p1,
+                                double hmax, int spline_id,
+                                DomainIndex domain_left, DomainIndex domain_right)
+{
+    SplineSeg* spline = new LineSeg(p0, p1);
+    spline->dom_left = domain_left;
+    spline->dom_right = domain_right;
+    spline->id_ = spline_id;
+    spline->ref_fac_ = 1;  // Refinement factor
+    spline->hmax_ = hmax;
+    splines.push_back(spline);
+}
+
+void SplineGeometry::AddClosedLine(const std::vector<Point2d>& points, double hmax, int spline_id,
+                                   DomainIndex domain_left, DomainIndex domain_right)
+{
+    size_t old_nb_pts = geompoints.size();
+
+    AddPoints(points);
+
+    for (size_t i0 = 0; i0 < points.size(); i0++) {
+        size_t i1 = (i0 == points.size() - 1) ? 0 : i0 + 1;
+        size_t ip0 = old_nb_pts + i0;
+        size_t ip1 = old_nb_pts + i1;
+        AddSegment(geompoints[ip0], geompoints[ip1], hmax, spline_id, domain_left, domain_right);
+    }
+}
+
+void SplineGeometry::AddOpenLine(const std::vector<size_t>& points, double hmax, int spline_id,
+                                 DomainIndex domain_left, DomainIndex domain_right)
+{
+    for (size_t i = 0; i < points.size() - 1; i++) {
+        size_t i0 = points[i];
+        size_t i1 = points[i + 1];
+        AddSegment(geompoints[i0], geompoints[i1], hmax, spline_id, domain_left, domain_right);
     }
 }
 
 void SplineGeometry::AddHole(const std::vector<Point2d>& point_list, double hmax, int bc, DomainIndex domain)
 {
-    AddLine(point_list, hmax, bc, 0, domain);
+    AddClosedLine(point_list, hmax, bc, 0, domain);
 }
 
 void SplineGeometry::AddStructureLine(const std::vector<Point2d>& points, double hmax, int bc, DomainIndex domain)
 {
-    AddLine(points, hmax, bc, domain, domain);
+    AddClosedLine(points, hmax, bc, domain, domain);
 }
 
 void SplineGeometry::AddSpline(const std::vector<Point2d>& points, double hmax, int spline_id,

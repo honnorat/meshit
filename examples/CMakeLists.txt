@@ -4,7 +4,7 @@ MACRO(MESHIT_ADD_TEST examplename)
     SET(targetname test_${examplename})
     SET(filename ${examplename}.cpp)
     ADD_EXECUTABLE(${targetname} ${filename})
-    TARGET_LINK_LIBRARIES(${targetname} ${MESHIT_LINK_LIBRARIES})
+    TARGET_LINK_LIBRARIES(${targetname} meshit)
 ENDMACRO(MESHIT_ADD_TEST)
 
 FILE(GLOB tests "*.cpp")

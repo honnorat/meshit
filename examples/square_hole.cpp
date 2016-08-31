@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     list_outer.push_back(meshit::Point2d(1, -1));
     list_outer.push_back(meshit::Point2d(1, 1));
     list_outer.push_back(meshit::Point2d(-1, 1));
-    geom.AddLine(list_outer, 0.25, 2, face1);
+    geom.AddClosedLine(list_outer, 0.25, 2, face1);
 
     std::vector<meshit::Point2d> line_inner;
     line_inner.push_back(meshit::Point2d(-0.5, -0.5));
